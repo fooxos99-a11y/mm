@@ -1,0 +1,50 @@
+# Environment variables (never commit secrets)
+.env
+.env.*
+!.env.example
+
+# Logs
+logs
+*.log
+.*-logs/
+frontend/.*-logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Local archives and deployment bundles
+*.tar
+*.tar.gz
+*.tgz
+*.zip
+*.sql.gz
+*.bak
+*.backup
+composer.phar
+*.lnk
+vendor_gen.php
+autoload_real_fixed.php
+project-health-report.txt
+MIGRATION_STATUS.md
+
+node_modules
+dist
+dist-ssr
+*.local
+frontend/test-results/
+frontend/playwright-report/
+frontend/blob-report/
+backend/coverage.xml
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

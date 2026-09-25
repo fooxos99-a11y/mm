@@ -1,0 +1,73 @@
+
+.results-view .results-task-review__button--approve {
+  border-color: #86c7a0;
+  color: #166534;
+}
+
+.results-view .results-task-review__button--reject {
+  border-color: #f0a5a5;
+  color: #b91c1c;
+}
+
+.results-view .results-task-review__button--approve.results-task-review__button--active {
+  background: #166534;
+  color: #fff;
+}
+
+.results-view .results-task-review__button--reject.results-task-review__button--active {
+  background: #b91c1c;
+  color: #fff;
+}
+
+.results-view .results-task-review__button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.results-view .results-detail-dialog__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.results-view .results-detail-dialog__download-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: #e53935;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.results-view .results-detail-dialog__download-btn:hover {
+  background: #c62828;
+}
+
+.results-view .results-detail-dialog__body--tasks {
+  padding: 0;
+}
+
+.results-view .results-detail-dialog__body--tasks .results-answer-card {
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  margin: 0;
+  box-shadow: none;
+}
+
+.results-view .results-detail-dialog__body--tasks .rich-text-document-view__surface {
+  padding: 8px;
+  border-radius: 0;
+  border: none;
+  background: #f4f7fa;
+}
+
+.results-view .results-detail-dialog__body--tasks .rich-text-document-view__page {
+  min-height: 0 !important;
+  padding: 16px 20px;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
+}

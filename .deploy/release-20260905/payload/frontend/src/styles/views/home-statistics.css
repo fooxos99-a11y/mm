@@ -1,0 +1,106 @@
+
+
+.home-page .our-numbers__stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 32px;
+  transition: transform 0.2s ease;
+}
+
+.home-page .our-numbers__stat:hover {
+  transform: translateY(-3px);
+}
+
+.home-page .our-numbers__num {
+  font-size: clamp(2.4rem, 4.5vw, 3.8rem);
+  font-weight: 800;
+  color: #1a6a85;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+  display: flex;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.home-page .our-numbers__plus {
+  font-size: 55%;
+  font-weight: 700;
+  color: #2a94b2;
+  margin-top: 4px;
+}
+
+.home-page .our-numbers__lbl {
+  font-size: clamp(0.9rem, 1.6vw, 1.1rem);
+  font-weight: 500;
+  color: #1a3a4f;
+}
+
+.home-page .our-numbers__divider {
+  width: 1px;
+  height: 72px;
+  background: linear-gradient(to bottom, transparent, #b0c8d8, transparent);
+  flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+  .home-page .our-numbers__graduates {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: 28px;
+  }
+
+  .home-page .our-numbers__graduate-item:nth-child(odd) {
+    border-inline-start: 0;
+  }
+
+  .home-page .our-numbers__graduate-item:nth-child(n + 3) {
+    padding-top: 24px;
+    border-top: 1px solid rgba(26, 106, 133, 0.13);
+  }
+}
+
+@media (max-width: 600px) {
+  .home-page .our-numbers__row {
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  .home-page .our-numbers__graduates {
+    grid-template-columns: 1fr;
+    gap: 0;
+    margin-top: 36px;
+    padding-top: 16px;
+  }
+
+  .home-page .our-numbers__graduate-item {
+    min-height: 96px;
+    padding: 20px 12px;
+    border-inline-start: 0 !important;
+  }
+
+  .home-page .our-numbers__graduate-item + .our-numbers__graduate-item,
+  .home-page .our-numbers__graduate-item:nth-child(n + 3) {
+    border-top: 1px solid rgba(26, 106, 133, 0.13);
+  }
+
+  .home-page .our-numbers__divider {
+    width: 80px;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #b0c8d8, transparent);
+  }
+
+  .home-page .our-numbers__stat {
+    padding: 0;
+  }
+
+  .home-page .our-numbers__num {
+    font-size: clamp(2.1rem, 12vw, 3rem);
+  }
+
+  .home-page .our-numbers__lbl {
+    line-height: 1.6;
+  }
+}

@@ -1,0 +1,276 @@
+:root {
+  --app-dialog-radius: 28px;
+  --app-dialog-border: 1px solid rgba(148, 163, 184, 0.18);
+  --app-dialog-divider: 1px solid rgba(148, 163, 184, 0.16);
+  --app-dialog-shadow: 0 24px 60px rgba(15, 23, 42, 0.08);
+  --app-dialog-padding: 18px;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  width: min(100% - 32px, calc(var(--modal-box-max-width, 620px) + 32px));
+  max-width: none;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 16px;
+  border: 0;
+  background: transparent;
+  overflow: visible;
+  box-sizing: border-box;
+}
+
+.modal[open] {
+  display: grid;
+  place-items: center;
+}
+
+.modal::backdrop {
+  background: rgba(15, 23, 42, 0.48);
+  backdrop-filter: blur(5px);
+}
+
+.modal-box {
+  width: min(100%, var(--modal-box-max-width, 620px));
+  margin: auto;
+}
+
+.modal-action {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.app-dialog,
+.assessment-dialog {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.96);
+  border: var(--app-dialog-border);
+  border-radius: var(--app-dialog-radius);
+  box-shadow: var(--app-dialog-shadow);
+}
+
+.app-dialog--compact,
+.assessment-dialog--compact {
+  max-width: 620px;
+  margin: 0 auto;
+}
+
+.app-dialog__header,
+.app-dialog__footer,
+.assessment-dialog__header,
+.assessment-dialog__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px;
+}
+
+.app-dialog__header,
+.assessment-dialog__header {
+  border-bottom: var(--app-dialog-divider);
+}
+
+.app-dialog__footer,
+.assessment-dialog__footer {
+  border-top: var(--app-dialog-divider);
+}
+
+.app-dialog__title-wrap,
+.assessment-dialog__title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.app-dialog__title,
+.assessment-dialog__title {
+  margin: 0;
+  color: #0f172a;
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.app-dialog__body,
+.assessment-dialog__body {
+  display: grid;
+  gap: 14px;
+  padding: var(--app-dialog-padding);
+  overflow-y: auto;
+}
+
+.app-dialog__body--compact,
+.assessment-dialog__body--compact {
+  overflow: visible;
+}
+
+.app-dialog__text,
+.assessment-dialog__text {
+  margin: 0;
+  color: #4b6478;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 2;
+  text-align: right;
+}
+
+.app-dialog__import-row,
+.assessment-dialog__import-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 18px;
+  border-bottom: var(--app-dialog-divider);
+}
+
+.app-dialog__import-row--inline,
+.assessment-dialog__import-row--inline {
+  padding: 0;
+  margin-bottom: 18px;
+  border-bottom: 0;
+}
+
+.app-dialog__paste,
+.assessment-dialog__paste {
+  flex: 1;
+  min-height: 72px;
+  max-height: 140px;
+  padding: 12px 14px;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 18px;
+  outline: none;
+  resize: vertical;
+  background: rgba(248, 250, 252, 0.72);
+  color: #0f172a;
+  font-size: 0.94rem;
+  line-height: 1.8;
+}
+
+.app-dialog__paste:focus,
+.assessment-dialog__paste:focus {
+  border-color: rgba(13, 90, 115, 0.38);
+  box-shadow: 0 0 0 4px rgba(13, 90, 115, 0.08);
+}
+
+.app-dialog-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 22px 18px;
+  border-bottom: var(--app-dialog-divider);
+}
+
+.app-dialog-header__main {
+  min-width: 0;
+  flex: 1;
+}
+
+.app-dialog-header__eyebrow {
+  color: #74879a;
+  font-size: 0.92rem;
+  font-weight: 800;
+}
+
+.app-dialog-header__title {
+  margin: 4px 0 0;
+  color: #0f172a;
+  font-size: 1.22rem;
+  font-weight: 900;
+  line-height: 1.5;
+}
+
+.app-dialog-header__extra {
+  margin-top: 8px;
+}
+
+.app-dialog-header__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
+}
+
+.app-dialog-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgba(31, 111, 150, 0.14);
+  border-radius: 999px;
+  background: linear-gradient(180deg, #ffffff 0%, #f3f9fd 100%);
+  color: #35627a;
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.app-dialog-body {
+  display: grid;
+  gap: 14px;
+  padding: var(--app-dialog-padding);
+  overflow-y: auto;
+}
+
+.app-dialog-body--compact {
+  overflow: visible;
+}
+
+.app-dialog-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 18px;
+  border-top: var(--app-dialog-divider);
+}
+
+.app-dialog-footer > .app-button,
+.app-dialog-footer > .assessment-primary-button,
+.app-dialog-footer > .assessment-secondary-button,
+.app-dialog-footer > a.app-button,
+.app-dialog-footer > button.app-button {
+  flex: 1 1 0;
+  min-width: 136px;
+  max-width: 168px;
+}
+
+.app-dialog-footer--stack {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+@media (max-width: 960px) {
+  .modal {
+    width: calc(100% - 18px);
+    padding: 9px;
+  }
+
+  .app-dialog-header,
+  .app-dialog-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .app-dialog-footer > .app-button,
+  .app-dialog-footer > .assessment-primary-button,
+  .app-dialog-footer > .assessment-secondary-button,
+  .app-dialog-footer > a.app-button,
+  .app-dialog-footer > button.app-button {
+    max-width: none;
+  }
+
+  .app-dialog__header,
+  .app-dialog__footer,
+  .assessment-dialog__header,
+  .assessment-dialog__footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

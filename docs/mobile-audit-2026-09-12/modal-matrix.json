@@ -1,0 +1,365 @@
+[
+  {
+    "width": 320,
+    "height": 568,
+    "panel": "satisfaction",
+    "name": "إضافة",
+    "buttons": [
+      {
+        "name": "إلغاء",
+        "box": {
+          "x": 92,
+          "y": 518.34375,
+          "width": 136,
+          "height": 44
+        },
+        "reachable": true
+      },
+      {
+        "name": "إضافة",
+        "box": {
+          "x": 92,
+          "y": 574.34375,
+          "width": 136,
+          "height": 44
+        },
+        "reachable": false
+      }
+    ],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              "label[for=\"input-v-0-0-12\"]"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 1.95 (foreground color: #afbbc7, background color: #ffffff, font size: 11.4pt (15.2px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "label[for=\"input-v-0-0-18\"]"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 1.95 (foreground color: #afbbc7, background color: #ffffff, font size: 11.4pt (15.2px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "width": 320,
+    "height": 568,
+    "panel": "users",
+    "name": null,
+    "buttons": [
+      {
+        "name": "إضافة جماعية",
+        "box": {
+          "x": 91.140625,
+          "y": 107.265625,
+          "width": 137.71875,
+          "height": 44
+        },
+        "reachable": true
+      },
+      {
+        "name": "إظهار كلمة المرور",
+        "box": {
+          "x": 58,
+          "y": 634.484375,
+          "width": 44,
+          "height": 48
+        },
+        "reachable": true
+      },
+      {
+        "name": "إظهار كلمة المرور",
+        "box": {
+          "x": 58,
+          "y": 350.015625,
+          "width": 44,
+          "height": 48
+        },
+        "reachable": true
+      },
+      {
+        "name": "إضافة",
+        "box": {
+          "x": 92,
+          "y": 386,
+          "width": 136,
+          "height": 54
+        },
+        "reachable": true
+      },
+      {
+        "name": "إلغاء",
+        "box": {
+          "x": 92,
+          "y": 454,
+          "width": 136,
+          "height": 54
+        },
+        "reachable": true
+      }
+    ],
+    "violations": [
+      {
+        "id": "label",
+        "impact": "critical",
+        "nodes": [
+          {
+            "target": [
+              "#input-v-0-0-27"
+            ],
+            "summary": "Fix any of the following:\n  Element does not have an implicit (wrapped) <label>\n  Element does not have an explicit <label>\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element has no placeholder attribute\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+          },
+          {
+            "target": [
+              "#input-v-0-0-33"
+            ],
+            "summary": "Fix any of the following:\n  Element does not have an implicit (wrapped) <label>\n  Element does not have an explicit <label>\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element has no placeholder attribute\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "width": 320,
+    "height": 568,
+    "panel": "completion",
+    "name": "متطلبات الاجتياز",
+    "buttons": [
+      {
+        "name": "إلغاء",
+        "box": {
+          "x": 36,
+          "y": 443,
+          "width": 248,
+          "height": 44
+        },
+        "reachable": true
+      },
+      {
+        "name": "حفظ المتطلبات",
+        "box": {
+          "x": 36,
+          "y": 499,
+          "width": 248,
+          "height": 44
+        },
+        "reachable": true
+      }
+    ],
+    "violations": []
+  },
+  {
+    "width": 320,
+    "height": 568,
+    "panel": "completion",
+    "name": "إغلاق واعتماد النتائج",
+    "buttons": [
+      {
+        "name": "إلغاء",
+        "box": {
+          "x": 36,
+          "y": 319.015625,
+          "width": 248,
+          "height": 44
+        },
+        "reachable": true
+      },
+      {
+        "name": "تأكيد",
+        "box": {
+          "x": 36,
+          "y": 375.015625,
+          "width": 248,
+          "height": 44
+        },
+        "reachable": true
+      }
+    ],
+    "violations": []
+  },
+  {
+    "width": 320,
+    "height": 568,
+    "panel": "settings&settingsItem=archive",
+    "name": "إضافة",
+    "buttons": [
+      {
+        "name": "إلغاء",
+        "box": {
+          "x": 60,
+          "y": 485.1875,
+          "width": 200,
+          "height": 44
+        },
+        "reachable": true
+      }
+    ],
+    "violations": []
+  },
+  {
+    "width": 844,
+    "height": 390,
+    "panel": "satisfaction",
+    "name": "إضافة",
+    "buttons": [
+      {
+        "name": "إلغاء",
+        "box": {
+          "x": 354,
+          "y": 491.859375,
+          "width": 136,
+          "height": 44
+        },
+        "reachable": false
+      },
+      {
+        "name": "إضافة",
+        "box": {
+          "x": 354,
+          "y": 547.859375,
+          "width": 136,
+          "height": 44
+        },
+        "reachable": false
+      }
+    ]
+  },
+  {
+    "width": 844,
+    "height": 390,
+    "panel": "users",
+    "name": null,
+    "buttons": [
+      {
+        "name": "إضافة جماعية",
+        "box": {
+          "x": 353.140625,
+          "y": 115.265625,
+          "width": 137.71875,
+          "height": 44
+        },
+        "reachable": true
+      },
+      {
+        "name": "إظهار كلمة المرور",
+        "box": {
+          "x": 124,
+          "y": 642.296875,
+          "width": 44,
+          "height": 48
+        },
+        "reachable": true
+      },
+      {
+        "name": "إظهار كلمة المرور",
+        "box": {
+          "x": 124,
+          "y": 307.828125,
+          "width": 44,
+          "height": 48
+        },
+        "reachable": true
+      },
+      {
+        "name": "إضافة",
+        "box": {
+          "x": 354,
+          "y": 293.265625,
+          "width": 136,
+          "height": 54
+        },
+        "reachable": true
+      },
+      {
+        "name": "إلغاء",
+        "box": {
+          "x": 354,
+          "y": 361.265625,
+          "width": 136,
+          "height": 54
+        },
+        "reachable": true
+      }
+    ]
+  },
+  {
+    "width": 844,
+    "height": 390,
+    "panel": "completion",
+    "name": "متطلبات الاجتياز",
+    "buttons": [
+      {
+        "name": "إلغاء",
+        "box": {
+          "x": 36,
+          "y": 265,
+          "width": 772,
+          "height": 44
+        },
+        "reachable": true
+      },
+      {
+        "name": "حفظ المتطلبات",
+        "box": {
+          "x": 36,
+          "y": 321,
+          "width": 772,
+          "height": 44
+        },
+        "reachable": true
+      }
+    ]
+  },
+  {
+    "width": 844,
+    "height": 390,
+    "panel": "completion",
+    "name": "إغلاق واعتماد النتائج",
+    "buttons": [
+      {
+        "name": "إلغاء",
+        "box": {
+          "x": 180,
+          "y": 214.828125,
+          "width": 484,
+          "height": 44
+        },
+        "reachable": true
+      },
+      {
+        "name": "تأكيد",
+        "box": {
+          "x": 180,
+          "y": 270.828125,
+          "width": 484,
+          "height": 44
+        },
+        "reachable": true
+      }
+    ]
+  },
+  {
+    "width": 844,
+    "height": 390,
+    "panel": "settings&settingsItem=archive",
+    "name": "إضافة",
+    "buttons": [
+      {
+        "name": "إلغاء",
+        "box": {
+          "x": 204,
+          "y": 485.1875,
+          "width": 436,
+          "height": 44
+        },
+        "reachable": false
+      }
+    ]
+  }
+]

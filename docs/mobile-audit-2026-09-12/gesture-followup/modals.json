@@ -1,0 +1,596 @@
+[
+  {
+    "case": "modal-swipe",
+    "size": {
+      "width": 320,
+      "height": 568
+    },
+    "panel": "satisfaction",
+    "before": {
+      "x": 18,
+      "y": 9,
+      "width": 284,
+      "height": 645.34375
+    },
+    "after": {
+      "x": 18,
+      "y": 9,
+      "width": 284,
+      "height": 645.34375
+    },
+    "controls": [
+      {
+        "name": "إلغاء",
+        "box": {
+          "x": 92,
+          "y": 518.34375,
+          "width": 136,
+          "height": 44
+        },
+        "reachable": true
+      },
+      {
+        "name": "إضافة",
+        "box": {
+          "x": 92,
+          "y": 574.34375,
+          "width": 136,
+          "height": 44
+        },
+        "reachable": false
+      }
+    ]
+  },
+  {
+    "case": "modal-swipe",
+    "size": {
+      "width": 320,
+      "height": 568
+    },
+    "panel": "users",
+    "before": {
+      "x": 18,
+      "y": 16,
+      "width": 284,
+      "height": 536
+    },
+    "after": {
+      "x": 18,
+      "y": 16,
+      "width": 284,
+      "height": 536
+    },
+    "controls": [
+      {
+        "name": "إضافة جماعية",
+        "box": {
+          "x": 91.140625,
+          "y": 107.265625,
+          "width": 137.71875,
+          "height": 44
+        },
+        "reachable": true
+      },
+      {
+        "name": "إظهار كلمة المرور",
+        "box": {
+          "x": 58,
+          "y": 634.484375,
+          "width": 44,
+          "height": 48
+        },
+        "reachable": true
+      },
+      {
+        "name": "إظهار كلمة المرور",
+        "box": {
+          "x": 58,
+          "y": 350.015625,
+          "width": 44,
+          "height": 48
+        },
+        "reachable": true
+      },
+      {
+        "name": "إضافة",
+        "box": {
+          "x": 92,
+          "y": 386,
+          "width": 136,
+          "height": 54
+        },
+        "reachable": true
+      },
+      {
+        "name": "إلغاء",
+        "box": {
+          "x": 92,
+          "y": 454,
+          "width": 136,
+          "height": 54
+        },
+        "reachable": true
+      }
+    ]
+  },
+  {
+    "case": "modal-swipe",
+    "size": {
+      "width": 320,
+      "height": 568
+    },
+    "panel": "completion",
+    "before": {
+      "x": 18,
+      "y": 9,
+      "width": 284,
+      "height": 550
+    },
+    "after": {
+      "x": 18,
+      "y": 9,
+      "width": 284,
+      "height": 550
+    },
+    "controls": [
+      {
+        "name": "إلغاء",
+        "box": {
+          "x": 36,
+          "y": 443,
+          "width": 248,
+          "height": 44
+        },
+        "reachable": true
+      },
+      {
+        "name": "حفظ المتطلبات",
+        "box": {
+          "x": 36,
+          "y": 499,
+          "width": 248,
+          "height": 44
+        },
+        "reachable": true
+      }
+    ]
+  },
+  {
+    "case": "modal-swipe",
+    "size": {
+      "width": 320,
+      "height": 568
+    },
+    "panel": "settings&settingsItem=archive",
+    "before": {
+      "x": 18,
+      "y": 9,
+      "width": 284,
+      "height": 616.1875
+    },
+    "after": {
+      "x": 18,
+      "y": 9,
+      "width": 284,
+      "height": 616.1875
+    },
+    "controls": [
+      {
+        "name": "إلغاء",
+        "box": {
+          "x": 60,
+          "y": 485.1875,
+          "width": 200,
+          "height": 44
+        },
+        "reachable": true
+      },
+      {
+        "name": "إضافة",
+        "box": {
+          "x": 60,
+          "y": 541.1875,
+          "width": 200,
+          "height": 44
+        },
+        "reachable": true
+      }
+    ]
+  },
+  {
+    "case": "modal-swipe",
+    "size": {
+      "width": 390,
+      "height": 400
+    },
+    "panel": "satisfaction",
+    "before": {
+      "x": 18,
+      "y": 9,
+      "width": 354,
+      "height": 645.34375
+    },
+    "after": {
+      "x": 18,
+      "y": 9,
+      "width": 354,
+      "height": 645.34375
+    },
+    "controls": [
+      {
+        "name": "إلغاء",
+        "box": {
+          "x": 127,
+          "y": 518.34375,
+          "width": 136,
+          "height": 44
+        },
+        "reachable": false
+      },
+      {
+        "name": "إضافة",
+        "box": {
+          "x": 127,
+          "y": 574.34375,
+          "width": 136,
+          "height": 44
+        },
+        "reachable": false
+      }
+    ]
+  },
+  {
+    "case": "modal-swipe",
+    "size": {
+      "width": 390,
+      "height": 400
+    },
+    "panel": "users",
+    "before": {
+      "x": 18,
+      "y": 16,
+      "width": 354,
+      "height": 368
+    },
+    "after": {
+      "x": 18,
+      "y": 16,
+      "width": 354,
+      "height": 368
+    },
+    "controls": [
+      {
+        "name": "إضافة جماعية",
+        "box": {
+          "x": 126.140625,
+          "y": 107.265625,
+          "width": 137.71875,
+          "height": 44
+        },
+        "reachable": true
+      },
+      {
+        "name": "إظهار كلمة المرور",
+        "box": {
+          "x": 58,
+          "y": 634.296875,
+          "width": 44,
+          "height": 48
+        },
+        "reachable": true
+      },
+      {
+        "name": "إظهار كلمة المرور",
+        "box": {
+          "x": 58,
+          "y": 299.828125,
+          "width": 44,
+          "height": 48
+        },
+        "reachable": true
+      },
+      {
+        "name": "إضافة",
+        "box": {
+          "x": 127,
+          "y": 285.265625,
+          "width": 136,
+          "height": 54
+        },
+        "reachable": true
+      },
+      {
+        "name": "إلغاء",
+        "box": {
+          "x": 127,
+          "y": 353.265625,
+          "width": 136,
+          "height": 54
+        },
+        "reachable": true
+      }
+    ]
+  },
+  {
+    "case": "modal-swipe",
+    "size": {
+      "width": 390,
+      "height": 400
+    },
+    "panel": "completion",
+    "before": {
+      "x": 18,
+      "y": 9,
+      "width": 354,
+      "height": 382
+    },
+    "after": {
+      "x": 18,
+      "y": 9,
+      "width": 354,
+      "height": 382
+    },
+    "controls": [
+      {
+        "name": "إلغاء",
+        "box": {
+          "x": 36,
+          "y": 275,
+          "width": 318,
+          "height": 44
+        },
+        "reachable": true
+      },
+      {
+        "name": "حفظ المتطلبات",
+        "box": {
+          "x": 36,
+          "y": 331,
+          "width": 318,
+          "height": 44
+        },
+        "reachable": true
+      }
+    ]
+  },
+  {
+    "case": "modal-swipe",
+    "size": {
+      "width": 390,
+      "height": 400
+    },
+    "panel": "settings&settingsItem=archive",
+    "before": {
+      "x": 18,
+      "y": 9,
+      "width": 354,
+      "height": 616.1875
+    },
+    "after": {
+      "x": 18,
+      "y": 9,
+      "width": 354,
+      "height": 616.1875
+    },
+    "controls": [
+      {
+        "name": "إلغاء",
+        "box": {
+          "x": 60,
+          "y": 485.1875,
+          "width": 270,
+          "height": 44
+        },
+        "reachable": false
+      },
+      {
+        "name": "إضافة",
+        "box": {
+          "x": 60,
+          "y": 541.1875,
+          "width": 270,
+          "height": 44
+        },
+        "reachable": false
+      }
+    ]
+  },
+  {
+    "case": "modal-swipe",
+    "size": {
+      "width": 844,
+      "height": 390
+    },
+    "panel": "satisfaction",
+    "before": {
+      "x": 102,
+      "y": 9,
+      "width": 640,
+      "height": 618.859375
+    },
+    "after": {
+      "x": 102,
+      "y": 9,
+      "width": 640,
+      "height": 618.859375
+    },
+    "controls": [
+      {
+        "name": "إلغاء",
+        "box": {
+          "x": 354,
+          "y": 491.859375,
+          "width": 136,
+          "height": 44
+        },
+        "reachable": false
+      },
+      {
+        "name": "إضافة",
+        "box": {
+          "x": 354,
+          "y": 547.859375,
+          "width": 136,
+          "height": 44
+        },
+        "reachable": false
+      }
+    ]
+  },
+  {
+    "case": "modal-swipe",
+    "size": {
+      "width": 844,
+      "height": 390
+    },
+    "panel": "users",
+    "before": {
+      "x": 62,
+      "y": 16,
+      "width": 720,
+      "height": 358
+    },
+    "after": {
+      "x": 62,
+      "y": 16,
+      "width": 720,
+      "height": 358
+    },
+    "controls": [
+      {
+        "name": "إضافة جماعية",
+        "box": {
+          "x": 353.140625,
+          "y": 115.265625,
+          "width": 137.71875,
+          "height": 44
+        },
+        "reachable": true
+      },
+      {
+        "name": "إظهار كلمة المرور",
+        "box": {
+          "x": 124,
+          "y": 642.296875,
+          "width": 44,
+          "height": 48
+        },
+        "reachable": true
+      },
+      {
+        "name": "إظهار كلمة المرور",
+        "box": {
+          "x": 124,
+          "y": 307.828125,
+          "width": 44,
+          "height": 48
+        },
+        "reachable": true
+      },
+      {
+        "name": "إضافة",
+        "box": {
+          "x": 354,
+          "y": 293.265625,
+          "width": 136,
+          "height": 54
+        },
+        "reachable": true
+      },
+      {
+        "name": "إلغاء",
+        "box": {
+          "x": 354,
+          "y": 361.265625,
+          "width": 136,
+          "height": 54
+        },
+        "reachable": true
+      }
+    ]
+  },
+  {
+    "case": "modal-swipe",
+    "size": {
+      "width": 844,
+      "height": 390
+    },
+    "panel": "completion",
+    "before": {
+      "x": 18,
+      "y": 9,
+      "width": 808,
+      "height": 372
+    },
+    "after": {
+      "x": 18,
+      "y": 9,
+      "width": 808,
+      "height": 372
+    },
+    "controls": [
+      {
+        "name": "إلغاء",
+        "box": {
+          "x": 36,
+          "y": 265,
+          "width": 772,
+          "height": 44
+        },
+        "reachable": true
+      },
+      {
+        "name": "حفظ المتطلبات",
+        "box": {
+          "x": 36,
+          "y": 321,
+          "width": 772,
+          "height": 44
+        },
+        "reachable": true
+      }
+    ]
+  },
+  {
+    "case": "modal-swipe",
+    "size": {
+      "width": 844,
+      "height": 390
+    },
+    "panel": "settings&settingsItem=archive",
+    "before": {
+      "x": 162,
+      "y": 9,
+      "width": 520,
+      "height": 616.1875
+    },
+    "after": {
+      "x": 162,
+      "y": 9,
+      "width": 520,
+      "height": 616.1875
+    },
+    "controls": [
+      {
+        "name": "إلغاء",
+        "box": {
+          "x": 204,
+          "y": 485.1875,
+          "width": 436,
+          "height": 44
+        },
+        "reachable": false
+      },
+      {
+        "name": "إضافة",
+        "box": {
+          "x": 204,
+          "y": 541.1875,
+          "width": 436,
+          "height": 44
+        },
+        "reachable": false
+      }
+    ]
+  }
+]

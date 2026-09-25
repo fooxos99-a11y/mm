@@ -1,0 +1,31 @@
+.assessment-section-title {
+  margin-bottom: 18px;
+  color: #0f172a;
+  font-size: 1.15rem;
+  font-weight: 900;
+}
+
+.assessment-review__answer {
+  margin-top: 12px;
+  color: #0f172a;
+  font-size: 0.96rem;
+  font-weight: 700;
+}
+
+.assessment-review__meta {
+  margin-top: 10px;
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
+.assessment-review__meta--success {
+  color: #047857;
+}
+
+.assessment-review__meta--danger {
+  color: #b91c1c;
+}
+
+.assessment-review__meta--neutral {
+  color: #64748b;
+}

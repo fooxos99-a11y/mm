@@ -1,0 +1,455 @@
+
+
+@media (max-width: 600px) {
+  .home-page .hero-orbit {
+    animation: none;
+  }
+
+  .home-page .hero-glow {
+    display: none;
+  }
+
+  .home-page .landing-section {
+    padding: 72px 0;
+  }
+
+  .home-page .landing-header__inner {
+    min-height: 84px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .home-page .brand-mark {
+    gap: 10px;
+    margin-inline-end: 0;
+  }
+
+  .home-page .brand-mark__text {
+    display: none;
+  }
+
+  .home-page .site-logo {
+    height: 52px;
+  }
+
+  .home-page .hero-section {
+    min-height: max(100svh, 760px);
+    box-sizing: border-box;
+    padding-top: 116px;
+    padding-bottom: 80px;
+  }
+
+  .home-page .hero-title {
+    font-size: clamp(2rem, 10vw, 2.7rem);
+    line-height: 1.28;
+  }
+
+  .home-page .hero-text,
+  .home-page .program-card__text,
+  .home-page .faq-card__answer {
+    line-height: 1.82;
+  }
+
+  .home-page .hero-text {
+    font-size: 0.98rem;
+    margin-bottom: 28px;
+  }
+
+  .home-page .hero-stats-strip,
+  .home-page .achievements-grid,
+  .home-page .programs-grid,
+  .home-page .faq-grid,
+  .home-page .landing-footer__grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .home-page .hero-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .home-page .licenses-menu {
+    right: 16px !important;
+    left: auto !important;
+    width: min(330px, calc(100vw - 32px)) !important;
+    max-width: calc(100vw - 32px) !important;
+  }
+
+  .home-page .hero-primary-btn,
+  .home-page .hero-outline-btn--licenses,
+  .home-page .program-card__action,
+  .home-page .hero-panel__action {
+    width: 100%;
+    min-height: 52px;
+  }
+
+  .home-page .hero-title,
+  .home-page .section-heading,
+  .home-page .hero-copy--licenses {
+    text-align: center;
+  }
+
+  .home-page .hero-logos,
+  .home-page .hero-actions {
+    justify-content: center;
+  }
+
+  .home-page .hero-logo--hero-white {
+    height: 116px;
+    transform: translateY(-8px);
+    filter: brightness(0) invert(1);
+  }
+
+  .home-page .program-card__body,
+  .home-page .faq-card,
+  .home-page .achievement-card {
+    padding: 22px 18px;
+    border-radius: 22px;
+  }
+
+  .home-page .program-card {
+    border-radius: 18px;
+  }
+
+  .home-page .program-card--poster-design {
+    min-height: auto;
+    padding: 22px 18px;
+    border-radius: 22px;
+  }
+
+  .home-page .manager-license-card__circle {
+    right: -240px;
+    bottom: -220px;
+  }
+
+  .home-page .manager-license-card__header {
+    margin-bottom: 18px;
+  }
+
+  .home-page .manager-license-card__header h3 {
+    font-size: 1.35rem;
+  }
+
+  .home-page .manager-license-card__header p {
+    font-size: 0.9rem;
+    line-height: 1.75;
+  }
+
+  .home-page .manager-license-card__content {
+    grid-template-columns: minmax(118px, 132px) minmax(0, 1fr);
+    gap: 14px;
+    align-items: start;
+  }
+
+  .home-page .manager-license-card__line {
+    margin-inline-start: auto;
+  }
+
+  .home-page .manager-license-card__illustration {
+    min-height: 170px;
+    transform: none;
+  }
+
+  .home-page .manager-license-card__dots {
+    top: 10px;
+    left: 6px;
+    grid-template-columns: repeat(3, 6px);
+    gap: 8px;
+  }
+
+  .home-page .manager-license-card__leaves {
+    bottom: 30px;
+    width: 100%;
+    height: 110px;
+  }
+
+  .home-page .manager-license-card__leaf {
+    width: 24px;
+    height: 72px;
+  }
+
+  .home-page .manager-license-card__leaf--one {
+    left: 8px;
+    bottom: 8px;
+  }
+
+  .home-page .manager-license-card__leaf--two {
+    left: 38px;
+    bottom: 18px;
+  }
+
+  .home-page .manager-license-card__leaf--three {
+    right: 12px;
+    bottom: 12px;
+  }
+
+  .home-page .manager-license-card__leaf--four {
+    right: 40px;
+    bottom: 24px;
+  }
+
+  .home-page .manager-license-card__platform {
+    bottom: 2px;
+    width: 100%;
+    height: 42px;
+  }
+
+  .home-page .manager-license-card__platform::after {
+    right: 18px;
+    bottom: -12px;
+    left: 18px;
+    height: 24px;
+  }
+
+  .home-page .manager-license-card__document {
+    width: 116px;
+    height: 154px;
+    padding: 28px 16px 22px;
+    border-radius: 18px;
+  }
+
+  .home-page .manager-license-card__certificate {
+    top: 16px;
+    right: 14px;
+    width: 42px;
+    height: 42px;
+    stroke-width: 2;
+  }
+
+  .home-page .manager-license-card__briefcase {
+    top: 20px;
+    right: 18px;
+    width: 34px;
+    height: 28px;
+    border-width: 3px;
+  }
+
+  .home-page .manager-license-card__briefcase::before {
+    top: -11px;
+    width: 14px;
+    height: 7px;
+    border-width: 3px;
+  }
+
+  .home-page .manager-license-card__briefcase::after {
+    top: 10px;
+    right: -3px;
+    left: -3px;
+    height: 3px;
+  }
+
+  .home-page .manager-license-card__doc-line {
+    height: 4px;
+    margin-bottom: 8px;
+  }
+
+  .home-page .manager-license-card__doc-spacer {
+    height: 18px;
+  }
+
+  .home-page .manager-license-card__signature {
+    bottom: 22px;
+    left: 16px;
+    width: 44px;
+    height: 16px;
+    border-bottom-width: 3px;
+  }
+
+  .home-page .manager-license-card__doc-line--bottom {
+    right: 16px;
+    bottom: 16px;
+  }
+
+  .home-page .manager-license-card__features {
+    gap: 8px;
+  }
+
+  .home-page .manager-license-card__feature {
+    min-height: 54px;
+    padding: 8px 10px;
+    border-radius: 14px;
+    gap: 10px;
+  }
+
+  .home-page .manager-license-card__icon-box {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+  }
+
+  .home-page .manager-license-card__icon {
+    width: 22px;
+    height: 22px;
+  }
+
+  .home-page .manager-license-card__feature span {
+    font-size: 0.86rem;
+    line-height: 1.5;
+  }
+
+  .home-page .program-card__top {
+    gap: 12px;
+  }
+
+  .home-page .program-card__title {
+    font-size: 1.18rem;
+  }
+
+  .home-page .program-card__status-badge {
+    padding-inline: 10px;
+  }
+
+  .home-page .section-heading__title,
+  .home-page .our-numbers__title {
+    line-height: 1.32;
+  }
+
+  .home-page .hero-divider {
+    margin-inline: auto;
+  }
+
+  .home-page .hero-text {
+    margin-inline: auto;
+  }
+
+  .home-page .landing-footer__bottom {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+/* Modals */
+
+.home-page .login-modal__panel,
+.home-page .profile-modal__panel {
+  padding: 16px;
+}
+
+.home-page .login-modal__brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.home-page .login-modal__logo {
+  height: 48px;
+  object-fit: contain;
+}
+
+.home-page .login-modal__copy {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.home-page .login-modal__copy h3 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #2a94b2;
+}
+
+.home-page .profile-modal__card {
+  background: #f7fcfb;
+  border: 1px solid #edf4f5;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.home-page .profile-modal__label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #4a7585;
+  margin-bottom: 4px;
+}
+
+.home-page .profile-modal__value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #2a94b2;
+}
+
+/* ── أرقامنا ─────────────────────────────────────── */
+
+.home-page .achievements-section {
+  background: linear-gradient(160deg, #f5f8fb 0%, #eef3f7 100%);
+  padding: 64px 0 72px;
+}
+
+.home-page .our-numbers {
+  text-align: center;
+}
+
+.home-page .our-numbers__title {
+  font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+  font-weight: 900;
+  color: #08384a;
+  margin: 0 0 52px;
+  letter-spacing: -0.02em;
+}
+
+.home-page .our-numbers__row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 820px;
+  margin: 0 auto;
+}
+
+.home-page .our-numbers__graduates {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  max-width: 1080px;
+  margin: 48px auto 0;
+  padding-top: 28px;
+  border-top: 1px solid rgba(26, 106, 133, 0.18);
+}
+
+.home-page .our-numbers__graduate-item {
+  position: relative;
+  min-height: 104px;
+  padding: 8px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+}
+
+.home-page .our-numbers__graduate-item + .our-numbers__graduate-item {
+  border-inline-start: 1px solid rgba(26, 106, 133, 0.16);
+}
+
+.home-page .our-numbers__graduate-item::after {
+  content: "";
+  width: 34px;
+  height: 3px;
+  border-radius: 999px;
+  background: #2a94b2;
+  opacity: 0.72;
+}
+
+.home-page .our-numbers__graduate-item span {
+  max-width: 12rem;
+  color: #4d6677;
+  font-size: 0.88rem;
+  font-weight: 800;
+  line-height: 1.65;
+  order: 2;
+}
+
+.home-page .our-numbers__graduate-item strong {
+  color: #0b5872;
+  font-size: clamp(2rem, 3vw, 2.65rem);
+  font-weight: 900;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  order: 1;
+}
+
+.home-page .our-numbers__graduate-item::after {
+  order: 3;
+}

@@ -1,0 +1,80 @@
+[
+  {
+    "size": {
+      "width": 320,
+      "height": 568
+    },
+    "case": "native-sidebar-focus-close",
+    "passed": true
+  },
+  {
+    "size": {
+      "width": 320,
+      "height": 568
+    },
+    "case": "satisfaction",
+    "passed": true,
+    "method": "WebKit scroll-into-view and pointer reachability; not physical iPhone swipe"
+  },
+  {
+    "size": {
+      "width": 320,
+      "height": 568
+    },
+    "case": "settings&settingsItem=archive",
+    "passed": true,
+    "method": "WebKit scroll-into-view and pointer reachability; not physical iPhone swipe"
+  },
+  {
+    "size": {
+      "width": 390,
+      "height": 400
+    },
+    "case": "native-sidebar-focus-close",
+    "passed": true
+  },
+  {
+    "size": {
+      "width": 390,
+      "height": 400
+    },
+    "case": "satisfaction",
+    "passed": true,
+    "method": "WebKit scroll-into-view and pointer reachability; not physical iPhone swipe"
+  },
+  {
+    "size": {
+      "width": 390,
+      "height": 400
+    },
+    "case": "settings&settingsItem=archive",
+    "passed": true,
+    "method": "WebKit scroll-into-view and pointer reachability; not physical iPhone swipe"
+  },
+  {
+    "size": {
+      "width": 844,
+      "height": 390
+    },
+    "case": "native-sidebar-focus-close",
+    "passed": true
+  },
+  {
+    "size": {
+      "width": 844,
+      "height": 390
+    },
+    "case": "satisfaction",
+    "passed": true,
+    "method": "WebKit scroll-into-view and pointer reachability; not physical iPhone swipe"
+  },
+  {
+    "size": {
+      "width": 844,
+      "height": 390
+    },
+    "case": "settings&settingsItem=archive",
+    "passed": true,
+    "method": "WebKit scroll-into-view and pointer reachability; not physical iPhone swipe"
+  }
+]

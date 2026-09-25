@@ -1,0 +1,73 @@
+name: Deploy release
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Deployment environment
+        required: true
+        type: choice
+        options: [staging, production]
+      ref:
+        description: Commit SHA or tag to deploy
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-${{ inputs.environment }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    environment: ${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+          tools: composer:v2
+      - run: npm ci --prefix frontend --no-audit --no-fund
+      - run: composer install --working-dir=backend --no-interaction --prefer-dist --no-progress --no-ansi
+      - run: cp backend/.env.example backend/.env && php backend/artisan key:generate
+      - run: npm run verify:release
+      - name: Package immutable release
+        run: tar --exclude=release.tgz --exclude=.git --exclude='.*-logs' --exclude=frontend/node_modules --exclude=backend/vendor --exclude=backend/storage -czf release.tgz .
+      - name: Configure SSH host verification
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s' "$DEPLOY_SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+      - name: Upload and atomically activate release
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_ROOT: ${{ secrets.DEPLOY_ROOT }}
+        run: |
+          release_id="$(git rev-parse HEAD)"
+          remote_archive="/tmp/momars-${release_id}.tgz"
+          scp release.tgz "${DEPLOY_USER}@${DEPLOY_HOST}:${remote_archive}"
+          scp scripts/deploy-release.sh "${DEPLOY_USER}@${DEPLOY_HOST}:/tmp/deploy-release.sh"
+          ssh "${DEPLOY_USER}@${DEPLOY_HOST}" "bash /tmp/deploy-release.sh '$DEPLOY_ROOT' '$remote_archive' '$release_id'"
+          ssh "${DEPLOY_USER}@${DEPLOY_HOST}" "rm -f '$remote_archive' /tmp/deploy-release.sh"
+      - name: Verify deployed environment
+        env:
+          STAGING_URL: ${{ secrets.DEPLOY_URL }}
+          STAGING_CORS_ORIGIN: ${{ secrets.DEPLOY_CORS_ORIGIN }}
+        run: npm run verify:staging

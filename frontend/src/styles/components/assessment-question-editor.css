@@ -1,0 +1,215 @@
+.assessment-inline-list,
+.assessment-inline-builder__list {
+  display: grid;
+  gap: 18px;
+}
+
+.assessment-inline-list__item {
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.assessment-inline-list__item:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.assessment-inline-list__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.assessment-form-card {
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 22px;
+  background: rgba(248, 250, 252, 0.72);
+  padding: 18px;
+}
+
+.assessment-form-card--inline {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.assessment-form-card__topline,
+.assessment-form-card__label-row,
+.assessment-inline-builder__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.assessment-form-card__topline {
+  justify-content: flex-end;
+}
+
+.assessment-form-card__label {
+  color: #0f172a;
+  font-size: 0.92rem;
+  font-weight: 800;
+}
+
+.assessment-form-card__meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.assessment-form-card__trash,
+.assessment-options-grid__check,
+.assessment-options-grid__append,
+.assessment-inline-builder__add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+}
+
+.assessment-form-card__trash {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  background: transparent;
+  color: #ef4444;
+}
+
+.assessment-form-card__field-group {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.assessment-form-card__field-group--compact {
+  margin-top: 0;
+}
+
+.assessment-form-card__prompt-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 108px;
+  gap: 12px;
+  align-items: end;
+}
+
+.assessment-form-card__field-group--prompt,
+.assessment-form-card__field-group--points-inline {
+  min-width: 0;
+}
+
+.assessment-options-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.assessment-options-grid__item {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.assessment-options-grid__item--correct .assessment-input {
+  border-color: rgba(15, 159, 99, 0.42);
+  box-shadow: 0 0 0 2px rgba(15, 159, 99, 0.1);
+}
+
+.assessment-options-grid__check {
+  width: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  border: 1px solid rgba(148, 163, 184, 0.36);
+  border-radius: 18px;
+  background: #f8fafc;
+  color: #7b8794;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+}
+
+.assessment-options-grid__check--active {
+  border-color: rgba(15, 159, 99, 0.42);
+  background: rgba(15, 159, 99, 0.12);
+  color: #047857;
+}
+
+.assessment-options-grid__check:disabled,
+.assessment-options-grid__append:disabled {
+  opacity: 0.45;
+}
+
+.assessment-options-grid__append {
+  width: 44px;
+  min-width: 44px;
+  padding: 0;
+  background: transparent;
+  color: #156c82;
+}
+
+.assessment-options-grid__append .v-icon,
+.assessment-inline-builder__add .v-icon {
+  color: currentColor !important;
+}
+
+.assessment-form-card__error {
+  margin: 12px 0 0;
+  color: #dc2626;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.assessment-inline-builder {
+  display: grid;
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.assessment-inline-builder__list {
+  gap: 14px;
+}
+
+.assessment-inline-builder__add {
+  width: 52px;
+  min-width: 52px;
+  height: 52px;
+  padding: 0;
+  background: transparent;
+  color: #156c82;
+}
+
+.assessment-inline-builder__menu {
+  display: grid;
+  min-width: 180px;
+  padding: 6px 0;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 14px 28px rgba(17, 65, 96, 0.14);
+  overflow: hidden;
+}
+
+.assessment-inline-builder__menu-item {
+  min-height: 46px;
+  padding: 0 18px;
+  color: #21465f;
+  font-size: 0.96rem;
+  font-weight: 700;
+  text-align: right;
+}
+
+.assessment-inline-builder__menu-item:hover {
+  background: rgba(31, 111, 150, 0.08);
+}
+
+@media (max-width: 700px) {
+  .assessment-form-card__prompt-row {
+    grid-template-columns: 1fr;
+  }
+
+  .assessment-inline-builder__actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}

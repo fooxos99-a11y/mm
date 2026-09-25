@@ -1,0 +1,17 @@
+[
+  {
+    "attempt": 1,
+    "url": "https://license-qb.us/login",
+    "loginFieldVisible": true
+  },
+  {
+    "attempt": 2,
+    "url": "https://license-qb.us/login",
+    "loginFieldVisible": true
+  },
+  {
+    "attempt": 3,
+    "url": "https://license-qb.us/login",
+    "loginFieldVisible": true
+  }
+]

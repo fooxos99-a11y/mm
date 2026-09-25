@@ -1,0 +1,1 @@
+export const STATS_ANIMATION_DURATION = 3600;

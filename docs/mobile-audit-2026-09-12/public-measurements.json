@@ -1,0 +1,487 @@
+[
+  {
+    "label": "home",
+    "width": 320,
+    "height": 568,
+    "pageWidth": 320,
+    "smallControls": [],
+    "smallInputs": [],
+    "edgeControls": [],
+    "clippedText": [],
+    "dialogs": [],
+    "violations": []
+  },
+  {
+    "label": "practitioner",
+    "width": 320,
+    "height": 568,
+    "pageWidth": 320,
+    "smallControls": [],
+    "smallInputs": [],
+    "edgeControls": [],
+    "clippedText": [],
+    "dialogs": [],
+    "violations": []
+  },
+  {
+    "label": "login",
+    "width": 320,
+    "height": 568,
+    "pageWidth": 320,
+    "smallControls": [
+      {
+        "tag": "INPUT",
+        "cls": "v-field__input",
+        "text": "",
+        "x": 108,
+        "y": 443,
+        "w": 160,
+        "h": 40
+      }
+    ],
+    "smallInputs": [],
+    "edgeControls": [],
+    "clippedText": [],
+    "dialogs": [],
+    "violations": []
+  },
+  {
+    "label": "registration",
+    "width": 320,
+    "height": 568,
+    "pageWidth": 320,
+    "smallControls": [
+      {
+        "tag": "INPUT",
+        "cls": "v-field__input",
+        "text": "الاسم",
+        "x": 37,
+        "y": 307,
+        "w": 246,
+        "h": 40
+      },
+      {
+        "tag": "INPUT",
+        "cls": "",
+        "text": "",
+        "x": 77,
+        "y": 404,
+        "w": 206,
+        "h": 23
+      },
+      {
+        "tag": "INPUT",
+        "cls": "v-field__input",
+        "text": "رقم الجوال",
+        "x": 37,
+        "y": 485,
+        "w": 246,
+        "h": 40
+      },
+      {
+        "tag": "INPUT",
+        "cls": "v-field__input",
+        "text": "العمر",
+        "x": 37,
+        "y": 574,
+        "w": 246,
+        "h": 40
+      },
+      {
+        "tag": "INPUT",
+        "cls": "",
+        "text": "",
+        "x": 77,
+        "y": 671,
+        "w": 206,
+        "h": 23
+      },
+      {
+        "tag": "INPUT",
+        "cls": "",
+        "text": "",
+        "x": 77,
+        "y": 760,
+        "w": 206,
+        "h": 23
+      }
+    ],
+    "smallInputs": [],
+    "edgeControls": [],
+    "clippedText": [],
+    "dialogs": [],
+    "violations": []
+  },
+  {
+    "label": "not-found-audit",
+    "width": 320,
+    "height": 568,
+    "pageWidth": 320,
+    "smallControls": [],
+    "smallInputs": [],
+    "edgeControls": [],
+    "clippedText": [],
+    "dialogs": [],
+    "violations": []
+  },
+  {
+    "label": "home",
+    "width": 390,
+    "height": 844,
+    "pageWidth": 390,
+    "smallControls": [],
+    "smallInputs": [],
+    "edgeControls": [],
+    "clippedText": [],
+    "dialogs": []
+  },
+  {
+    "label": "practitioner",
+    "width": 390,
+    "height": 844,
+    "pageWidth": 390,
+    "smallControls": [],
+    "smallInputs": [],
+    "edgeControls": [],
+    "clippedText": [],
+    "dialogs": []
+  },
+  {
+    "label": "login",
+    "width": 390,
+    "height": 844,
+    "pageWidth": 390,
+    "smallControls": [
+      {
+        "tag": "INPUT",
+        "cls": "v-field__input",
+        "text": "",
+        "x": 108,
+        "y": 526,
+        "w": 230,
+        "h": 40
+      }
+    ],
+    "smallInputs": [],
+    "edgeControls": [],
+    "clippedText": [],
+    "dialogs": []
+  },
+  {
+    "label": "registration",
+    "width": 390,
+    "height": 844,
+    "pageWidth": 390,
+    "smallControls": [
+      {
+        "tag": "INPUT",
+        "cls": "v-field__input",
+        "text": "الاسم",
+        "x": 37,
+        "y": 307,
+        "w": 316,
+        "h": 40
+      },
+      {
+        "tag": "INPUT",
+        "cls": "",
+        "text": "",
+        "x": 77,
+        "y": 404,
+        "w": 276,
+        "h": 23
+      },
+      {
+        "tag": "INPUT",
+        "cls": "v-field__input",
+        "text": "رقم الجوال",
+        "x": 37,
+        "y": 485,
+        "w": 316,
+        "h": 40
+      },
+      {
+        "tag": "INPUT",
+        "cls": "v-field__input",
+        "text": "العمر",
+        "x": 37,
+        "y": 574,
+        "w": 316,
+        "h": 40
+      },
+      {
+        "tag": "INPUT",
+        "cls": "",
+        "text": "",
+        "x": 77,
+        "y": 671,
+        "w": 276,
+        "h": 23
+      },
+      {
+        "tag": "INPUT",
+        "cls": "",
+        "text": "",
+        "x": 77,
+        "y": 760,
+        "w": 276,
+        "h": 23
+      }
+    ],
+    "smallInputs": [],
+    "edgeControls": [],
+    "clippedText": [],
+    "dialogs": []
+  },
+  {
+    "label": "not-found-audit",
+    "width": 390,
+    "height": 844,
+    "pageWidth": 390,
+    "smallControls": [],
+    "smallInputs": [],
+    "edgeControls": [],
+    "clippedText": [],
+    "dialogs": []
+  },
+  {
+    "label": "home",
+    "width": 768,
+    "height": 844,
+    "pageWidth": 768,
+    "smallControls": [],
+    "smallInputs": [],
+    "edgeControls": [],
+    "clippedText": [],
+    "dialogs": []
+  },
+  {
+    "label": "practitioner",
+    "width": 768,
+    "height": 844,
+    "pageWidth": 768,
+    "smallControls": [],
+    "smallInputs": [],
+    "edgeControls": [],
+    "clippedText": [],
+    "dialogs": []
+  },
+  {
+    "label": "login",
+    "width": 768,
+    "height": 844,
+    "pageWidth": 768,
+    "smallControls": [
+      {
+        "tag": "INPUT",
+        "cls": "v-field__input",
+        "text": "",
+        "x": 238,
+        "y": 512,
+        "w": 348,
+        "h": 40
+      }
+    ],
+    "smallInputs": [],
+    "edgeControls": [],
+    "clippedText": [],
+    "dialogs": []
+  },
+  {
+    "label": "registration",
+    "width": 768,
+    "height": 844,
+    "pageWidth": 768,
+    "smallControls": [
+      {
+        "tag": "INPUT",
+        "cls": "v-field__input",
+        "text": "الاسم",
+        "x": 510,
+        "y": 286,
+        "w": 217,
+        "h": 40
+      },
+      {
+        "tag": "INPUT",
+        "cls": "",
+        "text": "",
+        "x": 316,
+        "y": 294,
+        "w": 177,
+        "h": 23
+      },
+      {
+        "tag": "INPUT",
+        "cls": "v-field__input",
+        "text": "رقم الجوال",
+        "x": 41,
+        "y": 286,
+        "w": 217,
+        "h": 40
+      },
+      {
+        "tag": "INPUT",
+        "cls": "v-field__input",
+        "text": "العمر",
+        "x": 510,
+        "y": 375,
+        "w": 217,
+        "h": 40
+      },
+      {
+        "tag": "INPUT",
+        "cls": "",
+        "text": "",
+        "x": 316,
+        "y": 383,
+        "w": 177,
+        "h": 23
+      },
+      {
+        "tag": "INPUT",
+        "cls": "",
+        "text": "",
+        "x": 81,
+        "y": 383,
+        "w": 177,
+        "h": 23
+      }
+    ],
+    "smallInputs": [],
+    "edgeControls": [],
+    "clippedText": [],
+    "dialogs": []
+  },
+  {
+    "label": "not-found-audit",
+    "width": 768,
+    "height": 844,
+    "pageWidth": 768,
+    "smallControls": [],
+    "smallInputs": [],
+    "edgeControls": [],
+    "clippedText": [],
+    "dialogs": []
+  },
+  {
+    "label": "home",
+    "width": 844,
+    "height": 390,
+    "pageWidth": 844,
+    "smallControls": [],
+    "smallInputs": [],
+    "edgeControls": [],
+    "clippedText": [],
+    "dialogs": []
+  },
+  {
+    "label": "practitioner",
+    "width": 844,
+    "height": 390,
+    "pageWidth": 844,
+    "smallControls": [],
+    "smallInputs": [],
+    "edgeControls": [],
+    "clippedText": [],
+    "dialogs": []
+  },
+  {
+    "label": "login",
+    "width": 844,
+    "height": 390,
+    "pageWidth": 844,
+    "smallControls": [
+      {
+        "tag": "INPUT",
+        "cls": "v-field__input",
+        "text": "",
+        "x": 276,
+        "y": 366,
+        "w": 348,
+        "h": 40
+      }
+    ],
+    "smallInputs": [],
+    "edgeControls": [],
+    "clippedText": [],
+    "dialogs": []
+  },
+  {
+    "label": "registration",
+    "width": 844,
+    "height": 390,
+    "pageWidth": 844,
+    "smallControls": [
+      {
+        "tag": "INPUT",
+        "cls": "v-field__input",
+        "text": "الاسم",
+        "x": 552,
+        "y": 286,
+        "w": 225,
+        "h": 40
+      },
+      {
+        "tag": "INPUT",
+        "cls": "",
+        "text": "",
+        "x": 350,
+        "y": 294,
+        "w": 185,
+        "h": 23
+      },
+      {
+        "tag": "INPUT",
+        "cls": "v-field__input",
+        "text": "رقم الجوال",
+        "x": 67,
+        "y": 286,
+        "w": 225,
+        "h": 40
+      },
+      {
+        "tag": "INPUT",
+        "cls": "v-field__input",
+        "text": "العمر",
+        "x": 552,
+        "y": 375,
+        "w": 225,
+        "h": 40
+      },
+      {
+        "tag": "INPUT",
+        "cls": "",
+        "text": "",
+        "x": 350,
+        "y": 383,
+        "w": 185,
+        "h": 23
+      },
+      {
+        "tag": "INPUT",
+        "cls": "",
+        "text": "",
+        "x": 107,
+        "y": 383,
+        "w": 185,
+        "h": 23
+      }
+    ],
+    "smallInputs": [],
+    "edgeControls": [],
+    "clippedText": [],
+    "dialogs": []
+  },
+  {
+    "label": "not-found-audit",
+    "width": 844,
+    "height": 390,
+    "pageWidth": 844,
+    "smallControls": [],
+    "smallInputs": [],
+    "edgeControls": [],
+    "clippedText": [],
+    "dialogs": []
+  }
+]

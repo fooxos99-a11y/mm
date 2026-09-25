@@ -1,0 +1,56 @@
+name: Roll back release
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Deployment environment
+        required: true
+        type: choice
+        options: [staging, production]
+      release_id:
+        description: Existing release SHA to reactivate
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-${{ inputs.environment }}
+  cancel-in-progress: false
+
+jobs:
+  rollback:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    environment: ${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure SSH host verification
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s' "$DEPLOY_SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+      - name: Reactivate selected immutable release
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_ROOT: ${{ secrets.DEPLOY_ROOT }}
+          RELEASE_ID: ${{ inputs.release_id }}
+        run: |
+          scp scripts/rollback-release.sh "${DEPLOY_USER}@${DEPLOY_HOST}:/tmp/"
+          ssh "${DEPLOY_USER}@${DEPLOY_HOST}" "bash /tmp/rollback-release.sh '$DEPLOY_ROOT' '$RELEASE_ID'"
+          ssh "${DEPLOY_USER}@${DEPLOY_HOST}" "rm -f /tmp/rollback-release.sh"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify rolled-back environment
+        env:
+          STAGING_URL: ${{ secrets.DEPLOY_URL }}
+          STAGING_CORS_ORIGIN: ${{ secrets.DEPLOY_CORS_ORIGIN }}
+        run: node scripts/verify-staging.mjs

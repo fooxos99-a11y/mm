@@ -1,0 +1,221 @@
+[
+  {
+    "engine": "WebKit desktop emulating iPhone; wheel is not a finger swipe",
+    "viewport": {
+      "width": 320,
+      "height": 568
+    },
+    "before": {
+      "scroll": 0,
+      "height": 568,
+      "content": 777,
+      "overflow": "auto",
+      "rect": {
+        "x": 320,
+        "y": 0,
+        "width": 302,
+        "height": 568,
+        "top": 0,
+        "right": 622,
+        "bottom": 568,
+        "left": 320
+      }
+    },
+    "after": {
+      "scroll": 0,
+      "height": 568,
+      "content": 777,
+      "overflow": "auto",
+      "rect": {
+        "x": 18,
+        "y": 0,
+        "width": 302,
+        "height": 568,
+        "top": 0,
+        "right": 320,
+        "bottom": 568,
+        "left": 18
+      }
+    },
+    "wheelError": "mouse.wheel: Mouse wheel is not supported in mobile WebKit",
+    "settingsBefore": {
+      "scroll": 209,
+      "height": 568,
+      "content": 1048,
+      "overflow": "auto",
+      "rect": {
+        "x": 18,
+        "y": 0,
+        "width": 302,
+        "height": 568,
+        "top": 0,
+        "right": 320,
+        "bottom": 568,
+        "left": 18
+      }
+    },
+    "settingsAfter": {
+      "scroll": 209,
+      "height": 568,
+      "content": 1048,
+      "overflow": "auto",
+      "rect": {
+        "x": 18,
+        "y": 0,
+        "width": 302,
+        "height": 568,
+        "top": 0,
+        "right": 320,
+        "bottom": 568,
+        "left": 18
+      }
+    },
+    "errors": []
+  },
+  {
+    "engine": "WebKit desktop emulating iPhone; wheel is not a finger swipe",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "before": {
+      "scroll": 0,
+      "height": 844,
+      "content": 844,
+      "overflow": "auto",
+      "rect": {
+        "x": 390,
+        "y": 0,
+        "width": 372,
+        "height": 843.984375,
+        "top": 0,
+        "right": 762,
+        "bottom": 843.984375,
+        "left": 390
+      }
+    },
+    "after": {
+      "scroll": 0,
+      "height": 844,
+      "content": 844,
+      "overflow": "auto",
+      "rect": {
+        "x": 18,
+        "y": 0,
+        "width": 372,
+        "height": 843.984375,
+        "top": 0,
+        "right": 390,
+        "bottom": 843.984375,
+        "left": 18
+      }
+    },
+    "wheelError": "mouse.wheel: Mouse wheel is not supported in mobile WebKit",
+    "settingsBefore": {
+      "scroll": 0,
+      "height": 844,
+      "content": 1048,
+      "overflow": "auto",
+      "rect": {
+        "x": 18,
+        "y": 0,
+        "width": 372,
+        "height": 843.984375,
+        "top": 0,
+        "right": 390,
+        "bottom": 843.984375,
+        "left": 18
+      }
+    },
+    "settingsAfter": {
+      "scroll": 0,
+      "height": 844,
+      "content": 1048,
+      "overflow": "auto",
+      "rect": {
+        "x": 18,
+        "y": 0,
+        "width": 372,
+        "height": 843.984375,
+        "top": 0,
+        "right": 390,
+        "bottom": 843.984375,
+        "left": 18
+      }
+    },
+    "errors": []
+  },
+  {
+    "engine": "WebKit desktop emulating iPhone; wheel is not a finger swipe",
+    "viewport": {
+      "width": 844,
+      "height": 390
+    },
+    "before": {
+      "scroll": 0,
+      "height": 390,
+      "content": 802,
+      "overflow": "auto",
+      "rect": {
+        "x": 844,
+        "y": 0,
+        "width": 336,
+        "height": 390,
+        "top": 0,
+        "right": 1180,
+        "bottom": 390,
+        "left": 844
+      }
+    },
+    "after": {
+      "scroll": 0,
+      "height": 390,
+      "content": 802,
+      "overflow": "auto",
+      "rect": {
+        "x": 508,
+        "y": 0,
+        "width": 336,
+        "height": 390,
+        "top": 0,
+        "right": 844,
+        "bottom": 390,
+        "left": 508
+      }
+    },
+    "wheelError": "mouse.wheel: Mouse wheel is not supported in mobile WebKit",
+    "settingsBefore": {
+      "scroll": 412,
+      "height": 390,
+      "content": 1073,
+      "overflow": "auto",
+      "rect": {
+        "x": 508,
+        "y": 0,
+        "width": 336,
+        "height": 390,
+        "top": 0,
+        "right": 844,
+        "bottom": 390,
+        "left": 508
+      }
+    },
+    "settingsAfter": {
+      "scroll": 412,
+      "height": 390,
+      "content": 1073,
+      "overflow": "auto",
+      "rect": {
+        "x": 508,
+        "y": 0,
+        "width": 336,
+        "height": 390,
+        "top": 0,
+        "right": 844,
+        "bottom": 390,
+        "left": 508
+      }
+    },
+    "errors": []
+  }
+]

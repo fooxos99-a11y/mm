@@ -1,0 +1,224 @@
+.communications-page__prep-shell {
+  width: 100%;
+}
+
+.communications-page__prep-card {
+  padding: 28px 28px 18px;
+  border: 1px solid #e6edf3;
+  border-radius: 30px;
+  background: #fff;
+  box-shadow: 0 12px 34px rgba(15, 23, 42, 0.04);
+}
+
+.communications-page__prep-filters {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(340px, 1.45fr) minmax(260px, 1fr);
+  align-items: end;
+  gap: 16px;
+  padding-inline-end: 58px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #e8eef4;
+}
+
+.communications-page__prep-field {
+  min-width: 0;
+}
+
+.communications-page__prep-input {
+  width: 100%;
+}
+
+.communications-page__prep-input :deep(.v-input__slot) {
+  min-height: 50px !important;
+}
+
+.prep-field__label {
+  display: block;
+  margin: 0 0 10px;
+  color: #0f3554;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.communications-page__prep-table-wrap {
+  overflow: hidden;
+}
+
+.prep-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.prep-table thead th {
+  padding: 18px 12px 14px;
+  border-bottom: 1px solid #dfe8f0;
+  color: #5f7790;
+  font-size: 1rem;
+  font-weight: 700;
+  text-align: right;
+}
+
+.prep-table tbody td {
+  padding: 18px 12px;
+  border-bottom: 1px solid #e7eef4;
+  color: #244764;
+  font-size: 1rem;
+}
+
+.prep-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.prep-table__name {
+  font-weight: 700;
+}
+
+.prep-table__login {
+  width: 160px;
+  color: #577089;
+  white-space: nowrap;
+}
+
+.prep-table__status {
+  width: 88px;
+  text-align: left;
+}
+
+.prep-table__empty {
+  padding: 34px 12px !important;
+  color: #6c8193 !important;
+  text-align: center !important;
+}
+
+.attendance-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 2px solid #6aaecd;
+  border-radius: 50%;
+  background: transparent;
+  transition: background-color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+}
+
+.attendance-toggle:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.attendance-toggle__dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: transparent;
+  transition: background-color 0.2s ease;
+}
+
+.attendance-toggle--active {
+  border-color: #1484a7;
+}
+
+.attendance-toggle--active .attendance-toggle__dot,
+.attendance-toggle--partial .attendance-toggle__dot {
+  background: #1484a7;
+}
+
+.communications-page__bulk-toggle {
+  position: absolute;
+  top: 40px;
+  inset-inline-end: 0;
+}
+
+.communications-page__prep-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 18px;
+}
+
+@media (max-width: 1100px) {
+  .communications-page__prep-filters {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 14px;
+    padding-inline-end: 0;
+  }
+
+  .communications-page__prep-field--message {
+    grid-column: 1 / -1;
+  }
+
+  .communications-page__prep-field:not(.communications-page__prep-field--message) {
+    grid-column: 1;
+  }
+
+  .communications-page__bulk-toggle {
+    position: static;
+    grid-column: 2;
+    justify-self: end;
+    align-self: end;
+  }
+}
+
+@media (max-width: 960px) {
+  .communications-page__prep-card {
+    padding: 22px 18px 12px;
+    border-radius: 24px;
+  }
+
+  .communications-page__prep-filters > :last-child {
+    justify-self: start;
+  }
+}
+
+@media (max-width: 680px) {
+  .prep-table,
+  .prep-table thead,
+  .prep-table tbody,
+  .prep-table tr,
+  .prep-table th,
+  .prep-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .prep-table thead {
+    display: none;
+  }
+
+  .prep-table tbody tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid #e7eef4;
+  }
+
+  .prep-table tbody tr:last-child {
+    border-bottom: none;
+  }
+
+  .prep-table tbody td {
+    padding: 0;
+    border-bottom: none;
+  }
+
+  .prep-table__name {
+    min-width: 0;
+  }
+
+  .prep-table__login {
+    display: none !important;
+  }
+
+  .prep-table__status {
+    width: auto;
+    text-align: left;
+  }
+
+  .communications-page__prep-actions {
+    justify-content: flex-start;
+  }
+}

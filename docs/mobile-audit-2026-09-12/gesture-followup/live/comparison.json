@@ -1,0 +1,9 @@
+{
+  "site": "https://license-qb.us/",
+  "asset": "https://license-qb.us/assets/DashboardView-rCVc7l-O.css",
+  "local": "DashboardView-rCVc7l-O.css",
+  "localSHA256": "7e5041c15bfa758aafe47c7a9153086fa53eb9100e36417c4d642348e9278e86",
+  "publishedSHA256": "7e5041c15bfa758aafe47c7a9153086fa53eb9100e36417c4d642348e9278e86",
+  "identical": true,
+  "scope": "Dashboard stylesheet only; relevant scroll-lock function inspected separately; no production admin login performed"
+}

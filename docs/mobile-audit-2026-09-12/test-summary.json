@@ -1,0 +1,599 @@
+{
+  "stats": {
+    "startTime": "2026-09-12T10:18:26.426Z",
+    "duration": 697483.349,
+    "expected": 38,
+    "skipped": 0,
+    "unexpected": 10,
+    "flaky": 0
+  },
+  "total": 48,
+  "tests": [
+    {
+      "file": "accessibility.spec.mjs",
+      "title": "public pages have no serious accessibility violations",
+      "project": "mobile-320",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "duration": 2452
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "title": "management pages have no serious accessibility violations",
+      "project": "mobile-320",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "duration": 27294
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "title": "public pages have no serious accessibility violations",
+      "project": "mobile-390",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "duration": 1384
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "title": "management pages have no serious accessibility violations",
+      "project": "mobile-390",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "duration": 36405
+        }
+      ]
+    },
+    {
+      "file": "assessment-admin.spec.mjs",
+      "title": "dashboard overview shows truthful indicator context",
+      "project": "mobile-320",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "duration": 3104
+        }
+      ]
+    },
+    {
+      "file": "assessment-admin.spec.mjs",
+      "title": "manager can add and save a task question from the plus menu",
+      "project": "mobile-320",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "duration": 4262
+        }
+      ]
+    },
+    {
+      "file": "assessment-admin.spec.mjs",
+      "title": "task start action opens its availability dialog",
+      "project": "mobile-320",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "duration": 4538
+        }
+      ]
+    },
+    {
+      "file": "assessment-admin.spec.mjs",
+      "title": "final exam question editor keeps the same clear assessment layout",
+      "project": "mobile-320",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "duration": 3858
+        }
+      ]
+    },
+    {
+      "file": "assessment-admin.spec.mjs",
+      "title": "course and task management actions stay inside the shared dropdown",
+      "project": "mobile-320",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "duration": 2961
+        }
+      ]
+    },
+    {
+      "file": "assessment-admin.spec.mjs",
+      "title": "dashboard overview shows truthful indicator context",
+      "project": "mobile-390",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "duration": 4836
+        }
+      ]
+    },
+    {
+      "file": "assessment-admin.spec.mjs",
+      "title": "manager can add and save a task question from the plus menu",
+      "project": "mobile-390",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "duration": 9187
+        }
+      ]
+    },
+    {
+      "file": "assessment-admin.spec.mjs",
+      "title": "task start action opens its availability dialog",
+      "project": "mobile-390",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "duration": 10747
+        }
+      ]
+    },
+    {
+      "file": "assessment-admin.spec.mjs",
+      "title": "final exam question editor keeps the same clear assessment layout",
+      "project": "mobile-390",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "duration": 3488
+        }
+      ]
+    },
+    {
+      "file": "assessment-admin.spec.mjs",
+      "title": "course and task management actions stay inside the shared dropdown",
+      "project": "mobile-390",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "duration": 2940
+        }
+      ]
+    },
+    {
+      "file": "auth.spec.mjs",
+      "title": "protected dashboard redirects guests to login",
+      "project": "mobile-320",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "duration": 652
+        }
+      ]
+    },
+    {
+      "file": "auth.spec.mjs",
+      "title": "admin can sign in and use the responsive dashboard shell",
+      "project": "mobile-320",
+      "status": "unexpected",
+      "results": [
+        {
+          "status": "failed",
+          "duration": 3453,
+          "error": "Error: expect(received).toBe(expected) // Object.is equality\n\nExpected: 2\nReceived: 0"
+        }
+      ]
+    },
+    {
+      "file": "auth.spec.mjs",
+      "title": "protected dashboard redirects guests to login",
+      "project": "mobile-390",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "duration": 609
+        }
+      ]
+    },
+    {
+      "file": "auth.spec.mjs",
+      "title": "admin can sign in and use the responsive dashboard shell",
+      "project": "mobile-390",
+      "status": "unexpected",
+      "results": [
+        {
+          "status": "failed",
+          "duration": 3181,
+          "error": "Error: expect(received).toBe(expected) // Object.is equality\n\nExpected: 2\nReceived: 0"
+        }
+      ]
+    },
+    {
+      "file": "critical-workflows.spec.mjs",
+      "title": "admin critical data workflows persist through the browser API session",
+      "project": "mobile-320",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "duration": 10448
+        }
+      ]
+    },
+    {
+      "file": "critical-workflows.spec.mjs",
+      "title": "admin critical data workflows persist through the browser API session",
+      "project": "mobile-390",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "duration": 16232
+        }
+      ]
+    },
+    {
+      "file": "management-panels.spec.mjs",
+      "title": "management panels remain usable across the viewport matrix",
+      "project": "mobile-320",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "duration": 15542
+        }
+      ]
+    },
+    {
+      "file": "management-panels.spec.mjs",
+      "title": "management panels remain usable across the viewport matrix",
+      "project": "mobile-390",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "duration": 27166
+        }
+      ]
+    },
+    {
+      "file": "people-directory.spec.mjs",
+      "title": "people directory searches and pages real server results with usable touch controls",
+      "project": "mobile-320",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "duration": 54409
+        }
+      ]
+    },
+    {
+      "file": "people-directory.spec.mjs",
+      "title": "people directory searches and pages real server results with usable touch controls",
+      "project": "mobile-390",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "duration": 54700
+        }
+      ]
+    },
+    {
+      "file": "registration.spec.mjs",
+      "title": "public registration persists a complete request",
+      "project": "mobile-320",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "duration": 14136
+        }
+      ]
+    },
+    {
+      "file": "registration.spec.mjs",
+      "title": "public registration persists a complete request",
+      "project": "mobile-390",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "duration": 12926
+        }
+      ]
+    },
+    {
+      "file": "remaining-panels.spec.mjs",
+      "title": "remaining dashboard panels expose usable controls and dialogs",
+      "project": "mobile-320",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "duration": 32070
+        }
+      ]
+    },
+    {
+      "file": "remaining-panels.spec.mjs",
+      "title": "remaining dashboard panels expose usable controls and dialogs",
+      "project": "mobile-390",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "duration": 27164
+        }
+      ]
+    },
+    {
+      "file": "responsive.spec.mjs",
+      "title": "public pages fit the viewport and expose usable controls",
+      "project": "mobile-320",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "duration": 3036
+        }
+      ]
+    },
+    {
+      "file": "responsive.spec.mjs",
+      "title": "public pages fit the viewport and expose usable controls",
+      "project": "mobile-390",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "duration": 1947
+        }
+      ]
+    },
+    {
+      "file": "results-directory.spec.mjs",
+      "title": "results page searches, paginates and retains full attendance totals without a snapshot",
+      "project": "mobile-320",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "duration": 23700
+        }
+      ]
+    },
+    {
+      "file": "results-directory.spec.mjs",
+      "title": "results page searches, paginates and retains full attendance totals without a snapshot",
+      "project": "mobile-390",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "duration": 24807
+        }
+      ]
+    },
+    {
+      "file": "rich-text-security.spec.mjs",
+      "title": "client rich text sanitizer strips executable HTML before rendering",
+      "project": "mobile-320",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "duration": 240
+        }
+      ]
+    },
+    {
+      "file": "rich-text-security.spec.mjs",
+      "title": "client rich text sanitizer strips executable HTML before rendering",
+      "project": "mobile-390",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "duration": 352
+        }
+      ]
+    },
+    {
+      "file": "role-journeys.spec.mjs",
+      "title": "e2e-male-manager can sign in and use its responsive home",
+      "project": "mobile-320",
+      "status": "unexpected",
+      "results": [
+        {
+          "status": "failed",
+          "duration": 22420,
+          "error": "Error: expect(locator).toHaveCount(expected) failed\n\nLocator:  locator('.dashboard-nav__item')\nExpected: 13\nReceived: 11\nTimeout:  20000ms\n\nCall log:\n  - Expect \"toHaveCount\" with timeout 20000ms\n  - waiting for locator('.dashboard-nav__item')\n    5 × locator resolved to 0 elements\n      - unexpected value \"0\"\n    38 × locator resolved to 11 elements\n       - unexpected value \"11\"\n"
+        }
+      ]
+    },
+    {
+      "file": "role-journeys.spec.mjs",
+      "title": "e2e-female-manager can sign in and use its responsive home",
+      "project": "mobile-320",
+      "status": "unexpected",
+      "results": [
+        {
+          "status": "failed",
+          "duration": 22531,
+          "error": "Error: expect(locator).toHaveCount(expected) failed\n\nLocator:  locator('.dashboard-nav__item')\nExpected: 13\nReceived: 11\nTimeout:  20000ms\n\nCall log:\n  - Expect \"toHaveCount\" with timeout 20000ms\n  - waiting for locator('.dashboard-nav__item')\n    5 × locator resolved to 0 elements\n      - unexpected value \"0\"\n    38 × locator resolved to 11 elements\n       - unexpected value \"11\"\n"
+        }
+      ]
+    },
+    {
+      "file": "role-journeys.spec.mjs",
+      "title": "e2e-reciter-role can sign in and use its responsive home",
+      "project": "mobile-320",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "duration": 3042
+        }
+      ]
+    },
+    {
+      "file": "role-journeys.spec.mjs",
+      "title": "e2e-student-role can sign in and use its responsive home",
+      "project": "mobile-320",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "duration": 6416
+        }
+      ]
+    },
+    {
+      "file": "role-journeys.spec.mjs",
+      "title": "e2e-trainee-role can sign in and use its responsive home",
+      "project": "mobile-320",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "duration": 5146
+        }
+      ]
+    },
+    {
+      "file": "role-journeys.spec.mjs",
+      "title": "manager panels load without browser or server errors",
+      "project": "mobile-320",
+      "status": "unexpected",
+      "results": [
+        {
+          "status": "failed",
+          "duration": 29246,
+          "error": "Error: expect(locator).toHaveCount(expected) failed\n\nLocator:  locator('.assessment-form-card--inline:visible')\nExpected: 1\nReceived: 2\nTimeout:  20000ms\n\nCall log:\n  - Expect \"toHaveCount\" with timeout 20000ms\n  - waiting for locator('.assessment-form-card--inline:visible')\n    43 × locator resolved to 2 elements\n       - unexpected value \"2\"\n"
+        }
+      ]
+    },
+    {
+      "file": "role-journeys.spec.mjs",
+      "title": "e2e-male-manager can sign in and use its responsive home",
+      "project": "mobile-390",
+      "status": "unexpected",
+      "results": [
+        {
+          "status": "failed",
+          "duration": 22860,
+          "error": "Error: expect(locator).toHaveCount(expected) failed\n\nLocator:  locator('.dashboard-nav__item')\nExpected: 13\nReceived: 11\nTimeout:  20000ms\n\nCall log:\n  - Expect \"toHaveCount\" with timeout 20000ms\n  - waiting for locator('.dashboard-nav__item')\n    5 × locator resolved to 0 elements\n      - unexpected value \"0\"\n    38 × locator resolved to 11 elements\n       - unexpected value \"11\"\n"
+        }
+      ]
+    },
+    {
+      "file": "role-journeys.spec.mjs",
+      "title": "e2e-female-manager can sign in and use its responsive home",
+      "project": "mobile-390",
+      "status": "unexpected",
+      "results": [
+        {
+          "status": "failed",
+          "duration": 22755,
+          "error": "Error: expect(locator).toHaveCount(expected) failed\n\nLocator:  locator('.dashboard-nav__item')\nExpected: 13\nReceived: 11\nTimeout:  20000ms\n\nCall log:\n  - Expect \"toHaveCount\" with timeout 20000ms\n  - waiting for locator('.dashboard-nav__item')\n    5 × locator resolved to 0 elements\n      - unexpected value \"0\"\n    38 × locator resolved to 11 elements\n       - unexpected value \"11\"\n"
+        }
+      ]
+    },
+    {
+      "file": "role-journeys.spec.mjs",
+      "title": "e2e-reciter-role can sign in and use its responsive home",
+      "project": "mobile-390",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "duration": 3173
+        }
+      ]
+    },
+    {
+      "file": "role-journeys.spec.mjs",
+      "title": "e2e-student-role can sign in and use its responsive home",
+      "project": "mobile-390",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "duration": 9040
+        }
+      ]
+    },
+    {
+      "file": "role-journeys.spec.mjs",
+      "title": "e2e-trainee-role can sign in and use its responsive home",
+      "project": "mobile-390",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "duration": 7478
+        }
+      ]
+    },
+    {
+      "file": "role-journeys.spec.mjs",
+      "title": "manager panels load without browser or server errors",
+      "project": "mobile-390",
+      "status": "unexpected",
+      "results": [
+        {
+          "status": "failed",
+          "duration": 32635,
+          "error": "Error: expect(locator).toHaveCount(expected) failed\n\nLocator:  locator('.assessment-form-card--inline:visible')\nExpected: 1\nReceived: 3\nTimeout:  20000ms\n\nCall log:\n  - Expect \"toHaveCount\" with timeout 20000ms\n  - waiting for locator('.assessment-form-card--inline:visible')\n    42 × locator resolved to 3 elements\n       - unexpected value \"3\"\n"
+        }
+      ]
+    },
+    {
+      "file": "student-dashboard.spec.mjs",
+      "title": "student results remain usable across the responsive viewport matrix",
+      "project": "mobile-320",
+      "status": "unexpected",
+      "results": [
+        {
+          "status": "failed",
+          "duration": 23727,
+          "error": "Error: expect(locator).toBeEnabled() failed\n\nLocator:  locator('.student-course-section .results-entry__preview').first()\nExpected: enabled\nReceived: disabled\nTimeout:  20000ms\n\nCall log:\n  - Expect \"toBeEnabled\" with timeout 20000ms\n  - waiting for locator('.student-course-section .results-entry__preview').first()\n    43 × locator resolved to <button disabled type=\"button\" aria-label=\"عرض التفاصيل\" class=\"results-entry__preview\">…</button>\n       - unexpected value \"disabled\"\n"
+        }
+      ]
+    },
+    {
+      "file": "student-dashboard.spec.mjs",
+      "title": "student results remain usable across the responsive viewport matrix",
+      "project": "mobile-390",
+      "status": "unexpected",
+      "results": [
+        {
+          "status": "failed",
+          "duration": 25209,
+          "error": "Error: expect(locator).toBeEnabled() failed\n\nLocator:  locator('.student-course-section .results-entry__preview').first()\nExpected: enabled\nReceived: disabled\nTimeout:  20000ms\n\nCall log:\n  - Expect \"toBeEnabled\" with timeout 20000ms\n  - waiting for locator('.student-course-section .results-entry__preview').first()\n    43 × locator resolved to <button disabled type=\"button\" aria-label=\"عرض التفاصيل\" class=\"results-entry__preview\">…</button>\n       - unexpected value \"disabled\"\n"
+        }
+      ]
+    }
+  ]
+}

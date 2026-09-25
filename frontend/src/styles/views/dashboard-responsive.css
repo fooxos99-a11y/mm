@@ -1,0 +1,225 @@
+
+
+@media (max-width: 700px) {
+  .dashboard-page .dashboard-topbar,
+  .dashboard-page .dashboard-card--header,
+  .dashboard-page .dashboard-card--overview-header {
+    border-radius: 24px;
+  }
+
+  .dashboard-page .dashboard-topbar {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    padding: 12px 14px;
+    gap: 8px;
+  }
+
+  .dashboard-page .dashboard-topbar__welcome {
+    display: none;
+  }
+
+  .dashboard-page .dashboard-topbar__actions,
+  .dashboard-page .dashboard-topbar__actions--overview {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    width: auto;
+    gap: 8px;
+    margin-inline: 0;
+  }
+
+  .dashboard-page .dashboard-topbar__action,
+  .dashboard-page .dashboard-overview-action {
+    width: auto;
+    min-width: 0;
+    min-height: 44px;
+    padding: 0 12px !important;
+    border-radius: 12px !important;
+    font-size: 0.84rem !important;
+  }
+
+  .dashboard-page .dashboard-topbar__timer-list {
+    display: inline-flex;
+    flex-wrap: wrap;
+    width: auto;
+    gap: 8px;
+  }
+
+  .dashboard-page .dashboard-topbar__timer {
+    min-height: 36px;
+    padding: 0 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+  }
+
+  .dashboard-page .dashboard-topbar__timer-text {
+    line-height: 1.2;
+  }
+
+  .dashboard-page .dashboard-overview-actions {
+    flex-direction: column;
+  }
+
+  .dashboard-page .dashboard-topbar__actions--overview {
+    justify-content: flex-start;
+    margin-inline-start: 0;
+  }
+
+  .dashboard-page .dashboard-topbar__mobile {
+    display: inline-flex;
+    align-items: center;
+    margin-inline-end: 2px;
+  }
+
+  .dashboard-page .dashboard-icon-button {
+    width: 44px;
+    height: 44px;
+  }
+
+  .dashboard-page .dashboard-overview-header__top,
+  .dashboard-page .dashboard-dialog-form-grid {
+    grid-template-columns: 1fr;
+    display: grid;
+  }
+
+  .dashboard-page .dashboard-course-manager__toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-page .dashboard-course-row {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .dashboard-page .dashboard-course-row__actions,
+  .dashboard-page .dashboard-course-manager__footer,
+  .dashboard-page .dashboard-supervision-manager__footer {
+    justify-content: flex-end;
+  }
+
+  .dashboard-page .dashboard-indicators-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dashboard-page .dashboard-links-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-page .dashboard-links-dialog-card__copy {
+    width: 100%;
+  }
+
+  .dashboard-page .dashboard-indicator-ring {
+    width: 152px;
+    height: 152px;
+  }
+
+  .dashboard-page .dashboard-indicator-ring__inner {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .dashboard-page .dashboard-main {
+    padding: 16px 12px 24px;
+  }
+
+  .dashboard-page .dashboard-topbar {
+    padding: 10px 12px;
+    gap: 6px;
+  }
+
+  .dashboard-page .dashboard-topbar__actions,
+  .dashboard-page .dashboard-topbar__actions--overview,
+  .dashboard-page .dashboard-topbar__timer-list {
+    gap: 6px;
+  }
+
+  .dashboard-page .dashboard-topbar__action,
+  .dashboard-page .dashboard-overview-action {
+    min-height: 44px;
+    padding: 0 10px !important;
+    font-size: 0.78rem !important;
+  }
+
+  .dashboard-page .dashboard-topbar__timer {
+    min-height: 34px;
+    padding: 0 9px;
+    font-size: 0.76rem;
+  }
+
+  .dashboard-page .dashboard-sidebar {
+    width: calc(100vw - 18px);
+    max-width: calc(100vw - 18px);
+    padding: 16px 14px 22px;
+  }
+
+  .dashboard-page .dashboard-sidebar__brand {
+    padding-inline: 4px;
+  }
+
+  .dashboard-page .dashboard-sidebar__title {
+    font-size: 1.05rem;
+  }
+
+  .dashboard-page .dashboard-nav__item,
+  .dashboard-page .dashboard-subnav__item {
+    padding-right: 16px;
+    padding-left: 42px;
+  }
+
+  .dashboard-page .dashboard-nav__copy {
+    gap: 10px;
+  }
+
+  .dashboard-page .dashboard-nav__label {
+    font-size: 0.96rem;
+  }
+
+  .dashboard-page .dashboard-workspace-panel,
+  .dashboard-page .dashboard-loader-shell,
+  .dashboard-page .dashboard-card,
+  .dashboard-page .dashboard-dialog-card {
+    border-radius: 20px !important;
+  }
+
+  .dashboard-page .dashboard-links-dialog-card,
+  .dashboard-page .dashboard-course-row,
+  .dashboard-page .dashboard-satisfaction-question,
+  .dashboard-page .dashboard-link-card,
+  .dashboard-page .dashboard-stack-item,
+  .dashboard-page .dashboard-permission-card {
+    border-radius: 18px;
+  }
+
+  .dashboard-page .dashboard-indicator-ring {
+    width: 132px;
+    height: 132px;
+  }
+
+  .dashboard-page .dashboard-indicator-ring__inner {
+    font-size: 1.7rem;
+  }
+
+  .dashboard-page .dashboard-dialog-card__actions,
+  .dashboard-page .dashboard-course-manager__footer,
+  .dashboard-page .dashboard-supervision-manager__footer {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .dashboard-page .dashboard-dialog-card__actions > *,
+  .dashboard-page .dashboard-course-manager__footer > *,
+  .dashboard-page .dashboard-supervision-manager__footer > * {
+    width: 100%;
+  }
+}
+
+@media (max-width: 340px) {
+  .dashboard-page .dashboard-indicators-grid {
+    grid-template-columns: 1fr;
+  }
+}

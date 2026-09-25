@@ -1,0 +1,41 @@
+.assessment-dialogs-host {
+  display: contents;
+}
+
+.assessment-dialog .assessment-form-card--flat {
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.assessment-dialog__spaced-input {
+  margin-top: 14px;
+}
+
+.assessment-dialog__body--compact .assessment-dialog__spaced-input {
+  margin-top: 20px;
+}
+
+.assessment-dialog__text--muted {
+  margin-top: 12px;
+  color: #64748b;
+}
+
+.assessment-template-shell {
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 24px;
+  background: rgba(248, 250, 252, 0.72);
+  padding: 12px;
+}
+
+.assessment-template-shell:focus-within {
+  border-color: var(--app-primary-border);
+  box-shadow: 0 0 0 3px var(--app-primary-soft);
+}
+
+@media (max-width: 700px) {
+  .assessment-template-shell {
+    padding: 10px;
+    border-radius: 20px;
+  }
+}

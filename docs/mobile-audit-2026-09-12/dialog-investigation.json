@@ -1,0 +1,69 @@
+{
+  "before": {
+    "x": 92,
+    "y": 574.34375,
+    "width": 136,
+    "height": 44
+  },
+  "layout": [
+    {
+      "cls": "modal",
+      "h": 568,
+      "scroll": 654,
+      "overflow": "visible",
+      "maxHeight": "calc(100% - 38px)"
+    },
+    {
+      "cls": "modal-box",
+      "h": 645,
+      "scroll": 645,
+      "overflow": "visible",
+      "maxHeight": "none"
+    },
+    {
+      "cls": "v-card v-theme--light v-card--density-default v-card--variant-elevated satisfaction-admin__dialog pa-5",
+      "h": 645,
+      "scroll": 645,
+      "overflow": "hidden",
+      "maxHeight": "none"
+    },
+    {
+      "cls": "app-dialog-footer satisfaction-admin__dialog-actions",
+      "h": 132,
+      "scroll": 132,
+      "overflow": "visible",
+      "maxHeight": "none"
+    }
+  ],
+  "reachable": false,
+  "error": "locator.click: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('dialog[open]').getByRole('button', { name: 'إضافة', exact: true })\u001b[22m\n\u001b[2m    - locator resolved to <button type=\"button\" data-v-b97d03a9=\"\" class=\"app-button app-button--primary\">…</button>\u001b[22m\n\u001b[2m  - attempting click action (trial run)\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - element is outside of the viewport\u001b[22m\n\u001b[2m    - retrying click action (trial run)\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - element is outside of the viewport\u001b[22m\n\u001b[2m    - retrying click action (trial run)\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    9 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - element is outside of the viewport\u001b[22m\n\u001b[2m    - retrying click action (trial run)\u001b[22m\n\u001b[2m      - waiting 500ms\u001b[22m\n",
+  "after": {
+    "x": 92,
+    "y": 574.34375,
+    "width": 136,
+    "height": 44
+  },
+  "backUrl": "http://127.0.0.1:61681/momars/dashboard",
+  "dialogAfterBack": 0,
+  "closedSidebar": {
+    "ariaHidden": null,
+    "inert": false,
+    "links": 12,
+    "rect": {
+      "x": 320,
+      "y": 0,
+      "width": 302,
+      "height": 568,
+      "top": 0,
+      "right": 622,
+      "bottom": 568,
+      "left": 320
+    }
+  },
+  "openSidebar": {
+    "active": "<button type=\"button\" class=\"app-icon-button app-icon-button--primary app-icon-button--md dashboard-icon-button\" aria-label=\"فتح القائمة\"><span class=\"app-icon-button__content\"><svg data-v-f0db0f9c=\"\" class=\"app-svg-icon v-icon notranslate v-theme--light v-icon--size-default\" viewBox=\"0 0 24 24\" ari",
+    "bodyOverflow": "hidden",
+    "htmlOverflow": "hidden"
+  },
+  "escapeCloses": false
+}

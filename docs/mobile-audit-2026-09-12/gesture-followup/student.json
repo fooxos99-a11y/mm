@@ -1,0 +1,398 @@
+[
+  {
+    "case": "student-sidebar-swipe",
+    "size": {
+      "width": 320,
+      "height": 568
+    },
+    "before": {
+      "scroll": 0,
+      "height": 568,
+      "content": 568,
+      "rect": {
+        "x": -16,
+        "y": 0,
+        "width": 336,
+        "height": 568,
+        "top": 0,
+        "right": 320,
+        "bottom": 568,
+        "left": -16
+      },
+      "hit": "<aside data-v-c4b15179=\"\" class=\"dashboard-sidebar dashboard-sidebar--open\"><a data-v-c4b15179=\"\" href=\"/momars/\" class=\"dashboard-sidebar__brand\"><img data-v-c4b15179=\"\" src=\"/momars/اللوقو-شفاف.webp\" alt=\"شعار البرنامج",
+      "ancestors": [
+        {
+          "tag": "ASIDE",
+          "cls": "dashboard-sidebar dashboard-sidebar--open",
+          "touch": "auto",
+          "overflow": "auto"
+        },
+        {
+          "tag": "DIV",
+          "cls": "student-navigation",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "student-page dashboard-page-shell",
+          "touch": "pan-y",
+          "overflow": "auto"
+        },
+        {
+          "tag": "MAIN",
+          "cls": "v-main app-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application__wrap",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application v-theme--light v-layout v-layout--full-height v-locale--is-rtl",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "BODY",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "auto"
+        },
+        {
+          "tag": "HTML",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "scroll"
+        }
+      ],
+      "bodyOverflow": "hidden auto",
+      "windowY": 0
+    },
+    "after": {
+      "scroll": 0,
+      "height": 568,
+      "content": 568,
+      "rect": {
+        "x": -16,
+        "y": 0,
+        "width": 336,
+        "height": 568,
+        "top": 0,
+        "right": 320,
+        "bottom": 568,
+        "left": -16
+      },
+      "hit": "<button data-v-c4b15179=\"\" type=\"button\" class=\"dashboard-nav__item dashboard-nav__item--active\"><span data-v-c4b15179=\"\" class=\"dashboard-nav__copy\"><span data-v-c4b15179=\"\" class=\"dashboard-nav__icon\"><svg data-v-f0db0",
+      "ancestors": [
+        {
+          "tag": "BUTTON",
+          "cls": "dashboard-nav__item dashboard-nav__item--active",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-nav__entry",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "NAV",
+          "cls": "dashboard-nav",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "ASIDE",
+          "cls": "dashboard-sidebar dashboard-sidebar--open",
+          "touch": "auto",
+          "overflow": "auto"
+        },
+        {
+          "tag": "DIV",
+          "cls": "student-navigation",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "student-page dashboard-page-shell",
+          "touch": "pan-y",
+          "overflow": "auto"
+        },
+        {
+          "tag": "MAIN",
+          "cls": "v-main app-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application__wrap",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application v-theme--light v-layout v-layout--full-height v-locale--is-rtl",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "BODY",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "auto"
+        },
+        {
+          "tag": "HTML",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "scroll"
+        }
+      ],
+      "bodyOverflow": "hidden auto",
+      "windowY": 274
+    }
+  },
+  {
+    "case": "student-page-swipe",
+    "size": {
+      "width": 320,
+      "height": 568
+    },
+    "start": 188,
+    "end": 188,
+    "menu": "dashboard-sidebar"
+  },
+  {
+    "case": "student-sidebar-swipe",
+    "size": {
+      "width": 844,
+      "height": 390
+    },
+    "before": {
+      "scroll": 0,
+      "height": 390,
+      "content": 475,
+      "rect": {
+        "x": 508,
+        "y": 0,
+        "width": 336,
+        "height": 390,
+        "top": 0,
+        "right": 844,
+        "bottom": 390,
+        "left": 508
+      },
+      "hit": "<button data-v-c4b15179=\"\" type=\"button\" class=\"dashboard-nav__item\"><span data-v-c4b15179=\"\" class=\"dashboard-nav__copy\"><span data-v-c4b15179=\"\" class=\"dashboard-nav__icon\"><svg data-v-f0db0f9c=\"\" data-v-c4b15179=\"\" cl",
+      "ancestors": [
+        {
+          "tag": "BUTTON",
+          "cls": "dashboard-nav__item",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-nav__entry",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "NAV",
+          "cls": "dashboard-nav",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "ASIDE",
+          "cls": "dashboard-sidebar dashboard-sidebar--open",
+          "touch": "auto",
+          "overflow": "auto"
+        },
+        {
+          "tag": "DIV",
+          "cls": "student-navigation",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "student-page dashboard-page-shell",
+          "touch": "pan-y",
+          "overflow": "auto"
+        },
+        {
+          "tag": "MAIN",
+          "cls": "v-main app-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application__wrap",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application v-theme--light v-layout v-layout--full-height v-locale--is-rtl",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "BODY",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "auto"
+        },
+        {
+          "tag": "HTML",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "scroll"
+        }
+      ],
+      "bodyOverflow": "hidden auto",
+      "windowY": 0
+    },
+    "after": {
+      "scroll": 85,
+      "height": 390,
+      "content": 475,
+      "rect": {
+        "x": 508,
+        "y": 0,
+        "width": 336,
+        "height": 390,
+        "top": 0,
+        "right": 844,
+        "bottom": 390,
+        "left": 508
+      },
+      "hit": "<span data-v-c4b15179=\"\" class=\"dashboard-nav__label\">الإقراء</span>",
+      "ancestors": [
+        {
+          "tag": "SPAN",
+          "cls": "dashboard-nav__label",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "SPAN",
+          "cls": "dashboard-nav__copy",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "BUTTON",
+          "cls": "dashboard-nav__item",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-nav__entry",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "NAV",
+          "cls": "dashboard-nav",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "ASIDE",
+          "cls": "dashboard-sidebar dashboard-sidebar--open",
+          "touch": "auto",
+          "overflow": "auto"
+        },
+        {
+          "tag": "DIV",
+          "cls": "student-navigation",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "student-page dashboard-page-shell",
+          "touch": "pan-y",
+          "overflow": "auto"
+        },
+        {
+          "tag": "MAIN",
+          "cls": "v-main app-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application__wrap",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application v-theme--light v-layout v-layout--full-height v-locale--is-rtl",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "BODY",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "auto"
+        },
+        {
+          "tag": "HTML",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "scroll"
+        }
+      ],
+      "bodyOverflow": "hidden auto",
+      "windowY": 0
+    }
+  },
+  {
+    "case": "student-page-swipe",
+    "size": {
+      "width": 844,
+      "height": 390
+    },
+    "start": 0,
+    "end": 99,
+    "menu": "dashboard-sidebar"
+  }
+]

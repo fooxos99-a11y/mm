@@ -1,0 +1,109 @@
+
+
+.admin-archive-view__registration-item {
+  display: flex;
+  min-width: 0;
+  justify-content: space-between;
+  gap: 8px;
+  color: #688094;
+  font-size: 0.76rem;
+}
+
+.admin-archive-view__registration-item strong {
+  overflow-wrap: anywhere;
+  color: #163e54;
+  text-align: left;
+}
+
+.archive-dialog__field + .archive-dialog__field {
+  margin-top: 16px;
+}
+
+.archive-dialog__label {
+  color: #334155;
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.archive-dialog__input {
+  width: 100%;
+  border: 1px solid rgba(148, 163, 184, 0.34);
+  border-radius: 18px;
+  padding: 14px 16px;
+  background: #fff;
+  color: #0f172a;
+  font-size: 0.95rem;
+  font-weight: 600;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.archive-dialog__input:focus {
+  border-color: rgba(42, 148, 178, 0.65);
+  box-shadow: 0 0 0 4px rgba(42, 148, 178, 0.12);
+}
+
+.archive-dialog__select {
+  width: 100%;
+}
+
+.archive-dialog__footer {
+  margin-top: 20px;
+  justify-content: flex-end;
+}
+
+.archive-dialog__danger-note {
+  margin: 14px 0 0;
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  border-radius: 14px;
+  padding: 12px 14px;
+  background: rgba(254, 242, 242, 0.92);
+  color: #991b1b;
+  font-size: 0.88rem;
+  font-weight: 700;
+  line-height: 1.8;
+}
+
+@media (max-width: 960px) {
+  .admin-archive-view__workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-archive-view__toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-archive-view__field,
+  .admin-archive-view__field--select {
+    max-width: none;
+    width: 100%;
+  }
+
+  .admin-archive-view__manual-action {
+    align-self: stretch;
+  }
+
+  .admin-archive-view__stats,
+  .admin-archive-view__assessment-grid,
+  .admin-archive-view__registration-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-archive-view__parts-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-archive-view__details-header,
+  .admin-archive-view__course-head {
+    flex-direction: column;
+  }
+
+  .admin-archive-view__stats,
+  .admin-archive-view__assessment-grid,
+  .admin-archive-view__parts-grid {
+    grid-template-columns: 1fr;
+  }
+}

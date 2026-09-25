@@ -1,0 +1,2407 @@
+[
+  {
+    "case": "sidebar-swipe",
+    "size": {
+      "width": 320,
+      "height": 568
+    },
+    "position": "button",
+    "before": {
+      "scroll": 0,
+      "height": 568,
+      "content": 777,
+      "rect": {
+        "x": 18,
+        "y": 0,
+        "width": 302,
+        "height": 568,
+        "top": 0,
+        "right": 320,
+        "bottom": 568,
+        "left": 18
+      },
+      "hit": "<button data-v-78f1f9a7=\"\" type=\"button\" class=\"app-button app-button--plain dashboard-nav__item\"><!----><span class=\"app-button__content\"><span data-v-78f1f9a7=\"\" class=\"dashboard-nav__copy\"><span data-v-78f1f9a7=\"\" cla",
+      "ancestors": [
+        {
+          "tag": "BUTTON",
+          "cls": "app-button app-button--plain dashboard-nav__item",
+          "touch": "manipulation",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-nav__entry",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "NAV",
+          "cls": "dashboard-nav",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "ASIDE",
+          "cls": "dashboard-sidebar dashboard-sidebar--open",
+          "touch": "pan-y",
+          "overflow": "auto"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-sidebar-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-page",
+          "touch": "auto",
+          "overflow": "auto"
+        },
+        {
+          "tag": "MAIN",
+          "cls": "v-main app-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application__wrap",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application v-theme--light v-layout v-layout--full-height v-locale--is-rtl",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "BODY",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        },
+        {
+          "tag": "HTML",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        }
+      ],
+      "bodyOverflow": "hidden",
+      "windowY": 0
+    },
+    "after": {
+      "scroll": 209,
+      "height": 568,
+      "content": 777,
+      "rect": {
+        "x": 18,
+        "y": 0,
+        "width": 302,
+        "height": 568,
+        "top": 0,
+        "right": 320,
+        "bottom": 568,
+        "left": 18
+      },
+      "hit": "<nav data-v-78f1f9a7=\"\" class=\"dashboard-nav\"><!----><div data-v-78f1f9a7=\"\" class=\"dashboard-nav__entry\"><button data-v-78f1f9a7=\"\" type=\"button\" class=\"app-button app-button--plain dashboard-nav__item dashboard-nav__it",
+      "ancestors": [
+        {
+          "tag": "NAV",
+          "cls": "dashboard-nav",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "ASIDE",
+          "cls": "dashboard-sidebar dashboard-sidebar--open",
+          "touch": "pan-y",
+          "overflow": "auto"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-sidebar-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-page",
+          "touch": "auto",
+          "overflow": "auto"
+        },
+        {
+          "tag": "MAIN",
+          "cls": "v-main app-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application__wrap",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application v-theme--light v-layout v-layout--full-height v-locale--is-rtl",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "BODY",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        },
+        {
+          "tag": "HTML",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        }
+      ],
+      "bodyOverflow": "hidden",
+      "windowY": 0
+    },
+    "moved": true
+  },
+  {
+    "case": "sidebar-swipe",
+    "size": {
+      "width": 320,
+      "height": 568
+    },
+    "position": "edge",
+    "before": {
+      "scroll": 0,
+      "height": 568,
+      "content": 777,
+      "rect": {
+        "x": 18,
+        "y": 0,
+        "width": 302,
+        "height": 568,
+        "top": 0,
+        "right": 320,
+        "bottom": 568,
+        "left": 18
+      },
+      "hit": "<aside data-v-78f1f9a7=\"\" class=\"dashboard-sidebar dashboard-sidebar--open\"><a data-v-78f1f9a7=\"\" href=\"/momars/practitioner\" class=\"dashboard-sidebar__brand\"><img data-v-78f1f9a7=\"\" src=\"/momars/اللوقو-شفاف.webp\" alt=\"ش",
+      "ancestors": [
+        {
+          "tag": "ASIDE",
+          "cls": "dashboard-sidebar dashboard-sidebar--open",
+          "touch": "pan-y",
+          "overflow": "auto"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-sidebar-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-page",
+          "touch": "auto",
+          "overflow": "auto"
+        },
+        {
+          "tag": "MAIN",
+          "cls": "v-main app-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application__wrap",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application v-theme--light v-layout v-layout--full-height v-locale--is-rtl",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "BODY",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        },
+        {
+          "tag": "HTML",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        }
+      ],
+      "bodyOverflow": "hidden",
+      "windowY": 0
+    },
+    "after": {
+      "scroll": 209,
+      "height": 568,
+      "content": 777,
+      "rect": {
+        "x": 18,
+        "y": 0,
+        "width": 302,
+        "height": 568,
+        "top": 0,
+        "right": 320,
+        "bottom": 568,
+        "left": 18
+      },
+      "hit": "<aside data-v-78f1f9a7=\"\" class=\"dashboard-sidebar dashboard-sidebar--open\"><a data-v-78f1f9a7=\"\" href=\"/momars/practitioner\" class=\"dashboard-sidebar__brand\"><img data-v-78f1f9a7=\"\" src=\"/momars/اللوقو-شفاف.webp\" alt=\"ش",
+      "ancestors": [
+        {
+          "tag": "ASIDE",
+          "cls": "dashboard-sidebar dashboard-sidebar--open",
+          "touch": "pan-y",
+          "overflow": "auto"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-sidebar-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-page",
+          "touch": "auto",
+          "overflow": "auto"
+        },
+        {
+          "tag": "MAIN",
+          "cls": "v-main app-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application__wrap",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application v-theme--light v-layout v-layout--full-height v-locale--is-rtl",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "BODY",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        },
+        {
+          "tag": "HTML",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        }
+      ],
+      "bodyOverflow": "hidden",
+      "windowY": 0
+    },
+    "moved": true
+  },
+  {
+    "case": "settings-swipe",
+    "size": {
+      "width": 320,
+      "height": 568
+    },
+    "before": {
+      "scroll": 209,
+      "height": 568,
+      "content": 1048,
+      "rect": {
+        "x": 18,
+        "y": 0,
+        "width": 302,
+        "height": 568,
+        "top": 0,
+        "right": 320,
+        "bottom": 568,
+        "left": 18
+      },
+      "hit": "<nav data-v-78f1f9a7=\"\" class=\"dashboard-nav\"><!----><div data-v-78f1f9a7=\"\" class=\"dashboard-nav__entry\"><button data-v-78f1f9a7=\"\" type=\"button\" class=\"app-button app-button--plain dashboard-nav__item dashboard-nav__it",
+      "ancestors": [
+        {
+          "tag": "NAV",
+          "cls": "dashboard-nav",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "ASIDE",
+          "cls": "dashboard-sidebar dashboard-sidebar--open",
+          "touch": "pan-y",
+          "overflow": "auto"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-sidebar-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-page",
+          "touch": "auto",
+          "overflow": "auto"
+        },
+        {
+          "tag": "MAIN",
+          "cls": "v-main app-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application__wrap",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application v-theme--light v-layout v-layout--full-height v-locale--is-rtl",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "BODY",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        },
+        {
+          "tag": "HTML",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        }
+      ],
+      "bodyOverflow": "hidden",
+      "windowY": 0
+    },
+    "after": {
+      "scroll": 480,
+      "height": 568,
+      "content": 1048,
+      "rect": {
+        "x": 18,
+        "y": 0,
+        "width": 302,
+        "height": 568,
+        "top": 0,
+        "right": 320,
+        "bottom": 568,
+        "left": 18
+      },
+      "hit": "<button data-v-78f1f9a7=\"\" type=\"button\" class=\"app-button app-button--plain dashboard-nav__item\"><!----><span class=\"app-button__content\"><span data-v-78f1f9a7=\"\" class=\"dashboard-nav__copy\"><span data-v-78f1f9a7=\"\" cla",
+      "ancestors": [
+        {
+          "tag": "BUTTON",
+          "cls": "app-button app-button--plain dashboard-nav__item",
+          "touch": "manipulation",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-nav__entry",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "NAV",
+          "cls": "dashboard-nav",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "ASIDE",
+          "cls": "dashboard-sidebar dashboard-sidebar--open",
+          "touch": "pan-y",
+          "overflow": "auto"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-sidebar-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-page",
+          "touch": "auto",
+          "overflow": "auto"
+        },
+        {
+          "tag": "MAIN",
+          "cls": "v-main app-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application__wrap",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application v-theme--light v-layout v-layout--full-height v-locale--is-rtl",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "BODY",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        },
+        {
+          "tag": "HTML",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        }
+      ],
+      "bodyOverflow": "hidden",
+      "windowY": 0
+    }
+  },
+  {
+    "case": "sidebar-swipe",
+    "size": {
+      "width": 390,
+      "height": 844
+    },
+    "position": "button",
+    "before": {
+      "scroll": 0,
+      "height": 844,
+      "content": 844,
+      "rect": {
+        "x": 18,
+        "y": 0,
+        "width": 372,
+        "height": 844,
+        "top": 0,
+        "right": 390,
+        "bottom": 844,
+        "left": 18
+      },
+      "hit": "<button data-v-78f1f9a7=\"\" type=\"button\" class=\"app-button app-button--plain dashboard-nav__item\"><!----><span class=\"app-button__content\"><span data-v-78f1f9a7=\"\" class=\"dashboard-nav__copy\"><span data-v-78f1f9a7=\"\" cla",
+      "ancestors": [
+        {
+          "tag": "BUTTON",
+          "cls": "app-button app-button--plain dashboard-nav__item",
+          "touch": "manipulation",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-nav__entry",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "NAV",
+          "cls": "dashboard-nav",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "ASIDE",
+          "cls": "dashboard-sidebar dashboard-sidebar--open",
+          "touch": "pan-y",
+          "overflow": "auto"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-sidebar-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-page",
+          "touch": "auto",
+          "overflow": "auto"
+        },
+        {
+          "tag": "MAIN",
+          "cls": "v-main app-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application__wrap",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application v-theme--light v-layout v-layout--full-height v-locale--is-rtl",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "BODY",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        },
+        {
+          "tag": "HTML",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        }
+      ],
+      "bodyOverflow": "hidden",
+      "windowY": 0
+    },
+    "after": {
+      "scroll": 0,
+      "height": 844,
+      "content": 844,
+      "rect": {
+        "x": 18,
+        "y": 0,
+        "width": 372,
+        "height": 844,
+        "top": 0,
+        "right": 390,
+        "bottom": 844,
+        "left": 18
+      },
+      "hit": "<button data-v-78f1f9a7=\"\" type=\"button\" class=\"app-button app-button--plain dashboard-nav__item\"><!----><span class=\"app-button__content\"><span data-v-78f1f9a7=\"\" class=\"dashboard-nav__copy\"><span data-v-78f1f9a7=\"\" cla",
+      "ancestors": [
+        {
+          "tag": "BUTTON",
+          "cls": "app-button app-button--plain dashboard-nav__item",
+          "touch": "manipulation",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-nav__entry",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "NAV",
+          "cls": "dashboard-nav",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "ASIDE",
+          "cls": "dashboard-sidebar dashboard-sidebar--open",
+          "touch": "pan-y",
+          "overflow": "auto"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-sidebar-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-page",
+          "touch": "auto",
+          "overflow": "auto"
+        },
+        {
+          "tag": "MAIN",
+          "cls": "v-main app-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application__wrap",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application v-theme--light v-layout v-layout--full-height v-locale--is-rtl",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "BODY",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        },
+        {
+          "tag": "HTML",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        }
+      ],
+      "bodyOverflow": "hidden",
+      "windowY": 0
+    },
+    "moved": false
+  },
+  {
+    "case": "sidebar-swipe",
+    "size": {
+      "width": 390,
+      "height": 844
+    },
+    "position": "edge",
+    "before": {
+      "scroll": 0,
+      "height": 844,
+      "content": 844,
+      "rect": {
+        "x": 18,
+        "y": 0,
+        "width": 372,
+        "height": 844,
+        "top": 0,
+        "right": 390,
+        "bottom": 844,
+        "left": 18
+      },
+      "hit": "<aside data-v-78f1f9a7=\"\" class=\"dashboard-sidebar dashboard-sidebar--open\"><a data-v-78f1f9a7=\"\" href=\"/momars/practitioner\" class=\"dashboard-sidebar__brand\"><img data-v-78f1f9a7=\"\" src=\"/momars/اللوقو-شفاف.webp\" alt=\"ش",
+      "ancestors": [
+        {
+          "tag": "ASIDE",
+          "cls": "dashboard-sidebar dashboard-sidebar--open",
+          "touch": "pan-y",
+          "overflow": "auto"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-sidebar-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-page",
+          "touch": "auto",
+          "overflow": "auto"
+        },
+        {
+          "tag": "MAIN",
+          "cls": "v-main app-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application__wrap",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application v-theme--light v-layout v-layout--full-height v-locale--is-rtl",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "BODY",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        },
+        {
+          "tag": "HTML",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        }
+      ],
+      "bodyOverflow": "hidden",
+      "windowY": 0
+    },
+    "after": {
+      "scroll": 0,
+      "height": 844,
+      "content": 844,
+      "rect": {
+        "x": 18,
+        "y": 0,
+        "width": 372,
+        "height": 844,
+        "top": 0,
+        "right": 390,
+        "bottom": 844,
+        "left": 18
+      },
+      "hit": "<aside data-v-78f1f9a7=\"\" class=\"dashboard-sidebar dashboard-sidebar--open\"><a data-v-78f1f9a7=\"\" href=\"/momars/practitioner\" class=\"dashboard-sidebar__brand\"><img data-v-78f1f9a7=\"\" src=\"/momars/اللوقو-شفاف.webp\" alt=\"ش",
+      "ancestors": [
+        {
+          "tag": "ASIDE",
+          "cls": "dashboard-sidebar dashboard-sidebar--open",
+          "touch": "pan-y",
+          "overflow": "auto"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-sidebar-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-page",
+          "touch": "auto",
+          "overflow": "auto"
+        },
+        {
+          "tag": "MAIN",
+          "cls": "v-main app-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application__wrap",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application v-theme--light v-layout v-layout--full-height v-locale--is-rtl",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "BODY",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        },
+        {
+          "tag": "HTML",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        }
+      ],
+      "bodyOverflow": "hidden",
+      "windowY": 0
+    },
+    "moved": false
+  },
+  {
+    "case": "settings-swipe",
+    "size": {
+      "width": 390,
+      "height": 844
+    },
+    "before": {
+      "scroll": 0,
+      "height": 844,
+      "content": 1048,
+      "rect": {
+        "x": 18,
+        "y": 0,
+        "width": 372,
+        "height": 844,
+        "top": 0,
+        "right": 390,
+        "bottom": 844,
+        "left": 18
+      },
+      "hit": "<button data-v-78f1f9a7=\"\" type=\"button\" class=\"app-button app-button--plain dashboard-nav__item\"><!----><span class=\"app-button__content\"><span data-v-78f1f9a7=\"\" class=\"dashboard-nav__copy\"><span data-v-78f1f9a7=\"\" cla",
+      "ancestors": [
+        {
+          "tag": "BUTTON",
+          "cls": "app-button app-button--plain dashboard-nav__item",
+          "touch": "manipulation",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-nav__entry",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "NAV",
+          "cls": "dashboard-nav",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "ASIDE",
+          "cls": "dashboard-sidebar dashboard-sidebar--open",
+          "touch": "pan-y",
+          "overflow": "auto"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-sidebar-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-page",
+          "touch": "auto",
+          "overflow": "auto"
+        },
+        {
+          "tag": "MAIN",
+          "cls": "v-main app-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application__wrap",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application v-theme--light v-layout v-layout--full-height v-locale--is-rtl",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "BODY",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        },
+        {
+          "tag": "HTML",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        }
+      ],
+      "bodyOverflow": "hidden",
+      "windowY": 0
+    },
+    "after": {
+      "scroll": 204,
+      "height": 844,
+      "content": 1048,
+      "rect": {
+        "x": 18,
+        "y": 0,
+        "width": 372,
+        "height": 844,
+        "top": 0,
+        "right": 390,
+        "bottom": 844,
+        "left": 18
+      },
+      "hit": "<button data-v-78f1f9a7=\"\" type=\"button\" class=\"app-button app-button--plain dashboard-nav__item\"><!----><span class=\"app-button__content\"><span data-v-78f1f9a7=\"\" class=\"dashboard-nav__copy\"><span data-v-78f1f9a7=\"\" cla",
+      "ancestors": [
+        {
+          "tag": "BUTTON",
+          "cls": "app-button app-button--plain dashboard-nav__item",
+          "touch": "manipulation",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-nav__entry",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "NAV",
+          "cls": "dashboard-nav",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "ASIDE",
+          "cls": "dashboard-sidebar dashboard-sidebar--open",
+          "touch": "pan-y",
+          "overflow": "auto"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-sidebar-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-page",
+          "touch": "auto",
+          "overflow": "auto"
+        },
+        {
+          "tag": "MAIN",
+          "cls": "v-main app-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application__wrap",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application v-theme--light v-layout v-layout--full-height v-locale--is-rtl",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "BODY",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        },
+        {
+          "tag": "HTML",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        }
+      ],
+      "bodyOverflow": "hidden",
+      "windowY": 0
+    }
+  },
+  {
+    "case": "sidebar-swipe",
+    "size": {
+      "width": 844,
+      "height": 390
+    },
+    "position": "button",
+    "before": {
+      "scroll": 0,
+      "height": 390,
+      "content": 802,
+      "rect": {
+        "x": 508,
+        "y": 0,
+        "width": 336,
+        "height": 390,
+        "top": 0,
+        "right": 844,
+        "bottom": 390,
+        "left": 508
+      },
+      "hit": "<span data-v-78f1f9a7=\"\" class=\"dashboard-nav__label\">الاختبار النهائي</span>",
+      "ancestors": [
+        {
+          "tag": "SPAN",
+          "cls": "dashboard-nav__label",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "SPAN",
+          "cls": "dashboard-nav__copy",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "SPAN",
+          "cls": "app-button__content",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "BUTTON",
+          "cls": "app-button app-button--plain dashboard-nav__item",
+          "touch": "manipulation",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-nav__entry",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "NAV",
+          "cls": "dashboard-nav",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "ASIDE",
+          "cls": "dashboard-sidebar dashboard-sidebar--open",
+          "touch": "pan-y",
+          "overflow": "auto"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-sidebar-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-page",
+          "touch": "auto",
+          "overflow": "auto"
+        },
+        {
+          "tag": "MAIN",
+          "cls": "v-main app-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application__wrap",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application v-theme--light v-layout v-layout--full-height v-locale--is-rtl",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "BODY",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        },
+        {
+          "tag": "HTML",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        }
+      ],
+      "bodyOverflow": "hidden",
+      "windowY": 0
+    },
+    "after": {
+      "scroll": 175,
+      "height": 390,
+      "content": 802,
+      "rect": {
+        "x": 508,
+        "y": 0,
+        "width": 336,
+        "height": 390,
+        "top": 0,
+        "right": 844,
+        "bottom": 390,
+        "left": 508
+      },
+      "hit": "<span data-v-78f1f9a7=\"\" class=\"dashboard-nav__label\">الإشعارات</span>",
+      "ancestors": [
+        {
+          "tag": "SPAN",
+          "cls": "dashboard-nav__label",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "SPAN",
+          "cls": "dashboard-nav__copy",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "SPAN",
+          "cls": "app-button__content",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "BUTTON",
+          "cls": "app-button app-button--plain dashboard-nav__item",
+          "touch": "manipulation",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-nav__entry",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "NAV",
+          "cls": "dashboard-nav",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "ASIDE",
+          "cls": "dashboard-sidebar dashboard-sidebar--open",
+          "touch": "pan-y",
+          "overflow": "auto"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-sidebar-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-page",
+          "touch": "auto",
+          "overflow": "auto"
+        },
+        {
+          "tag": "MAIN",
+          "cls": "v-main app-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application__wrap",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application v-theme--light v-layout v-layout--full-height v-locale--is-rtl",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "BODY",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        },
+        {
+          "tag": "HTML",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        }
+      ],
+      "bodyOverflow": "hidden",
+      "windowY": 0
+    },
+    "moved": true
+  },
+  {
+    "case": "sidebar-swipe",
+    "size": {
+      "width": 844,
+      "height": 390
+    },
+    "position": "edge",
+    "before": {
+      "scroll": 0,
+      "height": 390,
+      "content": 802,
+      "rect": {
+        "x": 508,
+        "y": 0,
+        "width": 336,
+        "height": 390,
+        "top": 0,
+        "right": 844,
+        "bottom": 390,
+        "left": 508
+      },
+      "hit": "<aside data-v-78f1f9a7=\"\" class=\"dashboard-sidebar dashboard-sidebar--open\"><a data-v-78f1f9a7=\"\" href=\"/momars/practitioner\" class=\"dashboard-sidebar__brand\"><img data-v-78f1f9a7=\"\" src=\"/momars/اللوقو-شفاف.webp\" alt=\"ش",
+      "ancestors": [
+        {
+          "tag": "ASIDE",
+          "cls": "dashboard-sidebar dashboard-sidebar--open",
+          "touch": "pan-y",
+          "overflow": "auto"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-sidebar-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-page",
+          "touch": "auto",
+          "overflow": "auto"
+        },
+        {
+          "tag": "MAIN",
+          "cls": "v-main app-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application__wrap",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application v-theme--light v-layout v-layout--full-height v-locale--is-rtl",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "BODY",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        },
+        {
+          "tag": "HTML",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        }
+      ],
+      "bodyOverflow": "hidden",
+      "windowY": 0
+    },
+    "after": {
+      "scroll": 175,
+      "height": 390,
+      "content": 802,
+      "rect": {
+        "x": 508,
+        "y": 0,
+        "width": 336,
+        "height": 390,
+        "top": 0,
+        "right": 844,
+        "bottom": 390,
+        "left": 508
+      },
+      "hit": "<aside data-v-78f1f9a7=\"\" class=\"dashboard-sidebar dashboard-sidebar--open\"><a data-v-78f1f9a7=\"\" href=\"/momars/practitioner\" class=\"dashboard-sidebar__brand\"><img data-v-78f1f9a7=\"\" src=\"/momars/اللوقو-شفاف.webp\" alt=\"ش",
+      "ancestors": [
+        {
+          "tag": "ASIDE",
+          "cls": "dashboard-sidebar dashboard-sidebar--open",
+          "touch": "pan-y",
+          "overflow": "auto"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-sidebar-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-page",
+          "touch": "auto",
+          "overflow": "auto"
+        },
+        {
+          "tag": "MAIN",
+          "cls": "v-main app-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application__wrap",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application v-theme--light v-layout v-layout--full-height v-locale--is-rtl",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "BODY",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        },
+        {
+          "tag": "HTML",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        }
+      ],
+      "bodyOverflow": "hidden",
+      "windowY": 0
+    },
+    "moved": true
+  },
+  {
+    "case": "settings-swipe",
+    "size": {
+      "width": 844,
+      "height": 390
+    },
+    "before": {
+      "scroll": 412,
+      "height": 390,
+      "content": 1073,
+      "rect": {
+        "x": 508,
+        "y": 0,
+        "width": 336,
+        "height": 390,
+        "top": 0,
+        "right": 844,
+        "bottom": 390,
+        "left": 508
+      },
+      "hit": "<button data-v-78f1f9a7=\"\" type=\"button\" class=\"app-button app-button--plain dashboard-nav__item dashboard-nav__item--active\"><!----><span class=\"app-button__content\"><span data-v-78f1f9a7=\"\" class=\"dashboard-nav__copy\">",
+      "ancestors": [
+        {
+          "tag": "BUTTON",
+          "cls": "app-button app-button--plain dashboard-nav__item dashboard-nav__item--active",
+          "touch": "manipulation",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-nav__entry",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "NAV",
+          "cls": "dashboard-nav",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "ASIDE",
+          "cls": "dashboard-sidebar dashboard-sidebar--open",
+          "touch": "pan-y",
+          "overflow": "auto"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-sidebar-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-page",
+          "touch": "auto",
+          "overflow": "auto"
+        },
+        {
+          "tag": "MAIN",
+          "cls": "v-main app-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application__wrap",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application v-theme--light v-layout v-layout--full-height v-locale--is-rtl",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "BODY",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        },
+        {
+          "tag": "HTML",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        }
+      ],
+      "bodyOverflow": "hidden",
+      "windowY": 0
+    },
+    "after": {
+      "scroll": 587,
+      "height": 390,
+      "content": 1073,
+      "rect": {
+        "x": 508,
+        "y": 0,
+        "width": 336,
+        "height": 390,
+        "top": 0,
+        "right": 844,
+        "bottom": 390,
+        "left": 508
+      },
+      "hit": "<nav data-v-78f1f9a7=\"\" class=\"dashboard-nav\"><!----><div data-v-78f1f9a7=\"\" class=\"dashboard-nav__entry\"><button data-v-78f1f9a7=\"\" type=\"button\" class=\"app-button app-button--plain dashboard-nav__item dashboard-nav__it",
+      "ancestors": [
+        {
+          "tag": "NAV",
+          "cls": "dashboard-nav",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "ASIDE",
+          "cls": "dashboard-sidebar dashboard-sidebar--open",
+          "touch": "pan-y",
+          "overflow": "auto"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-sidebar-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-page",
+          "touch": "auto",
+          "overflow": "auto"
+        },
+        {
+          "tag": "MAIN",
+          "cls": "v-main app-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application__wrap",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application v-theme--light v-layout v-layout--full-height v-locale--is-rtl",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "BODY",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        },
+        {
+          "tag": "HTML",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        }
+      ],
+      "bodyOverflow": "hidden",
+      "windowY": 0
+    }
+  },
+  {
+    "case": "sidebar-swipe",
+    "size": {
+      "width": 768,
+      "height": 1024
+    },
+    "position": "button",
+    "before": {
+      "scroll": 0,
+      "height": 1024,
+      "content": 1024,
+      "rect": {
+        "x": 432,
+        "y": 0,
+        "width": 336,
+        "height": 1024,
+        "top": 0,
+        "right": 768,
+        "bottom": 1024,
+        "left": 432
+      },
+      "hit": "<span data-v-78f1f9a7=\"\" class=\"dashboard-nav__label\">الإشعارات</span>",
+      "ancestors": [
+        {
+          "tag": "SPAN",
+          "cls": "dashboard-nav__label",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "SPAN",
+          "cls": "dashboard-nav__copy",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "SPAN",
+          "cls": "app-button__content",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "BUTTON",
+          "cls": "app-button app-button--plain dashboard-nav__item",
+          "touch": "manipulation",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-nav__entry",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "NAV",
+          "cls": "dashboard-nav",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "ASIDE",
+          "cls": "dashboard-sidebar dashboard-sidebar--open",
+          "touch": "pan-y",
+          "overflow": "auto"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-sidebar-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-page",
+          "touch": "auto",
+          "overflow": "auto"
+        },
+        {
+          "tag": "MAIN",
+          "cls": "v-main app-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application__wrap",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application v-theme--light v-layout v-layout--full-height v-locale--is-rtl",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "BODY",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        },
+        {
+          "tag": "HTML",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        }
+      ],
+      "bodyOverflow": "hidden",
+      "windowY": 0
+    },
+    "after": {
+      "scroll": 0,
+      "height": 1024,
+      "content": 1024,
+      "rect": {
+        "x": 432,
+        "y": 0,
+        "width": 336,
+        "height": 1024,
+        "top": 0,
+        "right": 768,
+        "bottom": 1024,
+        "left": 432
+      },
+      "hit": "<span data-v-78f1f9a7=\"\" class=\"dashboard-nav__label\">الإشعارات</span>",
+      "ancestors": [
+        {
+          "tag": "SPAN",
+          "cls": "dashboard-nav__label",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "SPAN",
+          "cls": "dashboard-nav__copy",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "SPAN",
+          "cls": "app-button__content",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "BUTTON",
+          "cls": "app-button app-button--plain dashboard-nav__item",
+          "touch": "manipulation",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-nav__entry",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "NAV",
+          "cls": "dashboard-nav",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "ASIDE",
+          "cls": "dashboard-sidebar dashboard-sidebar--open",
+          "touch": "pan-y",
+          "overflow": "auto"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-sidebar-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-page",
+          "touch": "auto",
+          "overflow": "auto"
+        },
+        {
+          "tag": "MAIN",
+          "cls": "v-main app-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application__wrap",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application v-theme--light v-layout v-layout--full-height v-locale--is-rtl",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "BODY",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        },
+        {
+          "tag": "HTML",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        }
+      ],
+      "bodyOverflow": "hidden",
+      "windowY": 0
+    },
+    "moved": false
+  },
+  {
+    "case": "sidebar-swipe",
+    "size": {
+      "width": 768,
+      "height": 1024
+    },
+    "position": "edge",
+    "before": {
+      "scroll": 0,
+      "height": 1024,
+      "content": 1024,
+      "rect": {
+        "x": 432,
+        "y": 0,
+        "width": 336,
+        "height": 1024,
+        "top": 0,
+        "right": 768,
+        "bottom": 1024,
+        "left": 432
+      },
+      "hit": "<aside data-v-78f1f9a7=\"\" class=\"dashboard-sidebar dashboard-sidebar--open\"><a data-v-78f1f9a7=\"\" href=\"/momars/practitioner\" class=\"dashboard-sidebar__brand\"><img data-v-78f1f9a7=\"\" src=\"/momars/اللوقو-شفاف.webp\" alt=\"ش",
+      "ancestors": [
+        {
+          "tag": "ASIDE",
+          "cls": "dashboard-sidebar dashboard-sidebar--open",
+          "touch": "pan-y",
+          "overflow": "auto"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-sidebar-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-page",
+          "touch": "auto",
+          "overflow": "auto"
+        },
+        {
+          "tag": "MAIN",
+          "cls": "v-main app-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application__wrap",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application v-theme--light v-layout v-layout--full-height v-locale--is-rtl",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "BODY",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        },
+        {
+          "tag": "HTML",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        }
+      ],
+      "bodyOverflow": "hidden",
+      "windowY": 0
+    },
+    "after": {
+      "scroll": 0,
+      "height": 1024,
+      "content": 1024,
+      "rect": {
+        "x": 432,
+        "y": 0,
+        "width": 336,
+        "height": 1024,
+        "top": 0,
+        "right": 768,
+        "bottom": 1024,
+        "left": 432
+      },
+      "hit": "<aside data-v-78f1f9a7=\"\" class=\"dashboard-sidebar dashboard-sidebar--open\"><a data-v-78f1f9a7=\"\" href=\"/momars/practitioner\" class=\"dashboard-sidebar__brand\"><img data-v-78f1f9a7=\"\" src=\"/momars/اللوقو-شفاف.webp\" alt=\"ش",
+      "ancestors": [
+        {
+          "tag": "ASIDE",
+          "cls": "dashboard-sidebar dashboard-sidebar--open",
+          "touch": "pan-y",
+          "overflow": "auto"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-sidebar-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-page",
+          "touch": "auto",
+          "overflow": "auto"
+        },
+        {
+          "tag": "MAIN",
+          "cls": "v-main app-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application__wrap",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application v-theme--light v-layout v-layout--full-height v-locale--is-rtl",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "BODY",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        },
+        {
+          "tag": "HTML",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        }
+      ],
+      "bodyOverflow": "hidden",
+      "windowY": 0
+    },
+    "moved": false
+  },
+  {
+    "case": "settings-swipe",
+    "size": {
+      "width": 768,
+      "height": 1024
+    },
+    "before": {
+      "scroll": 0,
+      "height": 1024,
+      "content": 1073,
+      "rect": {
+        "x": 432,
+        "y": 0,
+        "width": 336,
+        "height": 1024,
+        "top": 0,
+        "right": 768,
+        "bottom": 1024,
+        "left": 432
+      },
+      "hit": "<span data-v-78f1f9a7=\"\" class=\"dashboard-nav__label\">الإشعارات</span>",
+      "ancestors": [
+        {
+          "tag": "SPAN",
+          "cls": "dashboard-nav__label",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "SPAN",
+          "cls": "dashboard-nav__copy",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "SPAN",
+          "cls": "app-button__content",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "BUTTON",
+          "cls": "app-button app-button--plain dashboard-nav__item",
+          "touch": "manipulation",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-nav__entry",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "NAV",
+          "cls": "dashboard-nav",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "ASIDE",
+          "cls": "dashboard-sidebar dashboard-sidebar--open",
+          "touch": "pan-y",
+          "overflow": "auto"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-sidebar-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-page",
+          "touch": "auto",
+          "overflow": "auto"
+        },
+        {
+          "tag": "MAIN",
+          "cls": "v-main app-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application__wrap",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application v-theme--light v-layout v-layout--full-height v-locale--is-rtl",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "BODY",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        },
+        {
+          "tag": "HTML",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        }
+      ],
+      "bodyOverflow": "hidden",
+      "windowY": 0
+    },
+    "after": {
+      "scroll": 49,
+      "height": 1024,
+      "content": 1073,
+      "rect": {
+        "x": 432,
+        "y": 0,
+        "width": 336,
+        "height": 1024,
+        "top": 0,
+        "right": 768,
+        "bottom": 1024,
+        "left": 432
+      },
+      "hit": "<button data-v-78f1f9a7=\"\" type=\"button\" class=\"app-button app-button--plain dashboard-nav__item\"><!----><span class=\"app-button__content\"><span data-v-78f1f9a7=\"\" class=\"dashboard-nav__copy\"><span data-v-78f1f9a7=\"\" cla",
+      "ancestors": [
+        {
+          "tag": "BUTTON",
+          "cls": "app-button app-button--plain dashboard-nav__item",
+          "touch": "manipulation",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-nav__entry",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "NAV",
+          "cls": "dashboard-nav",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "ASIDE",
+          "cls": "dashboard-sidebar dashboard-sidebar--open",
+          "touch": "pan-y",
+          "overflow": "auto"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-sidebar-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-page",
+          "touch": "auto",
+          "overflow": "auto"
+        },
+        {
+          "tag": "MAIN",
+          "cls": "v-main app-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application__wrap",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application v-theme--light v-layout v-layout--full-height v-locale--is-rtl",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "BODY",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        },
+        {
+          "tag": "HTML",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        }
+      ],
+      "bodyOverflow": "hidden",
+      "windowY": 0
+    }
+  },
+  {
+    "case": "resize-open-menu-to-desktop",
+    "initial": 0,
+    "afterWheel": 0,
+    "state": {
+      "scroll": 0,
+      "height": 800,
+      "content": 802,
+      "rect": {
+        "x": 864,
+        "y": 0,
+        "width": 336,
+        "height": 800,
+        "top": 0,
+        "right": 1200,
+        "bottom": 800,
+        "left": 864
+      },
+      "hit": "<div data-v-78f1f9a7=\"\" class=\"dashboard-backdrop\"></div>",
+      "ancestors": [
+        {
+          "tag": "DIV",
+          "cls": "dashboard-backdrop",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-sidebar-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-page",
+          "touch": "auto",
+          "overflow": "auto"
+        },
+        {
+          "tag": "MAIN",
+          "cls": "v-main app-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application__wrap",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application v-theme--light v-layout v-layout--full-height v-locale--is-rtl",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "BODY",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        },
+        {
+          "tag": "HTML",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "hidden"
+        }
+      ],
+      "bodyOverflow": "hidden",
+      "windowY": 0
+    }
+  },
+  {
+    "case": "browser-back-menu",
+    "url": "http://127.0.0.1:57730/momars/dashboard",
+    "state": {
+      "scroll": 0,
+      "height": 844,
+      "content": 844,
+      "rect": {
+        "x": 390,
+        "y": 0,
+        "width": 372,
+        "height": 844,
+        "top": 0,
+        "right": 762,
+        "bottom": 844,
+        "left": 390
+      },
+      "hit": "<div class=\"dashboard-indicator-ring__inner\">0%</div>",
+      "ancestors": [
+        {
+          "tag": "DIV",
+          "cls": "dashboard-indicator-ring__inner",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-indicator-ring dashboard-indicator-ring--empty",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "ARTICLE",
+          "cls": "dashboard-indicator-card",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-indicators-grid",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-card dashboard-card--indicators",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "SECTION",
+          "cls": "dashboard-section dashboard-section--hero",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "MAIN",
+          "cls": "dashboard-main",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "dashboard-page",
+          "touch": "auto",
+          "overflow": "auto"
+        },
+        {
+          "tag": "MAIN",
+          "cls": "v-main app-shell",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application__wrap",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "v-application v-theme--light v-layout v-layout--full-height v-locale--is-rtl",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "DIV",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "visible"
+        },
+        {
+          "tag": "BODY",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "auto"
+        },
+        {
+          "tag": "HTML",
+          "cls": "",
+          "touch": "auto",
+          "overflow": "scroll"
+        }
+      ],
+      "bodyOverflow": "hidden auto",
+      "windowY": 0
+    }
+  }
+]

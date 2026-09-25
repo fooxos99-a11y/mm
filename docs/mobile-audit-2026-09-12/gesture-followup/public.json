@@ -1,0 +1,46 @@
+[
+  {
+    "case": "public-swipe",
+    "route": "",
+    "before": {
+      "y": 0,
+      "h": 2036
+    },
+    "after": {
+      "y": 485,
+      "h": 2036
+    }
+  },
+  {
+    "case": "public-swipe",
+    "route": "practitioner",
+    "before": {
+      "y": 0,
+      "h": 9533
+    },
+    "after": {
+      "y": 696,
+      "h": 9533
+    }
+  },
+  {
+    "case": "public-swipe",
+    "route": "registration",
+    "before": {
+      "y": 0,
+      "h": 844
+    },
+    "after": {
+      "y": 0,
+      "h": 844
+    }
+  },
+  {
+    "case": "registration-network-error",
+    "text": "تعذر تحميل المحتوى\n\nNetwork Error\n\nإعادة المحاولة"
+  },
+  {
+    "case": "registration-retry",
+    "recovered": true
+  }
+]

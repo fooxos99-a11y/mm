@@ -1,0 +1,12 @@
+
+
+@media (max-width: 680px) {
+  .communications-page__field-grid,
+  .communications-page__student-head,
+  .communications-page__section-head,
+  .communications-page__item-head {
+    grid-template-columns: minmax(0, 1fr);
+    display: grid;
+  }
+
+}

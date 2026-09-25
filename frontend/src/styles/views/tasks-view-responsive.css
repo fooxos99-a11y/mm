@@ -1,0 +1,87 @@
+
+
+@media (max-width: 960px) {
+  .assessment-question__header {
+    flex-direction: column;
+  }
+
+  .assessment-question__tools {
+    justify-content: center;
+  }
+
+  .assessment-options-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .assessment-submit-row {
+    justify-content: stretch;
+  }
+
+  .assessment-submit-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .assessment-page__container,
+  .assessment-stage,
+  .assessment-shell,
+  .assessment-hero,
+  .assessment-hero__summary,
+  .task-document-layout,
+  .task-editor-shell {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  .assessment-hero__badge {
+    width: 100%;
+    padding-inline: 18px;
+    font-size: 1rem;
+    box-sizing: border-box;
+  }
+
+  .assessment-hero__summary {
+    padding-inline: 6px;
+    font-size: 0.9rem;
+  }
+
+  .assessment-question,
+  .task-editor-shell,
+  .assessment-shell {
+    border-radius: 24px;
+  }
+
+  .assessment-question,
+  .task-editor-shell {
+    padding: 16px;
+  }
+
+  .task-video-card {
+    padding: 16px;
+    border-radius: 24px;
+  }
+
+  .task-video-card__frame {
+    min-height: 220px;
+    border-radius: 18px;
+  }
+}
+
+@media (max-width: 420px) {
+  .assessment-page__container {
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+  }
+
+  .task-editor-shell {
+    padding: 10px;
+  }
+
+  .assessment-shell {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+}

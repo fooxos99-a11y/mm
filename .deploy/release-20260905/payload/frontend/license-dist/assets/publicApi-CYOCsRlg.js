@@ -1,0 +1,1 @@
+import{J as e}from"./index-AsZn0N0o.js";import{r as t}from"./httpClient-BIo0U7Gx.js";import{t as n}from"./completeSnapshot-XSzqn3r4.js";var r=e({fetchPublicSnapshot:()=>i,fetchPublicStats:()=>a}),i=()=>n(async e=>(await t.get(`/public/snapshot`,{params:{page:e}})).data),a=async()=>(await t.get(`/public/stats`)).data;export{a as n,r,i as t};

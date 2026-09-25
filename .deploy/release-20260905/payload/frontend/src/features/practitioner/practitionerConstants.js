@@ -1,0 +1,1 @@
+export const AVAILABILITY_REFRESH_MS = 60000;
