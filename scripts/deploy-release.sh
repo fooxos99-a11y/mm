@@ -9,6 +9,17 @@ fi
 deploy_root="${1%/}"
 archive="$2"
 release_id="$3"
+umask 002
+
+# On the production VPS the deploy user may run artisan as www-data (see scripts/server/setup-momars-server.sh),
+# so cache and log files stay writable by PHP-FPM.
+artisan() {
+  if sudo -n -u www-data true 2>/dev/null; then
+    sudo -n -u www-data php "$@"
+  else
+    php "$@"
+  fi
+}
 
 if [[ -z "$deploy_root" || "$deploy_root" == "/" || "$deploy_root" != /* ]]; then
   echo "Deploy root must be an absolute non-root path." >&2
@@ -62,12 +73,18 @@ rm -rf "$release_dir/backend/storage"
 ln -sfn "$shared_dir/storage" "$release_dir/backend/storage"
 
 composer --working-dir="$release_dir/backend" install --no-dev --classmap-authoritative --no-interaction --no-progress
-php "$release_dir/backend/artisan" migrate --force
-php "$release_dir/backend/artisan" optimize
+artisan "$release_dir/backend/artisan" migrate --force
+php "$release_dir/backend/artisan" storage:link --force
+chmod -R g+w "$release_dir/backend/bootstrap/cache"
+artisan "$release_dir/backend/artisan" optimize
 
 ln -sfn "$release_dir" "$deploy_root/.current-next"
 mv -Tf "$deploy_root/.current-next" "$current_link"
 trap - ERR
+
+# Clear OPcache for the new symlink target and let queue workers pick up the new code.
+sudo -n systemctl reload php8.3-fpm 2>/dev/null || true
+artisan "$current_link/backend/artisan" queue:restart || true
 
 find "$releases_dir" -mindepth 1 -maxdepth 1 -type d -printf '%T@ %p\n' \
   | sort -nr \
