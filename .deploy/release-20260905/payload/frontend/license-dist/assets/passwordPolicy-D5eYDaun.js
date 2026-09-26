@@ -1,1 +1,0 @@
-var e=`10 أحرف على الأقل، وتتضمن حرفًا ورقمًا`,t=/\p{L}/u,n=/\p{N}/u,r=e=>{let r=String(e||``);return r.length>=10&&t.test(r)&&n.test(r)},i=(e,t)=>r(e)&&e===t;export{i as n,r,e as t};

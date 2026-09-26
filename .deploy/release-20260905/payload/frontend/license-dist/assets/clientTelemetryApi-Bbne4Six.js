@@ -1,1 +1,0 @@
-import{t as e}from"./httpClient-BIo0U7Gx.js";var t=t=>e.post(`/client-errors`,t);export{t as reportClientError};

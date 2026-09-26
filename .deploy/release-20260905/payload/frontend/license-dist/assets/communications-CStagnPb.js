@@ -1,1 +1,0 @@
-import{X as e,Z as t}from"./api-Cv51HxX7.js";var n={async addNotification({dispatch:t},n){let r=await e(n);return await t(`reloadNotifications`),r},async deleteNotification({dispatch:e},n){await t(n),await e(`reloadNotifications`)}};export{n as communicationActions};
