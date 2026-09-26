@@ -269,7 +269,8 @@ class DashboardSecurityBoundaryTest extends TestCase
 
         $queries = collect();
         DB::listen(function ($query) use ($queries): void {
-            $queries->push(strtolower($query->sql));
+            // Normalise identifier quoting so the assertions hold on SQLite and MySQL.
+            $queries->push(str_replace(['`', '"'], '', strtolower($query->sql)));
         });
 
         $this->getJson('/api/dashboard/snapshot')
@@ -278,10 +279,10 @@ class DashboardSecurityBoundaryTest extends TestCase
             ->assertJsonMissing(['loginId' => 'query-female']);
 
         $submissionQuery = $queries->first(
-            fn (string $sql): bool => str_contains($sql, 'from "course_submissions"'),
+            fn (string $sql): bool => str_contains($sql, 'from course_submissions '),
         );
         $answerQuery = $queries->first(
-            fn (string $sql): bool => str_contains($sql, 'from "course_submission_answers"'),
+            fn (string $sql): bool => str_contains($sql, 'from course_submission_answers '),
         );
 
         $this->assertNotNull($submissionQuery);
