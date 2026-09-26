@@ -9,7 +9,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class SanitizeRichTextInput
 {
-    public function __construct(private readonly RichTextPayloadSanitizer $sanitizer) {}
+    public function __construct(private readonly RichTextPayloadSanitizer $sanitizer)
+    {
+    }
 
     public function handle(Request $request, Closure $next): Response
     {

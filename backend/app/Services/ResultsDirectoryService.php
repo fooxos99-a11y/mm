@@ -7,7 +7,9 @@ use Illuminate\Support\Facades\DB;
 
 class ResultsDirectoryService
 {
-    public function __construct(private readonly CoreDataService $core) {}
+    public function __construct(private readonly CoreDataService $core)
+    {
+    }
 
     public function catalog(): array
     {
@@ -101,17 +103,24 @@ class ResultsDirectoryService
         $permissions = $this->core->loadRolePermissions()[$user->role] ?? [];
         $courseKeys = $user->role === 'admin' || collect(['edit_pre_questions', 'edit_post_questions', 'edit_tasks'])
             ->contains(fn ($key) => (bool) ($permissions[$key] ?? false));
-        $data = $this->core->serializeResultsPage($courses, $questions, $submissions,
+        $data = $this->core->serializeResultsPage(
+            $courses,
+            $questions,
+            $submissions,
             DB::table('course_submission_answers')
                 ->whereNull('archive_id')
                 ->whereIn('submission_id', $submissions->pluck('id'))
                 ->get(),
-            $attendance, $finalQuestions, $finalSubmissions,
+            $attendance,
+            $finalQuestions,
+            $finalSubmissions,
             DB::table('final_exam_submission_answers')
                 ->whereNull('archive_id')
                 ->whereIn('submission_id', $finalSubmissions->pluck('id'))
                 ->get(),
-            $courseKeys, $user->role === 'admin' || ($permissions['page_final_exam'] ?? false));
+            $courseKeys,
+            $user->role === 'admin' || ($permissions['page_final_exam'] ?? false),
+        );
 
         return [...$data, 'students' => $page->getCollection()->map(fn ($student) => [
             'id' => $student->id, 'name' => $student->full_name, 'loginId' => $student->login_code,

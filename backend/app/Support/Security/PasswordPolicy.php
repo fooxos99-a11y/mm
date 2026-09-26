@@ -8,7 +8,9 @@ final class PasswordPolicy
 {
     public const MIN_LENGTH = 10;
 
-    private function __construct() {}
+    private function __construct()
+    {
+    }
 
     public static function rule(): Password
     {

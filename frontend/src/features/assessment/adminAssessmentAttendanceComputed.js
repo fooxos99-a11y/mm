@@ -1,4 +1,5 @@
-export default {
+// Vue merges these members into the component, so `this` is the component instance.
+export default /** @type {Record<string, any>} */ ({
     attendanceStudents() {
       return this.students.filter((student) => student.branchId === (this.managedBranchId || this.attendanceBranchId));
     },
@@ -24,4 +25,4 @@ export default {
     selectedAttendanceRecords() {
       return this.attendance.filter((record) => record.courseId === this.selectedCourseId);
     },
-};
+});

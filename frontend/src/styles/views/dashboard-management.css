@@ -15,13 +15,13 @@
 }
 
 .dashboard-page .dashboard-status-badge--success {
-  background: rgba(16, 185, 129, 0.12);
+  background: rgba(209, 241, 231, 0.62);
   color: #047857;
 }
 
 .dashboard-page .dashboard-status-badge--warning {
-  background: rgba(249, 115, 22, 0.12);
-  color: #c2410c;
+  background: rgba(254, 237, 224, 0.91);
+  color: #c1410c;
 }
 
 .dashboard-page .dashboard-permissions-grid {
@@ -364,7 +364,7 @@
   align-items: center;
   padding: 7px 12px;
   border-radius: 999px;
-  background: rgba(15, 118, 110, 0.08);
+  background: rgba(223, 237, 236, 0.6);
   color: #0f766e;
   font-size: 0.8rem;
   font-weight: 700;

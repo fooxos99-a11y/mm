@@ -9,7 +9,8 @@ const resolveDisplayedRowsSource = (vm) => {
   return vm.isAttendanceResultsType ? vm.attendanceRows : vm.assessmentRows;
 };
 
-export default {
+// Vue merges these members into the component, so `this` is the component instance.
+export default /** @type {Record<string, any>} */ ({
   managedBranchId() {
     if (this.currentUser?.role === 'male_manager') return 'male';
     if (this.currentUser?.role === 'female_manager') return 'female';
@@ -245,4 +246,4 @@ export default {
   hasManualReviewAnswers() {
     return this.resultDetailCards.some(detail => detail.requiresManualReview);
   },
-};
+});

@@ -76,7 +76,7 @@
   margin-bottom: 14px;
   padding: 12px 14px;
   border-radius: 16px;
-  background: rgba(8, 118, 153, 0.08);
+  background: rgba(103, 171, 192, 0.13);
   color: #0f3554;
   font-size: 0.95rem;
   font-weight: 800;
@@ -121,7 +121,7 @@
 .registration-admin__empty {
   padding: 24px;
   border-radius: 22px;
-  background: rgba(148, 163, 184, 0.1);
+  background: rgba(196, 204, 216, 0.18);
   color: #475569;
   text-align: center;
   font-weight: 700;
@@ -144,7 +144,7 @@
 
 .registration-admin__requests-panel-head {
   padding: 14px 18px;
-  background: rgba(8, 118, 153, 0.07);
+  background: rgba(159, 202, 215, 0.18);
   color: #0f5670;
   font-size: 0.86rem;
   font-weight: 900;
@@ -213,17 +213,17 @@
 }
 
 .registration-admin__request-status--pending {
-  background: rgba(245, 158, 11, 0.14);
-  color: #b45309;
+  background: rgba(253, 240, 216, 0.88);
+  color: #b15209;
 }
 
 .registration-admin__request-status--accepted {
-  background: rgba(22, 163, 74, 0.14);
+  background: rgba(164, 219, 185, 0.36);
   color: #166534;
 }
 
 .registration-admin__request-status--rejected {
-  background: rgba(220, 38, 38, 0.12);
+  background: rgba(247, 207, 207, 0.54);
   color: #b91c1c;
 }
 

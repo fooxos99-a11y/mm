@@ -3,22 +3,13 @@ import { Quill } from './editorRuntime';
 
 const findBlotForNode = (node) => (node ? Quill.find(node, true) : null);
 
-// Prefer the standard caretPositionFromPoint API; caretRangeFromPoint remains as a
-// fallback for engines that have not shipped the standard API yet.
+// Uses the standard caretPositionFromPoint API (Chromium 128+, Safari 18.2+, Firefox).
 const findBlotAtPoint = (x, y) => {
-  if (typeof document.caretPositionFromPoint === 'function') {
-    const positionBlot = findBlotForNode(document.caretPositionFromPoint(x, y)?.offsetNode);
-
-    if (positionBlot) {
-      return positionBlot;
-    }
+  if (typeof document.caretPositionFromPoint !== 'function') {
+    return null;
   }
 
-  if (typeof document.caretRangeFromPoint === 'function') {
-    return findBlotForNode(document.caretRangeFromPoint(x, y)?.startContainer);
-  }
-
-  return null;
+  return findBlotForNode(document.caretPositionFromPoint(x, y)?.offsetNode);
 };
 
 export default {

@@ -5,19 +5,17 @@ import {
   setTaskReviewStatus,
 } from '../../services/api';
 import { sanitizeRichTextHtml } from '../../utils/documentContent';
+import { openHtmlDocument } from '../../utils/htmlWindow.mjs';
 
 export default {
   openAttachmentPreview(attachment) {
     if (!attachment?.fileDataUrl) return;
-    const previewWindow = window.open('', '_blank', 'noopener,noreferrer');
-    if (!previewWindow) return;
-    previewWindow.document.write(`<!doctype html><html lang="ar" dir="rtl"><head>
+    openHtmlDocument(`<!doctype html><html lang="ar" dir="rtl"><head>
       <meta charset="utf-8"><title>${this.escapeHtml(attachment.fileName || 'المرفق')}</title>
       <style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#f8fafc;font-family:sans-serif}
       iframe,img,video{width:100%;height:100vh;border:0;object-fit:contain;background:#fff}
       a{color:#006c67;font-weight:800;font-size:18px}</style></head>
-      <body>${this.renderAttachmentPreview(attachment)}</body></html>`);
-    previewWindow.document.close();
+      <body>${this.renderAttachmentPreview(attachment)}</body></html>`, { features: 'noopener,noreferrer' });
   },
   escapeHtml(value) {
     return String(value || '').replaceAll('&', '&amp;').replaceAll('<', '&lt;')
@@ -134,14 +132,13 @@ export default {
       .q-answer-label{font-size:12px;color:#888;margin-bottom:8px}.student-doc-answer{direction:rtl;text-align:right;font-size:14px;line-height:1.8;padding:10px;background:#fafafa;border-radius:6px}
       .student-doc-answer img{position:static!important;display:block;max-width:100%;height:auto;margin:10px auto;border-radius:8px}.student-text-answer{font-size:14px;color:#333;padding:8px 12px;background:#fafafa;border-right:3px solid #4e7fc5;border-radius:4px;margin-top:4px}
       @media print{body{background:#fff;padding:10px}.q-card{border:1px solid #ccc}}</style></head>
-      <body><div class="pdf-header"><h1>${title}</h1></div>${cards}
-      <script>window.onload=function(){setTimeout(function(){window.print()},400)};</` + `script></body></html>`;
-    const win = window.open('', '_blank', 'width=900,height=700');
+      <body><div class="pdf-header"><h1>${title}</h1></div>${cards}</body></html>`;
+    const win = openHtmlDocument(html, { features: 'width=900,height=700' });
     if (!win) {
       this.$toast.error('يرجى السماح بفتح النوافذ المنبثقة لتحميل الملف');
       return;
     }
-    win.document.write(html);
-    win.document.close();
+    // The page's CSP blocks inline scripts, so the print dialog is opened from here.
+    win.addEventListener('load', () => setTimeout(() => win.print(), 400), { once: true });
   },
 };

@@ -3,7 +3,7 @@ import AssessmentExistingQuestionList from '../../components/assessment/Assessme
 import AssessmentQuestionBuilder from '../../components/assessment/AssessmentQuestionBuilder.vue';
 import FinalExamDialogs from '../../components/finalExam/FinalExamDialogs.vue';
 import { AppChoiceButton, AppSelect } from '../../components/ui';
-import indicatorAnimation from '../../mixins/indicatorAnimation';
+import { useIndicatorAnimation } from '../../composables/useIndicatorAnimation';
 import { finalExamBranchMethods } from './finalExamBranchMethods';
 import { finalExamIndicatorMethods } from './finalExamIndicatorMethods';
 import { finalExamQuestionMethods } from './finalExamQuestionMethods';
@@ -12,7 +12,9 @@ import { createFinalExamState } from './finalExamViewModel.mjs';
 export default {
   name: 'AdminFinalExamView',
   components: { AssessmentExistingQuestionList, AssessmentQuestionBuilder, FinalExamDialogs, AppChoiceButton, AppSelect },
-  mixins: [indicatorAnimation],
+  setup() {
+    return useIndicatorAnimation();
+  },
   props: { embedded: { type: Boolean, default: false } },
   data: createFinalExamState,
   computed: {

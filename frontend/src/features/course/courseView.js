@@ -13,7 +13,8 @@ const isAssessmentEnabledBySettings = (course, assessmentType, branchId) => {
   return branchAvailability[type] !== false;
 };
 
-export default {
+// Vue merges these members into the component, so `this` is the component instance.
+export default /** @type {Record<string, any>} */ ({
   name: 'CourseView',
   components: {
     AttachmentPreviewDialog,
@@ -219,4 +220,4 @@ export default {
     }
   },
   methods: courseMethods,
-};
+});

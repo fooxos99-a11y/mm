@@ -8,7 +8,9 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class TrainingMaterialAttachmentService
 {
-    public function __construct(private readonly TrainingMaterialAccessService $accessService) {}
+    public function __construct(private readonly TrainingMaterialAccessService $accessService)
+    {
+    }
 
     public function findAuthorized(?User $user, string $attachmentId): Media
     {

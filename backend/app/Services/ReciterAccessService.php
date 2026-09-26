@@ -9,7 +9,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ReciterAccessService
 {
-    public function __construct(private readonly CoreDataService $coreDataService) {}
+    public function __construct(private readonly CoreDataService $coreDataService)
+    {
+    }
 
     public function assertCanViewAccount(?User $user, string $loginCode): void
     {

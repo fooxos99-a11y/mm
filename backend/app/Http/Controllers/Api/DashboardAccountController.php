@@ -9,7 +9,9 @@ use Illuminate\Http\JsonResponse;
 
 class DashboardAccountController extends Controller
 {
-    public function __construct(private readonly DashboardAccountService $dashboardAccountService) {}
+    public function __construct(private readonly DashboardAccountService $dashboardAccountService)
+    {
+    }
 
     public function index(): JsonResponse
     {

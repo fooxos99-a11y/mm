@@ -9,7 +9,9 @@ use Illuminate\Database\Eloquent\Builder;
 
 class PeopleEditorService
 {
-    public function __construct(private readonly RegistrationService $registration) {}
+    public function __construct(private readonly RegistrationService $registration)
+    {
+    }
 
     private function query(User $user, string $type): Builder
     {

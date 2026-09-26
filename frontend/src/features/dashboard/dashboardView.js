@@ -4,7 +4,7 @@ import DashboardOverviewPanel from '../../components/dashboard/DashboardOverview
 import DashboardSidebar from '../../components/dashboard/DashboardSidebar.vue';
 import DashboardTopbar from '../../components/dashboard/DashboardTopbar.vue';
 import DashboardUtilityDialogs from '../../components/dashboard/DashboardUtilityDialogs.vue';
-import indicatorAnimation from '../../mixins/indicatorAnimation';
+import { useIndicatorAnimation } from '../../composables/useIndicatorAnimation';
 import computed from './dashboardComputed';
 import navigationMethods from './dashboardNavigationMethods';
 import utilityMethods from './dashboardUtilityMethods';
@@ -38,7 +38,9 @@ export default {
     AdminArchiveView,
     AdminSettingsView,
   },
-  mixins: [indicatorAnimation],
+  setup() {
+    return useIndicatorAnimation();
+  },
   data() {
     return {
       mobileMenuOpen: false,

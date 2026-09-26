@@ -9,7 +9,9 @@ use Illuminate\Support\Facades\DB;
 
 class PeopleDirectoryService
 {
-    public function __construct(private readonly PeopleDirectoryPresenter $presenter) {}
+    public function __construct(private readonly PeopleDirectoryPresenter $presenter)
+    {
+    }
 
     public function paginate(User $user, array $filters): array
     {
@@ -46,10 +48,12 @@ class PeopleDirectoryService
             $query->where(fn ($query) => $query->where('students.full_name', 'like', '%'.$search.'%')
                 ->orWhere('students.login_code', 'like', '%'.$search.'%'));
         }
-        $query->selectSub(DB::table('student_parts')->selectRaw('COUNT(*)')
-            ->whereColumn('student_id', 'students.id'), 'parts_count');
-        $query->selectSub(DB::table('course_attendance')->selectRaw('COUNT(*)')
-            ->whereNull('archive_id')->whereColumn('login_code', 'students.login_code'), 'attendance_count');
+        $partsCount = DB::table('student_parts')->selectRaw('COUNT(*)')
+            ->whereColumn('student_id', 'students.id');
+        $query->selectSub($partsCount, 'parts_count');
+        $attendanceCount = DB::table('course_attendance')->selectRaw('COUNT(*)')
+            ->whereNull('archive_id')->whereColumn('login_code', 'students.login_code');
+        $query->selectSub($attendanceCount, 'attendance_count');
         foreach (['pre', 'post', 'tasks'] as $type) {
             $counts = DB::table('course_submissions')->selectRaw('COUNT(DISTINCT course_id)')
                 ->whereNull('archive_id')

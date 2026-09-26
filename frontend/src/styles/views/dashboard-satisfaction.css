@@ -76,15 +76,15 @@
   min-height: 34px;
   padding: 0 14px;
   border-radius: 999px;
-  background: rgba(16, 118, 153, 0.08);
+  background: rgba(216, 233, 238, 0.49);
   color: #0b6f8c;
   font-size: 0.84rem;
   font-weight: 800;
 }
 
 .dashboard-page .dashboard-satisfaction-badge--required {
-  background: rgba(220, 38, 38, 0.08);
-  color: #d52222;
+  background: rgba(252, 236, 236, 0.9);
+  color: #d32222;
 }
 
 .dashboard-page .dashboard-satisfaction-metrics {

@@ -23,7 +23,8 @@ class StudentController extends Controller
         private readonly CompletionRequirementsService $completionRequirementsService,
         private readonly ReciterAccessService $reciterAccessService,
         private readonly UserManagementService $userManagementService,
-    ) {}
+    ) {
+    }
 
     public function indicators(Request $request): JsonResponse
     {

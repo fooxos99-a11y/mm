@@ -22,10 +22,28 @@ trait SerializesResultsPages
             'post' => $this->normalizeCourseQuestions($items->where('assessment_type', 'post'), $courseKeys),
             'tasks' => $this->normalizeCourseQuestions($items->where('assessment_type', 'tasks'), $courseKeys),
         ]);
-        $courseData = $this->serializeDashboardCourses($courses, $grouped, collect(), $submissions,
-            $answers->groupBy('submission_id'), $questions->keyBy('id'), $courseKeys, $attendance, collect());
-        $finalData = $this->serializeDashboardFeedback(collect(), collect(), $finalQuestions, $finalSubmissions,
-            $finalAnswers->groupBy('submission_id'), $finalQuestions->keyBy('id'), $finalKeys, collect(), '');
+        $courseData = $this->serializeDashboardCourses(
+            $courses,
+            $grouped,
+            collect(),
+            $submissions,
+            $answers->groupBy('submission_id'),
+            $questions->keyBy('id'),
+            $courseKeys,
+            $attendance,
+            collect(),
+        );
+        $finalData = $this->serializeDashboardFeedback(
+            collect(),
+            collect(),
+            $finalQuestions,
+            $finalSubmissions,
+            $finalAnswers->groupBy('submission_id'),
+            $finalQuestions->keyBy('id'),
+            $finalKeys,
+            collect(),
+            '',
+        );
 
         return array_intersect_key($courseData, array_flip(['courses', 'submissions', 'attendance']))
             + array_intersect_key($finalData, array_flip(['finalExamQuestions', 'finalExamSubmissions']));

@@ -10,7 +10,9 @@ use Illuminate\Http\JsonResponse;
 
 class PageContentController extends Controller
 {
-    public function __construct(private readonly PageContentService $pageContentService) {}
+    public function __construct(private readonly PageContentService $pageContentService)
+    {
+    }
 
     public function updateHome(UpdateHomePageContentRequest $request): JsonResponse
     {

@@ -19,7 +19,8 @@ class CourseAssessmentController extends Controller
         private readonly AssessmentAccessService $accessService,
         private readonly CourseAssessmentService $courseAssessmentService,
         private readonly AssessmentAnswerReviewService $answerReviews,
-    ) {}
+    ) {
+    }
 
     public function store(SubmitAssessmentRequest $request): JsonResponse
     {

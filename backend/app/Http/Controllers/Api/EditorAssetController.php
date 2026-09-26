@@ -10,7 +10,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 class EditorAssetController extends Controller
 {
-    public function __construct(private readonly EditorAssetService $editorAssetService) {}
+    public function __construct(private readonly EditorAssetService $editorAssetService)
+    {
+    }
 
     public function store(StoreEditorImageRequest $request): JsonResponse
     {

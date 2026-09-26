@@ -22,7 +22,8 @@ class FinalExamController extends Controller
         private readonly AssessmentAccessService $accessService,
         private readonly FinalExamService $finalExamService,
         private readonly AssessmentAnswerReviewService $answerReviews,
-    ) {}
+    ) {
+    }
 
     public function storeQuestion(StoreFinalExamQuestionRequest $request): JsonResponse
     {

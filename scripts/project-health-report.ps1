@@ -70,6 +70,22 @@ function Resolve-ComposerInvocation {
     return $null
 }
 
+function ConvertTo-EscapedArgumentList {
+    param([string[]]$ArgumentList)
+
+    $escapedArgs = @()
+    foreach ($argument in $ArgumentList) {
+        if ($argument -match '[\s"]') {
+            $escapedArgs += ('"' + ($argument -replace '"', '\"') + '"')
+        }
+        else {
+            $escapedArgs += $argument
+        }
+    }
+
+    return ,$escapedArgs
+}
+
 function Invoke-ReportCommand {
     param(
         [string]$Title,
@@ -89,15 +105,7 @@ function Invoke-ReportCommand {
     $stderrPath = [System.IO.Path]::GetTempFileName()
 
     try {
-        $escapedArgs = @()
-        foreach ($argument in $ArgumentList) {
-            if ($argument -match '[\s"]') {
-                $escapedArgs += ('"' + ($argument -replace '"', '\"') + '"')
-            }
-            else {
-                $escapedArgs += $argument
-            }
-        }
+        $escapedArgs = ConvertTo-EscapedArgumentList $ArgumentList
 
         $process = Start-Process -FilePath $ProgramPath -ArgumentList $escapedArgs -WorkingDirectory $WorkingDirectory -NoNewWindow -PassThru -RedirectStandardOutput $stdoutPath -RedirectStandardError $stderrPath
         $finished = $process.WaitForExit($TimeoutSeconds * 1000)

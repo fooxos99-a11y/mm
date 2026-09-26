@@ -48,9 +48,12 @@ trait ArchivesActiveBatch
             $archive = Archive::create(['name' => trim($data['name']), 'batch_type' => $batchType]);
             $archiveId = $archive->id;
             $activeStudents = DB::table('students')->whereNull('archive_id')
-                ->when($batchType !== 'all', fn ($query) => $query
-                    ->join('branches', 'branches.id', '=', 'students.branch_id')
-                    ->where('branches.code', $batchType))
+                ->when(
+                    $batchType !== 'all',
+                    fn ($query) => $query
+                        ->join('branches', 'branches.id', '=', 'students.branch_id')
+                        ->where('branches.code', $batchType),
+                )
                 ->select(['students.id', 'students.login_code'])->orderBy('students.created_at')->get();
             $studentIds = $activeStudents->pluck('id')->values();
             $studentLoginCodes = $activeStudents->pluck('login_code')->filter()->values();

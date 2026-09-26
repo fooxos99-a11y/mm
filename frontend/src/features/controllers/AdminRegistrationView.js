@@ -221,25 +221,6 @@ export default {
           this.$toast.success('تم نسخ رابط التسجيل');
           return;
         }
-
-        if (typeof document !== 'undefined') {
-          const input = document.createElement('textarea');
-          input.value = this.registrationUrl;
-          input.setAttribute('readonly', 'readonly');
-          input.style.position = 'fixed';
-          input.style.opacity = '0';
-          document.body.appendChild(input);
-          input.select();
-          input.setSelectionRange(0, input.value.length);
-
-          const copied = document.execCommand('copy');
-          input.remove();
-
-          if (copied) {
-            this.$toast.success('تم نسخ رابط التسجيل');
-            return;
-          }
-        }
       } catch {
         // Fall through to the shared error toast below.
       }

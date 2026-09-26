@@ -10,7 +10,9 @@ use Illuminate\Http\Request;
 
 class SnapshotController extends Controller
 {
-    public function __construct(private readonly CoreDataService $coreDataService) {}
+    public function __construct(private readonly CoreDataService $coreDataService)
+    {
+    }
 
     public function snapshot(Request $request): JsonResponse
     {

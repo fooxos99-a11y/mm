@@ -42,7 +42,7 @@ const request = async (name, path, options, validate) => {
       ...options,
       headers: {
         Accept: 'application/json, text/html;q=0.9',
-        ...(options?.headers || {}),
+        ...options?.headers,
       },
     });
     const body = await response.text();

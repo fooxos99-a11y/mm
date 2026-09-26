@@ -125,7 +125,8 @@ class ManualAttendanceTest extends TestCase
     private function actAs(string $role, bool $permitted = true): void
     {
         DB::table('role_permissions')->updateOrInsert(
-            ['role' => $role, 'permission_key' => 'page_results'], ['is_enabled' => $permitted],
+            ['role' => $role, 'permission_key' => 'page_results'],
+            ['is_enabled' => $permitted],
         );
         Sanctum::actingAs(User::factory()->create(['role' => $role]));
     }

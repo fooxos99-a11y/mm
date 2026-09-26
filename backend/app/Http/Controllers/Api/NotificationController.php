@@ -9,7 +9,9 @@ use Illuminate\Http\JsonResponse;
 
 class NotificationController extends Controller
 {
-    public function __construct(private readonly CoreDataService $coreDataService) {}
+    public function __construct(private readonly CoreDataService $coreDataService)
+    {
+    }
 
     public function index(): JsonResponse
     {

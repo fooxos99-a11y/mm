@@ -2,7 +2,7 @@ import { mapActions, mapState } from 'vuex';
 import {
   AppButton, AppDialog, AppDialogFooter, AppDialogHeader, AppIconButton, AppSelect, AppTextField,
 } from '../../components/ui';
-import indicatorAnimation from '../../mixins/indicatorAnimation';
+import { useIndicatorAnimation } from '../../composables/useIndicatorAnimation';
 
 const buildIndicatorValue = (isRating, average, textCount) => {
   if (!isRating) {
@@ -27,7 +27,9 @@ export default {
     AppIconButton,
     AppTextField,
   },
-  mixins: [indicatorAnimation],
+  setup() {
+    return useIndicatorAnimation();
+  },
   props: {
     embedded: {
       type: Boolean,

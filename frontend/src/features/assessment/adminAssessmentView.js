@@ -10,7 +10,7 @@ import {
   AppChoiceButton, AppIconButton,
 } from '../../components/ui';
 import { normalizeAssessmentAnswer } from '../assessmentQuestions/questionModel.mjs';
-import indicatorAnimation from '../../mixins/indicatorAnimation';
+import { useIndicatorAnimation } from '../../composables/useIndicatorAnimation';
 import computed from './adminAssessmentComputed';
 import watchers from './adminAssessmentWatchers';
 import availabilityMethods from './assessmentAvailabilityMethods';
@@ -33,7 +33,9 @@ export default {
     AppChoiceButton,
     AppIconButton,
   },
-  mixins: [indicatorAnimation],
+  setup() {
+    return useIndicatorAnimation();
+  },
   props: {
     embedded: { type: Boolean, default: false },
     assessmentTypeOverride: { type: String, default: '' },

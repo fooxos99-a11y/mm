@@ -233,17 +233,6 @@
 .app-sidebar__header, .app-sidebar__footer { padding: 16px; }
 .app-sidebar__nav { flex: 1; padding: 10px; overflow-y: auto; }
 
-.app-drawer-layer { position: fixed; inset: 0; z-index: 1000; }
-.app-drawer__backdrop { position: absolute; inset: 0; width: 100%; border: 0; background: rgba(15, 23, 42, 0.48); }
-.app-drawer { position: absolute; inset-block: 0; display: flex; flex-direction: column; width: min(88vw, 380px); background: #fff; box-shadow: 0 24px 60px rgba(15, 23, 42, 0.2); }
-.app-drawer--right { right: 0; }
-.app-drawer--left { left: 0; }
-.app-drawer__header, .app-drawer__footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 18px; border-bottom: 1px solid var(--app-ui-border); }
-.app-drawer__header h2 { margin: 0; color: var(--app-ui-text); font-size: 1.1rem; font-weight: 900; }
-.app-drawer__body { flex: 1; padding: 18px; overflow-y: auto; }
-.app-drawer__footer { border-top: 1px solid var(--app-ui-border); border-bottom: 0; }
-.app-drawer-enter-active, .app-drawer-leave-active { transition: opacity 0.2s ease; }
-.app-drawer-enter, .app-drawer-leave-to { opacity: 0; }
 
 @keyframes app-ui-spin { to { transform: rotate(360deg); } }
 @keyframes app-ui-skeleton { to { background-position: -200% 0; } }

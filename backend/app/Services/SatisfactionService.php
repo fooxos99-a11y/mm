@@ -65,11 +65,14 @@ class SatisfactionService
 
         DB::table('satisfaction_questions')->insert($rows);
 
-        return array_map(fn (array $row) => [
-            'id' => $row['id'],
-            'courseId' => $row['course_id'],
-            'createdAt' => $createdAt->toISOString(),
-        ], $rows);
+        return array_map(
+            fn (array $row) => [
+                'id' => $row['id'],
+                'courseId' => $row['course_id'],
+                'createdAt' => $createdAt->toISOString(),
+            ],
+            $rows,
+        );
     }
 
     public function deleteSatisfactionQuestion(string $questionId): void
@@ -79,16 +82,19 @@ class SatisfactionService
 
     public function submitSatisfactionResponses(array $responses): array
     {
-        $rows = array_map(fn (array $response) => [
-            'id' => (string) str()->uuid(),
-            'course_id' => $response['courseId'],
-            'question_id' => $response['questionId'],
-            'login_code' => $response['loginCode'],
-            'student_name' => $response['studentName'],
-            'rating_value' => $response['ratingValue'],
-            'text_value' => ($response['textValue'] ?? '') !== '' ? $response['textValue'] : null,
-            'submitted_at' => now(),
-        ], $responses);
+        $rows = array_map(
+            fn (array $response) => [
+                'id' => (string) str()->uuid(),
+                'course_id' => $response['courseId'],
+                'question_id' => $response['questionId'],
+                'login_code' => $response['loginCode'],
+                'student_name' => $response['studentName'],
+                'rating_value' => $response['ratingValue'],
+                'text_value' => ($response['textValue'] ?? '') !== '' ? $response['textValue'] : null,
+                'submitted_at' => now(),
+            ],
+            $responses,
+        );
 
         DB::table('satisfaction_responses')->upsert(
             $rows,
@@ -96,15 +102,18 @@ class SatisfactionService
             ['student_name', 'rating_value', 'text_value', 'submitted_at'],
         );
 
-        return array_map(fn (array $row) => [
-            'id' => (string) DB::table('satisfaction_responses')
-                ->where('course_id', $row['course_id'])
-                ->where('question_id', $row['question_id'])
-                ->where('login_code', $row['login_code'])
-                ->value('id'),
-            'courseId' => $row['course_id'],
-            'questionId' => $row['question_id'],
-            'loginCode' => $row['login_code'],
-        ], $rows);
+        return array_map(
+            fn (array $row) => [
+                'id' => (string) DB::table('satisfaction_responses')
+                    ->where('course_id', $row['course_id'])
+                    ->where('question_id', $row['question_id'])
+                    ->where('login_code', $row['login_code'])
+                    ->value('id'),
+                'courseId' => $row['course_id'],
+                'questionId' => $row['question_id'],
+                'loginCode' => $row['login_code'],
+            ],
+            $rows,
+        );
     }
 }

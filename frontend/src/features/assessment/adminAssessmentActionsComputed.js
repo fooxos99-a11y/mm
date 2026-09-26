@@ -1,4 +1,5 @@
-export default {
+// Vue merges these members into the component, so `this` is the component instance.
+export default /** @type {Record<string, any>} */ ({
     rolePermissions() {
       return this.dashboardSnapshot?.rolePermissions?.[this.currentUser?.role] || {};
     },
@@ -149,4 +150,4 @@ export default {
         timers: this.currentAssessmentActionTimers,
       };
     },
-};
+});

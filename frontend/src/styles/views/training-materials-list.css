@@ -198,8 +198,8 @@
   width: 42px;
   height: 42px;
   border-radius: 14px;
-  background: rgba(16, 118, 153, 0.09);
-  color: #0f7793;
+  background: rgba(232, 242, 245, 0.92);
+  color: #0f7692;
 }
 
 .training-materials-list__title {
@@ -298,7 +298,7 @@
 .training-materials-list__action-button--delete:hover {
   border-color: rgba(190, 69, 69, 0.32);
   color: #b42323;
-  background: rgba(190, 69, 69, 0.07);
+  background: rgba(239, 208, 208, 0.28);
 }
 
 .training-materials-list__action-button:disabled {

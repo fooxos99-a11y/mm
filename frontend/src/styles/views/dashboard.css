@@ -182,7 +182,7 @@
 
 .dashboard-page .dashboard-subnav__item:hover,
 .dashboard-page .dashboard-subnav__item--active {
-  background: rgba(16, 118, 153, 0.08);
+  background: rgba(108, 171, 192, 0.13);
   color: #0f3554;
 }
 
@@ -266,8 +266,8 @@
   min-height: 44px;
   padding: 0 16px;
   border-radius: 16px;
-  background: rgba(34, 197, 94, 0.12);
-  color: #15803d;
+  background: rgba(223, 247, 231, 0.82);
+  color: #157e3c;
   font-size: 0.96rem;
   font-weight: 900;
   white-space: nowrap;
@@ -334,7 +334,7 @@
   padding: 14px 18px;
   border-radius: 20px;
   border: 1px solid rgba(220, 38, 38, 0.2);
-  background: rgba(220, 38, 38, 0.05);
+  background: rgba(247, 208, 208, 0.23);
   color: #b91c1c;
   font-size: 0.92rem;
   font-weight: 600;

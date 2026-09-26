@@ -12,7 +12,9 @@ class DashboardNotificationCreated implements ShouldBroadcastNow
     use Dispatchable;
     use SerializesModels;
 
-    public function __construct(public readonly array $notification) {}
+    public function __construct(public readonly array $notification)
+    {
+    }
 
     public function broadcastOn(): array
     {

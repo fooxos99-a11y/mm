@@ -7,7 +7,9 @@ use Illuminate\Support\Facades\DB;
 
 class DashboardShellService
 {
-    public function __construct(private readonly DashboardOverviewService $overview) {}
+    public function __construct(private readonly DashboardOverviewService $overview)
+    {
+    }
 
     public function load(User $user): array
     {

@@ -144,8 +144,8 @@
 }
 
 .assessment-page .assessment-select-option__action:hover:not(:disabled) {
-  background: rgba(15, 118, 152, 0.1);
-  color: #0f7698;
+  background: rgba(228, 240, 243, 0.89);
+  color: #0f7495;
 }
 
 .assessment-page .assessment-select-option__action:disabled {

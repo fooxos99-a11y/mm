@@ -202,13 +202,13 @@
 
 .assessment-alert--error {
   border: 1px solid rgba(220, 38, 38, 0.18);
-  background: rgba(220, 38, 38, 0.06);
+  background: rgba(247, 207, 207, 0.27);
   color: #b91c1c;
 }
 
 .assessment-alert--warning {
   border: 1px solid rgba(217, 119, 6, 0.18);
-  background: rgba(245, 158, 11, 0.08);
+  background: rgba(254, 245, 230, 0.77);
   color: #a16207;
 }
 
@@ -223,7 +223,7 @@
 .assessment-state--success {
   border-style: solid;
   border-color: rgba(14, 165, 233, 0.18);
-  background: rgba(14, 165, 233, 0.08);
+  background: rgba(142, 213, 245, 0.17);
   color: #075985;
 }
 

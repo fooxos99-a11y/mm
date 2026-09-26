@@ -9,7 +9,9 @@ use Illuminate\Http\Request;
 
 class CompletionRequirementsController extends Controller
 {
-    public function __construct(private readonly CompletionRequirementsService $service) {}
+    public function __construct(private readonly CompletionRequirementsService $service)
+    {
+    }
 
     public function show(string $branchCode): JsonResponse
     {

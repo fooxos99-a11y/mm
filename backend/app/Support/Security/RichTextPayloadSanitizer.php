@@ -16,7 +16,9 @@ final class RichTextPayloadSanitizer
         'value' => true,
     ];
 
-    public function __construct(private readonly RichTextSanitizer $sanitizer) {}
+    public function __construct(private readonly RichTextSanitizer $sanitizer)
+    {
+    }
 
     public function sanitize(array $payload): array
     {

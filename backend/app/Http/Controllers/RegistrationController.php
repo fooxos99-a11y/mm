@@ -12,7 +12,9 @@ use Illuminate\Http\JsonResponse;
 
 class RegistrationController extends Controller
 {
-    public function __construct(private readonly RegistrationService $registrationService) {}
+    public function __construct(private readonly RegistrationService $registrationService)
+    {
+    }
 
     public function publicStatus(): JsonResponse
     {

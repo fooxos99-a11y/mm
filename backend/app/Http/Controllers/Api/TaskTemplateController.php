@@ -10,7 +10,9 @@ use Illuminate\Http\JsonResponse;
 
 class TaskTemplateController extends Controller
 {
-    public function __construct(private readonly CoreDataService $coreDataService) {}
+    public function __construct(private readonly CoreDataService $coreDataService)
+    {
+    }
 
     public function store(StoreTaskTemplateRequest $request): JsonResponse
     {

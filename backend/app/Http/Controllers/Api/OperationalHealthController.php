@@ -12,7 +12,9 @@ use Throwable;
 
 class OperationalHealthController extends Controller
 {
-    public function __construct(private readonly OperationalMetricsService $metrics) {}
+    public function __construct(private readonly OperationalMetricsService $metrics)
+    {
+    }
 
     public function __invoke(): JsonResponse
     {

@@ -77,7 +77,7 @@
 .rich-text-editor__toolbar :deep(button.ql-table.rich-text-editor__table-trigger:hover),
 .rich-text-editor__toolbar :deep(button.ql-table.rich-text-editor__table-trigger:focus-visible) {
   color: #0f172a;
-  background: rgba(15, 23, 42, 0.06);
+  background: rgba(135, 139, 148, 0.12);
 }
 
 .rich-text-editor__toolbar :deep(button.ql-undo svg) {
@@ -278,13 +278,13 @@
 
 .rich-text-editor__toolbar :deep(.ql-picker.ql-font .ql-picker-item:hover),
 .rich-text-editor__toolbar :deep(.ql-picker.ql-font .ql-picker-item.ql-selected) {
-  background: rgba(31, 111, 150, 0.1);
+  background: rgba(223, 234, 240, 0.69);
   color: #1f6f96;
 }
 
 .rich-text-editor__toolbar :deep(.ql-picker.ql-table .ql-picker-item:hover),
 .rich-text-editor__toolbar :deep(.ql-picker.ql-table .ql-picker-item.ql-selected) {
-  background: rgba(31, 111, 150, 0.1);
+  background: rgba(223, 234, 240, 0.69);
   color: #1f6f96;
 }
 

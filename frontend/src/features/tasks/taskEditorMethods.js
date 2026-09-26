@@ -6,6 +6,7 @@ import { parseImportedQuestionsFromText, splitPastedQuestionOptions } from '../.
 import { emptyQuestionForm, emptyTaskDraft } from './taskViewModel.mjs';
 
 const TRUE_FALSE_OPTIONS = ['صح', 'خطأ'];
+const TRUE_FALSE_ANSWERS = new Set(TRUE_FALSE_OPTIONS);
 
 const resolveOptionsForTypeChange = (type, options) => {
   if (type === 'truefalse') return [...TRUE_FALSE_OPTIONS];
@@ -16,7 +17,7 @@ const resolveOptionsForTypeChange = (type, options) => {
 const resolveCorrectAnswerForTypeChange = (type, correctAnswer) => {
   if (type === 'multiple') return correctAnswer;
   if (type !== 'truefalse') return '';
-  return TRUE_FALSE_OPTIONS.includes(correctAnswer) ? correctAnswer : 'صح';
+  return TRUE_FALSE_ANSWERS.has(correctAnswer) ? correctAnswer : 'صح';
 };
 
 const resolveImportedQuestionType = (preferredType, draftType) => {

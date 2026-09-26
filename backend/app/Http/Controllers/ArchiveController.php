@@ -17,7 +17,8 @@ class ArchiveController extends Controller
         private readonly ArchiveQueryService $queries,
         private readonly ArchiveLifecycleService $lifecycle,
         private readonly ArchivedStudentDetailService $studentDetails,
-    ) {}
+    ) {
+    }
 
     public function index(): JsonResponse
     {

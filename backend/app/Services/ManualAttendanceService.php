@@ -41,8 +41,9 @@ class ManualAttendanceService
 
             $attendance = DB::table('course_attendance')->where('course_id', $courseId)->whereNull('archive_id');
             if ($branchCode !== null) {
-                $attendance->whereIn('login_code', Student::query()->select('login_code')->whereNull('archive_id')
-                    ->whereHas('branch', fn ($query) => $query->where('code', $branchCode)));
+                $branchLoginCodes = Student::query()->select('login_code')->whereNull('archive_id')
+                    ->whereHas('branch', fn ($query) => $query->where('code', $branchCode));
+                $attendance->whereIn('login_code', $branchLoginCodes);
             }
             $attendance->delete();
 

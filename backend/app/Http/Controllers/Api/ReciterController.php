@@ -16,7 +16,8 @@ class ReciterController extends Controller
     public function __construct(
         private readonly ReciterAccessService $reciterAccessService,
         private readonly UserManagementService $userManagementService,
-    ) {}
+    ) {
+    }
 
     public function store(StoreReciterRequest $request): JsonResponse
     {

@@ -24,6 +24,8 @@ export async function createStudentResultFixture(page, suffix) {
     await request('/dashboard/assessment-submissions', { courseId: course.id, assessmentType: 'pre', studentName: `Result student ${suffix}`, loginId, answers: [{ questionId: question.id, value: 'A' }] });
     return { loginId, title };
   }, { suffix, password: studentPassword });
+  // Leave the dashboard first so late API responses cannot set a new session cookie.
+  await page.goto('about:blank');
   await page.context().clearCookies();
   return fixture;
 }

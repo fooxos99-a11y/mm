@@ -186,8 +186,6 @@
             :key="metric.key"
             class="people-metric"
             :class="{ 'people-metric--clickable': metric.key === 'parts' }"
-            role="button"
-            tabindex="0"
             @click.stop="$emit('metric', { person, key: metric.key })"
             @keydown.enter.stop="$emit('metric', { person, key: metric.key })"
             @keydown.space.stop.prevent="$emit('metric', { person, key: metric.key })"

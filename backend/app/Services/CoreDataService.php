@@ -27,5 +27,6 @@ class CoreDataService
         private readonly DashboardSnapshotFeedbackLoader $dashboardSnapshotFeedbackLoader,
         private readonly DashboardSnapshotReferenceLoader $dashboardSnapshotReferenceLoader,
         private readonly AssessmentAttachmentService $assessmentAttachmentService,
-    ) {}
+    ) {
+    }
 }

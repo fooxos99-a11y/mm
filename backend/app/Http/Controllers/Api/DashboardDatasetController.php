@@ -9,7 +9,9 @@ use Illuminate\Http\JsonResponse;
 
 class DashboardDatasetController extends Controller
 {
-    public function __construct(private readonly DashboardDatasetService $dashboardDatasetService) {}
+    public function __construct(private readonly DashboardDatasetService $dashboardDatasetService)
+    {
+    }
 
     public function index(DashboardDatasetRequest $request, string $dataset): JsonResponse
     {

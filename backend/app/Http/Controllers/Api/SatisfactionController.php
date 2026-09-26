@@ -14,7 +14,8 @@ class SatisfactionController extends Controller
     public function __construct(
         private readonly AssessmentAccessService $accessService,
         private readonly SatisfactionService $satisfactionService,
-    ) {}
+    ) {
+    }
 
     public function storeQuestion(StoreSatisfactionQuestionRequest $request): JsonResponse
     {

@@ -194,7 +194,7 @@
 .people-page .people-card__icon-button--delete:hover {
   border-color: rgba(190, 69, 69, 0.32);
   color: #b42323;
-  background: rgba(190, 69, 69, 0.07);
+  background: rgba(239, 208, 208, 0.28);
 }
 
 .people-page .people-card__badge--pending {

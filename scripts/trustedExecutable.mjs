@@ -3,8 +3,8 @@ import path from 'node:path';
 
 // Resolve system tools from fixed install locations instead of searching PATH,
 // so a writable directory earlier in PATH cannot shadow them.
-const windowsRoot = process.env.SystemRoot || 'C:\\Windows';
-const programFiles = [process.env.ProgramFiles, process.env['ProgramFiles(x86)'], 'C:\\Program Files']
+const windowsRoot = process.env.SystemRoot || String.raw`C:\Windows`;
+const programFiles = [process.env.ProgramFiles, process.env['ProgramFiles(x86)'], String.raw`C:\Program Files`]
   .filter(Boolean);
 
 const CANDIDATES = {

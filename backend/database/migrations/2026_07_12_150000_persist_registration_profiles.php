@@ -39,9 +39,10 @@ return new class extends Migration
             return;
         }
 
-        $storedFields = json_decode((string) DB::table('app_settings')
+        $storedValue = (string) DB::table('app_settings')
             ->where('setting_key', 'registration_form_fields')
-            ->value('value'), true);
+            ->value('value');
+        $storedFields = json_decode($storedValue, true);
         $fields = is_array($storedFields) ? $storedFields : [];
         $fields = array_values(
             array_filter($fields, fn ($field): bool => trim((string) ($field['label'] ?? '')) !== 'رقم الجوال')

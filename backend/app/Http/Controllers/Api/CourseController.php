@@ -15,7 +15,9 @@ use Illuminate\Http\JsonResponse;
 
 class CourseController extends Controller
 {
-    public function __construct(private readonly CourseManagementService $courseManagementService) {}
+    public function __construct(private readonly CourseManagementService $courseManagementService)
+    {
+    }
 
     public function store(StoreCourseRequest $request): JsonResponse
     {

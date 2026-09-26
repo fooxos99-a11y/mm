@@ -7,7 +7,9 @@ use Illuminate\Validation\ValidationException;
 
 class CourseQuestionService
 {
-    public function __construct(private readonly AssessmentAttachmentService $assessmentAttachmentService) {}
+    public function __construct(private readonly AssessmentAttachmentService $assessmentAttachmentService)
+    {
+    }
 
     public function create(string $courseId, string $assessmentType, array $question): string
     {

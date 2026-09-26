@@ -11,7 +11,8 @@ class AttendanceController extends Controller
 {
     public function __construct(
         private readonly ManualAttendanceService $attendanceService,
-    ) {}
+    ) {
+    }
 
     public function store(SetManualAttendanceRequest $request): JsonResponse
     {

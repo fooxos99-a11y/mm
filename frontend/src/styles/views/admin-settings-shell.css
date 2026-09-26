@@ -59,12 +59,12 @@
 }
 
 .settings-admin__nav-item:hover {
-  background: rgba(42, 148, 178, 0.08);
+  background: rgba(85, 169, 193, 0.1);
   color: #0f3554;
 }
 
 .settings-admin__nav-item--active {
-  background: linear-gradient(135deg, rgba(42, 148, 178, 0.14), rgba(15, 109, 136, 0.08));
+  background: linear-gradient(135deg, rgba(80, 167, 192, 0.17), rgba(107, 165, 182, 0.13));
   color: #0f3554;
 }
 

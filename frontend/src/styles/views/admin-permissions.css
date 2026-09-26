@@ -13,7 +13,7 @@
 }
 .permissions-admin__alert--error {
   border: 1px solid rgba(220, 38, 38, 0.18);
-  background: rgba(220, 38, 38, 0.06);
+  background: rgba(247, 207, 207, 0.27);
   color: #b91c1c;
 }
 .permissions-admin__panel { display: grid; gap: 18px; }

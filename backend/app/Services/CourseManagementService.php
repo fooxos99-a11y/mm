@@ -18,5 +18,6 @@ class CourseManagementService
         private readonly CourseQuestionService $courseQuestionService,
         private readonly DashboardCommunicationService $dashboardCommunicationService,
         private readonly AssessmentAttachmentService $assessmentAttachmentService,
-    ) {}
+    ) {
+    }
 }

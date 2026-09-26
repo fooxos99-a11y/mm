@@ -7,7 +7,9 @@ use App\Models\Student;
 
 class PeopleDirectoryPresenter
 {
-    public function __construct(private readonly RegistrationService $registrationService) {}
+    public function __construct(private readonly RegistrationService $registrationService)
+    {
+    }
 
     public function student(Student $student, object $counts, array $totals): array
     {

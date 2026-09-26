@@ -17,5 +17,6 @@ class CourseAssessmentService
         private readonly DashboardCommunicationService $dashboardCommunicationService,
         private readonly CourseAssessmentQuestionService $questionService,
         private readonly AssessmentAttachmentService $assessmentAttachmentService,
-    ) {}
+    ) {
+    }
 }

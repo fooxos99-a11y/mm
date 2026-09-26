@@ -6,10 +6,16 @@ use Laravel\Sanctum\Http\Middleware\AuthenticateSession;
 use Laravel\Sanctum\Sanctum;
 
 return [
-    'stateful' => explode(',', env('SANCTUM_STATEFUL_DOMAINS', sprintf(
-        'localhost,localhost:8080,127.0.0.1,127.0.0.1:8080,127.0.0.1:8000,127.0.0.1:8001%s',
-        Sanctum::currentApplicationUrlWithPort(),
-    ))),
+    'stateful' => explode(
+        ',',
+        env(
+            'SANCTUM_STATEFUL_DOMAINS',
+            sprintf(
+                'localhost,localhost:8080,127.0.0.1,127.0.0.1:8080,127.0.0.1:8000,127.0.0.1:8001%s',
+                Sanctum::currentApplicationUrlWithPort(),
+            ),
+        ),
+    ),
 
     'guard' => ['web'],
 

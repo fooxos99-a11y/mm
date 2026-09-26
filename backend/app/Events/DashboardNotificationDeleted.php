@@ -12,7 +12,9 @@ class DashboardNotificationDeleted implements ShouldBroadcastNow
     use Dispatchable;
     use SerializesModels;
 
-    public function __construct(public readonly string $notificationId) {}
+    public function __construct(public readonly string $notificationId)
+    {
+    }
 
     public function broadcastOn(): array
     {

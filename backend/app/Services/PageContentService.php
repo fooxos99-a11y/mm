@@ -14,7 +14,9 @@ class PageContentService
     use ProvidesPageContentDefaults;
     use RepairsPageContentEncoding;
 
-    public function __construct(private readonly AppSettingsService $appSettingsService) {}
+    public function __construct(private readonly AppSettingsService $appSettingsService)
+    {
+    }
 
     public function loadHomePageContent(): array
     {

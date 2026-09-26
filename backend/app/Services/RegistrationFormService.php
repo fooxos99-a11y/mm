@@ -16,7 +16,9 @@ class RegistrationFormService
         'phone' => 'رقم الجوال',
     ];
 
-    public function __construct(private readonly AppSettingsService $appSettingsService) {}
+    public function __construct(private readonly AppSettingsService $appSettingsService)
+    {
+    }
 
     public function load(): array
     {

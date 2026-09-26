@@ -1,6 +1,7 @@
 
 
-export default {
+// Vue merges these members into the component, so `this` is the component instance.
+export default /** @type {Record<string, any>} */ ({
     managedBranchId: {
       immediate: true,
       handler(value) {
@@ -87,4 +88,4 @@ export default {
         this.syncDashboardRouteQuery('settings');
       }
     },
-};
+});

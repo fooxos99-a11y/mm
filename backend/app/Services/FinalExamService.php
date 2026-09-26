@@ -20,6 +20,7 @@ class FinalExamService
         private readonly DashboardCommunicationService $dashboardCommunicationService,
         private readonly FinalExamSubmissionValidator $submissionValidator,
         private readonly AssessmentAttachmentService $assessmentAttachmentService,
-    ) {}
+    ) {
+    }
 
 }

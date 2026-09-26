@@ -29,7 +29,7 @@
             class="login-modal__field"
             label="رقم الدخول"
             type="text"
-            autocomplete="username"
+            :autocomplete="usernameAutocomplete"
             @input="$emit('update:loginCode', String($event).trim())"
           />
           <AppInput
@@ -124,7 +124,7 @@ export default {
     'update:profileOpen',
   ],
   data() {
-    return { passwordVisible: false };
+    return { passwordVisible: false, usernameAutocomplete: 'username' };
   },
   computed: {
     profileItems() {

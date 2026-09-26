@@ -3,7 +3,8 @@ import { CREATE_COURSE_OPTION } from './adminAssessmentConfig';
 const normalizedQuestionType = (type) => (type === 'text' ? 'text' : 'multiple');
 const normalizedOptions = (options) => (options || []).map((option) => String(option).trim()).filter(Boolean);
 
-export default {
+// Vue merges these members into the component, so `this` is the component instance.
+export default /** @type {Record<string, any>} */ ({
     assessmentType() {
       const value = this.assessmentTypeOverride || this.$route.params.assessmentType;
 
@@ -185,4 +186,4 @@ export default {
 
       return this.getAssessmentManageOptions(this.currentAssessmentManageCourse, this.assessmentManageType);
     },
-};
+});

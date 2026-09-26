@@ -16,5 +16,6 @@ class RegistrationService
         private readonly RegistrationFormService $registrationFormService,
         private readonly RegistrationMetadataService $registrationMetadataService,
         private readonly StudentAccountService $studentAccountService,
-    ) {}
+    ) {
+    }
 }

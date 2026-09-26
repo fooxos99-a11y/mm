@@ -17,7 +17,8 @@ class EnsureDashboardAccess
     public function __construct(
         private readonly CoreDataService $coreDataService,
         private readonly DashboardPermissionResolver $permissionResolver,
-    ) {}
+    ) {
+    }
 
     public function handle(Request $request, Closure $next, string $capability = ''): Response
     {

@@ -18,7 +18,8 @@ class TrainingMaterialController extends Controller
         private readonly TrainingMaterialAttachmentService $attachmentService,
         private readonly TrainingMaterialRequestData $requestData,
         private readonly TrainingMaterialService $trainingMaterialService,
-    ) {}
+    ) {
+    }
 
     public function index(): JsonResponse
     {
@@ -29,12 +30,14 @@ class TrainingMaterialController extends Controller
     {
         $data = $request->validated();
 
-        return response()->json($this->trainingMaterialService->create(
+        $material = $this->trainingMaterialService->create(
             $data['title'],
             (string) ($data['description'] ?? ''),
             $data['branchId'] ?? null,
             $this->requestData->attachments($request),
-        ), 201);
+        );
+
+        return response()->json($material, 201);
     }
 
     public function update(UpdateTrainingMaterialRequest $request, string $materialId): JsonResponse

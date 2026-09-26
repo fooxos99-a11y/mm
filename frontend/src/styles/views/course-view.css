@@ -163,19 +163,19 @@
 
 .assessment-alert--error {
   border: 1px solid rgba(220, 38, 38, 0.18);
-  background: rgba(220, 38, 38, 0.06);
+  background: rgba(247, 207, 207, 0.27);
   color: #b91c1c;
 }
 
 .assessment-alert--warning {
   border: 1px solid rgba(217, 119, 6, 0.18);
-  background: rgba(245, 158, 11, 0.08);
+  background: rgba(254, 245, 230, 0.77);
   color: #a16207;
 }
 
 .assessment-alert--success {
   border: 1px solid rgba(5, 150, 105, 0.2);
-  background: rgba(16, 185, 129, 0.08);
+  background: rgba(209, 242, 231, 0.42);
   color: #047857;
 }
 
@@ -190,14 +190,14 @@
 .assessment-state--success {
   border-style: solid;
   border-color: rgba(14, 165, 233, 0.18);
-  background: rgba(14, 165, 233, 0.08);
+  background: rgba(142, 213, 245, 0.17);
   color: #075985;
 }
 
 .assessment-state--info {
   border-style: solid;
   border-color: rgba(14, 165, 233, 0.18);
-  background: rgba(14, 165, 233, 0.08);
+  background: rgba(211, 239, 251, 0.44);
   color: #0f766e;
 }
 
@@ -354,7 +354,7 @@
   min-width: 78px;
   padding: 3px 10px;
   border-radius: 999px;
-  background: rgba(16, 118, 153, 0.08);
+  background: rgba(233, 243, 246, 0.88);
   color: #107699;
   text-align: center;
 }

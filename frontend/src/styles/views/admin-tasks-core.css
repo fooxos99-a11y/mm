@@ -189,14 +189,14 @@
   min-height: 34px;
   padding: 0 14px;
   border-radius: 999px;
-  background: rgba(13, 90, 115, 0.1);
+  background: rgba(182, 205, 213, 0.33);
   color: #0d5a73;
   font-size: 0.82rem;
   font-weight: 800;
 }
 
 .tasks-page .task-card__badge--document {
-  background: rgba(196, 61, 61, 0.1);
+  background: rgba(237, 196, 196, 0.33);
   color: #9e2e2e;
 }
 
@@ -207,7 +207,7 @@
   width: 34px;
   height: 34px;
   border-radius: 12px;
-  background: rgba(13, 90, 115, 0.08);
+  background: rgba(181, 204, 212, 0.26);
   color: #0d5a73;
 }
 

@@ -14,5 +14,7 @@ class TrainingMaterialService
     use SerializesTrainingMaterials;
     use SyncsTrainingMaterialAttachments;
 
-    public function __construct(private readonly DashboardCommunicationService $dashboardCommunicationService) {}
+    public function __construct(private readonly DashboardCommunicationService $dashboardCommunicationService)
+    {
+    }
 }

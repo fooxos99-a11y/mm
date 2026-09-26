@@ -35,18 +35,21 @@ class PageContentEncodingTest extends TestCase
 
         $service = app(PageContentService::class);
         $content = $service->loadHomePageContent();
-        $storedBeforeRepair = json_decode((string) DB::table('app_settings')
-            ->where('setting_key', 'home_page_content')
-            ->value('value'), true, flags: JSON_THROW_ON_ERROR);
+        $storedBeforeRepair = json_decode($this->storedHomePageContent(), true, flags: JSON_THROW_ON_ERROR);
 
         $service->repairStoredContentEncoding();
 
-        $stored = json_decode((string) DB::table('app_settings')
-            ->where('setting_key', 'home_page_content')
-            ->value('value'), true, flags: JSON_THROW_ON_ERROR);
+        $stored = json_decode($this->storedHomePageContent(), true, flags: JSON_THROW_ON_ERROR);
 
         $this->assertSame($expected, $content['brandTitle']);
         $this->assertSame($mojibake, $storedBeforeRepair['brandTitle']);
         $this->assertSame($expected, $stored['brandTitle']);
+    }
+
+    private function storedHomePageContent(): string
+    {
+        return (string) DB::table('app_settings')
+            ->where('setting_key', 'home_page_content')
+            ->value('value');
     }
 }
