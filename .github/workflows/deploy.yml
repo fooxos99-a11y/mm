@@ -1,6 +1,8 @@
 name: Deploy release
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
     inputs:
       environment:
@@ -17,18 +19,18 @@ permissions:
   contents: read
 
 concurrency:
-  group: deploy-${{ inputs.environment }}
+  group: deploy-${{ inputs.environment || 'production' }}
   cancel-in-progress: false
 
 jobs:
   release:
     runs-on: ubuntu-24.04
     timeout-minutes: 35
-    environment: ${{ inputs.environment }}
+    environment: ${{ inputs.environment || 'production' }}
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
-          ref: ${{ inputs.ref }}
+          ref: ${{ inputs.ref || github.sha }}
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: '22'
@@ -42,9 +44,14 @@ jobs:
       - run: npm ci --prefix frontend --no-audit --no-fund --ignore-scripts
       - run: composer install --working-dir=backend --no-interaction --prefer-dist --no-progress --no-ansi
       - run: cp backend/.env.example backend/.env && php backend/artisan key:generate
-      - run: npm run verify:release
+      # Pushes to main deploy after the fast gate (secrets, size, lint, unit, backend tests, build).
+      # Manual runs keep the full release gate, including browser tests.
+      - if: github.event_name == 'push'
+        run: npm run verify:quick && npm test && npm run build && npm --prefix frontend run check:bundle
+      - if: github.event_name != 'push'
+        run: npm run verify:release
       - name: Package immutable release
-        run: tar --exclude=release.tgz --exclude=.git --exclude='.*-logs' --exclude=frontend/node_modules --exclude=backend/vendor --exclude=backend/storage -czf release.tgz .
+        run: tar --exclude=release.tgz --exclude=.git --exclude='.*-logs' --exclude=frontend/node_modules --exclude=backend/vendor --exclude=backend/storage --exclude=backend/.env -czf release.tgz .
       - name: Configure SSH host verification
         env:
           DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
