@@ -154,15 +154,6 @@
     max-width: calc(100vw - 32px) !important;
   }
 
-  .practitioner-page .account-menu__panel--header {
-    left: auto;
-    right: 0;
-    transform: none;
-    width: min(228px, calc(100vw - 24px));
-    max-width: calc(100vw - 24px);
-    padding: 16px 18px 18px;
-  }
-
   .practitioner-page .section-ribbon h2 {
     width: 100%;
     padding: 16px 18px;

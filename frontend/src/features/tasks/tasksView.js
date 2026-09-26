@@ -38,7 +38,7 @@ export default {
       return this.$store?.state?.currentUser || null;
     },
     isAuthenticatedNonStudent() {
-      return Boolean(this.currentUser && this.currentUser.role && !['student', 'trainee'].includes(this.currentUser.role));
+      return Boolean(this.currentUser?.role && !['student', 'trainee'].includes(this.currentUser.role));
     },
     authenticatedStudentLogin() {
       return ['student', 'trainee'].includes(this.currentUser?.role)
@@ -89,7 +89,7 @@ export default {
         return '';
       }
 
-      return Object.prototype.hasOwnProperty.call(this.answers, this.documentQuestion.id)
+      return Object.hasOwn(this.answers, this.documentQuestion.id)
         ? this.answers[this.documentQuestion.id]
         : this.documentInitialContent;
     },

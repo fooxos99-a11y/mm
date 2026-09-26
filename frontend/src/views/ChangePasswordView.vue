@@ -7,6 +7,7 @@
       <form @submit.prevent="submit">
         <AppPasswordField
           v-model="form.currentPassword"
+          type="password"
           autocomplete="current-password"
           label="كلمة المرور الحالية"
           outlined
@@ -14,6 +15,7 @@
         />
         <AppPasswordField
           v-model="form.password"
+          type="password"
           autocomplete="new-password"
           label="كلمة المرور الجديدة"
           :hint="PASSWORD_REQUIREMENTS_TEXT"
@@ -23,6 +25,7 @@
         />
         <AppPasswordField
           v-model="form.passwordConfirmation"
+          type="password"
           autocomplete="new-password"
           label="تأكيد كلمة المرور الجديدة"
           outlined

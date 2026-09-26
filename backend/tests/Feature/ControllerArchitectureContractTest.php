@@ -28,8 +28,22 @@ class ControllerArchitectureContractTest extends TestCase
             ->filter(fn ($route): bool => str_starts_with($route->uri(), 'api/'))
             ->map(fn ($route): string => $route->getActionName());
 
-        $this->assertFalse($actions->contains(fn (string $action): bool => str_starts_with($action, 'App\\Http\\Controllers\\Api\\CoreDataController@')));
-        $this->assertFalse($actions->contains(fn (string $action): bool => str_starts_with($action, 'App\\Http\\Controllers\\Api\\AssessmentController@')));
+        $this->assertFalse(
+            $actions->contains(
+                fn (string $action): bool => str_starts_with(
+                    $action,
+                    'App\\Http\\Controllers\\Api\\CoreDataController@'
+                )
+            )
+        );
+        $this->assertFalse(
+            $actions->contains(
+                fn (string $action): bool => str_starts_with(
+                    $action,
+                    'App\\Http\\Controllers\\Api\\AssessmentController@'
+                )
+            )
+        );
 
         foreach ($this->splitControllers() as $controller) {
             $this->assertTrue(

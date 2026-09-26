@@ -40,7 +40,11 @@ class CourseAssessmentController extends Controller
         $data = $request->validated();
 
         return response()->json(
-            $this->courseAssessmentService->bulkImportAssessments($data['courseId'], $data['assessmentType'], $data['submissions']),
+            $this->courseAssessmentService->bulkImportAssessments(
+                $data['courseId'],
+                $data['assessmentType'],
+                $data['submissions']
+            ),
         );
     }
 
@@ -56,8 +60,11 @@ class CourseAssessmentController extends Controller
         return response()->json(status: 204);
     }
 
-    public function updateAnswerScore(SetAnswerManualScoreRequest $request, string $submissionId, string $answerId): JsonResponse
-    {
+    public function updateAnswerScore(
+        SetAnswerManualScoreRequest $request,
+        string $submissionId,
+        string $answerId
+    ): JsonResponse {
         $this->accessService->assertCanManageSubmissionBranch($request->user(), $submissionId);
         $score = $request->validated('score');
         $this->answerReviews->reviewCourseAnswer(

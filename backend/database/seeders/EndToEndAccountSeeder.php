@@ -10,10 +10,8 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
-class E2EAccountSeeder extends Seeder
+class EndToEndAccountSeeder extends Seeder
 {
-    private const PASSWORD = 'E2E-Role-2026!';
-
     private const MANAGER_PERMISSIONS = [
         'page_overview', 'page_courses', 'page_tasks', 'page_final_exam',
         'page_satisfaction', 'page_users', 'page_notifications', 'page_materials',
@@ -27,11 +25,18 @@ class E2EAccountSeeder extends Seeder
 
     public function run(): void
     {
+        $password = (string) env('MOMARS_SEED_E2E_ROLE_PASSWORD', '');
+
+        if ($password === '') {
+            throw new \RuntimeException('MOMARS_SEED_E2E_ROLE_PASSWORD is required to seed E2E role accounts.');
+        }
+
+        $passwordHash = Hash::make($password);
         $maleBranch = Branch::query()->where('code', 'male')->firstOrFail();
         $femaleBranch = Branch::query()->where('code', 'female')->firstOrFail();
 
-        $this->user('e2e-male-manager', 'مشرف الاختبار', 'male_manager');
-        $this->user('e2e-female-manager', 'مشرفة الاختبار', 'female_manager');
+        $this->user('e2e-male-manager', 'مشرف الاختبار', 'male_manager', $passwordHash);
+        $this->user('e2e-female-manager', 'مشرفة الاختبار', 'female_manager', $passwordHash);
 
         $student = Student::query()->updateOrCreate(
             ['login_code' => 'e2e-student-role'],
@@ -41,7 +46,7 @@ class E2EAccountSeeder extends Seeder
                 'note' => 'حساب معزول لاختبارات الواجهة',
             ],
         );
-        $this->user('e2e-student-role', 'طالب الاختبار', 'student');
+        $this->user('e2e-student-role', 'طالب الاختبار', 'student', $passwordHash);
 
         Student::query()->updateOrCreate(
             ['login_code' => 'e2e-trainee-role'],
@@ -51,9 +56,9 @@ class E2EAccountSeeder extends Seeder
                 'note' => 'حساب معزول لاختبارات الواجهة',
             ],
         );
-        $this->user('e2e-trainee-role', 'معلم الاختبار', 'trainee');
+        $this->user('e2e-trainee-role', 'معلم الاختبار', 'trainee', $passwordHash);
 
-        $reciterUser = $this->user('e2e-reciter-role', 'مقرئ الاختبار', 'reciter');
+        $reciterUser = $this->user('e2e-reciter-role', 'مقرئ الاختبار', 'reciter', $passwordHash);
         $reciter = Reciter::query()->updateOrCreate(
             ['user_id' => $reciterUser->id],
             [
@@ -98,14 +103,14 @@ class E2EAccountSeeder extends Seeder
         );
     }
 
-    private function user(string $loginCode, string $name, string $role): User
+    private function user(string $loginCode, string $name, string $role, string $passwordHash): User
     {
         return User::query()->updateOrCreate(
             ['login_code' => $loginCode],
             [
                 'full_name' => $name,
                 'role' => $role,
-                'password' => Hash::make(self::PASSWORD),
+                'password' => $passwordHash,
                 'must_change_password' => false,
             ],
         );

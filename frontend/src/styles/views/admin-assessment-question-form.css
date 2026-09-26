@@ -145,7 +145,7 @@
   border: 1px solid rgba(148, 163, 184, 0.36);
   border-radius: 18px;
   background: #f8fafc;
-  color: #7b8794;
+  color: #687481;
   transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
 }
 
@@ -222,23 +222,19 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
+  width: 52px;
+  height: 52px;
   min-width: 28px;
   padding: 0;
   border: 0;
   background: transparent;
   color: #156c82;
   box-shadow: none;
+  justify-self: center;
 }
 
 .assessment-page .assessment-inline-builder__add .v-icon {
   color: currentColor !important;
-}
-
-.assessment-page .assessment-inline-builder__add {
-  width: 52px;
-  height: 52px;
-  justify-self: center;
 }
 
 .assessment-page .assessment-inline-builder__menu {

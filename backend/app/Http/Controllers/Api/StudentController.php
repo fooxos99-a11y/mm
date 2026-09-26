@@ -74,7 +74,12 @@ class StudentController extends Controller
         $data = $request->validated();
         $reciterId = $data['reciterId'] ?? null;
         $this->reciterAccessService->assertCanToggleStudentPart($request->user(), $student, $reciterId);
-        $this->userManagementService->toggleStudentPart($student->id, $reciterId, $partNumber, $data['shouldMarkComplete']);
+        $this->userManagementService->toggleStudentPart(
+            $student->id,
+            $reciterId,
+            $partNumber,
+            $data['shouldMarkComplete']
+        );
 
         return response()->json(status: 204);
     }

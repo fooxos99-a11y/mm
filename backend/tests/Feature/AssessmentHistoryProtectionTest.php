@@ -26,7 +26,13 @@ class AssessmentHistoryProtectionTest extends TestCase
 
     public function test_course_submission_validates_question_scope_snapshots_it_and_freezes_historical_content(): void
     {
-        [$courseId, $questionId] = $this->createCourseWithQuestion('pre', 'Original course question', ['A', 'B'], 'A', 4);
+        [$courseId, $questionId] = $this->createCourseWithQuestion(
+            'pre',
+            'Original course question',
+            ['A', 'B'],
+            'A',
+            4
+        );
         [, $foreignQuestionId] = $this->createCourseWithQuestion('post', 'Foreign question', ['X', 'Y'], 'X', 2);
 
         $this->postJson('/api/dashboard/assessment-submissions', [
@@ -101,8 +107,20 @@ class AssessmentHistoryProtectionTest extends TestCase
 
     public function test_bulk_import_validates_question_scope_and_stores_snapshots(): void
     {
-        [$courseId, $questionId] = $this->createCourseWithQuestion('post', 'Imported question', ['Yes', 'No'], 'Yes', 3);
-        [, $foreignQuestionId] = $this->createCourseWithQuestion('post', 'Other course question', ['Yes', 'No'], 'No', 1);
+        [$courseId, $questionId] = $this->createCourseWithQuestion(
+            'post',
+            'Imported question',
+            ['Yes', 'No'],
+            'Yes',
+            3
+        );
+        [, $foreignQuestionId] = $this->createCourseWithQuestion(
+            'post',
+            'Other course question',
+            ['Yes', 'No'],
+            'No',
+            1
+        );
 
         $this->postJson('/api/dashboard/assessment-import', [
             'courseId' => $courseId,
@@ -205,7 +223,12 @@ class AssessmentHistoryProtectionTest extends TestCase
             'answers' => [['questionId' => $questionId, 'value' => 'A']],
         ])->assertCreated();
 
-        $this->assertDuplicateAnswerRejected('course_submission_answers', $courseSubmission->json('id'), $questionId, true);
+        $this->assertDuplicateAnswerRejected(
+            'course_submission_answers',
+            $courseSubmission->json('id'),
+            $questionId,
+            true
+        );
 
         $finalQuestionId = $this->createFinalQuestion('male', 'Unique final answer', ['A', 'B'], 'A', 1);
         $this->openFinalExam('male');
@@ -216,7 +239,12 @@ class AssessmentHistoryProtectionTest extends TestCase
             'answers' => [['questionId' => $finalQuestionId, 'value' => 'A']],
         ])->assertCreated();
 
-        $this->assertDuplicateAnswerRejected('final_exam_submission_answers', $finalSubmission->json('id'), $finalQuestionId, false);
+        $this->assertDuplicateAnswerRejected(
+            'final_exam_submission_answers',
+            $finalSubmission->json('id'),
+            $finalQuestionId,
+            false
+        );
     }
 
     /**
@@ -299,8 +327,12 @@ class AssessmentHistoryProtectionTest extends TestCase
         ];
     }
 
-    private function assertDuplicateAnswerRejected(string $table, string $submissionId, string $questionId, bool $hasCreatedAt): void
-    {
+    private function assertDuplicateAnswerRejected(
+        string $table,
+        string $submissionId,
+        string $questionId,
+        bool $hasCreatedAt
+    ): void {
         $row = [
             'id' => (string) Str::uuid(),
             'submission_id' => $submissionId,

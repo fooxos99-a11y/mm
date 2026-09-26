@@ -1,6 +1,7 @@
 import { fetchPublicSnapshot, fetchPublicStats } from '../../services/publicApi';
 import { fetchPublicRegistrationStatus } from '../../services/registrationApi';
-import { DISPLAY_NUMBER_PATTERN, easeOutCubic } from './practitionerMeta';
+import { easeOutCubic } from './practitionerMeta';
+import { splitDisplayNumber } from '../../utils/displayNumber.mjs';
 
 export default {
     async loadPublicData() {
@@ -21,7 +22,7 @@ export default {
       try {
         const payload = await fetchPublicRegistrationStatus();
         this.isRegistrationOpen = Boolean(payload?.isOpen);
-      } catch (error) {
+      } catch {
         this.isRegistrationOpen = false;
       }
     },
@@ -154,13 +155,13 @@ export default {
     },
     animatedProgramStatValue(display) {
       const text = String(display ?? '');
-      const match = text.match(DISPLAY_NUMBER_PATTERN);
+      const parts = splitDisplayNumber(text);
 
-      if (!match) {
+      if (!parts) {
         return text;
       }
 
-      const [, prefix, rawValue, suffix] = match;
+      const [prefix, rawValue, suffix] = parts;
       const targetValue = Number(rawValue);
 
       if (!Number.isFinite(targetValue)) {

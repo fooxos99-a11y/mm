@@ -17,6 +17,10 @@ class UpdateRegistrationFieldsRequest extends DashboardFormRequest
             'fields.*.showInRequests' => ['nullable', 'boolean'],
             'fields.*.options' => ['nullable', 'array'],
             'fields.*.options.*' => ['nullable', 'string', 'max:255'],
+            'fixedLabels' => ['nullable', 'array:name,gender,phone'],
+            'fixedLabels.name' => ['nullable', 'string', 'max:255'],
+            'fixedLabels.gender' => ['nullable', 'string', 'max:255'],
+            'fixedLabels.phone' => ['nullable', 'string', 'max:255'],
         ];
     }
 }

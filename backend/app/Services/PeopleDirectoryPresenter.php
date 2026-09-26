@@ -11,14 +11,30 @@ class PeopleDirectoryPresenter
 
     public function student(Student $student, object $counts, array $totals): array
     {
-        $labels = ['parts' => 'الأجزاء', 'attendance' => 'الحضور', 'pre' => 'القبلي', 'post' => 'البعدي', 'tasks' => 'المهام الأدائية'];
+        $labels = [
+            'parts' => 'الأجزاء',
+            'attendance' => 'الحضور',
+            'pre' => 'القبلي',
+            'post' => 'البعدي',
+            'tasks' => 'المهام الأدائية',
+        ];
         $metrics = [];
         foreach ($labels as $key => $label) {
             $progress = min(100, (int) round(100 * $counts->{$key.'_count'} / $totals[$key]));
-            $metrics[] = ['key' => $key, 'label' => $label, 'display' => $progress.'%', 'progressWidth' => $progress.'%'];
+            $metrics[] = [
+                'key' => $key,
+                'label' => $label,
+                'display' => $progress.'%',
+                'progressWidth' => $progress.'%',
+            ];
         }
         $overall = (int) $counts->overall_progress;
-        $metrics[] = ['key' => 'overall', 'label' => 'الإجمالي', 'display' => $overall.'%', 'progressWidth' => $overall.'%'];
+        $metrics[] = [
+            'key' => 'overall',
+            'label' => 'الإجمالي',
+            'display' => $overall.'%',
+            'progressWidth' => $overall.'%',
+        ];
 
         return [
             'id' => $student->id, 'cardKey' => 'student:'.$student->id, 'name' => $student->full_name,
@@ -26,7 +42,9 @@ class PeopleDirectoryPresenter
             'isCertified' => $student->is_certified, 'completedParts' => $student->parts->pluck('part_number')->all(),
             'reciterName' => $student->reciters->first()?->full_name ?: 'غير مرتبط',
             'overallProgress' => $overall, 'metrics' => $metrics,
-            'registrationProfile' => $this->registrationService->serializeStudentRegistrationProfile($student->registrationRequest),
+            'registrationProfile' => $this->registrationService->serializeStudentRegistrationProfile(
+                $student->registrationRequest
+            ),
         ];
     }
 

@@ -3,15 +3,19 @@ export const ADD_MATERIAL_OPTION_VALUE = '__add_material__';
 
 let attachmentDraftCounter = 0;
 
-export const createAttachmentDraft = (overrides = {}) => ({
-  id: `attachment-${attachmentDraftCounter += 1}`,
-  label: '',
-  file: null,
-  existingAttachmentId: '',
-  existingFileName: '',
-  url: '',
-  ...overrides,
-});
+export const createAttachmentDraft = (overrides = {}) => {
+  attachmentDraftCounter += 1;
+
+  return {
+    id: `attachment-${attachmentDraftCounter}`,
+    label: '',
+    file: null,
+    existingAttachmentId: '',
+    existingFileName: '',
+    url: '',
+    ...overrides,
+  };
+};
 
 export const resolveDefaultAttachmentLabel = (file) => {
   const fileName = String(file?.name || '').trim();

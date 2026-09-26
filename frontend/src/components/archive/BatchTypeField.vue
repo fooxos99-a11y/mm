@@ -1,13 +1,13 @@
 <template>
   <div class="archive-dialog__field">
     <label
-      for="archive-batch-type"
+      :for="fieldId"
       class="archive-dialog__label"
     >
       الدفعة
     </label>
     <AppNativeSelect
-      id="archive-batch-type"
+      :id="fieldId"
       :value="value"
       class="archive-dialog__select"
       @input="$emit('input', $event)"
@@ -32,6 +32,8 @@ export default {
   props: {
     value: { type: String, required: true },
     options: { type: Array, required: true },
+    fieldId: { type: String, default: 'archive-batch-type' },
   },
+  emits: ['input'],
 };
 </script>

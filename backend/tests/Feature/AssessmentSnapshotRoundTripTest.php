@@ -25,7 +25,7 @@ class AssessmentSnapshotRoundTripTest extends TestCase
         ]));
     }
 
-    public function test_dashboard_snapshot_exposes_flat_question_snapshots_and_hides_answer_keys_without_permission(): void
+    public function test_dashboard_snapshot_exposes_flat_question_snapshots_and_hides_keys_without_permission(): void
     {
         $this->seedAssessmentHistory();
 

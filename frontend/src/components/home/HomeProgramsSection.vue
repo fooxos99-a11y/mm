@@ -290,5 +290,6 @@ export default {
     programsRevealed: { type: Boolean, default: false },
     animatedValue: { type: Function, required: true },
   },
+  emits: ['open-program'],
 };
 </script>

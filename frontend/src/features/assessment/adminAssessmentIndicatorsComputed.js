@@ -62,7 +62,7 @@ export default {
       return this.formatIndicatorMetaLabel(this.assessmentPostIndicator);
     },
     assessmentScoreDiffLabel() {
-      return `${Math.abs(Math.round(this.assessmentScoreDiff))}%`;
+      return `${Math.abs(Math.round(Number(this.assessmentScoreDiff)))}%`;
     },
     assessmentScoreDiffClass() {
       if (this.assessmentScoreDiff > 0) {

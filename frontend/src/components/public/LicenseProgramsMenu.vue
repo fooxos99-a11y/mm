@@ -72,6 +72,7 @@ export default {
     title: { type: String, default: '' },
     programs: { type: Array, default: () => [] },
   },
+  emits: ['select'],
   data() {
     return { open: false };
   },

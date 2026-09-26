@@ -10,7 +10,7 @@ const requests = new WeakMap();
 
 const replaceSnapshotSection = (state, commit, key, value) => {
   commit('setDashboardSnapshot', {
-    ...(state.dashboardSnapshot || {}),
+    ...state.dashboardSnapshot,
     [key]: value,
   });
 };

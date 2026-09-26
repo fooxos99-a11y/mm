@@ -111,7 +111,12 @@ final class ArchivedStudentDetailService
         $submissionsByCourse = $records['submissions']->groupBy('course_id');
         $satisfactionByCourse = $records['satisfactionResponses']->groupBy('course_id');
 
-        return $courses->map(function ($course) use ($branchCode, $records, $submissionsByCourse, $satisfactionByCourse): array {
+        return $courses->map(function ($course) use (
+            $branchCode,
+            $records,
+            $submissionsByCourse,
+            $satisfactionByCourse
+        ): array {
             $submissions = collect($submissionsByCourse->get($course->id, []));
             $attendance = $records['attendance']->get($course->id);
 
@@ -120,18 +125,33 @@ final class ArchivedStudentDetailService
                 'title' => $course->title,
                 'entityType' => $course->entity_type === 'task' ? 'task' : 'course',
                 'branchAvailability' => [
-                    'pre' => $branchCode === 'female' ? (bool) $course->female_pre_enabled : (bool) $course->male_pre_enabled,
-                    'post' => $branchCode === 'female' ? (bool) $course->female_post_enabled : (bool) $course->male_post_enabled,
-                    'tasks' => $branchCode === 'female' ? (bool) $course->female_tasks_enabled : (bool) $course->male_tasks_enabled,
+                    'pre' => $branchCode === 'female'
+                        ? (bool) $course->female_pre_enabled
+                        : (bool) $course->male_pre_enabled,
+                    'post' => $branchCode === 'female'
+                        ? (bool) $course->female_post_enabled
+                        : (bool) $course->male_post_enabled,
+                    'tasks' => $branchCode === 'female'
+                        ? (bool) $course->female_tasks_enabled
+                        : (bool) $course->male_tasks_enabled,
                 ],
                 'attendance' => [
                     'isPresent' => (bool) $attendance,
                     'source' => $attendance?->source,
                     'createdAt' => $attendance ? (string) $attendance->created_at : null,
                 ],
-                'pre' => $this->submission($submissions->firstWhere('assessment_type', 'pre'), $records['submissionAnswers']),
-                'post' => $this->submission($submissions->firstWhere('assessment_type', 'post'), $records['submissionAnswers']),
-                'tasks' => $this->submission($submissions->firstWhere('assessment_type', 'tasks'), $records['submissionAnswers']),
+                'pre' => $this->submission(
+                    $submissions->firstWhere('assessment_type', 'pre'),
+                    $records['submissionAnswers']
+                ),
+                'post' => $this->submission(
+                    $submissions->firstWhere('assessment_type', 'post'),
+                    $records['submissionAnswers']
+                ),
+                'tasks' => $this->submission(
+                    $submissions->firstWhere('assessment_type', 'tasks'),
+                    $records['submissionAnswers']
+                ),
                 'satisfactionResponses' => collect($satisfactionByCourse->get($course->id, []))
                     ->map(function ($response) use ($records): array {
                         $question = $records['satisfactionQuestions']->get($response->question_id);
@@ -158,7 +178,9 @@ final class ArchivedStudentDetailService
         return [
             'id' => $submission->id,
             'manualScore' => $submission->manual_score !== null ? (float) $submission->manual_score : null,
-            'taskReviewStatus' => $submission->assessment_type === 'tasks' ? ($submission->task_review_status ?: 'pending') : null,
+            'taskReviewStatus' => $submission->assessment_type === 'tasks'
+                ? ($submission->task_review_status ?: 'pending')
+                : null,
             'submittedAt' => (string) $submission->submitted_at,
             'answers' => collect($answers->get($submission->id, []))->map(fn ($answer): array => [
                 'questionId' => $answer->question_id,

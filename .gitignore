@@ -48,3 +48,17 @@ backend/coverage.xml
 *.njsproj
 *.sln
 *.sw?
+
+# Generated release bundles and one-off audit output (never commit)
+.deploy/
+docs/mobile-audit-*/gesture-followup/live/
+frontend/scripts/mobile-audit/
+frontend/mobile-audit-*
+frontend/mobile-fixes-*
+frontend/mobile-gesture-*
+frontend/mobile-live-*
+frontend/mobile-webkit-*
+frontend/gesture-recheck-results/
+frontend/gesture-test-results/
+frontend/webkit-fixes-results/
+frontend/build/

@@ -216,10 +216,10 @@ export default {
         return;
       }
 
-      const incompleteAttachment = attachments.find((attachment) => !attachment.label
+      const hasIncompleteAttachment = attachments.some((attachment) => !attachment.label
         || (!attachment.id && !attachment.file && !attachment.url));
 
-      if (incompleteAttachment) {
+      if (hasIncompleteAttachment) {
         this.formError = 'أدخل اسم الملف واختر ملفًا، أو ألصق رابط يوتيوب صحيحًا.';
         this.$toast.error(this.formError);
         return;

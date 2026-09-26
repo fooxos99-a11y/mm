@@ -7,8 +7,12 @@ use Illuminate\Validation\ValidationException;
 
 class AssessmentAnswerReviewService
 {
-    public function reviewCourseAnswer(string $submissionId, string $answerId, float|int|null $score, string $reviewerId): void
-    {
+    public function reviewCourseAnswer(
+        string $submissionId,
+        string $answerId,
+        float|int|null $score,
+        string $reviewerId
+    ): void {
         $this->review(
             'course_submission_answers',
             'course_submissions',
@@ -20,8 +24,12 @@ class AssessmentAnswerReviewService
         );
     }
 
-    public function reviewFinalAnswer(string $submissionId, string $answerId, float|int|null $score, string $reviewerId): void
-    {
+    public function reviewFinalAnswer(
+        string $submissionId,
+        string $answerId,
+        float|int|null $score,
+        string $reviewerId
+    ): void {
         $this->review(
             'final_exam_submission_answers',
             'final_exam_submissions',
@@ -59,7 +67,9 @@ class AssessmentAnswerReviewService
         $requiresManualReview = $type === 'text' || $correctAnswer === '' || filled($answer->file_name ?? null);
 
         if (! $requiresManualReview) {
-            throw ValidationException::withMessages(['answerId' => 'هذه الإجابة تُصحح تلقائيًا ولا تحتاج تصحيحًا يدويًا.']);
+            throw ValidationException::withMessages(
+                ['answerId' => 'هذه الإجابة تُصحح تلقائيًا ولا تحتاج تصحيحًا يدويًا.']
+            );
         }
 
         if ($score !== null && (float) $score > $maxPoints) {
@@ -68,7 +78,14 @@ class AssessmentAnswerReviewService
             ]);
         }
 
-        DB::transaction(function () use ($answerTable, $submissionTable, $answerId, $submissionId, $score, $reviewerId): void {
+        DB::transaction(function () use (
+            $answerTable,
+            $submissionTable,
+            $answerId,
+            $submissionId,
+            $score,
+            $reviewerId
+        ): void {
             DB::table($answerTable)->where('id', $answerId)->update([
                 'manual_points' => $score,
                 'reviewed_by' => $score === null ? null : $reviewerId,

@@ -61,8 +61,10 @@ class FinalExamController extends Controller
         return response()->json(status: 204);
     }
 
-    public function updateNotificationTemplate(UpdateFinalExamNotificationTemplateRequest $request, string $branchCode): JsonResponse
-    {
+    public function updateNotificationTemplate(
+        UpdateFinalExamNotificationTemplateRequest $request,
+        string $branchCode
+    ): JsonResponse {
         $this->finalExamService->updateFinalExamNotificationTemplate(
             $branchCode,
             $request->validated('notificationTemplate'),
@@ -98,8 +100,11 @@ class FinalExamController extends Controller
         return response()->json(status: 204);
     }
 
-    public function updateAnswerScore(SetAnswerManualScoreRequest $request, string $submissionId, string $answerId): JsonResponse
-    {
+    public function updateAnswerScore(
+        SetAnswerManualScoreRequest $request,
+        string $submissionId,
+        string $answerId
+    ): JsonResponse {
         $this->accessService->assertCanManageSubmissionBranch($request->user(), $submissionId, true);
         $score = $request->validated('score');
         $this->answerReviews->reviewFinalAnswer(

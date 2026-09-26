@@ -72,62 +72,59 @@ export default {
     this.satisfactionError = '';
     return true;
   },
-  async handleSubmit() {
-    if (!this.activeCourse) {
-      this.pageError = 'لا توجد دورة مفعلة حاليًا.';
-      return;
-    }
-    if (!this.isAssessmentEnabled) {
-      this.pageError = 'هذا الاختبار غير متاح لك الآن.';
-      return;
-    }
-    if (!this.student) {
-      this.pageError = 'تعذر تحديد الطالب الحالي.';
-      return;
-    }
+  getSubmissionBlockReason() {
+    if (!this.activeCourse) return 'لا توجد دورة مفعلة حاليًا.';
+    if (!this.isAssessmentEnabled) return 'هذا الاختبار غير متاح لك الآن.';
+    if (!this.student) return 'تعذر تحديد الطالب الحالي.';
     if (this.existingSubmission && !this.hasPendingPostSatisfaction) {
-      this.pageError = 'تم إرسال النتيجة مسبقًا، ولا يمكن إعادة الإرسال مرة أخرى.';
+      return 'تم إرسال النتيجة مسبقًا، ولا يمكن إعادة الإرسال مرة أخرى.';
+    }
+    if (!this.existingSubmission && this.questions.some((question) => !(this.answers[question.id] || '').trim())) {
+      return 'الرجاء إكمال جميع الأسئلة';
+    }
+    return '';
+  },
+  needsSatisfactionSubmission() {
+    return this.resolvedAssessmentType === 'post' && this.satisfactionQuestions.length > 0 && !this.alreadySubmittedSatisfaction;
+  },
+  submitAssessmentAnswers() {
+    return submitPublicAssessment({
+      courseId: this.activeCourse.id,
+      assessmentType: this.resolvedAssessmentType,
+      studentName: this.student.name,
+      loginId: this.student.loginId,
+      answers: this.questions.map((question) => ({
+        questionId: question.id,
+        value: this.answers[question.id] || '',
+        fileName: this.files[question.id]?.name || null,
+        fileType: this.files[question.id]?.type || null,
+        file: this.files[question.id]?.file || null,
+        fileDataUrl: null,
+      })),
+    });
+  },
+  submitSatisfactionAnswers() {
+    return submitPublicSatisfactionResponses(this.satisfactionQuestions.map((question) => ({
+      courseId: this.activeCourse.id,
+      questionId: question.id,
+      loginCode: this.student.loginId,
+      studentName: this.student.name,
+      ratingValue: question.type === 'rating' ? (this.satisfactionAnswers[question.id]?.ratingValue ?? null) : null,
+      textValue: question.type === 'text' ? (this.satisfactionAnswers[question.id]?.textValue || '') : '',
+    })));
+  },
+  async handleSubmit() {
+    const blockReason = this.getSubmissionBlockReason();
+    if (blockReason) {
+      this.pageError = blockReason;
       return;
     }
-    if (!this.existingSubmission) {
-      for (const question of this.questions) {
-        if (!(this.answers[question.id] || '').trim()) {
-          this.pageError = 'الرجاء إكمال جميع الأسئلة';
-          return;
-        }
-      }
-    }
-    if (this.resolvedAssessmentType === 'post' && this.satisfactionQuestions.length > 0
-      && !this.alreadySubmittedSatisfaction && !this.validateSatisfactionAnswers()) return;
+    if (this.needsSatisfactionSubmission() && !this.validateSatisfactionAnswers()) return;
 
     this.submitting = true;
     try {
-      if (!this.existingSubmission) {
-        await submitPublicAssessment({
-          courseId: this.activeCourse.id,
-          assessmentType: this.resolvedAssessmentType,
-          studentName: this.student.name,
-          loginId: this.student.loginId,
-          answers: this.questions.map((question) => ({
-            questionId: question.id,
-            value: this.answers[question.id] || '',
-            fileName: this.files[question.id]?.name || null,
-            fileType: this.files[question.id]?.type || null,
-            file: this.files[question.id]?.file || null,
-            fileDataUrl: null,
-          })),
-        });
-      }
-      if (this.resolvedAssessmentType === 'post' && this.satisfactionQuestions.length > 0 && !this.alreadySubmittedSatisfaction) {
-        await submitPublicSatisfactionResponses(this.satisfactionQuestions.map((question) => ({
-          courseId: this.activeCourse.id,
-          questionId: question.id,
-          loginCode: this.student.loginId,
-          studentName: this.student.name,
-          ratingValue: question.type === 'rating' ? (this.satisfactionAnswers[question.id]?.ratingValue ?? null) : null,
-          textValue: question.type === 'text' ? (this.satisfactionAnswers[question.id]?.textValue || '') : '',
-        })));
-      }
+      if (!this.existingSubmission) await this.submitAssessmentAnswers();
+      if (this.needsSatisfactionSubmission()) await this.submitSatisfactionAnswers();
 
       this.pageError = '';
       this.satisfactionError = '';

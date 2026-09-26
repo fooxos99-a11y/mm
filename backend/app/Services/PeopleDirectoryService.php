@@ -52,17 +52,25 @@ class PeopleDirectoryService
             ->whereNull('archive_id')->whereColumn('login_code', 'students.login_code'), 'attendance_count');
         foreach (['pre', 'post', 'tasks'] as $type) {
             $counts = DB::table('course_submissions')->selectRaw('COUNT(DISTINCT course_id)')
-                ->whereNull('archive_id')->whereColumn('login_code', 'students.login_code')->where('assessment_type', $type);
+                ->whereNull('archive_id')
+                ->whereColumn('login_code', 'students.login_code')
+                ->where('assessment_type', $type);
             if ($type === 'tasks') {
                 $counts->where('task_review_status', 'approved');
             }
             $query->selectSub($counts, $type.'_count');
         }
-        $totals = ['parts' => $branch === 'female' ? 10 : 30, 'attendance' => max(1, $courseCount),
-            'pre' => max(1, $courseCount), 'post' => max(1, $courseCount), 'tasks' => max(1, $taskCount)];
+        $totals = [
+            'parts' => $branch === 'female' ? 10 : 30,
+            'attendance' => max(1, $courseCount),
+            'pre' => max(1, $courseCount),
+            'post' => max(1, $courseCount),
+            'tasks' => max(1, $taskCount),
+        ];
         $percentages = [];
         foreach ($totals as $key => $total) {
-            $percentages[] = "CASE WHEN {$key}_count >= {$total} THEN 100 ELSE ROUND(100.0 * {$key}_count / {$total}) END";
+            $percentages[] = "CASE WHEN {$key}_count >= {$total} THEN 100 "
+                ."ELSE ROUND(100.0 * {$key}_count / {$total}) END";
         }
         // Counts cover the whole active dataset before sorting and pagination.
         $ranked = DB::query()->fromSub($query, 'directory')->select('directory.*')
@@ -73,9 +81,13 @@ class PeopleDirectoryService
         }
         $page = $ranked->orderBy('full_name')->orderBy('id')->paginate($perPage);
         $students = Student::query()->whereIn('id', $page->getCollection()->pluck('id'))
-            ->with(['branch', 'parts', 'registrationRequest', 'reciters' => fn ($query) => $query->whereNull('archive_id')])
+            ->with(
+                ['branch', 'parts', 'registrationRequest', 'reciters' => fn ($query) => $query->whereNull('archive_id')]
+            )
             ->get()->keyBy('id');
-        $page->setCollection($page->getCollection()->map(fn ($row) => $this->presenter->student($students[$row->id], $row, $totals)));
+        $page->setCollection(
+            $page->getCollection()->map(fn ($row) => $this->presenter->student($students[$row->id], $row, $totals))
+        );
 
         return $page->toArray();
     }

@@ -154,6 +154,16 @@ export default {
     canEdit: { type: Boolean, default: false },
     saving: { type: Boolean, default: false },
   },
+  emits: [
+    'remove',
+    'prompt-paste',
+    'select-correct',
+    'option-change',
+    'option-paste',
+    'add-option',
+    'update-draft',
+    'clear-error',
+  ],
   methods: {
     draftFor(questionId) {
       return this.drafts[questionId] || {};

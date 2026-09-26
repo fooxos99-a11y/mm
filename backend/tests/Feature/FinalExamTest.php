@@ -131,12 +131,15 @@ class FinalExamTest extends CoreDataApiTestCase
             ->where('question_id', $textQuestionId)
             ->value('id');
 
-        $this->putJson('/api/dashboard/final-exam/submissions/'.$submissionId.'/answers/'.$textAnswerId.'/manual-score', [
+        $manualScoreUrl = '/api/dashboard/final-exam/submissions/'.$submissionId
+            .'/answers/'.$textAnswerId.'/manual-score';
+
+        $this->putJson($manualScoreUrl, [
             'score' => 5,
         ])->assertUnprocessable()
             ->assertJsonPath('errors.score.0', 'الحد الأعلى لدرجة هذه الإجابة هو 4.');
 
-        $this->putJson('/api/dashboard/final-exam/submissions/'.$submissionId.'/answers/'.$textAnswerId.'/manual-score', [
+        $this->putJson($manualScoreUrl, [
             'score' => 3.5,
         ])->assertNoContent();
 

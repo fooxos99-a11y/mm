@@ -286,12 +286,12 @@
   padding: 10px 6px;
   text-align: center;
   background: #edf3f5;
-  color: #64748b;
+  color: #607086;
   font-weight: 800;
 }
 
 .admin-archive-view__part-chip--active {
-  background: linear-gradient(135deg, #2a94b2, #0f6d88);
+  background: linear-gradient(135deg, #24809a, #0f6d88);
   color: #fff;
 }
 
@@ -335,14 +335,14 @@
   border-radius: 999px;
   padding: 8px 12px;
   background: #f1f5f9;
-  color: #64748b;
+  color: #607086;
   font-size: 0.8rem;
   font-weight: 800;
 }
 
 .admin-archive-view__attendance-badge--active {
   background: rgba(34, 197, 94, 0.14);
-  color: #15803d;
+  color: #157f3d;
 }
 
 .admin-archive-view__assessment-grid {

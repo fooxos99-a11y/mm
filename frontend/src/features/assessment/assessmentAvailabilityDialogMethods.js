@@ -54,13 +54,13 @@ export default {
     const targetBranches = targetBranch === 'all' ? ['male', 'female'] : [targetBranch];
     const otherBranches = ['male', 'female'].filter((branchId) => !targetBranches.includes(branchId));
     const branchAvailability = {
-      male: { ...(course.branchAvailability?.male || {}) },
-      female: { ...(course.branchAvailability?.female || {}) },
+      male: { ...course.branchAvailability?.male },
+      female: { ...course.branchAvailability?.female },
     };
     const nextWindows = {
-      global: { ...(course.assessmentWindows?.global || {}) },
-      male: { ...(course.assessmentWindows?.male || {}) },
-      female: { ...(course.assessmentWindows?.female || {}) },
+      global: { ...course.assessmentWindows?.global },
+      male: { ...course.assessmentWindows?.male },
+      female: { ...course.assessmentWindows?.female },
     };
 
     nextWindows.global[this.assessmentAvailabilityType] = targetBranch === 'all' ? windowPayload : undefined;

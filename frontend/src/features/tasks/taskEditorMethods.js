@@ -5,6 +5,35 @@ import { hasMeaningfulDocumentContent } from '../../utils/documentContent';
 import { parseImportedQuestionsFromText, splitPastedQuestionOptions } from '../../utils/questionImportParser';
 import { emptyQuestionForm, emptyTaskDraft } from './taskViewModel.mjs';
 
+const TRUE_FALSE_OPTIONS = ['صح', 'خطأ'];
+
+const resolveOptionsForTypeChange = (type, options) => {
+  if (type === 'truefalse') return [...TRUE_FALSE_OPTIONS];
+  if (type === 'multiple' && options.length > 1) return options;
+  return ['', ''];
+};
+
+const resolveCorrectAnswerForTypeChange = (type, correctAnswer) => {
+  if (type === 'multiple') return correctAnswer;
+  if (type !== 'truefalse') return '';
+  return TRUE_FALSE_OPTIONS.includes(correctAnswer) ? correctAnswer : 'صح';
+};
+
+const resolveImportedQuestionType = (preferredType, draftType) => {
+  if (preferredType === 'multiple') return 'multiple';
+  return preferredType === 'truefalse' && draftType === 'text' ? 'truefalse' : draftType;
+};
+
+const resolveImportedQuestionOptions = (type, options) => {
+  if (type === 'truefalse') return [...TRUE_FALSE_OPTIONS];
+  return options.length >= 2 ? options : ['', ''];
+};
+
+const resolveSavedQuestionOptions = (form) => {
+  if (form.type === 'multiple') return form.options.map((option) => option.trim()).filter(Boolean);
+  return form.type === 'truefalse' ? [...TRUE_FALSE_OPTIONS] : [];
+};
+
 export const taskEditorMethods = {
     openCreateDialog(mode) {
       this.createMode = mode;
@@ -180,9 +209,9 @@ export const taskEditorMethods = {
         return {
           ...form,
           type,
-          options: type === 'multiple' ? (form.options.length > 1 ? form.options : ['', '']) : (type === 'truefalse' ? ['صح', 'خطأ'] : ['', '']),
+          options: resolveOptionsForTypeChange(type, form.options),
           points: type === 'truefalse' ? '1' : form.points,
-          correctAnswer: type === 'multiple' ? form.correctAnswer : (type === 'truefalse' ? (['صح', 'خطأ'].includes(form.correctAnswer) ? form.correctAnswer : 'صح') : ''),
+          correctAnswer: resolveCorrectAnswerForTypeChange(type, form.correctAnswer),
         };
       });
       this.clearQuestionError(formIndex);
@@ -212,15 +241,13 @@ export const taskEditorMethods = {
       });
     },
     mapImportedDraftToForm(draft, defaultPoints, preferredType) {
-      const effectiveType = preferredType === 'multiple'
-        ? 'multiple'
-        : (preferredType === 'truefalse' && draft.type === 'text' ? 'truefalse' : draft.type);
+      const effectiveType = resolveImportedQuestionType(preferredType, draft.type);
 
       return {
         ...emptyQuestionForm(),
         prompt: draft.prompt,
         type: effectiveType,
-        options: effectiveType === 'truefalse' ? ['صح', 'خطأ'] : (draft.options.length >= 2 ? draft.options : ['', '']),
+        options: resolveImportedQuestionOptions(effectiveType, draft.options),
         points: String(defaultPoints),
         correctAnswer: effectiveType === 'truefalse' ? 'صح' : '',
       };
@@ -282,9 +309,7 @@ export const taskEditorMethods = {
       }
 
       const newDraftQuestions = this.questionForms.map((form) => {
-        const options = form.type === 'multiple'
-          ? form.options.map((option) => option.trim()).filter(Boolean)
-          : (form.type === 'truefalse' ? ['صح', 'خطأ'] : []);
+        const options = resolveSavedQuestionOptions(form);
 
         return {
           prompt: form.prompt.trim(),

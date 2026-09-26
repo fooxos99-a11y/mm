@@ -47,8 +47,12 @@
 
         <div class="dashboard-templates-manager__body px-5 pt-5 pb-4">
           <div class="dashboard-template-field">
-            <label class="dashboard-supervision-field__label">الدورة</label>
+            <label
+              for="dashboard-templates-course"
+              class="dashboard-supervision-field__label"
+            >الدورة</label>
             <AppSelect
+              id="dashboard-templates-course"
               :value="selectedCourseId"
               :items="courseOptions"
               item-text="label"
@@ -67,8 +71,12 @@
               :key="field.key"
               class="dashboard-template-field"
             >
-              <label class="dashboard-supervision-field__label">{{ field.label }}</label>
+              <label
+                :for="`dashboard-template-${field.key}`"
+                class="dashboard-supervision-field__label"
+              >{{ field.label }}</label>
               <v-textarea
+                :id="`dashboard-template-${field.key}`"
                 :model-value="draft[field.key]"
                 rows="3"
                 outlined
@@ -122,6 +130,15 @@ export default {
     submitting: { type: Boolean, default: false },
     templatesOpen: { type: Boolean, default: false },
   },
+  emits: [
+    'update:admins-open',
+    'close-admins',
+    'accounts-busy',
+    'update:templates-open',
+    'update:selected-course-id',
+    'update-template',
+    'save-templates',
+  ],
   data: () => ({
     templateFields: [
       { key: 'pre', label: 'قالب القبلي' },

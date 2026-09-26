@@ -1,7 +1,6 @@
 import { expect, test } from '@playwright/test';
+import { adminLogin, adminPassword, studentPassword } from './support/credentials.mjs';
 
-const adminLogin = process.env.E2E_ADMIN_LOGIN || 'e2e-admin';
-const adminPassword = process.env.E2E_ADMIN_PASSWORD || 'E2E-Momars-2026!';
 
 test('admin critical data workflows persist through the browser API session', async ({ page }, testInfo) => {
   await page.goto('login', { waitUntil: 'domcontentloaded' });
@@ -13,7 +12,7 @@ test('admin critical data workflows persist through the browser API session', as
   ]);
 
   const suffix = testInfo.project.name.replace(/\D/g, '') || '1440';
-  const result = await page.evaluate(async ({ suffix }) => {
+  const result = await page.evaluate(async ({ suffix, password }) => {
     const token = document.cookie
       .split('; ')
       .find((cookie) => cookie.startsWith('XSRF-TOKEN='))
@@ -44,8 +43,8 @@ test('admin critical data workflows persist through the browser API session', as
       body: JSON.stringify({
         name: `E2E Student ${suffix}`,
         loginId,
-        password: 'Student-2026!',
-        passwordConfirmation: 'Student-2026!',
+        password,
+        passwordConfirmation: password,
         branchId: 'male',
       }),
     });
@@ -123,7 +122,7 @@ test('admin critical data workflows persist through the browser API session', as
         && snapshot.data?.finalExamSettings?.male?.isEnabled === true,
       permissionPersisted: snapshot.data?.rolePermissions?.male_manager?.page_results === true,
     };
-  }, { suffix });
+  }, { suffix, password: studentPassword });
 
   expect(result.statuses).toEqual({
     student: 201,
@@ -145,7 +144,7 @@ test('admin critical data workflows persist through the browser API session', as
   await page.context().clearCookies();
   await page.goto('login', { waitUntil: 'domcontentloaded' });
   await page.locator('input[autocomplete="username"]').fill(result.loginId);
-  await page.locator('input[autocomplete="current-password"]').fill('Student-2026!');
+  await page.locator('input[autocomplete="current-password"]').fill(studentPassword);
   await Promise.all([
     page.waitForURL((url) => url.pathname === '/momars/student'),
     page.locator('form button[type="submit"]').click(),

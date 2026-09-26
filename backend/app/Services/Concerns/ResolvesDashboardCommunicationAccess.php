@@ -106,8 +106,11 @@ trait ResolvesDashboardCommunicationAccess
         return in_array($branchCode, ['male', 'female'], true) ? (string) $branchCode : null;
     }
 
-    private function notificationIsVisibleToBranch(array $notification, string $branchCode, Collection $allowedLoginCodes): bool
-    {
+    private function notificationIsVisibleToBranch(
+        array $notification,
+        string $branchCode,
+        Collection $allowedLoginCodes
+    ): bool {
         $targetBranchCode = trim((string) ($notification['targetBranchId'] ?? ''));
 
         if ($targetBranchCode !== '' && $targetBranchCode !== $branchCode) {
@@ -130,7 +133,10 @@ trait ResolvesDashboardCommunicationAccess
         $targetBranchCode = trim((string) ($notification->target_branch_code ?? ''));
         $targetLoginIds = $this->normalizeLoginIds($this->decodeArray($notification->target_login_ids ?? null));
 
-        if ($managedBranch === null || ($targetBranchCode !== $managedBranch && ($targetBranchCode !== '' || $targetLoginIds === []))) {
+        if (
+            $managedBranch === null
+                || ($targetBranchCode !== $managedBranch && ($targetBranchCode !== '' || $targetLoginIds === []))
+        ) {
             throw new AuthorizationException;
         }
 

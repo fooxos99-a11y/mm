@@ -59,5 +59,18 @@ export default {
     templateSaving: { type: Boolean, default: false },
     canEdit: { type: Boolean, default: false },
   },
+  emits: [
+    'update:course-value',
+    'update:view-mode',
+    'update:task-points',
+    'update:task-video-url',
+    'update:task-description',
+    'create-course',
+    'edit-course',
+    'move-course',
+    'delete-course',
+    'update:template-draft',
+    'save-template',
+  ],
 };
 </script>

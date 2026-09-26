@@ -47,9 +47,13 @@
       </div>
 
       <div class="admin-archive-view__field admin-archive-view__field--search">
-        <label class="admin-archive-view__field-label">البحث باسم الطالب</label>
+        <label
+          for="archive-records-search"
+          class="admin-archive-view__field-label"
+        >البحث باسم الطالب</label>
         <div class="admin-archive-view__search-row">
           <input
+            id="archive-records-search"
             :value="searchQuery"
             type="search"
             class="admin-archive-view__search-input"
@@ -130,6 +134,13 @@ export default {
     selectedStudentId: { type: String, default: '' },
     formatDate: { type: Function, required: true },
   },
+  emits: [
+    'delete-archive',
+    'update:search-query',
+    'open-student',
+    'update:archive-id',
+    'archive-change',
+  ],
   computed: {
     selectedArchive() {
       return this.archives.find((archive) => archive.id === this.archiveId) || null;

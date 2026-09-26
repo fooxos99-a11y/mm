@@ -34,7 +34,7 @@ class DatabaseSeeder extends Seeder
         );
 
         if (app()->environment('testing') && filter_var(env('MOMARS_SEED_E2E_ROLES', false), FILTER_VALIDATE_BOOLEAN)) {
-            $this->call(E2EAccountSeeder::class);
+            $this->call(EndToEndAccountSeeder::class);
         }
     }
 }

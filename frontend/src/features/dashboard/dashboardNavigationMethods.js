@@ -22,8 +22,8 @@ export default {
     },
     hasSameRouteQuery(nextQuery) {
       const currentQuery = this.$route.query || {};
-      const currentKeys = Object.keys(currentQuery).sort();
-      const nextKeys = Object.keys(nextQuery).sort();
+      const currentKeys = Object.keys(currentQuery).sort((left, right) => left.localeCompare(right));
+      const nextKeys = Object.keys(nextQuery).sort((left, right) => left.localeCompare(right));
 
       if (currentKeys.length !== nextKeys.length) {
         return false;

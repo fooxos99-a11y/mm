@@ -54,7 +54,9 @@ trait SyncsTrainingMaterialAttachments
             $attachmentId = trim((string) ($attachment['id'] ?? ''));
 
             if ($label === '' && $url === '') {
-                throw ValidationException::withMessages(["attachments.$index.label" => 'اسم الملف أو رابط المقطع مطلوب.']);
+                throw ValidationException::withMessages(
+                    ["attachments.$index.label" => 'اسم الملف أو رابط المقطع مطلوب.']
+                );
             }
             if ($url !== '') {
                 continue;
@@ -62,7 +64,9 @@ trait SyncsTrainingMaterialAttachments
             if ($allowExisting && $attachmentId !== '') {
                 $media = $mediaIndex->get($attachmentId);
                 if (! $media) {
-                    throw ValidationException::withMessages(["attachments.$index.id" => 'الملف المحدد غير موجود ضمن المادة التدريبية.']);
+                    throw ValidationException::withMessages(
+                        ["attachments.$index.id" => 'الملف المحدد غير موجود ضمن المادة التدريبية.']
+                    );
                 }
                 $media->name = $label;
                 $media->custom_properties = array_merge($media->custom_properties ?? [], ['display_name' => $label]);
@@ -72,7 +76,9 @@ trait SyncsTrainingMaterialAttachments
                 continue;
             }
             if (! $file) {
-                throw ValidationException::withMessages(["attachments.$index.file" => 'اختر ملفًا أو أضف رابط يوتيوب.']);
+                throw ValidationException::withMessages(
+                    ["attachments.$index.file" => 'اختر ملفًا أو أضف رابط يوتيوب.']
+                );
             }
 
             $newMedia = $material->addMedia($file)

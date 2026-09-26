@@ -19,7 +19,12 @@ class DashboardShellTest extends TestCase
         $branch = DB::table('branches')->where('code', 'male')->value('id');
         $rows = [];
         for ($i = 0; $i < 1001; $i++) {
-            $rows[] = ['id' => (string) str()->uuid(), 'branch_id' => $branch, 'full_name' => 'Private name', 'login_code' => 'login-'.$i];
+            $rows[] = [
+                'id' => (string) str()->uuid(),
+                'branch_id' => $branch,
+                'full_name' => 'Private name',
+                'login_code' => 'login-'.$i,
+            ];
         }
         foreach (array_chunk($rows, 200) as $chunk) {
             DB::table('students')->insert($chunk);
@@ -55,8 +60,13 @@ class DashboardShellTest extends TestCase
                     'submitted_at' => now(),
                 ]);
             }
-            DB::table('course_attendance')->insert(['id' => (string) str()->uuid(), 'course_id' => $course,
-                'student_id' => $student->id, 'student_name' => $student->full_name, 'login_code' => $student->login_code]);
+            DB::table('course_attendance')->insert([
+                'id' => (string) str()->uuid(),
+                'course_id' => $course,
+                'student_id' => $student->id,
+                'student_name' => $student->full_name,
+                'login_code' => $student->login_code,
+            ]);
         }
         $this->getJson('/api/dashboard/shell')->assertOk()
             ->assertJsonPath('overviewIndicators.all.0.meta', '1 من 40')
@@ -71,11 +81,15 @@ class DashboardShellTest extends TestCase
     {
         $this->student('female');
         Sanctum::actingAs(User::factory()->create(['role' => 'male_manager']));
-        DB::table('role_permissions')->updateOrInsert(['role' => 'male_manager', 'permission_key' => 'page_overview'], ['is_enabled' => true]);
+        DB::table('role_permissions')
+            ->updateOrInsert(['role' => 'male_manager', 'permission_key' => 'page_overview'], ['is_enabled' => true]);
         $response = $this->getJson('/api/dashboard/shell?branchCode=female')->assertOk()
             ->assertJsonPath('overviewIndicators.male.5.meta', '0 من 0')->assertJsonCount(1, 'branches');
         $this->assertSame(['male'], array_keys($response->json('overviewIndicators')));
-        DB::table('role_permissions')->where('role', 'male_manager')->where('permission_key', 'page_overview')->update(['is_enabled' => false]);
+        DB::table('role_permissions')
+            ->where('role', 'male_manager')
+            ->where('permission_key', 'page_overview')
+            ->update(['is_enabled' => false]);
         $this->getJson('/api/dashboard/shell')->assertOk()->assertJsonCount(0, 'overviewIndicators');
         Sanctum::actingAs(User::factory()->create(['role' => 'student']));
         $this->getJson('/api/dashboard/shell')->assertForbidden();

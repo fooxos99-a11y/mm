@@ -313,7 +313,7 @@
 .home-page .program-card__action:disabled {
   background: #edf3f5 !important;
   border-color: #d1dfe5 !important;
-  color: #8096a0;
+  color: #5d727c;
   cursor: default;
 }
 

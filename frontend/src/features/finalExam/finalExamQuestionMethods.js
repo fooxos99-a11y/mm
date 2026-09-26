@@ -4,6 +4,11 @@ import {
 import { parseImportedQuestionsFromText, splitPastedQuestionOptions } from '../../utils/questionImportParser';
 import { emptyFinalExamQuestionForm as emptyQuestionForm } from './finalExamViewModel.mjs';
 
+const resolveImportedDraftOptions = (type, options) => {
+  if (type !== 'multiple') return [];
+  return options.length >= 2 ? options : ['', ''];
+};
+
 export const finalExamQuestionMethods = {
     removeQuestion(questionId) {
       if (!questionId || this.pendingDeletedQuestionIds.includes(questionId)) {
@@ -94,7 +99,7 @@ export const finalExamQuestionMethods = {
         ...emptyQuestionForm(effectiveType),
         prompt: draft.prompt,
         type: effectiveType,
-        options: effectiveType === 'multiple' ? (draft.options.length >= 2 ? draft.options : ['', '']) : [],
+        options: resolveImportedDraftOptions(effectiveType, draft.options),
         points: String(defaultPoints),
         correctAnswer: '',
       };

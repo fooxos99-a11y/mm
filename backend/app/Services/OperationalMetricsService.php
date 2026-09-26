@@ -39,7 +39,14 @@ class OperationalMetricsService
         }
     }
 
-    /** @return array{errorsLastFiveMinutes: int, lastErrorAt: ?string, clientErrorsLastFiveMinutes: int, lastClientErrorAt: ?string} */
+    /**
+     * @return array{
+     *     errorsLastFiveMinutes: int,
+     *     lastErrorAt: ?string,
+     *     clientErrorsLastFiveMinutes: int,
+     *     lastClientErrorAt: ?string
+     * }
+     */
     public function snapshot(): array
     {
         $errors = collect(range(0, 4))->sum(function (int $minutesAgo): int {

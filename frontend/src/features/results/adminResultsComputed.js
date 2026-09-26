@@ -3,6 +3,12 @@ import { buildResultDetailCards } from './resultModel.mjs';
 export const RESULTS_FINAL_EXAM_VALUE = '__final_exam__';
 export const RESULTS_TASKS_VALUE = '__tasks__';
 
+const resolveDisplayedRowsSource = (vm) => {
+  if (vm.isFinalExamResultsSection) return vm.finalExamRows;
+  if (vm.isTaskResultsSection) return vm.taskRows;
+  return vm.isAttendanceResultsType ? vm.attendanceRows : vm.assessmentRows;
+};
+
 export default {
   managedBranchId() {
     if (this.currentUser?.role === 'male_manager') return 'male';
@@ -212,9 +218,7 @@ export default {
     });
   },
   displayedRows() {
-    const source = this.isFinalExamResultsSection ? this.finalExamRows
-      : (this.isTaskResultsSection ? this.taskRows
-        : (this.isAttendanceResultsType ? this.attendanceRows : this.assessmentRows));
+    const source = resolveDisplayedRowsSource(this);
     if (!this.isAttendanceMode) return source;
     return source.filter((row) => {
       if (!this.studentFilter || this.studentFilter === 'all') return true;

@@ -15,7 +15,8 @@ if (baseUrl.protocol !== 'https:' && !allowInsecure) {
   process.exit(1);
 }
 
-baseUrl.pathname = baseUrl.pathname.replace(/\/+$/, '') + '/';
+const basePathSegments = baseUrl.pathname.split('/').filter(Boolean);
+baseUrl.pathname = basePathSegments.length ? `/${basePathSegments.join('/')}/` : '/';
 baseUrl.search = '';
 baseUrl.hash = '';
 
@@ -41,7 +42,7 @@ const request = async (name, path, options, validate) => {
       ...options,
       headers: {
         Accept: 'application/json, text/html;q=0.9',
-        ...(options && options.headers ? options.headers : {}),
+        ...(options?.headers || {}),
       },
     });
     const body = await response.text();

@@ -69,7 +69,8 @@ class PeopleDirectoryTest extends TestCase
         $low = $this->student('male', 'A first by name', 'low');
         $high = $this->student('male', 'Z last by name', 'high');
         $course = (string) str()->uuid();
-        DB::table('courses')->insert(['id' => $course, 'title' => 'Course', 'entity_type' => 'course', 'created_at' => now()]);
+        DB::table('courses')
+            ->insert(['id' => $course, 'title' => 'Course', 'entity_type' => 'course', 'created_at' => now()]);
         DB::table('course_attendance')->insert([
             'id' => (string) str()->uuid(), 'course_id' => $course, 'student_id' => $high->id,
             'student_name' => $high->full_name, 'login_code' => $high->login_code, 'created_at' => now(),
@@ -92,10 +93,17 @@ class PeopleDirectoryTest extends TestCase
             DB::table('student_parts')->insert(['student_id' => $high->id, 'part_number' => $part]);
         }
         $task = (string) str()->uuid();
-        DB::table('courses')->insert(['id' => $task, 'title' => 'Task', 'entity_type' => 'task', 'created_at' => now()]);
+        DB::table('courses')
+            ->insert(['id' => $task, 'title' => 'Task', 'entity_type' => 'task', 'created_at' => now()]);
         DB::table('course_submissions')->insert([
-            'id' => (string) str()->uuid(), 'course_id' => $task, 'assessment_type' => 'tasks', 'task_review_status' => 'approved',
-            'student_id' => $high->id, 'student_name' => $high->full_name, 'login_code' => $high->login_code, 'submitted_at' => now(),
+            'id' => (string) str()->uuid(),
+            'course_id' => $task,
+            'assessment_type' => 'tasks',
+            'task_review_status' => 'approved',
+            'student_id' => $high->id,
+            'student_name' => $high->full_name,
+            'login_code' => $high->login_code,
+            'submitted_at' => now(),
         ]);
         $this->getJson('/api/dashboard/people?sort=highest-progress&perPage=1')->assertOk()
             ->assertJsonPath('data.0.overallProgress', 82)->assertJsonPath('data.0.metrics.0.display', '10%');
@@ -103,7 +111,8 @@ class PeopleDirectoryTest extends TestCase
 
     private function actAs(string $role, bool $allowed = true): void
     {
-        DB::table('role_permissions')->updateOrInsert(['role' => $role, 'permission_key' => 'page_users'], ['is_enabled' => $allowed]);
+        DB::table('role_permissions')
+            ->updateOrInsert(['role' => $role, 'permission_key' => 'page_users'], ['is_enabled' => $allowed]);
         Sanctum::actingAs(User::factory()->create(['role' => $role]));
     }
 

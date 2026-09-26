@@ -44,7 +44,15 @@ trait FinalizesCompletionBranches
                 DB::table('student_completion_results')->upsert(
                     $results,
                     ['student_id'],
-                    ['branch_code', 'status', 'requirements_snapshot', 'details', 'finalized_by', 'finalized_at', 'updated_at'],
+                    [
+                        'branch_code',
+                        'status',
+                        'requirements_snapshot',
+                        'details',
+                        'finalized_by',
+                        'finalized_at',
+                        'updated_at',
+                    ],
                 );
             }
 

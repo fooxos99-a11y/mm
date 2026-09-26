@@ -36,7 +36,11 @@ class AddSecurityHeaders
             'Content-Security-Policy',
             $isApiRequest
                 ? "default-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'self'"
-                : "default-src 'self'; base-uri 'self'; connect-src 'self' https: wss:; font-src 'self' data:; form-action 'self'; frame-ancestors 'self'; frame-src 'self' blob: https://www.youtube.com https://www.youtube-nocookie.com; img-src 'self' data: blob: https:; media-src 'self' blob: https:; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; worker-src 'self' blob:",
+                : "default-src 'self'; base-uri 'self'; connect-src 'self' https: wss:; font-src 'self' data:; "
+                    ."form-action 'self'; frame-ancestors 'self'; frame-src 'self' blob: https://www.youtube.com "
+                    ."https://www.youtube-nocookie.com; img-src 'self' data: blob: https:; media-src 'self' blob: "
+                    ."https:; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; worker-src "
+                    ."'self' blob:",
         );
 
         if ($request->isSecure()) {

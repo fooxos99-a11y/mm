@@ -1,5 +1,22 @@
 import { pathToFileURL } from 'node:url';
 
+const trimTrailingSlashes = (value) => {
+  let end = value.length;
+
+  while (end > 0 && value[end - 1] === '/') {
+    end -= 1;
+  }
+
+  return value.slice(0, end);
+};
+
+// Response details come from the monitored server; keep each log entry on one line.
+export const toSingleLineLogValue = (value) => Array.from(String(value ?? ''), (character) => {
+  const code = character.codePointAt(0);
+
+  return code < 32 || code === 127 ? ' ' : character;
+}).join('');
+
 const timedFetch = async (url, timeoutMs) => {
   const startedAt = performance.now();
   const response = await fetch(url, { signal: AbortSignal.timeout(timeoutMs) });
@@ -9,7 +26,7 @@ const timedFetch = async (url, timeoutMs) => {
 
 export const runMonitor = async ({ baseUrl, timeoutMs = 10000, maxLatencyMs = 2000 }) => {
   const root = new URL(baseUrl);
-  root.pathname = `${root.pathname.replace(/\/+$/, '')}/`;
+  root.pathname = `${trimTrailingSlashes(root.pathname)}/`;
   const results = [];
   const check = async (name, path, validate) => {
     try {
@@ -49,6 +66,8 @@ export const runMonitor = async ({ baseUrl, timeoutMs = 10000, maxLatencyMs = 20
   return { passed: results.every((result) => result.passed), results };
 };
 
+const describeFailure = (item) => `${item.name}: ${item.detail}`;
+
 export const sendAlert = async (webhookUrl, report, baseUrl) => {
   if (!webhookUrl) return;
   const failures = report.results.filter((result) => !result.passed);
@@ -56,7 +75,7 @@ export const sendAlert = async (webhookUrl, report, baseUrl) => {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      text: `Momars production monitor failed for ${baseUrl}: ${failures.map((item) => `${item.name}: ${item.detail}`).join('; ')}`,
+      text: `Momars production monitor failed for ${baseUrl}: ${failures.map(describeFailure).join('; ')}`,
       status: 'failure',
       service: 'momars',
       failures,
@@ -81,7 +100,8 @@ if (isMain) {
     maxLatencyMs: Number(process.env.MONITOR_MAX_LATENCY_MS || 2000),
   });
   report.results.forEach((result) => {
-    console.log(`${result.passed ? 'PASS' : 'FAIL'} ${result.name} (${result.durationMs}ms): ${result.detail}`);
+    const outcome = result.passed ? 'PASS' : 'FAIL';
+    console.log(`${outcome} ${result.name} (${result.durationMs}ms): ${toSingleLineLogValue(result.detail)}`);
   });
 
   if (!report.passed) {

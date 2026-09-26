@@ -6,6 +6,16 @@ use Illuminate\Validation\ValidationException;
 
 class RegistrationFormService
 {
+    public const FIXED_FIELD_IDS = ['name', 'gender', 'phone'];
+
+    private const FIXED_LABELS_SETTING = 'registration_fixed_field_labels';
+
+    private const DEFAULT_FIXED_LABELS = [
+        'name' => 'الاسم',
+        'gender' => 'الجنس',
+        'phone' => 'رقم الجوال',
+    ];
+
     public function __construct(private readonly AppSettingsService $appSettingsService) {}
 
     public function load(): array
@@ -19,6 +29,25 @@ class RegistrationFormService
     {
         $normalized = $this->normalize($fields);
         $this->appSettingsService->storeJson('registration_form_fields', $normalized);
+
+        return $normalized;
+    }
+
+    /**
+     * Display labels for the built-in name, gender and phone fields.
+     * Only the wording can change; their input types and validation stay fixed.
+     */
+    public function loadFixedLabels(): array
+    {
+        return $this->normalizeFixedLabels(
+            $this->appSettingsService->loadJson(self::FIXED_LABELS_SETTING, []),
+        );
+    }
+
+    public function updateFixedLabels(array $labels): array
+    {
+        $normalized = $this->normalizeFixedLabels(array_merge($this->loadFixedLabels(), $labels));
+        $this->appSettingsService->storeJson(self::FIXED_LABELS_SETTING, $normalized);
 
         return $normalized;
     }
@@ -100,12 +129,45 @@ class RegistrationFormService
         return $normalized;
     }
 
+    private function normalizeFixedLabels(array $labels): array
+    {
+        $normalized = [];
+
+        foreach (self::DEFAULT_FIXED_LABELS as $fieldId => $defaultLabel) {
+            $label = trim((string) ($labels[$fieldId] ?? ''));
+            $normalized[$fieldId] = $label !== '' ? mb_substr($label, 0, 255) : $defaultLabel;
+        }
+
+        return $normalized;
+    }
+
     private function defaults(): array
     {
         return [
-            ['id' => 'age', 'label' => 'العمر', 'type' => 'number', 'required' => true, 'showInRequests' => true, 'options' => []],
-            ['id' => 'complex_name', 'label' => 'اسم المجمع', 'type' => 'select', 'required' => false, 'showInRequests' => true, 'options' => ['غير محدد']],
-            ['id' => 'house_name', 'label' => 'اسم الدار', 'type' => 'select', 'required' => false, 'showInRequests' => true, 'options' => ['غير محدد']],
+            [
+                'id' => 'age',
+                'label' => 'العمر',
+                'type' => 'number',
+                'required' => true,
+                'showInRequests' => true,
+                'options' => [],
+            ],
+            [
+                'id' => 'complex_name',
+                'label' => 'اسم المجمع',
+                'type' => 'select',
+                'required' => false,
+                'showInRequests' => true,
+                'options' => ['غير محدد'],
+            ],
+            [
+                'id' => 'house_name',
+                'label' => 'اسم الدار',
+                'type' => 'select',
+                'required' => false,
+                'showInRequests' => true,
+                'options' => ['غير محدد'],
+            ],
         ];
     }
 }

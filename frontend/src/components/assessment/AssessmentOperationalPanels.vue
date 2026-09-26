@@ -26,8 +26,12 @@
             v-if="!managedBranchId"
             class="assessment-indicators-card__filter-group"
           >
-            <label class="assessment-indicators-card__label">الفرع</label>
+            <label
+              for="assessment-indicators-branch"
+              class="assessment-indicators-card__label"
+            >الفرع</label>
             <AppSelect
+              id="assessment-indicators-branch"
               :value="indicatorBranch"
               :items="indicatorBranchOptions"
               item-text="label"
@@ -134,8 +138,12 @@
             v-if="!managedBranchId"
             class="prep-field prep-field--wide"
           >
-            <label class="prep-field__label">الفرع</label>
+            <label
+              for="assessment-attendance-branch"
+              class="prep-field__label"
+            >الفرع</label>
             <AppSelect
+              id="assessment-attendance-branch"
               :value="attendanceBranch"
               :items="attendanceBranchOptions"
               item-text="label"
@@ -248,6 +256,18 @@ export default {
     checkedCount: { type: Number, default: 0 },
     allChecked: Boolean,
   },
+  emits: [
+    'update:course-value',
+    'update:view-mode',
+    'create-course',
+    'edit-course',
+    'move-course',
+    'delete-course',
+    'update:indicator-branch',
+    'update:attendance-branch',
+    'toggle-all',
+    'toggle-student',
+  ],
 };
 </script>
 

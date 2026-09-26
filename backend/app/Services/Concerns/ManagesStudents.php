@@ -61,7 +61,14 @@ trait ManagesStudents
             $payload['branch_id'] = $this->findBranchByCode((string) $updates['branchId'])->id;
         }
 
-        DB::transaction(function () use ($student, $payload, $updates, $originalLoginCode, $originalName, $passwordHash): void {
+        DB::transaction(function () use (
+            $student,
+            $payload,
+            $updates,
+            $originalLoginCode,
+            $originalName,
+            $passwordHash
+        ): void {
             if ($payload !== []) {
                 $student->fill($payload);
                 $student->save();
@@ -79,7 +86,8 @@ trait ManagesStudents
                     'full_name' => $targetName,
                     'role' => 'student',
                     'login_code' => $targetLoginCode,
-                    'password' => User::query()->where('login_code', $originalLoginCode)->value('password') ?: Hash::make(Str::random(64)),
+                    'password' => User::query()->where('login_code', $originalLoginCode)->value('password')
+                        ?: Hash::make(Str::random(64)),
                 ],
             );
 
@@ -178,8 +186,12 @@ trait ManagesStudents
         });
     }
 
-    public function toggleStudentPart(string $studentId, ?string $reciterId, int $partNumber, bool $shouldMarkComplete): void
-    {
+    public function toggleStudentPart(
+        string $studentId,
+        ?string $reciterId,
+        int $partNumber,
+        bool $shouldMarkComplete
+    ): void {
         $student = Student::query()->with('branch')->find($studentId);
         $reciter = $reciterId ? Reciter::query()->find($reciterId) : null;
 

@@ -11,7 +11,11 @@ return new class extends Migration
     {
         Schema::table('course_submissions', function (Blueprint $table) {
             $table->string('task_review_status', 20)->nullable()->after('manual_score');
-            $table->foreignUuid('task_reviewed_by')->nullable()->after('task_review_status')->constrained('users')->nullOnDelete();
+            $table->foreignUuid('task_reviewed_by')
+                ->nullable()
+                ->after('task_review_status')
+                ->constrained('users')
+                ->nullOnDelete();
             $table->timestamp('task_reviewed_at')->nullable()->after('task_reviewed_by');
             $table->index(['assessment_type', 'task_review_status']);
         });
@@ -20,7 +24,10 @@ return new class extends Migration
             ->where('assessment_type', 'tasks')
             ->whereNull('task_review_status')
             ->update([
-                'task_review_status' => DB::raw("case when manual_score is null then 'pending' when manual_score > 0 then 'approved' else 'rejected' end"),
+                'task_review_status' => DB::raw(
+                    "case when manual_score is null then 'pending' when manual_score > 0 then 'approved' else "
+                        ."'rejected' end"
+                ),
             ]);
     }
 

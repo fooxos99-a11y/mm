@@ -297,7 +297,10 @@ class PublicContentArchiveTest extends CoreDataApiTestCase
 
         $archiveResponse->assertOk()->assertJsonPath('archive.name', 'دفعة الأرشيف الشامل');
 
-        $this->assertDatabaseHas('students', ['id' => $studentId, 'archive_id' => $archiveId, 'archived_login_code' => '8610']);
+        $this->assertDatabaseHas(
+            'students',
+            ['id' => $studentId, 'archive_id' => $archiveId, 'archived_login_code' => '8610']
+        );
         $this->assertDatabaseHas('courses', ['id' => $courseId, 'archive_id' => null]);
         $this->assertDatabaseHas('course_questions', ['id' => $questionId, 'archive_id' => null]);
         $archivedCourseId = DB::table('courses')
@@ -313,10 +316,16 @@ class PublicContentArchiveTest extends CoreDataApiTestCase
         $this->assertNotSame($courseId, $archivedCourseId);
         $this->assertNotSame($questionId, $archivedQuestionId);
         $this->assertDatabaseHas('course_submissions', ['id' => $submissionId, 'archive_id' => $archiveId]);
-        $this->assertDatabaseHas('course_submission_answers', ['id' => $submissionAnswerId, 'archive_id' => $archiveId]);
+        $this->assertDatabaseHas(
+            'course_submission_answers',
+            ['id' => $submissionAnswerId, 'archive_id' => $archiveId]
+        );
         $this->assertDatabaseHas('course_attendance', ['id' => $attendanceId, 'archive_id' => $archiveId]);
         $this->assertDatabaseHas('satisfaction_questions', ['id' => $satisfactionQuestionId, 'archive_id' => null]);
-        $this->assertDatabaseHas('satisfaction_responses', ['id' => $satisfactionResponseId, 'archive_id' => $archiveId]);
+        $this->assertDatabaseHas(
+            'satisfaction_responses',
+            ['id' => $satisfactionResponseId, 'archive_id' => $archiveId]
+        );
         $this->assertDatabaseHas('final_exam_questions', ['id' => $finalQuestionId, 'archive_id' => null]);
         $this->assertDatabaseHas('final_exam_submissions', ['id' => $finalSubmissionId, 'archive_id' => $archiveId]);
         $this->assertDatabaseHas('final_exam_submission_answers', ['id' => $finalAnswerId, 'archive_id' => $archiveId]);

@@ -14,8 +14,12 @@
       <section class="satisfaction-admin__card">
         <div class="satisfaction-admin__toolbar">
           <div class="prep-field satisfaction-admin__filter-field">
-            <label class="prep-field__label">الدورة</label>
+            <label
+              class="prep-field__label"
+              for="satisfaction-course"
+            >الدورة</label>
             <AppSelect
+              id="satisfaction-course"
               v-model="courseSelectValue"
               aria-label="الدورة"
               :items="courseOptions"

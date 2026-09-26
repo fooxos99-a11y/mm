@@ -84,7 +84,7 @@
 
 .dashboard-page .dashboard-satisfaction-badge--required {
   background: rgba(220, 38, 38, 0.08);
-  color: #dc2626;
+  color: #d52222;
 }
 
 .dashboard-page .dashboard-satisfaction-metrics {
@@ -253,7 +253,7 @@
   color: #5b7b8c;
   font-size: 0.98rem;
   line-height: 1.8;
-  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .dashboard-page .dashboard-links-dialog-card__copy {

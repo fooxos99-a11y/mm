@@ -8,8 +8,12 @@ use Illuminate\Validation\ValidationException;
 
 trait CourseManagementSupport
 {
-    private function dispatchAssessmentOpenNotification(?object $course, string $assessmentType, array $templates, array $windows): void
-    {
+    private function dispatchAssessmentOpenNotification(
+        ?object $course,
+        string $assessmentType,
+        array $templates,
+        array $windows
+    ): void {
         if (! $course || ! in_array($assessmentType, ['pre', 'post', 'tasks'], true)) {
             return;
         }
@@ -27,7 +31,11 @@ trait CourseManagementSupport
                 'courseTitle' => (string) ($course->title ?? ''),
                 'assessmentLabel' => $this->assessmentLabel($assessmentType),
                 'branchLabel' => $this->branchLabel($branchCode),
-                'durationMinutes' => (string) $this->resolveAssessmentDurationMinutes($windows, $assessmentType, $branchCode),
+                'durationMinutes' => (string) $this->resolveAssessmentDurationMinutes(
+                    $windows,
+                    $assessmentType,
+                    $branchCode
+                ),
             ]);
 
             if (trim($message) === '') {
@@ -44,8 +52,11 @@ trait CourseManagementSupport
         }
     }
 
-    private function dispatchFinalExamOpenNotification(string $branchCode, ?string $closesAt, string $notificationTemplate): void
-    {
+    private function dispatchFinalExamOpenNotification(
+        string $branchCode,
+        ?string $closesAt,
+        string $notificationTemplate
+    ): void {
         $template = trim($notificationTemplate);
 
         if ($template === '') {
@@ -204,8 +215,14 @@ trait CourseManagementSupport
                     'tasks' => (bool) $course->female_tasks_enabled,
                 ],
             ],
-            'assessmentWindows' => $this->decodeJsonObject($course->assessment_windows, ['global' => [], 'male' => [], 'female' => []]),
-            'assessmentNotificationTemplates' => $this->decodeJsonObject($course->assessment_notification_templates, ['pre' => '', 'post' => '', 'tasks' => '']),
+            'assessmentWindows' => $this->decodeJsonObject(
+                $course->assessment_windows,
+                ['global' => [], 'male' => [], 'female' => []]
+            ),
+            'assessmentNotificationTemplates' => $this->decodeJsonObject(
+                $course->assessment_notification_templates,
+                ['pre' => '', 'post' => '', 'tasks' => '']
+            ),
             'taskMode' => $course->task_mode,
             'taskTemplateId' => $course->task_template_id ?? '',
             'taskTemplateName' => $course->task_template_name ?? '',

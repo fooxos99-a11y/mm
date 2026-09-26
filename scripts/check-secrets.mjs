@@ -1,6 +1,7 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { extname, join, relative } from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { resolveTrustedExecutable } from './trustedExecutable.mjs';
 import { fileURLToPath } from 'node:url';
 
 const rootDirectory = fileURLToPath(new URL('../', import.meta.url));
@@ -27,11 +28,14 @@ function listWorkspaceFiles(directory = rootDirectory) {
   return files;
 }
 
-const listed = spawnSync(
-  'git',
-  ['ls-files', '--cached', '--others', '--exclude-standard', '-z'],
-  { cwd: rootDirectory, encoding: 'utf8', shell: false },
-);
+const gitExecutable = resolveTrustedExecutable('git');
+const listed = gitExecutable
+  ? spawnSync(
+    gitExecutable,
+    ['ls-files', '--cached', '--others', '--exclude-standard', '-z'],
+    { cwd: rootDirectory, encoding: 'utf8', shell: false },
+  )
+  : { status: 1, stdout: '' };
 const usingGit = listed.status === 0;
 const files = usingGit
   ? listed.stdout.split('\0').filter(Boolean)
@@ -45,7 +49,7 @@ const ignoredFiles = new Set(['package-lock.json', 'composer.lock']);
 const patterns = [
   ['private key', /-----BEGIN\s+(?:RSA\s+|EC\s+|OPENSSH\s+|DSA\s+)?PRIVATE KEY-----/g],
   ['AWS access key', /\bAKIA[0-9A-Z]{16}\b/g],
-  ['GitHub token', /\b(?:gh[pousr]_[A-Za-z0-9]{36,}|github_pat_[A-Za-z0-9_]{40,})\b/g],
+  ['GitHub token', /\b(?:gh[pousr]_[A-Za-z0-9]{36,}|github_pat_\w{40,})\b/g],
   ['API key', /\bsk-(?:proj-)?[A-Za-z0-9_-]{20,}\b/g],
   ['Slack token', /\bxox[baprs]-[A-Za-z0-9-]{20,}\b/g],
   ['Stripe live key', /\b(?:sk|rk)_live_[A-Za-z0-9]{16,}\b/g],
@@ -81,7 +85,8 @@ for (const file of files) {
 }
 
 if (findings.length) {
-  process.stderr.write(`Secret scan failed:\n${findings.map(item => `- ${item}`).join('\n')}\n`);
+  const findingLines = findings.map((item) => `- ${item}`).join('\n');
+  process.stderr.write(`Secret scan failed:\n${findingLines}\n`);
   process.exit(1);
 }
 

@@ -95,7 +95,12 @@ class AssessmentAccessService
         $userLoginCode = trim((string) ($user?->login_code ?? ''));
         $targetLoginCode = trim($loginCode);
 
-        if (! $user || ! in_array((string) $user->role, ['student', 'trainee'], true) || $userLoginCode === '' || $userLoginCode !== $targetLoginCode) {
+        if (
+            ! $user
+                || ! in_array((string) $user->role, ['student', 'trainee'], true)
+                || $userLoginCode === ''
+                || $userLoginCode !== $targetLoginCode
+        ) {
             throw ValidationException::withMessages([
                 $field => ['هذا الإرسال متاح فقط لصاحب الحساب المسجل.'],
             ]);

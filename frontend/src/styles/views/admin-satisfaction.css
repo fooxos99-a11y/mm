@@ -120,7 +120,7 @@
 }
 
 .satisfaction-admin__dialog {
-  border-radius: 28px;
+  border-radius: 28px !important;
 }
 
 .satisfaction-admin__dialog-note {
@@ -132,15 +132,11 @@
 }
 
 .satisfaction-admin__field {
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
 .satisfaction-admin__switch {
   margin-top: -6px;
-}
-
-.satisfaction-admin__dialog {
-  border-radius: 28px !important;
 }
 
 .satisfaction-admin__dialog-header {
@@ -162,10 +158,6 @@
   color: #0f172a;
   font-size: 1.3rem;
   font-weight: 900;
-}
-
-.satisfaction-admin__field {
-  margin-bottom: 16px;
 }
 
 .satisfaction-admin__dialog-actions {

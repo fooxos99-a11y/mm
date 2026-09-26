@@ -20,7 +20,7 @@ export default {
     try {
       const response = await listArchives();
       this.archives = response.data;
-    } catch (error) {
+    } catch {
       this.notifyError('تعذر تحميل الأرشيفات.');
     }
   },
@@ -36,7 +36,7 @@ export default {
     try {
       const response = await getArchive(this.selectedArchiveId);
       this.archiveData = response.data;
-    } catch (error) {
+    } catch {
       this.notifyError('تعذر تحميل بيانات الأرشيف.');
     } finally {
       this.loading = false;
@@ -77,7 +77,7 @@ export default {
     try {
       const response = await searchStudents(term);
       this.searchResults = Array.isArray(response.data) ? response.data : [];
-    } catch (error) {
+    } catch {
       this.searchResults = [];
       this.notifyError('تعذر تنفيذ البحث في الأرشيف.');
     } finally {
@@ -95,7 +95,7 @@ export default {
     try {
       const response = await getArchivedStudent(archiveId, student.id);
       this.selectedArchivedStudentDetail = response.data;
-    } catch (error) {
+    } catch {
       this.notifyError('تعذر تحميل السجل الكامل للطالب المؤرشف.');
     } finally {
       this.detailLoading = false;
@@ -129,7 +129,7 @@ export default {
       this.closeAddStudentDialog();
       await this.fetchArchiveData();
       this.notifySuccess('تمت إضافة الطالب إلى الأرشيف.');
-    } catch (error) {
+    } catch {
       this.notifyError('تعذر نقل الطالب إلى الأرشيف.');
     } finally {
       this.saving = false;

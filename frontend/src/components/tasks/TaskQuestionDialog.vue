@@ -60,7 +60,7 @@
           >
 
           <template v-if="form.type === 'multiple'">
-            <label>الخيارات</label>
+            <label :for="fieldId(formIndex, 'option-0')">الخيارات</label>
             <div class="assessment-options-grid">
               <div
                 v-for="(option, optionIndex) in form.options"
@@ -68,6 +68,7 @@
                 class="assessment-options-grid__item"
               >
                 <input
+                  :id="fieldId(formIndex, `option-${optionIndex}`)"
                   :value="option"
                   type="text"
                   class="assessment-input"
@@ -202,6 +203,20 @@ export default {
     errors: { type: Array, default: () => [] },
     pasteText: { type: String, default: '' },
   },
+  emits: [
+    'add-form',
+    'add-option',
+    'bulk-paste',
+    'change-type',
+    'clear-error',
+    'input',
+    'option-change',
+    'option-paste',
+    'remove-form',
+    'save',
+    'update-form',
+    'update:paste-text',
+  ],
   data: () => ({
     questionTypes: [
       { value: 'truefalse', label: 'صح وخطأ' },

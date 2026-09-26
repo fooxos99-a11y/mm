@@ -6,7 +6,6 @@ export const getRolePermissions = (user, snapshot) => (
 
 export const hasOneOfPermissions = (keys, user, snapshot) => (
   Array.isArray(keys)
-  && keys.length > 0
   && keys.some((key) => getRolePermissions(user, snapshot)[key] === true)
 );
 

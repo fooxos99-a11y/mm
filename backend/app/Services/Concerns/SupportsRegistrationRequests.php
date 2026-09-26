@@ -23,11 +23,16 @@ trait SupportsRegistrationRequests
             throw ValidationException::withMessages(['loginCode' => 'أدخل رقم الدخول.']);
         }
 
-        if (Student::query()->where('login_code', $loginCode)->exists() || User::query()->where('login_code', $loginCode)->exists()) {
+        if (
+            Student::query()->where('login_code', $loginCode)->exists()
+                || User::query()->where('login_code', $loginCode)->exists()
+        ) {
             throw ValidationException::withMessages(['loginCode' => 'رقم الدخول مستخدم مسبقًا.']);
         }
 
-        $requestQuery = RegistrationRequest::query()->where('login_code', $loginCode)->whereIn('status', ['pending', 'accepted']);
+        $requestQuery = RegistrationRequest::query()
+            ->where('login_code', $loginCode)
+            ->whereIn('status', ['pending', 'accepted']);
         if ($exceptRequestId) {
             $requestQuery->where('id', '!=', $exceptRequestId);
         }
@@ -45,7 +50,9 @@ trait SupportsRegistrationRequests
             'phone' => $request->phone ?: $this->registrationMetadataService->phone($request->id),
             'age' => $request->status === 'pending' ? $this->registrationMetadataService->age($request->id) : null,
             'gender' => $request->gender ?: $this->registrationMetadataService->gender($request->id),
-            'answers' => is_array($request->answers) ? $request->answers : $this->registrationMetadataService->answers($request->id),
+            'answers' => is_array($request->answers)
+                ? $request->answers
+                : $this->registrationMetadataService->answers($request->id),
             'branchId' => $request->branch_code ?: null,
             'note' => $request->note ?? '',
             'status' => $request->status,
@@ -57,7 +64,8 @@ trait SupportsRegistrationRequests
 
     private function registrationRequestBranchCode(string $requestId): string
     {
-        $gender = RegistrationRequest::query()->whereKey($requestId)->value('gender') ?: $this->registrationMetadataService->gender($requestId);
+        $gender = RegistrationRequest::query()->whereKey($requestId)->value('gender')
+            ?: $this->registrationMetadataService->gender($requestId);
 
         return $gender === 'female' ? 'female' : 'male';
     }

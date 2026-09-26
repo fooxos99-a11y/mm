@@ -96,5 +96,6 @@ export default {
     submission: { type: Object, default: null },
     title: { type: String, required: true },
   },
+  emits: ['toggle'],
 };
 </script>

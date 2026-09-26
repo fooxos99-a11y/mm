@@ -175,5 +175,19 @@ export default {
     submitting: Boolean,
     deleting: Boolean,
   },
+  emits: [
+    'update:links-open',
+    'copy-link',
+    'update:add-open',
+    'update-prompt',
+    'update-type',
+    'update-required',
+    'close-add',
+    'submit-add',
+    'update:delete-open',
+    'update:selected-delete-key',
+    'close-delete',
+    'confirm-delete',
+  ],
 };
 </script>

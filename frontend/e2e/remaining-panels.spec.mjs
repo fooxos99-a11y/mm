@@ -1,7 +1,6 @@
 import { expect, test } from '@playwright/test';
+import { adminLogin, adminPassword } from './support/credentials.mjs';
 
-const adminLogin = process.env.E2E_ADMIN_LOGIN || 'e2e-admin';
-const adminPassword = process.env.E2E_ADMIN_PASSWORD || 'E2E-Momars-2026!';
 
 const login = async (page) => {
   await page.goto('login', { waitUntil: 'domcontentloaded' });

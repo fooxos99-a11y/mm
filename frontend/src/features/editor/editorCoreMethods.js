@@ -212,7 +212,7 @@ export default {
           );
         }
 
-        if (typeof operation.insert !== 'undefined') {
+        if (operation.insert !== undefined) {
           return documentIndex < this.protectedBoundaryIndex;
         }
 

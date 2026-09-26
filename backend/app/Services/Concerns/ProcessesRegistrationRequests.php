@@ -9,8 +9,13 @@ use Illuminate\Validation\ValidationException;
 
 trait ProcessesRegistrationRequests
 {
-    public function createRegistrationRequest(string $name, string $phone, string $gender, array $answers = [], ?int $legacyAge = null): array
-    {
+    public function createRegistrationRequest(
+        string $name,
+        string $phone,
+        string $gender,
+        array $answers = [],
+        ?int $legacyAge = null
+    ): array {
         if (! $this->isRegistrationOpen()) {
             throw ValidationException::withMessages(['registration' => 'التسجيل مغلق حاليًا.']);
         }
@@ -61,7 +66,16 @@ trait ProcessesRegistrationRequests
         $branch = $this->findBranchByCode((string) $data['branchId']);
         $passwordHash = Hash::make((string) $data['password']);
 
-        DB::transaction(function () use ($registrationRequest, $branch, $passwordHash, $name, $loginCode, $phone, $gender, $answers): void {
+        DB::transaction(function () use (
+            $registrationRequest,
+            $branch,
+            $passwordHash,
+            $name,
+            $loginCode,
+            $phone,
+            $gender,
+            $answers
+        ): void {
             $student = $this->studentAccountService->create(
                 $name,
                 $loginCode,

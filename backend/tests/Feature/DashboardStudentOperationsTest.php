@@ -204,7 +204,10 @@ class DashboardStudentOperationsTest extends CoreDataApiTestCase
             'male_tasks_enabled' => true,
             'female_tasks_enabled' => true,
             'assessment_windows' => json_encode(['global' => [], 'male' => [], 'female' => []], JSON_UNESCAPED_UNICODE),
-            'assessment_notification_templates' => json_encode(['pre' => '', 'post' => '', 'tasks' => ''], JSON_UNESCAPED_UNICODE),
+            'assessment_notification_templates' => json_encode(
+                ['pre' => '', 'post' => '', 'tasks' => ''],
+                JSON_UNESCAPED_UNICODE
+            ),
             'sort_order' => 0,
             'created_at' => now(),
         ]);

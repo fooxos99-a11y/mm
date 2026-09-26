@@ -42,6 +42,7 @@
         <div
           class="account-menu account-menu--header"
           @click.stop
+          @keydown.stop
         >
           <AppIconButton
             variant="plain"
@@ -128,5 +129,6 @@ export default {
     accountMenuItems: { type: Array, default: () => [] },
     licensePrograms: { type: Array, default: () => [] },
   },
+  emits: ['account-click', 'account-menu-action', 'open-profile', 'open-program'],
 };
 </script>

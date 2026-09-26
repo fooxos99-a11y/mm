@@ -14,26 +14,34 @@
           aria-label="حقول التسجيل الأساسية"
         >
           <div
-            v-for="field in fixedFields"
+            v-for="field in fixedFieldDrafts"
             :key="field.id"
             class="registration-fields-dialog__field-editor registration-fields-dialog__field-editor--fixed"
           >
             <div class="registration-fields-dialog__field-grid">
-              <label class="registration-fields-dialog__accept-field">
-                <span class="registration-fields-dialog__accept-label">السؤال</span>
+              <div class="registration-fields-dialog__accept-field">
+                <label
+                  class="registration-fields-dialog__accept-label"
+                  :for="fieldControlId('fixed-label', field.id)"
+                >السؤال</label>
                 <AppTextField
-                  :value="field.label"
+                  :id="fieldControlId('fixed-label', field.id)"
+                  v-model="field.label"
                   class="registration-fields-dialog__input"
+                  maxlength="255"
                   dense
                   outlined
                   hide-details
-                  disabled
                 />
-              </label>
+              </div>
 
-              <label class="registration-fields-dialog__accept-field">
-                <span class="registration-fields-dialog__accept-label">النوع</span>
+              <div class="registration-fields-dialog__accept-field">
+                <label
+                  class="registration-fields-dialog__accept-label"
+                  :for="fieldControlId('fixed-type', field.id)"
+                >النوع</label>
                 <AppSelect
+                  :id="fieldControlId('fixed-type', field.id)"
                   :value="field.type"
                   :items="fieldTypeOptions"
                   item-text="label"
@@ -44,7 +52,7 @@
                   hide-details
                   disabled
                 />
-              </label>
+              </div>
             </div>
           </div>
         </div>
@@ -56,20 +64,27 @@
             class="registration-fields-dialog__field-editor"
           >
             <div class="registration-fields-dialog__field-grid">
-              <label class="registration-fields-dialog__accept-field">
-                <span class="registration-fields-dialog__accept-label">السؤال</span>
+              <div class="registration-fields-dialog__accept-field">
+                <label
+                  class="registration-fields-dialog__accept-label"
+                  :for="fieldControlId('label', field.id)"
+                >السؤال</label>
                 <AppTextField
+                  :id="fieldControlId('label', field.id)"
                   v-model.trim="field.label"
                   class="registration-fields-dialog__input"
                   dense
                   outlined
                   hide-details
                 />
-              </label>
+              </div>
 
-              <label class="registration-fields-dialog__accept-field">
+              <div class="registration-fields-dialog__accept-field">
                 <span class="registration-fields-dialog__type-header">
-                  <span class="registration-fields-dialog__accept-label">النوع</span>
+                  <label
+                    class="registration-fields-dialog__accept-label"
+                    :for="fieldControlId('type', field.id)"
+                  >النوع</label>
                   <AppIconButton
                     variant="plain"
                     size="sm"
@@ -87,6 +102,7 @@
                   </AppIconButton>
                 </span>
                 <AppSelect
+                  :id="fieldControlId('type', field.id)"
                   v-model="field.type"
                   :items="fieldTypeOptions"
                   item-text="label"
@@ -96,20 +112,24 @@
                   outlined
                   hide-details
                 />
-              </label>
+              </div>
             </div>
 
-            <label
+            <div
               v-if="field.type === 'select'"
               class="registration-fields-dialog__accept-field"
             >
-              <span class="registration-fields-dialog__accept-label">خيارات القائمة - كل خيار في سطر</span>
+              <label
+                class="registration-fields-dialog__accept-label"
+                :for="fieldControlId('options', field.id)"
+              >خيارات القائمة - كل خيار في سطر</label>
               <textarea
+                :id="fieldControlId('options', field.id)"
                 v-model.trim="field.optionsText"
                 class="registration-fields-dialog__textarea"
                 rows="4"
               />
-            </label>
+            </div>
 
             <div class="registration-fields-dialog__field-actions">
               <v-checkbox
@@ -163,6 +183,11 @@ import {
   AppButton, AppDialog, AppDialogBody, AppDialogFooter, AppDialogHeader,
   AppIconButton, AppSelect, AppTextField,
 } from './ui';
+import {
+  FIXED_FIELD_DEFINITIONS,
+  createRegistrationFieldId,
+  normalizeFixedFieldLabels,
+} from '../features/registration/registrationFieldLabels.mjs';
 
 export default {
   name: 'RegistrationFieldsDialog',
@@ -189,6 +214,10 @@ export default {
       type: Array,
       default: () => [],
     },
+    fixedLabels: {
+      type: Object,
+      default: () => ({}),
+    },
     loading: {
       type: Boolean,
       default: false,
@@ -198,11 +227,7 @@ export default {
   data() {
     return {
       formFields: [],
-      fixedFields: [
-        { id: 'name', label: 'الاسم', type: 'text' },
-        { id: 'gender', label: 'الجنس', type: 'select' },
-        { id: 'phone', label: 'رقم الجوال', type: 'number' },
-      ],
+      fixedFieldDrafts: [],
       fieldTypeOptions: [
         { label: 'نصي', value: 'text' },
         { label: 'رقم', value: 'number' },
@@ -225,6 +250,15 @@ export default {
         }
 
         this.formFields = [];
+        this.fixedFieldDrafts = [];
+      },
+    },
+    fixedLabels: {
+      deep: true,
+      handler() {
+        if (this.isOpen) {
+          this.syncFixedFieldDrafts();
+        }
       },
     },
     fields: {
@@ -243,12 +277,20 @@ export default {
     },
     syncFieldDrafts() {
       this.formFields = this.fields.map((field) => this.createFieldDraft(field));
+      this.syncFixedFieldDrafts();
+    },
+    syncFixedFieldDrafts() {
+      const labels = normalizeFixedFieldLabels(this.fixedLabels);
+      this.fixedFieldDrafts = FIXED_FIELD_DEFINITIONS.map((field) => ({ ...field, label: labels[field.id] }));
+    },
+    fieldControlId(role, fieldId) {
+      return `registration-fields-${role}-${encodeURIComponent(String(fieldId))}`;
     },
     createFieldDraft(field = {}) {
       const options = Array.isArray(field.options) ? field.options : [];
 
       return {
-        id: field.id || `field-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+        id: field.id || createRegistrationFieldId(),
         label: field.label || '',
         type: ['number', 'select'].includes(field.type) ? field.type : 'text',
         required: field.required !== false,
@@ -278,7 +320,11 @@ export default {
         .filter((field) => field.label);
     },
     submitFields() {
-      this.$emit('save', this.normalizeFieldDrafts());
+      const fixedLabels = normalizeFixedFieldLabels(Object.fromEntries(
+        this.fixedFieldDrafts.map((field) => [field.id, field.label]),
+      ));
+
+      this.$emit('save', this.normalizeFieldDrafts(), fixedLabels);
     },
     closeDialog() {
       this.$emit('update:modelValue', false);

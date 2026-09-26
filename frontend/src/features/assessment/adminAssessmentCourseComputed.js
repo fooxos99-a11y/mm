@@ -94,7 +94,8 @@ export default {
         return this.selectedCourseId || null;
       },
       set(value) {
-        const nextValue = value || '';
+        let nextValue = '';
+        if (value) nextValue = value;
         if (nextValue !== this.selectedCourseId && !this.confirmDiscardChanges()) return;
         this.selectedCourseId = nextValue;
       },

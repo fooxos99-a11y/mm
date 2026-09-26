@@ -23,7 +23,10 @@ class TrainingMaterialAccessService
         }
 
         if ($materialBranch === 'supervision') {
-            abort_unless(in_array($role, ['male_manager', 'female_manager', 'reciter'], true), Response::HTTP_FORBIDDEN);
+            abort_unless(
+                in_array($role, ['male_manager', 'female_manager', 'reciter'], true),
+                Response::HTTP_FORBIDDEN
+            );
 
             return;
         }

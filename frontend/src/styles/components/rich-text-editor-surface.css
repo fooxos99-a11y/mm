@@ -171,7 +171,6 @@
 
 .rich-text-editor__editor :deep(.ql-editor td),
 .rich-text-editor__editor :deep(.ql-editor th) {
-  word-break: break-word;
   overflow-wrap: anywhere;
 }
 

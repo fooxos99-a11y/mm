@@ -1,38 +1,39 @@
 import { Quill } from './editorRuntime';
 
+const getImageBlotIndex = (editor, imageElement) => {
+  const imageBlot = editor ? Quill.find(imageElement, true) : null;
+  return imageBlot && editor ? editor.getIndex(imageBlot) : -1;
+};
+
 export default {
     handleEditorClick(event) {
       this.hideTableContextMenu();
 
       const imageElement = event.target?.closest?.('img');
 
-      if (imageElement) {
-        if (this.lockImages) {
-          this.clearSelectedImage();
-          const imageBlot = this.editor ? Quill.find(imageElement, true) : null;
-          const imageIndex = imageBlot && this.editor ? this.editor.getIndex(imageBlot) : -1;
-
-          if (this.editor && imageIndex >= 0) {
-            this.editor.setSelection(imageIndex + 1, 0, Quill.sources.SILENT);
-          }
-
-          return;
-        }
-
-        const imageBlot = this.editor ? Quill.find(imageElement, true) : null;
-        const imageIndex = imageBlot && this.editor ? this.editor.getIndex(imageBlot) : -1;
-
-        if (this.isProtectedIndex(imageIndex)) {
-          this.clearSelectedImage();
-          this.ensureSelectionOutsideProtected();
-          return;
-        }
-
-        this.setSelectedImage(imageElement);
+      if (!imageElement) {
+        this.clearSelectedImage();
         return;
       }
 
-      this.clearSelectedImage();
+      if (this.lockImages) {
+        this.clearSelectedImage();
+        const imageIndex = getImageBlotIndex(this.editor, imageElement);
+
+        if (this.editor && imageIndex >= 0) {
+          this.editor.setSelection(imageIndex + 1, 0, Quill.sources.SILENT);
+        }
+
+        return;
+      }
+
+      if (this.isProtectedIndex(getImageBlotIndex(this.editor, imageElement))) {
+        this.clearSelectedImage();
+        this.ensureSelectionOutsideProtected();
+        return;
+      }
+
+      this.setSelectedImage(imageElement);
     },
     handleEditorPointerDown(event) {
       this.hideTableContextMenu();
@@ -49,10 +50,7 @@ export default {
         return;
       }
 
-      const imageBlot = this.editor ? Quill.find(imageElement, true) : null;
-      const imageIndex = imageBlot && this.editor ? this.editor.getIndex(imageBlot) : -1;
-
-      if (this.isProtectedIndex(imageIndex)) {
+      if (this.isProtectedIndex(getImageBlotIndex(this.editor, imageElement))) {
         event.preventDefault();
         this.clearSelectedImage();
         this.ensureSelectionOutsideProtected();

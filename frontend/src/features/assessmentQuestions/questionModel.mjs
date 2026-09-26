@@ -7,23 +7,35 @@ export const createEmptyQuestionForm = ({ type = 'multiple', points = '1' } = {}
   correctAnswerTouched: false,
 })
 
-export const normalizeAssessmentAnswer = value => String(value || '')
+const TRAILING_ANSWER_PUNCTUATION = new Set(['.', '،', ',', '؛', ';', '!', '?', '؟', ':'])
+
+const stripTrailingPunctuation = text => {
+  let end = text.length
+  while (end > 0 && TRAILING_ANSWER_PUNCTUATION.has(text[end - 1])) end -= 1
+  return text.slice(0, end)
+}
+
+const foldArabicLetters = value => String(value || '')
   .trim()
   .toLowerCase()
-  .replace(/[\u064B-\u065F\u0670]/g, '')
-  .replace(/[أإآ]/g, 'ا')
-  .replace(/ة/g, 'ه')
-  .replace(/ى/g, 'ي')
-  .replace(/[.،,؛;!?؟:]+$/g, '')
+  .replaceAll(/[\u064B-\u065F\u0670]/g, '')
+  .replaceAll(/[أإآ]/g, 'ا')
+  .replaceAll('ة', 'ه')
+  .replaceAll('ى', 'ي')
+
+export const normalizeAssessmentAnswer = value => stripTrailingPunctuation(foldArabicLetters(value))
   .replace(/^[أ-ي]\s*[).\-:]\s*/i, '')
   .trim()
+
+const createDraftOptions = question => {
+  if (question?.type !== 'multiple') return []
+  return (question?.options || []).length ? [...question.options] : ['', '']
+}
 
 export const createQuestionDraft = question => ({
   prompt: question?.prompt || '',
   type: question?.type === 'text' ? 'text' : 'multiple',
-  options: question?.type === 'multiple'
-    ? ((question?.options || []).length ? [...question.options] : ['', ''])
-    : [],
+  options: createDraftOptions(question),
   points: String(question?.points ?? 1),
   correctAnswer: question?.correctAnswer || '',
   correctAnswerTouched: Boolean(String(question?.correctAnswer || '').trim()),
@@ -81,13 +93,16 @@ export const isCorrectQuestionOption = (draft, option) => {
 }
 
 export const mapImportedQuestionToForm = (draft, defaultPoints, preferredType) => {
-  const effectiveType = draft.type === 'multiple'
+  const hasEnoughOptions = draft.options.length >= 2
+  const effectiveType = draft.type === 'multiple' || (preferredType === 'multiple' && hasEnoughOptions)
     ? 'multiple'
-    : (preferredType === 'multiple' && draft.options.length >= 2 ? 'multiple' : 'text')
+    : 'text'
+  let options = []
+  if (effectiveType === 'multiple') options = hasEnoughOptions ? [...draft.options] : ['', '']
 
   return {
     ...createEmptyQuestionForm({ type: effectiveType, points: defaultPoints }),
     prompt: draft.prompt,
-    options: effectiveType === 'multiple' ? (draft.options.length >= 2 ? [...draft.options] : ['', '']) : [],
+    options,
   }
 }

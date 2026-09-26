@@ -139,6 +139,7 @@ export default {
   name: 'HomeRequirementsSettings',
   components: { AppIconButton, AppTextField },
   props: { form: { type: Object, required: true } },
+  emits: ['delete-item'],
   data() { return { localForm: this.form }; },
   watch: { form(value) { this.localForm = value; } },
 };

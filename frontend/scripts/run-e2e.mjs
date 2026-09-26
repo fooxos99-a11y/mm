@@ -14,7 +14,12 @@ const playwrightCli = path.join(frontendRoot, 'node_modules', '@playwright', 'te
 const viteCli = path.join(frontendRoot, 'node_modules', 'vite', 'bin', 'vite.js');
 const databasePath = path.join(os.tmpdir(), `momars-e2e-${process.pid}.sqlite`);
 const adminLogin = 'e2e-admin';
-const adminPassword = 'E2E-Momars-2026!';
+// Throw-away accounts for the temporary SQLite database, regenerated on every run.
+const createTestSecret = () => `E2e-${randomBytes(12).toString('base64url')}-9`;
+const adminSecret = createTestSecret();
+const roleSecret = createTestSecret();
+const studentSecret = createTestSecret();
+const newAccountSecret = createTestSecret();
 const getAvailablePort = () => new Promise((resolve, reject) => {
   const server = createServer();
 
@@ -58,12 +63,16 @@ const e2eEnv = {
   BROADCAST_CONNECTION: 'log',
   QUEUE_CONNECTION: 'sync',
   MOMARS_SEED_ADMIN_LOGIN: adminLogin,
-  MOMARS_SEED_ADMIN_PASSWORD: adminPassword,
+  MOMARS_SEED_ADMIN_PASSWORD: adminSecret,
+  MOMARS_SEED_E2E_ROLE_PASSWORD: roleSecret,
   MOMARS_SEED_ADMIN_NAME: 'E2E Admin',
   MOMARS_SEED_ADMIN_EMAIL: 'e2e-admin@example.test',
   MOMARS_SEED_E2E_ROLES: 'true',
   E2E_ADMIN_LOGIN: adminLogin,
-  E2E_ADMIN_PASSWORD: adminPassword,
+  E2E_ADMIN_PASSWORD: adminSecret,
+  E2E_ROLE_PASSWORD: roleSecret,
+  E2E_STUDENT_PASSWORD: studentSecret,
+  E2E_NEW_ACCOUNT_PASSWORD: newAccountSecret,
 };
 
 const removeDatabaseFiles = () => {

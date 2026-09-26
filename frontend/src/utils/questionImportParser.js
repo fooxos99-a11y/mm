@@ -1,22 +1,28 @@
 const QUESTION_LINE_PATTERN = /[؟?؛:.]\s*$/;
 const NUMBER_TOKEN = '0-9\u0660-\u0669\u06F0-\u06F9';
 const OPTION_LETTER_TOKEN = 'A-Da-d\u0623\u0628\u062C\u062F\u0627';
-const QUESTION_START_PATTERN = new RegExp(`^\\s*[${NUMBER_TOKEN}]{1,3}\\s*[).:؛/-]?\\s+`);
-const QUESTION_END_NUMBER_PATTERN = new RegExp(`\\s*[).:؛/-]?\\s*[${NUMBER_TOKEN}]{1,3}\\s*$`);
-const LEADING_LIST_MARKER_PATTERN = new RegExp(`^\\s*(?:\\(?[${NUMBER_TOKEN}]{1,3}\\)?\\s*[-–—.)(:/؛]\\s*|\\(?[${NUMBER_TOKEN}]{1,3}\\)?\\s+|(?:\\([${OPTION_LETTER_TOKEN}]\\)|[${OPTION_LETTER_TOKEN}]\\s*[-–—.)(:/؛])\\s*)`);
-const OPTION_MARKER_PATTERN = new RegExp(`^\\s*(?:[-*•●▪◦]|\\(?[${NUMBER_TOKEN}]{1,3}\\)?\\s*[)(.:؛/-]|\\([${OPTION_LETTER_TOKEN}]\\)|[${OPTION_LETTER_TOKEN}]\\s*[)(.:؛/-])\\s*`);
-const TRAILING_OPTION_MARKER_PATTERN = new RegExp(`\\s*(?:\\([${OPTION_LETTER_TOKEN}]\\)|\\(?[${NUMBER_TOKEN}]{1,3}\\)?\\s*[)(.:؛/-])\\s*$`);
-const OPTION_MARKER_ANYWHERE_PATTERN = new RegExp(`(?:\\([${OPTION_LETTER_TOKEN}]\\)|[${OPTION_LETTER_TOKEN}]\\s*[)(.:؛/-]|\\(?[${NUMBER_TOKEN}]{1,3}\\)?\\s*[)(.:؛/-])`);
-const INLINE_OPTION_SPLIT_PATTERN = new RegExp(`\\s+(?=(?:\\([${OPTION_LETTER_TOKEN}]\\)|[${OPTION_LETTER_TOKEN}]\\s*[)(.:؛/-]|\\(?[${NUMBER_TOKEN}]{1,3}\\)?\\s*[)(.:؛/-]))`, 'g');
-const ANSWER_LINE_PATTERN = /^(?:الإجابة(?:\s+الصحيحة)?|الجواب(?:\s+الصحيح)?|answer|correct\s*answer|solution|الدرجة|التعليل|التفسير)\s*[:：-]/i;
+const QUESTION_START_PATTERN = new RegExp(String.raw`^\s*[${NUMBER_TOKEN}]{1,3}\s*[).:؛/-]?\s+`);
+const QUESTION_END_NUMBER_PATTERN = new RegExp(String.raw`\s*[).:؛/-]?\s*[${NUMBER_TOKEN}]{1,3}\s*$`);
+const LEADING_LIST_MARKER_PATTERN = new RegExp(String.raw`^\s*(?:\(?[${NUMBER_TOKEN}]{1,3}\)?\s*[-–—.)(:/؛]\s*|\(?[${NUMBER_TOKEN}]{1,3}\)?\s+|(?:\([${OPTION_LETTER_TOKEN}]\)|[${OPTION_LETTER_TOKEN}]\s*[-–—.)(:/؛])\s*)`);
+const OPTION_MARKER_PATTERN = new RegExp(String.raw`^\s*(?:[-*•●▪◦]|\(?[${NUMBER_TOKEN}]{1,3}\)?\s*[)(.:؛/-]|\([${OPTION_LETTER_TOKEN}]\)|[${OPTION_LETTER_TOKEN}]\s*[)(.:؛/-])\s*`);
+const TRAILING_OPTION_MARKER_PATTERN = new RegExp(String.raw`\s*(?:\([${OPTION_LETTER_TOKEN}]\)|\(?[${NUMBER_TOKEN}]{1,3}\)?\s*[)(.:؛/-])\s*$`);
+const OPTION_MARKER_ANYWHERE_PATTERN = new RegExp(String.raw`(?:\([${OPTION_LETTER_TOKEN}]\)|[${OPTION_LETTER_TOKEN}]\s*[)(.:؛/-]|\(?[${NUMBER_TOKEN}]{1,3}\)?\s*[)(.:؛/-])`);
+const INLINE_OPTION_SPLIT_PATTERN = new RegExp(String.raw`\s+(?=(?:\([${OPTION_LETTER_TOKEN}]\)|[${OPTION_LETTER_TOKEN}]\s*[)(.:؛/-]|\(?[${NUMBER_TOKEN}]{1,3}\)?\s*[)(.:؛/-]))`, 'g');
+const ANSWER_LINE_PATTERNS = [
+  /^الإجابة(?:\s+الصحيحة)?\s*[:：-]/i,
+  /^الجواب(?:\s+الصحيح)?\s*[:：-]/i,
+  /^(?:correct\s*)?answer\s*[:：-]/i,
+  /^(?:solution|الدرجة|التعليل|التفسير)\s*[:：-]/i,
+];
 const INSTRUCTION_LINE_PATTERN = /^(?:التعليمات|إرشادات|ملاحظات|instructions?)\s*[:：-]/i;
 const NOISE_LINE_PATTERN = /^(?:page\s*\d+|\d+\s*\/\s*\d+|\d+)$/i;
-const NUMBERED_MARKER_PATTERN = new RegExp(`^\\s*\\(?[${NUMBER_TOKEN}]{1,3}\\)?\\s*[)(.:؛/-]`);
+const NUMBERED_MARKER_PATTERN = new RegExp(String.raw`^\s*\(?[${NUMBER_TOKEN}]{1,3}\)?\s*[)(.:؛/-]`);
 
 const normalizeLine = (value) => String(value || '')
-  .replace(/\u00a0/g, ' ')
+  .replaceAll('\u00a0', ' ')
   .replace(/\s+/g, ' ')
-  .replace(/\s+([؟?؛:.,])/g, '$1')
+  // Whitespace runs are already collapsed to one space above, so a single space is enough here.
+  .replaceAll(/ ([؟?؛:.,])/g, '$1')
   .replace(/([.،؛:?؟])\1+/g, '$1')
   .replace(/^[-–—•●▪◦.،؛:]+\s*/, '')
   .trim();
@@ -48,7 +54,8 @@ const isOptionLine = (value) => {
 
 const shouldIgnoreLine = (value) => {
   const normalized = normalizeLine(value);
-  return !normalized || NOISE_LINE_PATTERN.test(normalized) || ANSWER_LINE_PATTERN.test(normalized) || INSTRUCTION_LINE_PATTERN.test(normalized);
+  return !normalized || NOISE_LINE_PATTERN.test(normalized)
+    || ANSWER_LINE_PATTERNS.some((pattern) => pattern.test(normalized)) || INSTRUCTION_LINE_PATTERN.test(normalized);
 };
 
 const isExplicitQuestionBoundary = (lines, index) => {
@@ -108,9 +115,111 @@ const splitInlineOptions = (value) => {
   return { prompt, options };
 };
 
+const collectQuestionParts = (rawLines, index) => {
+  const questionParts = [stripTrailingQuestionNumber(stripLeadingMarker(rawLines[index]))];
+  let cursor = index + 1;
+
+  if (isQuestionLine(questionParts[0])) {
+    return { questionParts, cursor };
+  }
+
+  while (cursor < rawLines.length) {
+    const nextLine = rawLines[cursor];
+
+    if (!nextLine) {
+      cursor += 1;
+      continue;
+    }
+
+    if (isExplicitQuestionBoundary(rawLines, cursor) || isOptionLine(nextLine)) {
+      break;
+    }
+
+    questionParts.push(stripTrailingQuestionNumber(nextLine));
+    cursor += 1;
+
+    if (isQuestionLine(nextLine)) {
+      break;
+    }
+  }
+
+  return { questionParts, cursor };
+};
+
+const endsOptionScan = (candidate, markedOptions) => (
+  isQuestionStartLine(candidate) || isQuestionLine(candidate) || markedOptions.length > 0
+);
+
+const collectMarkedOptions = (rawLines, startCursor, inlineOptions) => {
+  const markedOptions = [...inlineOptions];
+  let cursor = startCursor;
+
+  while (cursor < rawLines.length) {
+    const candidate = rawLines[cursor];
+
+    if (shouldIgnoreLine(candidate)) {
+      cursor += 1;
+      continue;
+    }
+
+    if (isExplicitQuestionBoundary(rawLines, cursor)) {
+      break;
+    }
+
+    if (isOptionLine(candidate)) {
+      markedOptions.push(stripOptionMarker(candidate));
+      cursor += 1;
+      continue;
+    }
+
+    if (endsOptionScan(candidate, markedOptions)) {
+      break;
+    }
+
+    cursor += 1;
+  }
+
+  return { markedOptions, cursor };
+};
+
+const isQuestionCandidateLine = (line) => (
+  !shouldIgnoreLine(line) && (isQuestionStartLine(line) || isQuestionLine(line))
+);
+
+const parseQuestionAt = (rawLines, index) => {
+  const skipLine = { question: null, nextIndex: index + 1 };
+
+  if (!isQuestionCandidateLine(rawLines[index])) {
+    return skipLine;
+  }
+
+  const { questionParts, cursor: promptEnd } = collectQuestionParts(rawLines, index);
+  const inlineSplit = splitInlineOptions(questionParts.join(' ').trim());
+  const resolvedPrompt = inlineSplit.prompt;
+
+  if (!resolvedPrompt) {
+    return skipLine;
+  }
+
+  const { markedOptions, cursor } = collectMarkedOptions(rawLines, promptEnd, inlineSplit.options);
+
+  if (!isQuestionLine(resolvedPrompt) && markedOptions.length === 0) {
+    return skipLine;
+  }
+
+  return {
+    question: {
+      prompt: resolvedPrompt,
+      type: markedOptions.length >= 2 ? 'multiple' : 'text',
+      options: markedOptions.filter((option, optionIndex, collection) => collection.indexOf(option) === optionIndex),
+    },
+    nextIndex: cursor,
+  };
+};
+
 export const parseImportedQuestionsFromText = (text) => {
   const rawLines = String(text || '')
-    .replace(/\r\n?/g, '\n')
+    .replaceAll(/\r\n?/g, '\n')
     .split('\n')
     .map(normalizeLine);
 
@@ -118,96 +227,13 @@ export const parseImportedQuestionsFromText = (text) => {
   let index = 0;
 
   while (index < rawLines.length) {
-    const line = rawLines[index];
+    const { question, nextIndex } = parseQuestionAt(rawLines, index);
 
-    if (shouldIgnoreLine(line)) {
-      index += 1;
-      continue;
+    if (question) {
+      importedQuestions.push(question);
     }
 
-    if (!isQuestionStartLine(line) && !isQuestionLine(line)) {
-      index += 1;
-      continue;
-    }
-
-    const questionParts = [stripTrailingQuestionNumber(stripLeadingMarker(line))];
-    let cursor = index + 1;
-
-    if (!isQuestionLine(questionParts[0])) {
-      while (cursor < rawLines.length) {
-        const nextLine = rawLines[cursor];
-
-        if (!nextLine) {
-          cursor += 1;
-          continue;
-        }
-
-        if (isExplicitQuestionBoundary(rawLines, cursor) || isOptionLine(nextLine)) {
-          break;
-        }
-
-        questionParts.push(stripTrailingQuestionNumber(nextLine));
-        cursor += 1;
-
-        if (isQuestionLine(nextLine)) {
-          break;
-        }
-      }
-    }
-
-    const prompt = questionParts.join(' ').trim();
-    const inlineSplit = splitInlineOptions(prompt);
-    const resolvedPrompt = inlineSplit.prompt;
-
-    if (!resolvedPrompt) {
-      index += 1;
-      continue;
-    }
-
-    const markedOptions = [...inlineSplit.options];
-
-    while (cursor < rawLines.length) {
-      const candidate = rawLines[cursor];
-
-      if (!candidate) {
-        cursor += 1;
-        continue;
-      }
-
-      if (shouldIgnoreLine(candidate)) {
-        cursor += 1;
-        continue;
-      }
-
-      if (isExplicitQuestionBoundary(rawLines, cursor)) {
-        break;
-      }
-
-      if (isOptionLine(candidate)) {
-        markedOptions.push(stripOptionMarker(candidate));
-        cursor += 1;
-        continue;
-      }
-
-      if (isQuestionStartLine(candidate) || isQuestionLine(candidate) || markedOptions.length > 0) {
-        break;
-      }
-
-      cursor += 1;
-    }
-
-    if (!isQuestionLine(resolvedPrompt) && markedOptions.length === 0) {
-      index += 1;
-      continue;
-    }
-
-    importedQuestions.push({
-      prompt: resolvedPrompt,
-      type: markedOptions.length >= 2 ? 'multiple' : 'text',
-      options: markedOptions.filter((option, optionIndex, collection) => collection.findIndex((candidate) => candidate === option) === optionIndex),
-    });
-
-    index = cursor;
+    index = nextIndex;
   }
 
   return importedQuestions.filter((question, questionIndex, collection) => collection.findIndex((candidate) => candidate.prompt === question.prompt) === questionIndex);
@@ -225,7 +251,7 @@ export const splitPastedQuestionOptions = (value) => {
     return [];
   }
 
-  const markerPattern = /(^|[\s\n])(?:[A-Za-z\u0621-\u064A]|\d{1,2})\s*[-–—.):]/gm;
+  const markerPattern = /(^|\s)(?:[A-Za-z\u0621-\u064A]|\d{1,2})\s*[-–—.):]/gm;
   const markers = [];
   let match;
 

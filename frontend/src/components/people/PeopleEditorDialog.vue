@@ -4,6 +4,7 @@
     max-width="720"
     :persistent="filePickerOpen"
     @input="$emit('input', $event)"
+    @close="$emit('close')"
   >
     <div class="people-dialog">
       <AppDialogHeader
@@ -22,8 +23,10 @@
             {{ bulkImporting ? 'جارٍ الاستيراد...' : 'إضافة جماعية' }}
           </AppButton>
           <input
+            id="people-editor-bulk-file"
             ref="bulkFileInput"
             type="file"
+            aria-label="ملف الإضافة الجماعية"
             accept=".xlsx,.csv"
             class="people-dialog__bulk-input"
             @change="$emit('file-change', $event)"
@@ -53,8 +56,12 @@
           v-if="!directCardEdit"
           class="people-dialog__field"
         >
-          <label class="people-dialog__label">اختر النوع</label>
+          <label
+            class="people-dialog__label"
+            for="people-editor-entity-type"
+          >اختر النوع</label>
           <AppSelect
+            id="people-editor-entity-type"
             :value="entityType"
             aria-label="اختر النوع"
             :items="entityOptions"
@@ -73,8 +80,12 @@
           v-if="!directCardEdit"
           class="people-dialog__field"
         >
-          <label class="people-dialog__label">اختر الفرع</label>
+          <label
+            class="people-dialog__label"
+            for="people-editor-branch"
+          >اختر الفرع</label>
           <AppSelect
+            id="people-editor-branch"
             :value="branchId"
             aria-label="اختر الفرع"
             :items="branchOptions"
@@ -93,9 +104,13 @@
           v-if="editing && !directCardEdit"
           class="people-dialog__field"
         >
-          <label class="people-dialog__label">{{ targetLabel }}</label>
+          <label
+            class="people-dialog__label"
+            for="people-editor-target"
+          >{{ targetLabel }}</label>
           <PeopleRemotePicker
             v-if="value"
+            input-id="people-editor-target"
             :type="entityType"
             :branch="branchId"
             :label="targetLabel"
@@ -106,8 +121,12 @@
         </div>
 
         <div class="people-dialog__field">
-          <label class="people-dialog__label">{{ nameLabel }}</label>
+          <label
+            class="people-dialog__label"
+            for="people-editor-name"
+          >{{ nameLabel }}</label>
           <AppTextField
+            id="people-editor-name"
             :value="name"
             :aria-label="nameLabel"
             :placeholder="namePlaceholder"
@@ -123,9 +142,13 @@
           v-if="entityType === 'reciter'"
           class="people-dialog__field"
         >
-          <label class="people-dialog__label">المعلمون المرتبطون (اختياري)</label>
+          <label
+            class="people-dialog__label"
+            for="people-editor-linked-students"
+          >المعلمون المرتبطون (اختياري)</label>
           <PeopleRemotePicker
             v-if="value"
+            input-id="people-editor-linked-students"
             type="student"
             :branch="branchId"
             label="البحث عن معلمين للربط"
@@ -137,8 +160,12 @@
         </div>
 
         <div class="people-dialog__field">
-          <label class="people-dialog__label">رقم الدخول</label>
+          <label
+            class="people-dialog__label"
+            for="people-editor-login-code"
+          >رقم الدخول</label>
           <AppTextField
+            id="people-editor-login-code"
             :value="loginCode"
             aria-label="رقم الدخول"
             placeholder="رقم الدخول"
@@ -153,12 +180,17 @@
         <div
           class="people-dialog__field"
         >
-          <label class="people-dialog__label">
+          <label
+            class="people-dialog__label"
+            for="people-editor-password"
+          >
             {{ editing ? 'كلمة المرور الجديدة (اختياري)' : 'كلمة المرور (اختياري)' }}
           </label>
           <AppPasswordField
+            id="people-editor-password"
             :value="password"
             :aria-label="editing ? 'كلمة المرور الجديدة (اختياري)' : 'كلمة المرور (اختياري)'"
+            type="password"
             autocomplete="new-password"
             :placeholder="passwordRequirements"
             dense
@@ -172,10 +204,15 @@
         <div
           class="people-dialog__field"
         >
-          <label class="people-dialog__label">تأكيد كلمة المرور</label>
+          <label
+            class="people-dialog__label"
+            for="people-editor-password-confirmation"
+          >تأكيد كلمة المرور</label>
           <AppPasswordField
+            id="people-editor-password-confirmation"
             :value="passwordConfirmation"
             aria-label="تأكيد كلمة المرور"
+            type="password"
             autocomplete="new-password"
             placeholder="أعد كتابة كلمة المرور"
             dense
@@ -270,6 +307,22 @@ export default {
     errors: { type: Array, default: () => [] },
     submitting: Boolean,
   },
+  emits: [
+    'close',
+    'context-change',
+    'file-change',
+    'input',
+    'open-file-picker',
+    'submit',
+    'target-change',
+    'toggle-student',
+    'update:branch-id',
+    'update:entity-type',
+    'update:login-code',
+    'update:name',
+    'update:password',
+    'update:password-confirmation',
+  ],
   methods: {
     clearFileInput() { this.$refs.bulkFileInput.value = ''; },
     openFileInput() { this.$refs.bulkFileInput.click(); },

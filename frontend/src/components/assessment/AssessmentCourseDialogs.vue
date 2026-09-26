@@ -66,7 +66,7 @@
             v-if="isTasksPage && createMode === 'document'"
             class="assessment-form-card__field-group assessment-dialog__spaced-input"
           >
-            <label class="assessment-form-card__label">الوصف</label>
+            <span class="assessment-form-card__label">الوصف</span>
             <div class="assessment-template-shell">
               <RichTextEditor
                 :value="templateDraft"
@@ -213,5 +213,21 @@ export default {
     deleteTitle: { type: String, default: '' },
     deleteSubmitting: { type: Boolean, default: false },
   },
+  emits: [
+    'update:create-open',
+    'update:create-title',
+    'update:create-video-url',
+    'update:create-description',
+    'update:template-draft',
+    'cancel-create',
+    'submit-create',
+    'update:edit-open',
+    'update:edit-title',
+    'cancel-edit',
+    'submit-edit',
+    'update:delete-open',
+    'cancel-delete',
+    'confirm-delete',
+  ],
 };
 </script>

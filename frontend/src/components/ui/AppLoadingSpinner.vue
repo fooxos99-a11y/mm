@@ -1,8 +1,7 @@
 <template>
-  <span
+  <output
     class="app-spinner"
     :class="`app-spinner--${size}`"
-    role="status"
     :aria-label="label"
   >
     <span
@@ -13,7 +12,7 @@
       v-if="showLabel"
       class="app-spinner__label"
     >{{ label }}</span>
-  </span>
+  </output>
 </template>
 
 <script>

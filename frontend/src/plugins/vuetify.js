@@ -2,13 +2,13 @@ import { createVuetify } from 'vuetify';
 import * as directives from 'vuetify/directives';
 import { ar } from 'vuetify/locale';
 import AppSvgIcon from '@/components/ui/AppSvgIcon.vue';
-import { appIconPaths } from '@/plugins/icons';
+import { appIconPaths, vuetifyControlIconAliases } from '@/plugins/icons';
 
 export default createVuetify({
   directives,
   icons: {
     defaultSet: 'app',
-    aliases: appIconPaths,
+    aliases: { ...appIconPaths, ...vuetifyControlIconAliases },
     sets: {
       app: { component: AppSvgIcon },
     },

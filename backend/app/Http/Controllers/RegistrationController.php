@@ -53,9 +53,9 @@ class RegistrationController extends Controller
     {
         $data = $request->validated();
 
-        return response()->json([
-            'fields' => $this->registrationService->updateRegistrationFormFields($data['fields']),
-        ]);
+        return response()->json(
+            $this->registrationService->updateRegistrationFormFields($data['fields'], $data['fixedLabels'] ?? null),
+        );
     }
 
     public function accept(AcceptRegistrationRequest $request, string $requestId): JsonResponse
@@ -69,7 +69,8 @@ class RegistrationController extends Controller
     {
         $data = $request->validated();
 
-        return response()->json($this->registrationService->rejectRegistrationRequest($requestId, (string) ($data['reason'] ?? '')));
+        return response()
+            ->json($this->registrationService->rejectRegistrationRequest($requestId, (string) ($data['reason'] ?? '')));
     }
 
     public function markAccepted(string $requestId): JsonResponse

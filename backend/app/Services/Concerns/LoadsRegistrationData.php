@@ -13,6 +13,7 @@ trait LoadsRegistrationData
         return [
             'isOpen' => $this->isRegistrationOpen(),
             'fields' => $this->registrationFormService->load(),
+            'fixedLabels' => $this->registrationFormService->loadFixedLabels(),
             'branches' => Branch::query()->orderBy('created_at')->get()
                 ->map(fn (Branch $branch) => ['id' => $branch->code, 'label' => $branch->name])
                 ->values()->all(),
@@ -44,7 +45,11 @@ trait LoadsRegistrationData
             'isOpen' => $this->isRegistrationOpen(),
             'registrationUrl' => $origin.'/registration',
             'fields' => $this->registrationFormService->load(),
-            'requests' => $requests->map(fn (RegistrationRequest $request) => $this->serializeRegistrationRequest($request))->all(),
+            'fixedLabels' => $this->registrationFormService->loadFixedLabels(),
+            'requests' => $requests->map(
+                fn (RegistrationRequest $request) => $this->serializeRegistrationRequest($request)
+            )
+                ->all(),
         ];
     }
 
@@ -61,8 +66,13 @@ trait LoadsRegistrationData
         return $this->registrationFormService->load();
     }
 
-    public function updateRegistrationFormFields(array $fields): array
+    public function updateRegistrationFormFields(array $fields, ?array $fixedLabels = null): array
     {
-        return $this->registrationFormService->update($fields);
+        return [
+            'fields' => $this->registrationFormService->update($fields),
+            'fixedLabels' => $fixedLabels === null
+                ? $this->registrationFormService->loadFixedLabels()
+                : $this->registrationFormService->updateFixedLabels($fixedLabels),
+        ];
     }
 }

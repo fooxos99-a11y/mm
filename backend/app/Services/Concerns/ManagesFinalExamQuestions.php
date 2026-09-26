@@ -22,14 +22,20 @@ trait ManagesFinalExamQuestions
             'branch_code' => $branchCode,
             'question_type' => $type,
             'prompt' => trim((string) $question['prompt']),
-            'options' => json_encode($isTrueFalse ? ['صح', 'خطأ'] : ($question['options'] ?? []), JSON_UNESCAPED_UNICODE),
+            'options' => json_encode(
+                $isTrueFalse ? ['صح', 'خطأ'] : ($question['options'] ?? []),
+                JSON_UNESCAPED_UNICODE
+            ),
             'allow_file' => (bool) ($question['allowFile'] ?? false),
             'points' => (int) ($question['points'] ?? 1),
             'correct_answer' => $question['correctAnswer'] ?? '',
             'attachment_name' => '',
             'attachment_type' => '',
             'attachment_data_url' => '',
-            'sort_order' => (int) DB::table('final_exam_questions')->where('branch_code', $branchCode)->whereNull('archive_id')->count(),
+            'sort_order' => (int) DB::table('final_exam_questions')
+                ->where('branch_code', $branchCode)
+                ->whereNull('archive_id')
+                ->count(),
             'created_at' => $createdAt,
         ]);
 
@@ -41,7 +47,9 @@ trait ManagesFinalExamQuestions
         $question = DB::table('final_exam_questions')->where('id', $questionId)->first(['branch_code', 'archive_id']);
 
         if (! $question) {
-            throw ValidationException::withMessages(['questionId' => 'The selected final exam question does not exist.']);
+            throw ValidationException::withMessages(
+                ['questionId' => 'The selected final exam question does not exist.']
+            );
         }
 
         $this->assertCanManageBranch((string) $question->branch_code);
@@ -58,14 +66,20 @@ trait ManagesFinalExamQuestions
         }
 
         $this->assertCanManageBranch((string) $existingQuestion->branch_code);
-        $this->assertFinalExamQuestionSetIsMutable((string) $existingQuestion->branch_code, $existingQuestion->archive_id ?? null);
+        $this->assertFinalExamQuestionSetIsMutable(
+            (string) $existingQuestion->branch_code,
+            $existingQuestion->archive_id ?? null
+        );
         $type = ($question['type'] ?? 'multiple') === 'text' ? 'text' : 'multiple';
         $isTrueFalse = ($question['type'] ?? 'multiple') === 'truefalse';
 
         DB::table('final_exam_questions')->where('id', $questionId)->update([
             'question_type' => $type,
             'prompt' => trim((string) $question['prompt']),
-            'options' => json_encode($isTrueFalse ? ['صح', 'خطأ'] : ($question['options'] ?? []), JSON_UNESCAPED_UNICODE),
+            'options' => json_encode(
+                $isTrueFalse ? ['صح', 'خطأ'] : ($question['options'] ?? []),
+                JSON_UNESCAPED_UNICODE
+            ),
             'allow_file' => (bool) ($question['allowFile'] ?? false),
             'points' => (int) ($question['points'] ?? 1),
             'correct_answer' => $question['correctAnswer'] ?? '',
@@ -80,10 +94,16 @@ trait ManagesFinalExamQuestions
         $this->assertCanManageBranch($to);
 
         if ($from === $to) {
-            throw ValidationException::withMessages(['to' => 'The source and target final exam branches must be different.']);
+            throw ValidationException::withMessages(
+                ['to' => 'The source and target final exam branches must be different.']
+            );
         }
 
-        $sourceQuestions = DB::table('final_exam_questions')->where('branch_code', $from)->whereNull('archive_id')->orderBy('sort_order')->get();
+        $sourceQuestions = DB::table('final_exam_questions')
+            ->where('branch_code', $from)
+            ->whereNull('archive_id')
+            ->orderBy('sort_order')
+            ->get();
 
         if ($sourceQuestions->isEmpty()) {
             return;

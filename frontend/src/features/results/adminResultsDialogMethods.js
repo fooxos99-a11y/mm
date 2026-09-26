@@ -20,10 +20,10 @@ export default {
     previewWindow.document.close();
   },
   escapeHtml(value) {
-    return String(value || '').replace(/&/g, '&amp;').replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    return String(value || '').replaceAll('&', '&amp;').replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;');
   },
-  escapeAttribute(value) { return this.escapeHtml(value).replace(/`/g, '&#96;'); },
+  escapeAttribute(value) { return this.escapeHtml(value).replaceAll('`', '&#96;'); },
   renderAttachmentPreview(attachment) {
     const source = this.escapeAttribute(attachment.fileDataUrl);
     const fileType = attachment.fileType || '';

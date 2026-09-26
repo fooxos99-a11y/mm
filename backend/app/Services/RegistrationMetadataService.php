@@ -6,8 +6,13 @@ use Illuminate\Support\Facades\File;
 
 class RegistrationMetadataService
 {
-    public function store(string $requestId, string $phone, string $gender, array $answers, ?int $legacyAge = null): void
-    {
+    public function store(
+        string $requestId,
+        string $phone,
+        string $gender,
+        array $answers,
+        ?int $legacyAge = null
+    ): void {
         $metadata = $this->load();
         $metadata[$requestId] = [
             'age' => $legacyAge,

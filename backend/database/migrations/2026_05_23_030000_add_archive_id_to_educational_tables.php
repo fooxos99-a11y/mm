@@ -52,11 +52,26 @@ return new class extends Migration
             ->pluck('archive_id', 'id');
 
         foreach ($courseArchiveIds as $courseId => $archiveId) {
-            DB::table('course_questions')->where('course_id', $courseId)->whereNull('archive_id')->update(['archive_id' => $archiveId]);
-            DB::table('course_submissions')->where('course_id', $courseId)->whereNull('archive_id')->update(['archive_id' => $archiveId]);
-            DB::table('course_attendance')->where('course_id', $courseId)->whereNull('archive_id')->update(['archive_id' => $archiveId]);
-            DB::table('satisfaction_questions')->where('course_id', $courseId)->whereNull('archive_id')->update(['archive_id' => $archiveId]);
-            DB::table('satisfaction_responses')->where('course_id', $courseId)->whereNull('archive_id')->update(['archive_id' => $archiveId]);
+            DB::table('course_questions')
+                ->where('course_id', $courseId)
+                ->whereNull('archive_id')
+                ->update(['archive_id' => $archiveId]);
+            DB::table('course_submissions')
+                ->where('course_id', $courseId)
+                ->whereNull('archive_id')
+                ->update(['archive_id' => $archiveId]);
+            DB::table('course_attendance')
+                ->where('course_id', $courseId)
+                ->whereNull('archive_id')
+                ->update(['archive_id' => $archiveId]);
+            DB::table('satisfaction_questions')
+                ->where('course_id', $courseId)
+                ->whereNull('archive_id')
+                ->update(['archive_id' => $archiveId]);
+            DB::table('satisfaction_responses')
+                ->where('course_id', $courseId)
+                ->whereNull('archive_id')
+                ->update(['archive_id' => $archiveId]);
         }
     }
 
@@ -67,7 +82,10 @@ return new class extends Migration
             ->pluck('archive_id', 'id');
 
         foreach ($submissionArchiveIds as $submissionId => $archiveId) {
-            DB::table('course_submission_answers')->where('submission_id', $submissionId)->whereNull('archive_id')->update(['archive_id' => $archiveId]);
+            DB::table('course_submission_answers')
+                ->where('submission_id', $submissionId)
+                ->whereNull('archive_id')
+                ->update(['archive_id' => $archiveId]);
         }
     }
 
@@ -78,7 +96,10 @@ return new class extends Migration
             ->pluck('archive_id', 'login_code');
 
         foreach ($studentArchiveIds as $loginCode => $archiveId) {
-            DB::table('final_exam_submissions')->where('login_code', $loginCode)->whereNull('archive_id')->update(['archive_id' => $archiveId]);
+            DB::table('final_exam_submissions')
+                ->where('login_code', $loginCode)
+                ->whereNull('archive_id')
+                ->update(['archive_id' => $archiveId]);
         }
 
         $finalSubmissionArchiveIds = DB::table('final_exam_submissions')
@@ -86,7 +107,10 @@ return new class extends Migration
             ->pluck('archive_id', 'id');
 
         foreach ($finalSubmissionArchiveIds as $submissionId => $archiveId) {
-            DB::table('final_exam_submission_answers')->where('submission_id', $submissionId)->whereNull('archive_id')->update(['archive_id' => $archiveId]);
+            DB::table('final_exam_submission_answers')
+                ->where('submission_id', $submissionId)
+                ->whereNull('archive_id')
+                ->update(['archive_id' => $archiveId]);
         }
     }
 };

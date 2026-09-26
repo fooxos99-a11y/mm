@@ -14,7 +14,13 @@ trait ManagesCourseQuestions
         array $deletedQuestionIds = [],
         array $courseUpdates = [],
     ): void {
-        DB::transaction(function () use ($courseId, $assessmentType, $questions, $deletedQuestionIds, $courseUpdates): void {
+        DB::transaction(function () use (
+            $courseId,
+            $assessmentType,
+            $questions,
+            $deletedQuestionIds,
+            $courseUpdates
+        ): void {
             $referencedIds = collect($questions)->pluck('id')->filter()
                 ->merge($deletedQuestionIds)->unique()->values();
 

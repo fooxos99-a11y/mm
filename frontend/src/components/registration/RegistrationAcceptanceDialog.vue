@@ -17,18 +17,20 @@
         </p>
 
         <div class="registration-acceptance__grid">
-          <label class="registration-acceptance__field">
-            <span>الاسم</span>
+          <div class="registration-acceptance__field">
+            <label for="registration-acceptance-name">{{ labels.name }}</label>
             <AppTextField
+              id="registration-acceptance-name"
               v-model.trim="draft.name"
               dense
               outlined
               hide-details
             />
-          </label>
-          <label class="registration-acceptance__field">
-            <span>رقم الجوال</span>
+          </div>
+          <div class="registration-acceptance__field">
+            <label for="registration-acceptance-phone">{{ labels.phone }}</label>
             <AppTextField
+              id="registration-acceptance-phone"
               v-model.trim="draft.phone"
               inputmode="numeric"
               maxlength="10"
@@ -37,10 +39,11 @@
               hide-details
               @input="draft.phone = digitsOnly($event, 10)"
             />
-          </label>
-          <label class="registration-acceptance__field">
-            <span>الجنس</span>
+          </div>
+          <div class="registration-acceptance__field">
+            <label for="registration-acceptance-gender">{{ labels.gender }}</label>
             <AppSelect
+              id="registration-acceptance-gender"
               v-model="draft.gender"
               :items="genderOptions"
               item-text="label"
@@ -50,10 +53,11 @@
               hide-details
               @change="syncBranchWithGender"
             />
-          </label>
-          <label class="registration-acceptance__field">
-            <span>الفرع</span>
+          </div>
+          <div class="registration-acceptance__field">
+            <label for="registration-acceptance-branch">الفرع</label>
             <AppSelect
+              id="registration-acceptance-branch"
               v-model="draft.branchId"
               :items="branches"
               item-text="label"
@@ -62,16 +66,17 @@
               outlined
               hide-details
             />
-          </label>
+          </div>
 
-          <label
+          <div
             v-for="field in fields"
             :key="field.id"
             class="registration-acceptance__field"
           >
-            <span>{{ field.label }}</span>
+            <label :for="`registration-acceptance-field-${field.id}`">{{ field.label }}</label>
             <AppSelect
               v-if="field.type === 'select'"
+              :id="`registration-acceptance-field-${field.id}`"
               v-model="draft.answers[field.id]"
               :items="field.options"
               dense
@@ -80,6 +85,7 @@
             />
             <AppTextField
               v-else
+              :id="`registration-acceptance-field-${field.id}`"
               v-model.trim="draft.answers[field.id]"
               :inputmode="field.type === 'number' ? 'numeric' : undefined"
               dense
@@ -87,33 +93,36 @@
               hide-details
               @input="field.type === 'number' && setNumericAnswer(field.id, $event)"
             />
-          </label>
+          </div>
         </div>
 
         <div class="registration-acceptance__credentials">
           <h3>بيانات الدخول</h3>
           <p>يقبل النظام أي قيمة تحددها، ومنها رمز من 3 أرقام، ولن يُطلب من الطالب تغييره عند أول دخول.</p>
           <div class="registration-acceptance__grid">
-            <label class="registration-acceptance__field">
-              <span>رقم الدخول</span>
+            <div class="registration-acceptance__field">
+              <label for="registration-acceptance-login-code">رقم الدخول</label>
               <AppTextField
+                id="registration-acceptance-login-code"
                 v-model.trim="draft.loginCode"
                 autocomplete="off"
                 dense
                 outlined
                 hide-details
               />
-            </label>
-            <label class="registration-acceptance__field">
-              <span>كلمة المرور</span>
+            </div>
+            <div class="registration-acceptance__field">
+              <label for="registration-acceptance-password">كلمة المرور</label>
               <AppPasswordField
+                id="registration-acceptance-password"
                 v-model="draft.password"
+                type="password"
                 autocomplete="new-password"
                 dense
                 outlined
                 hide-details
               />
-            </label>
+            </div>
           </div>
         </div>
       </AppDialogBody>
@@ -139,6 +148,7 @@
 </template>
 
 <script>
+import { normalizeFixedFieldLabels } from '../../features/registration/registrationFieldLabels.mjs';
 import { passwordMeetsPolicy, PASSWORD_REQUIREMENTS_TEXT } from '../../utils/passwordPolicy.mjs';
 import {
   AppButton, AppDialog, AppDialogBody, AppDialogFooter, AppDialogHeader,
@@ -159,6 +169,7 @@ export default {
     modelValue: { type: Boolean, default: false },
     request: { type: Object, default: null },
     fields: { type: Array, default: () => [] },
+    fixedLabels: { type: Object, default: () => ({}) },
     branches: { type: Array, default: () => [] },
     loading: { type: Boolean, default: false },
   },
@@ -174,6 +185,7 @@ export default {
   },
   computed: {
     isOpen() { return this.modelValue; },
+    labels() { return normalizeFixedFieldLabels(this.fixedLabels); },
   },
   watch: {
     isOpen(value) { if (value) this.prepareDraft(); },

@@ -95,6 +95,7 @@ export default {
       default: () => [],
     },
   },
+  emits: ['permissions-topbar-state', 'registration-topbar-state'],
   data() {
     return {
       selectedItemId: '',
@@ -129,15 +130,14 @@ export default {
       return { embedded: true };
     },
     selectedItemActions() {
-      switch (this.selectedItem?.id) {
-        case 'users':
-          return [
-            { id: 'edit', label: 'تعديل', variant: 'secondary' },
-            { id: 'create', label: 'إضافة', variant: 'primary' },
-          ];
-        default:
-          return [];
+      if (this.selectedItem?.id === 'users') {
+        return [
+          { id: 'edit', label: 'تعديل', variant: 'secondary' },
+          { id: 'create', label: 'إضافة', variant: 'primary' },
+        ];
       }
+
+      return [];
     },
   },
   watch: {

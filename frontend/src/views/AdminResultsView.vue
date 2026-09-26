@@ -3,13 +3,12 @@
     class="results-view"
     :class="{ 'results-view--embedded': embedded }"
   >
-    <div
+    <output
       v-if="isSnapshotTruncated"
-      class="results-snapshot-warning"
-      role="status"
+      class="results-snapshot-warning d-block"
     >
       بيانات النتائج غير مكتملة. أعد تحميل الصفحة قبل الاعتماد على المجاميع.
-    </div>
+    </output>
 
     <ResultsAttendancePanel
       v-if="isAttendanceMode"
@@ -48,8 +47,12 @@
 
         <div class="results-filters">
           <div class="results-filter-field results-filter-field--wide">
-            <label class="results-filter-field__label">القسم</label>
+            <label
+              class="results-filter-field__label"
+              for="results-filter-course"
+            >القسم</label>
             <AppSelect
+              id="results-filter-course"
               v-model="resultsCourseId"
               aria-label="القسم"
               :items="resultsCourseOptions"
@@ -68,8 +71,12 @@
             v-if="!managedBranchId"
             class="results-filter-field"
           >
-            <label class="results-filter-field__label">الفرع</label>
+            <label
+              class="results-filter-field__label"
+              for="results-filter-branch"
+            >الفرع</label>
             <AppSelect
+              id="results-filter-branch"
               v-model="resultsBranchId"
               aria-label="الفرع"
               :items="branchOptions"
@@ -86,8 +93,12 @@
             v-if="isCourseResultsSection"
             class="results-filter-field"
           >
-            <label class="results-filter-field__label">نوع البيانات</label>
+            <label
+              class="results-filter-field__label"
+              for="results-filter-type"
+            >نوع البيانات</label>
             <AppSelect
+              id="results-filter-type"
               v-model="resultsType"
               aria-label="نوع البيانات"
               :items="resultsTypeOptions"
@@ -106,8 +117,12 @@
             v-if="showStudentFilter"
             class="results-filter-field"
           >
-            <label class="results-filter-field__label">{{ studentFilterLabel }}</label>
+            <label
+              class="results-filter-field__label"
+              for="results-filter-student"
+            >{{ studentFilterLabel }}</label>
             <AppSelect
+              id="results-filter-student"
               v-model="studentFilter"
               :aria-label="studentFilterLabel"
               :items="studentFilterOptions"
@@ -241,7 +256,7 @@
           v-if="resultSnapshot && !resultsLoading && !resultsError"
           class="results-pagination"
         >
-          <span role="status">عدد النتائج: {{ resultSnapshot.pagination.total }}</span>
+          <output>عدد النتائج: {{ resultSnapshot.pagination.total }}</output>
           <AppPagination
             :value="resultsPage"
             :page-count="resultSnapshot.pagination.pages"

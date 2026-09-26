@@ -43,8 +43,15 @@ class DashboardSnapshotFeedbackLoader
         $finalExamAnswersQuery->whereIn('submission_id', $finalExamSubmissions->pluck('id')->all());
 
         return [
-            'satisfactionQuestions' => DB::table('satisfaction_questions')->whereNull('archive_id')->orderBy('sort_order')->get(),
-            'satisfactionResponses' => $satisfactionResponsesQuery->when(! $includeAll, fn ($query) => $query->forPage($page, self::MAX_SNAPSHOT_RECORDS))->get(),
+            'satisfactionQuestions' => DB::table('satisfaction_questions')
+                ->whereNull('archive_id')
+                ->orderBy('sort_order')
+                ->get(),
+            'satisfactionResponses' => $satisfactionResponsesQuery->when(
+                ! $includeAll,
+                fn ($query) => $query->forPage($page, self::MAX_SNAPSHOT_RECORDS)
+            )
+                ->get(),
             'finalExamQuestions' => $finalExamQuestionsQuery->get(),
             'finalExamSubmissions' => $finalExamSubmissions,
             'finalExamAnswers' => $finalExamAnswersQuery->get()->groupBy('submission_id'),
@@ -61,7 +68,9 @@ class DashboardSnapshotFeedbackLoader
     {
         return [
             'total' => $total,
-            'returned' => $includeAll ? $total : min(max(0, $total - ($page - 1) * self::MAX_SNAPSHOT_RECORDS), self::MAX_SNAPSHOT_RECORDS),
+            'returned' => $includeAll
+                ? $total
+                : min(max(0, $total - ($page - 1) * self::MAX_SNAPSHOT_RECORDS), self::MAX_SNAPSHOT_RECORDS),
             'truncated' => ! $includeAll && $total > $page * self::MAX_SNAPSHOT_RECORDS,
             'nextPage' => ! $includeAll && $total > $page * self::MAX_SNAPSHOT_RECORDS ? $page + 1 : null,
         ];

@@ -26,72 +26,80 @@ export default {
       const message = error?.response?.data?.message;
       return [message && !/^The\s/i.test(message) ? message : 'تعذر حفظ البيانات. تحقق من الحقول وحاول مرة أخرى.'];
     },
+    async submitStudentDialog() {
+      if (this.isEditing) {
+        if (!this.canEditStudent) {
+          return false;
+        }
+
+        if (!this.editingStudentRecord) {
+          this.showTimedToast('error', 'اختر المعلم أولًا');
+          return false;
+        }
+
+        await this.updateStudent({
+          studentId: this.editingStudentRecord.id,
+          updates: {
+            name: this.studentForm.name,
+            loginCode: this.studentForm.loginId,
+            branchId: this.studentForm.branchId,
+            note: this.studentForm.note,
+            password: this.studentForm.password || undefined,
+            passwordConfirmation: this.studentForm.password ? this.studentForm.passwordConfirmation : undefined,
+          },
+        });
+        this.selectedStudentId = this.editingStudentRecord.id;
+        this.showTimedToast('success', 'تم تحديث بيانات المعلم');
+        return true;
+      }
+
+      if (!this.canAddStudent) {
+        return false;
+      }
+
+      await this.addStudent({
+        name: this.studentForm.name,
+        loginId: this.studentForm.loginId,
+        password: this.studentForm.password,
+        passwordConfirmation: this.studentForm.passwordConfirmation,
+        branchId: this.studentForm.branchId,
+        note: this.studentForm.note,
+      });
+      this.showTimedToast('success', 'تمت إضافة المعلم');
+      return true;
+    },
+    async submitReciterDialog() {
+      if ((this.isEditing && !this.canEditReciter) || (!this.isEditing && !this.canAddReciter)) {
+        return false;
+      }
+
+      if (this.isEditing && !this.editingReciterRecord) {
+        this.showTimedToast('error', 'اختر المقرئ أولًا');
+        return false;
+      }
+
+      await this.saveReciter({
+        currentLoginCode: this.isEditing ? this.editingReciterRecord.loginCode : null,
+        name: this.reciterForm.name,
+        loginCode: this.reciterForm.loginCode,
+        password: this.reciterForm.password || undefined,
+        passwordConfirmation: this.reciterForm.password ? this.reciterForm.passwordConfirmation : undefined,
+        branchId: this.reciterForm.branchId,
+        linkedStudentIds: this.reciterForm.studentIds,
+      });
+      this.showTimedToast('success', this.isEditing ? 'تم تحديث المقرئ' : 'تمت إضافة المقرئ');
+      return true;
+    },
     async submitDialog() {
       this.dialogErrors = this.validatePersonForm();
       if (this.dialogErrors.length || this.dialogSubmitting) return;
       this.dialogSubmitting = true;
       try {
-        if (this.dialogEntityType === 'student') {
-          if (this.isEditing) {
-            if (!this.canEditStudent) {
-              return;
-            }
+        const saved = this.dialogEntityType === 'student'
+          ? await this.submitStudentDialog()
+          : await this.submitReciterDialog();
 
-            if (!this.editingStudentRecord) {
-              this.showTimedToast('error', 'اختر المعلم أولًا');
-              return;
-            }
-
-            await this.updateStudent({
-              studentId: this.editingStudentRecord.id,
-              updates: {
-                name: this.studentForm.name,
-                loginCode: this.studentForm.loginId,
-                branchId: this.studentForm.branchId,
-                note: this.studentForm.note,
-                password: this.studentForm.password || undefined,
-                passwordConfirmation: this.studentForm.password ? this.studentForm.passwordConfirmation : undefined,
-              },
-            });
-            this.selectedStudentId = this.editingStudentRecord.id;
-            this.showTimedToast('success', 'تم تحديث بيانات المعلم');
-          } else {
-            if (!this.canAddStudent) {
-              return;
-            }
-
-            await this.addStudent({
-              name: this.studentForm.name,
-              loginId: this.studentForm.loginId,
-              password: this.studentForm.password,
-              passwordConfirmation: this.studentForm.passwordConfirmation,
-              branchId: this.studentForm.branchId,
-              note: this.studentForm.note,
-            });
-            this.showTimedToast('success', 'تمت إضافة المعلم');
-          }
-
-        } else {
-          if ((this.isEditing && !this.canEditReciter) || (!this.isEditing && !this.canAddReciter)) {
-            return;
-          }
-
-          if (this.isEditing && !this.editingReciterRecord) {
-            this.showTimedToast('error', 'اختر المقرئ أولًا');
-            return;
-          }
-
-          await this.saveReciter({
-            currentLoginCode: this.isEditing ? this.editingReciterRecord.loginCode : null,
-            name: this.reciterForm.name,
-            loginCode: this.reciterForm.loginCode,
-            password: this.reciterForm.password || undefined,
-            passwordConfirmation: this.reciterForm.password ? this.reciterForm.passwordConfirmation : undefined,
-            branchId: this.reciterForm.branchId,
-            linkedStudentIds: this.reciterForm.studentIds,
-          });
-          this.showTimedToast('success', this.isEditing ? 'تم تحديث المقرئ' : 'تمت إضافة المقرئ');
-        }
+        if (!saved) return;
 
         this.dialogOpen = false;
         this.resetForms();

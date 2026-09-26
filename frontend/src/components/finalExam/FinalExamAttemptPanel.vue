@@ -113,6 +113,7 @@ export default {
     submitting: { type: Boolean, default: false },
     enabled: { type: Boolean, default: false },
   },
+  emits: ['select-file', 'preview', 'answer', 'submit'],
   methods: {
     questionAttachment(question) {
       return {

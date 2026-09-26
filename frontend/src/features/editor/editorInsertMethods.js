@@ -1,6 +1,26 @@
 import { uploadEditorImage } from '../../services/api';
 import { Quill } from './editorRuntime';
 
+const findBlotForNode = (node) => (node ? Quill.find(node, true) : null);
+
+// Prefer the standard caretPositionFromPoint API; caretRangeFromPoint remains as a
+// fallback for engines that have not shipped the standard API yet.
+const findBlotAtPoint = (x, y) => {
+  if (typeof document.caretPositionFromPoint === 'function') {
+    const positionBlot = findBlotForNode(document.caretPositionFromPoint(x, y)?.offsetNode);
+
+    if (positionBlot) {
+      return positionBlot;
+    }
+  }
+
+  if (typeof document.caretRangeFromPoint === 'function') {
+    return findBlotForNode(document.caretRangeFromPoint(x, y)?.startContainer);
+  }
+
+  return null;
+};
+
 export default {
     openImagePicker() {
       if (this.lockImages || this.disabled || this.isUploadingImage || !this.$refs.imageInput) {
@@ -266,37 +286,17 @@ export default {
         return files[0];
       }
 
-      const fallbackFiles = Array.from(source?.files || []).filter((file) => file.type.startsWith('image/'));
-
-      return fallbackFiles[0] || null;
+      return Array.from(source?.files || []).find((file) => file.type.startsWith('image/')) || null;
     },
     resolveDropInsertIndex(event) {
       if (!this.editor) {
         return 0;
       }
 
-      if (typeof document.caretRangeFromPoint === 'function') {
-        const range = document.caretRangeFromPoint(event.clientX, event.clientY);
+      const caretBlot = findBlotAtPoint(event.clientX, event.clientY);
 
-        if (range) {
-          const blot = Quill.find(range.startContainer, true);
-
-          if (blot) {
-            return this.editor.getIndex(blot);
-          }
-        }
-      }
-
-      if (typeof document.caretPositionFromPoint === 'function') {
-        const position = document.caretPositionFromPoint(event.clientX, event.clientY);
-
-        if (position) {
-          const blot = Quill.find(position.offsetNode, true);
-
-          if (blot) {
-            return this.editor.getIndex(blot);
-          }
-        }
+      if (caretBlot) {
+        return this.editor.getIndex(caretBlot);
       }
 
       const targetBlot = Quill.find(event.target, true);

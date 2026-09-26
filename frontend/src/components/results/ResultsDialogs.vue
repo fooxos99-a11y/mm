@@ -45,9 +45,13 @@
           v-if="finalExamSection && selectedRow && selectedRow.submission && !hasManualReviewAnswers"
           class="results-score-editor"
         >
-          <span class="results-score-editor__label">الدرجة</span>
+          <label
+            class="results-score-editor__label"
+            for="results-score-editor-input"
+          >الدرجة</label>
           <div class="results-score-editor__controls">
             <input
+              id="results-score-editor-input"
               :value="scoreValue"
               type="number"
               min="0"
@@ -266,6 +270,20 @@ export default {
     deleteTitle: { type: String, default: '' },
     deleting: Boolean,
   },
+  emits: [
+    'close-delete',
+    'close-result',
+    'confirm-delete',
+    'download',
+    'preview-attachment',
+    'review-task',
+    'save-answer-score',
+    'save-score',
+    'update-answer-score',
+    'update:delete-open',
+    'update:result-open',
+    'update:score-value',
+  ],
   data: () => ({
     reviewActions: [
       { value: 'approved', label: 'اعتماد', className: 'approve' },

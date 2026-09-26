@@ -64,8 +64,14 @@ trait ManagesCourseLifecycle
 
         if ($settings !== null) {
             $freshCourse = DB::table('courses')->where('id', $courseId)->first();
-            $templates = $this->decodeJsonObject($freshCourse?->assessment_notification_templates, ['pre' => '', 'post' => '', 'tasks' => '']);
-            $windows = $this->decodeJsonObject($freshCourse?->assessment_windows, ['global' => [], 'male' => [], 'female' => []]);
+            $templates = $this->decodeJsonObject(
+                $freshCourse?->assessment_notification_templates,
+                ['pre' => '', 'post' => '', 'tasks' => '']
+            );
+            $windows = $this->decodeJsonObject(
+                $freshCourse?->assessment_windows,
+                ['global' => [], 'male' => [], 'female' => []]
+            );
 
             if ((bool) ($settings['pre'] ?? false) && ! $wasPreEnabled) {
                 $this->dispatchAssessmentOpenNotification($freshCourse, 'pre', $templates, $windows);
@@ -98,11 +104,23 @@ trait ManagesCourseLifecycle
     {
         $comparisons = [
             'title' => [trim((string) ($course->title ?? '')), fn ($value): string => trim((string) $value)],
-            'entityType' => [(string) ($course->entity_type ?? 'course'), fn ($value): string => $value === 'task' ? 'task' : 'course'],
+            'entityType' => [
+                (string) ($course->entity_type ?? 'course'),
+                fn ($value): string => $value === 'task' ? 'task' : 'course',
+            ],
             'taskMode' => [(string) ($course->task_mode ?? ''), fn ($value): string => (string) $value],
-            'taskTemplateId' => [(string) ($course->task_template_id ?? ''), fn ($value): string => (string) ($value ?? '')],
-            'taskTemplateName' => [(string) ($course->task_template_name ?? ''), fn ($value): string => (string) $value],
-            'taskTemplateContent' => [(string) ($course->task_template_content ?? ''), fn ($value): string => (string) $value],
+            'taskTemplateId' => [
+                (string) ($course->task_template_id ?? ''),
+                fn ($value): string => (string) ($value ?? ''),
+            ],
+            'taskTemplateName' => [
+                (string) ($course->task_template_name ?? ''),
+                fn ($value): string => (string) $value,
+            ],
+            'taskTemplateContent' => [
+                (string) ($course->task_template_content ?? ''),
+                fn ($value): string => (string) $value,
+            ],
             'youtubeUrl' => [(string) ($course->youtube_url ?? ''), fn ($value): string => (string) $value],
             'taskDescription' => [(string) ($course->task_description ?? ''), fn ($value): string => (string) $value],
         ];

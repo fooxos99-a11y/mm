@@ -7,5 +7,4 @@ export const PRACTITIONER_PROGRAM_INDICATORS = [
   { key: 'tasks', label: 'المهام الأدائية', display: '630+', progress: 100 },
   { key: 'completed30', label: 'عدد خريجي هذه الدفعة معلم ومعلمة', display: '110', progress: 100 },
 ];
-export const DISPLAY_NUMBER_PATTERN = /^(.*?)([+-]?\d+(?:\.\d+)?)([^\d]*)$/;
 export const easeOutCubic = (value) => 1 - ((1 - value) ** 3);

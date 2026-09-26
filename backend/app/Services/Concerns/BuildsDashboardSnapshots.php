@@ -79,32 +79,56 @@ trait BuildsDashboardSnapshots
         $canViewCourseAnswerKeys = $currentRole === 'admin'
             || (in_array($currentRole, ['male_manager', 'female_manager'], true)
                 && collect(['edit_pre_questions', 'edit_post_questions', 'edit_tasks'])
-                    ->contains(fn (string $permission): bool => (bool) ($currentRolePermissions[$permission] ?? false)));
+                    ->contains(
+                        fn (string $permission): bool => (bool) ($currentRolePermissions[$permission] ?? false)
+                    ));
         $canViewFinalExamAnswerKeys = $currentRole === 'admin'
             || (in_array($currentRole, ['male_manager', 'female_manager'], true)
                 && (bool) ($currentRolePermissions['page_final_exam'] ?? false));
 
         if ($managedBranchId !== '') {
-            $students = $students->filter(fn (Student $student) => ($student->branch?->code ?? 'male') === $managedBranchId)->values();
-            $reciters = $reciters->filter(fn (Reciter $reciter) => ($reciter->branch?->code ?? 'male') === $managedBranchId)->values();
+            $students = $students->filter(
+                fn (Student $student) => ($student->branch?->code ?? 'male') === $managedBranchId
+            )
+                ->values();
+            $reciters = $reciters->filter(
+                fn (Reciter $reciter) => ($reciter->branch?->code ?? 'male') === $managedBranchId
+            )
+                ->values();
 
             $allowedStudentLogins = $students
                 ->map(fn (Student $student) => (string) $student->login_code)
                 ->filter(fn (string $loginCode) => $loginCode !== '')
                 ->flip();
 
-            $submissions = $submissions->filter(fn ($submission) => $allowedStudentLogins->has((string) $submission->login_code))->values();
-            $attendance = $attendance->filter(fn ($item) => $allowedStudentLogins->has((string) $item->login_code))->values();
-            $satisfactionResponses = $satisfactionResponses->filter(fn ($item) => $allowedStudentLogins->has((string) $item->login_code))->values();
-            $finalExamQuestions = $finalExamQuestions->filter(fn ($item) => (string) $item->branch_code === $managedBranchId)->values();
-            $finalExamSubmissions = $finalExamSubmissions->filter(fn ($item) => (string) $item->branch_code === $managedBranchId)->values();
+            $submissions = $submissions->filter(
+                fn ($submission) => $allowedStudentLogins->has((string) $submission->login_code)
+            )
+                ->values();
+            $attendance = $attendance->filter(fn ($item) => $allowedStudentLogins->has((string) $item->login_code))
+                ->values();
+            $satisfactionResponses = $satisfactionResponses->filter(
+                fn ($item) => $allowedStudentLogins->has((string) $item->login_code)
+            )
+                ->values();
+            $finalExamQuestions = $finalExamQuestions->filter(
+                fn ($item) => (string) $item->branch_code === $managedBranchId
+            )
+                ->values();
+            $finalExamSubmissions = $finalExamSubmissions->filter(
+                fn ($item) => (string) $item->branch_code === $managedBranchId
+            )
+                ->values();
             $trainingMaterials = $trainingMaterials
                 ->filter(fn (TrainingMaterial $material) => ! $material->target_branch_code
                     || $material->target_branch_code === $managedBranchId
                     || $material->target_branch_code === 'supervision')
                 ->values();
             $notifications = $notifications
-                ->filter(fn (array $item) => ! ($item['targetBranchId'] ?? null) || ($item['targetBranchId'] ?? null) === $managedBranchId)
+                ->filter(
+                    fn (array $item) => ! ($item['targetBranchId'] ?? null)
+                        || ($item['targetBranchId'] ?? null) === $managedBranchId
+                )
                 ->values();
         }
 
@@ -137,11 +161,24 @@ trait BuildsDashboardSnapshots
                 ->unique()
                 ->flip();
 
-            $submissions = $submissions->filter(fn ($submission) => $allowedStudentLogins->has((string) $submission->login_code))->values();
-            $attendance = $attendance->filter(fn ($item) => $allowedStudentLogins->has((string) $item->login_code))->values();
-            $satisfactionResponses = $satisfactionResponses->filter(fn ($item) => $allowedStudentLogins->has((string) $item->login_code))->values();
-            $finalExamQuestions = $finalExamQuestions->filter(fn ($item) => $allowedBranchCodes->has((string) $item->branch_code))->values();
-            $finalExamSubmissions = $finalExamSubmissions->filter(fn ($item) => $allowedStudentLogins->has((string) $item->login_code))->values();
+            $submissions = $submissions->filter(
+                fn ($submission) => $allowedStudentLogins->has((string) $submission->login_code)
+            )
+                ->values();
+            $attendance = $attendance->filter(fn ($item) => $allowedStudentLogins->has((string) $item->login_code))
+                ->values();
+            $satisfactionResponses = $satisfactionResponses->filter(
+                fn ($item) => $allowedStudentLogins->has((string) $item->login_code)
+            )
+                ->values();
+            $finalExamQuestions = $finalExamQuestions->filter(
+                fn ($item) => $allowedBranchCodes->has((string) $item->branch_code)
+            )
+                ->values();
+            $finalExamSubmissions = $finalExamSubmissions->filter(
+                fn ($item) => $allowedStudentLogins->has((string) $item->login_code)
+            )
+                ->values();
             $notifications = collect();
             $rolePermissions = collect();
 
@@ -157,8 +194,14 @@ trait BuildsDashboardSnapshots
         $finalQuestionsById = collect($finalExamQuestions)->keyBy('id');
         $questionsByCourse = $questions->map(fn (Collection $items) => [
             'pre' => $this->normalizeCourseQuestions($items->where('assessment_type', 'pre'), $canViewCourseAnswerKeys),
-            'post' => $this->normalizeCourseQuestions($items->where('assessment_type', 'post'), $canViewCourseAnswerKeys),
-            'tasks' => $this->normalizeCourseQuestions($items->where('assessment_type', 'tasks'), $canViewCourseAnswerKeys),
+            'post' => $this->normalizeCourseQuestions(
+                $items->where('assessment_type', 'post'),
+                $canViewCourseAnswerKeys
+            ),
+            'tasks' => $this->normalizeCourseQuestions(
+                $items->where('assessment_type', 'tasks'),
+                $canViewCourseAnswerKeys
+            ),
         ]);
 
         return [

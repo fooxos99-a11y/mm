@@ -28,8 +28,12 @@
           v-if="!managedBranchId"
           class="prep-field"
         >
-          <label class="prep-field__label">الفرع</label>
+          <label
+            class="prep-field__label"
+            for="results-attendance-branch"
+          >الفرع</label>
           <AppSelect
+            id="results-attendance-branch"
             :value="branchId"
             aria-label="الفرع"
             :items="branchOptions"
@@ -44,8 +48,12 @@
         </div>
 
         <div class="prep-field prep-field--wide">
-          <label class="prep-field__label">الدورة / المهام</label>
+          <label
+            class="prep-field__label"
+            for="results-attendance-course"
+          >الدورة / المهام</label>
           <AppSelect
+            id="results-attendance-course"
             :value="courseId"
             aria-label="الدورة أو المهمة"
             :items="courseOptions"
@@ -168,5 +176,12 @@ export default {
     displayedStudents: { type: Array, default: () => [] },
     checkedStudentIds: { type: Array, default: () => [] },
   },
+  emits: [
+    'request-course-delete',
+    'toggle-student',
+    'toggle-visible',
+    'update:branch-id',
+    'update:course-id',
+  ],
 };
 </script>

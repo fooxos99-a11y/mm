@@ -3,8 +3,12 @@
     <section class="prep-card communications-page__prep-card">
       <div class="prep-filters communications-page__prep-filters">
         <div class="prep-field communications-page__prep-field communications-page__prep-field--message">
-          <label class="prep-field__label">نص الإشعار</label>
+          <label
+            for="notification-prep-message"
+            class="prep-field__label"
+          >نص الإشعار</label>
           <AppTextField
+            id="notification-prep-message"
             :value="message"
             dense
             outlined
@@ -16,8 +20,12 @@
         </div>
 
         <div class="prep-field communications-page__prep-field">
-          <label class="prep-field__label">الفرع</label>
+          <label
+            for="notification-prep-branch"
+            class="prep-field__label"
+          >الفرع</label>
           <AppSelect
+            id="notification-prep-branch"
             :value="branchId"
             aria-label="الفرع"
             :items="branchOptions"
@@ -123,6 +131,7 @@ export default {
     students: { type: Array, default: () => [] },
     submitting: { type: Boolean, default: false },
   },
+  emits: ['update:message', 'update:branch-id', 'toggle-all', 'toggle-student', 'submit'],
 };
 </script>
 

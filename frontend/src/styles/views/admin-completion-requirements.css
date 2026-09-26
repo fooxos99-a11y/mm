@@ -113,7 +113,7 @@
 
 .completion-empty {
   padding: 38px 16px 18px;
-  color: #718694;
+  color: #5f7482;
   text-align: center;
   font-size: 0.9rem;
 }
@@ -124,7 +124,7 @@
   border-top: 1px solid #e3edf0;
 }
 
-.completion-student-head span { color: #718694; font-size: 0.76rem; }
+.completion-student-head span { color: #5f7482; font-size: 0.76rem; }
 
 .completion-status {
   padding: 7px 12px;

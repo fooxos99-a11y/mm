@@ -27,14 +27,13 @@
             </h1>
           </div>
 
-          <div
+          <output
             v-if="registrationState === 'loading'"
-            class="registration-entry__state"
-            role="status"
+            class="registration-entry__state d-block"
             aria-live="polite"
           >
             جارٍ تحميل التسجيل...
-          </div>
+          </output>
 
           <AppErrorState
             v-else-if="registrationState === 'error'"
@@ -50,14 +49,13 @@
             التسجيل مغلق حاليًا.
           </div>
 
-          <div
+          <output
             v-else-if="registrationState === 'success'"
-            class="registration-entry__state registration-entry__state--success"
-            role="status"
+            class="registration-entry__state registration-entry__state--success d-block"
             aria-live="polite"
           >
             تم الإرسال بنجاح
-          </div>
+          </output>
 
           <form
             v-else-if="registrationState === 'open'"
@@ -69,7 +67,7 @@
                 <label
                   class="registration-entry__label"
                   for="registration-name"
-                >الاسم</label>
+                >{{ fixedLabels.name }}</label>
                 <AppTextField
                   id="registration-name"
                   v-model.trim="form.name"
@@ -77,7 +75,7 @@
                   outlined
                   hide-details
                   class="registration-entry__input"
-                  placeholder="الاسم"
+                  :placeholder="fixedLabels.name"
                 />
               </div>
 
@@ -85,7 +83,7 @@
                 <label
                   class="registration-entry__label"
                   for="registration-gender"
-                >الجنس</label>
+                >{{ fixedLabels.gender }}</label>
                 <AppSelect
                   id="registration-gender"
                   v-model="form.gender"
@@ -96,7 +94,7 @@
                   outlined
                   hide-details
                   class="registration-entry__input"
-                  placeholder="اختر الجنس"
+                  :placeholder="`اختر ${fixedLabels.gender}`"
                 />
               </div>
 
@@ -104,7 +102,7 @@
                 <label
                   class="registration-entry__label"
                   for="registration-phone"
-                >رقم الجوال</label>
+                >{{ fixedLabels.phone }}</label>
                 <AppTextField
                   id="registration-phone"
                   v-model.trim="form.phone"
@@ -116,7 +114,7 @@
                   outlined
                   hide-details
                   class="registration-entry__input"
-                  placeholder="رقم الجوال"
+                  :placeholder="fixedLabels.phone"
                   @input="form.phone = digitsOnly($event, 10)"
                 />
               </div>

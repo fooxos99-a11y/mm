@@ -18,7 +18,10 @@ class SecurityHeadersTest extends TestCase
             ->assertHeader('Referrer-Policy', 'strict-origin-when-cross-origin')
             ->assertHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=()')
             ->assertHeader('Cross-Origin-Opener-Policy', 'same-origin')
-            ->assertHeader('Content-Security-Policy', "default-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'self'");
+            ->assertHeader(
+                'Content-Security-Policy',
+                "default-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'self'"
+            );
     }
 
     public function test_hsts_is_only_added_to_https_responses(): void
@@ -37,7 +40,11 @@ class SecurityHeadersTest extends TestCase
             ->assertOk()
             ->assertHeader(
                 'Content-Security-Policy',
-                "default-src 'self'; base-uri 'self'; connect-src 'self' https: wss:; font-src 'self' data:; form-action 'self'; frame-ancestors 'self'; frame-src 'self' blob: https://www.youtube.com https://www.youtube-nocookie.com; img-src 'self' data: blob: https:; media-src 'self' blob: https:; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; worker-src 'self' blob:",
+                "default-src 'self'; base-uri 'self'; connect-src 'self' https: wss:; font-src 'self' data:; "
+                    ."form-action 'self'; frame-ancestors 'self'; frame-src 'self' blob: https://www.youtube.com "
+                    ."https://www.youtube-nocookie.com; img-src 'self' data: blob: https:; media-src 'self' blob: "
+                    ."https:; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; worker-src "
+                    ."'self' blob:",
             );
     }
 }

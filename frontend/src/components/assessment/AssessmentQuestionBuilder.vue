@@ -207,6 +207,18 @@ export default {
     isDocumentMode: { type: Boolean, default: false },
     saving: { type: Boolean, default: false },
   },
+  emits: [
+    'remove-form',
+    'prompt-paste',
+    'select-correct',
+    'option-change',
+    'option-paste',
+    'add-option',
+    'add-question',
+    'save',
+    'update-form',
+    'clear-error',
+  ],
   computed: {
     canAddDocument() {
       return this.isTasksPage && !this.hasExistingQuestions && !this.forms.length && !this.isDocumentMode;

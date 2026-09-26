@@ -50,7 +50,7 @@ const candidates = [...new Set([
 ].filter(Boolean))];
 
 const firstArg = args[0];
-const artisanPath = firstArg && firstArg.endsWith('artisan') ? firstArg : null;
+const artisanPath = firstArg?.endsWith('artisan') ? firstArg : null;
 const cwd = artisanPath ? path.resolve(path.dirname(artisanPath)) : process.cwd();
 const normalizedArgs = artisanPath ? [path.basename(artisanPath), ...args.slice(1)] : args;
 

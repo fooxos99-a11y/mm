@@ -1,11 +1,10 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
+import { adminLogin, adminPassword } from './support/credentials.mjs';
 
 const criticalViolations = (results) => results.violations.filter(
   ({ impact }) => impact === 'critical' || impact === 'serious',
 );
-const adminLogin = process.env.E2E_ADMIN_LOGIN || 'e2e-admin';
-const adminPassword = process.env.E2E_ADMIN_PASSWORD || 'E2E-Momars-2026!';
 
 const expectAccessiblePage = async (page, name) => {
   const results = await new AxeBuilder({ page })

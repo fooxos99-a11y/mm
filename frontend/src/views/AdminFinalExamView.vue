@@ -66,8 +66,12 @@
             v-if="!managedBranchId"
             class="assessment-indicators-card__filter-group"
           >
-            <label class="assessment-indicators-card__label">الفرع</label>
+            <label
+              class="assessment-indicators-card__label"
+              for="final-exam-indicator-branch"
+            >الفرع</label>
             <AppSelect
+              id="final-exam-indicator-branch"
               v-model="indicatorBranch"
               aria-label="الفرع"
               :items="branchOptions"
@@ -122,8 +126,12 @@
           class="assessment-toolbar assessment-toolbar--embedded"
         >
           <div class="assessment-toolbar__field">
-            <label class="assessment-toolbar__label">الفرع</label>
+            <label
+              class="assessment-toolbar__label"
+              for="final-exam-question-branch"
+            >الفرع</label>
             <AppSelect
+              id="final-exam-question-branch"
               v-model="selectedBranch"
               aria-label="الفرع"
               :items="branchOptions"

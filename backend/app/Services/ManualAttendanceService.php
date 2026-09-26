@@ -31,7 +31,9 @@ class ManualAttendanceService
             $students = Student::query()->whereNull('archive_id')->with('branch')
                 ->whereIn('login_code', $logins)->get()->keyBy('login_code');
             if ($students->count() !== $logins->count()) {
-                throw ValidationException::withMessages(['presentStudents' => 'تتضمن قائمة الحضور حسابًا غير صالح أو مكررًا.']);
+                throw ValidationException::withMessages(
+                    ['presentStudents' => 'تتضمن قائمة الحضور حسابًا غير صالح أو مكررًا.']
+                );
             }
             if ($branchCode !== null) {
                 abort_if($students->contains(fn (Student $student) => $student->branch?->code !== $branchCode), 403);

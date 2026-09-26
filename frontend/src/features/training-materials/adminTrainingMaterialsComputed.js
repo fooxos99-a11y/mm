@@ -3,6 +3,12 @@ import {
   ALL_MATERIALS_OPTION_VALUE,
 } from './trainingMaterialForm';
 
+const resolveDisplayedMaterials = (materials, selectedMaterialId, selectedMaterial) => {
+  if (selectedMaterialId === ALL_MATERIALS_OPTION_VALUE) return materials;
+
+  return selectedMaterial ? [selectedMaterial] : [];
+};
+
 export default {
   trainingMaterials() {
     return this.dashboardSnapshot?.trainingMaterials || [];
@@ -45,11 +51,8 @@ export default {
   },
   displayedMaterials() {
     if (!this.hasMaterials) return [];
-    if (this.selectedMaterialId !== ALL_MATERIALS_OPTION_VALUE) {
-      return this.selectedMaterial ? [this.selectedMaterial] : [];
-    }
 
-    return this.trainingMaterials;
+    return resolveDisplayedMaterials(this.trainingMaterials, this.selectedMaterialId, this.selectedMaterial);
   },
   branchOptions() {
     return [

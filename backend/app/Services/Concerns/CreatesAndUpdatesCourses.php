@@ -11,7 +11,9 @@ trait CreatesAndUpdatesCourses
     {
         $title = trim($title);
         $entityType = ($options['entityType'] ?? 'course') === 'task' ? 'task' : 'course';
-        $taskMode = $entityType === 'task' ? (($options['taskMode'] ?? 'questions') === 'document' ? 'document' : 'questions') : null;
+        $taskMode = $entityType === 'task'
+            ? (($options['taskMode'] ?? 'questions') === 'document' ? 'document' : 'questions')
+            : null;
 
         if ($title === '') {
             throw ValidationException::withMessages(['title' => 'اسم الدورة مطلوب.']);
@@ -20,7 +22,15 @@ trait CreatesAndUpdatesCourses
         $courseId = (string) str()->uuid();
         $createdAt = now();
 
-        DB::transaction(function () use ($courseId, $createdAt, $title, $isActive, $entityType, $taskMode, $options): void {
+        DB::transaction(function () use (
+            $courseId,
+            $createdAt,
+            $title,
+            $isActive,
+            $entityType,
+            $taskMode,
+            $options
+        ): void {
             if ($isActive && $entityType !== 'task') {
                 DB::table('courses')->update(['is_active' => false]);
             }
@@ -45,8 +55,14 @@ trait CreatesAndUpdatesCourses
                 'female_post_enabled' => true,
                 'male_tasks_enabled' => true,
                 'female_tasks_enabled' => true,
-                'assessment_windows' => json_encode(['global' => [], 'male' => [], 'female' => []], JSON_UNESCAPED_UNICODE),
-                'assessment_notification_templates' => json_encode(['pre' => '', 'post' => '', 'tasks' => ''], JSON_UNESCAPED_UNICODE),
+                'assessment_windows' => json_encode(
+                    ['global' => [], 'male' => [], 'female' => []],
+                    JSON_UNESCAPED_UNICODE
+                ),
+                'assessment_notification_templates' => json_encode(
+                    ['pre' => '', 'post' => '', 'tasks' => ''],
+                    JSON_UNESCAPED_UNICODE
+                ),
                 'sort_order' => (int) DB::table('courses')->count(),
                 'created_at' => $createdAt,
             ]);
@@ -93,7 +109,10 @@ trait CreatesAndUpdatesCourses
 
         $payload = [];
         $wasTasksEnabled = (bool) $course->is_tasks_enabled;
-        $previousWindows = $this->decodeJsonObject($course->assessment_windows, ['global' => [], 'male' => [], 'female' => []]);
+        $previousWindows = $this->decodeJsonObject(
+            $course->assessment_windows,
+            ['global' => [], 'male' => [], 'female' => []]
+        );
 
         if (array_key_exists('title', $updates)) {
             $payload['title'] = trim((string) $updates['title']);
@@ -120,12 +139,36 @@ trait CreatesAndUpdatesCourses
         }
 
         if (isset($updates['branchAvailability']) && is_array($updates['branchAvailability'])) {
-            $payload['male_pre_enabled'] = (bool) data_get($updates, 'branchAvailability.male.pre', $course->male_pre_enabled);
-            $payload['female_pre_enabled'] = (bool) data_get($updates, 'branchAvailability.female.pre', $course->female_pre_enabled);
-            $payload['male_post_enabled'] = (bool) data_get($updates, 'branchAvailability.male.post', $course->male_post_enabled);
-            $payload['female_post_enabled'] = (bool) data_get($updates, 'branchAvailability.female.post', $course->female_post_enabled);
-            $payload['male_tasks_enabled'] = (bool) data_get($updates, 'branchAvailability.male.tasks', $course->male_tasks_enabled);
-            $payload['female_tasks_enabled'] = (bool) data_get($updates, 'branchAvailability.female.tasks', $course->female_tasks_enabled);
+            $payload['male_pre_enabled'] = (bool) data_get(
+                $updates,
+                'branchAvailability.male.pre',
+                $course->male_pre_enabled
+            );
+            $payload['female_pre_enabled'] = (bool) data_get(
+                $updates,
+                'branchAvailability.female.pre',
+                $course->female_pre_enabled
+            );
+            $payload['male_post_enabled'] = (bool) data_get(
+                $updates,
+                'branchAvailability.male.post',
+                $course->male_post_enabled
+            );
+            $payload['female_post_enabled'] = (bool) data_get(
+                $updates,
+                'branchAvailability.female.post',
+                $course->female_post_enabled
+            );
+            $payload['male_tasks_enabled'] = (bool) data_get(
+                $updates,
+                'branchAvailability.male.tasks',
+                $course->male_tasks_enabled
+            );
+            $payload['female_tasks_enabled'] = (bool) data_get(
+                $updates,
+                'branchAvailability.female.tasks',
+                $course->female_tasks_enabled
+            );
         }
 
         if (array_key_exists('assessmentWindows', $updates)) {
@@ -136,7 +179,10 @@ trait CreatesAndUpdatesCourses
         }
 
         if (array_key_exists('assessmentNotificationTemplates', $updates)) {
-            $payload['assessment_notification_templates'] = json_encode($updates['assessmentNotificationTemplates'], JSON_UNESCAPED_UNICODE);
+            $payload['assessment_notification_templates'] = json_encode(
+                $updates['assessmentNotificationTemplates'],
+                JSON_UNESCAPED_UNICODE
+            );
         }
 
         if (array_key_exists('taskMode', $updates)) {
@@ -144,7 +190,9 @@ trait CreatesAndUpdatesCourses
         }
 
         if (array_key_exists('taskTemplateId', $updates)) {
-            $payload['task_template_id'] = (($updates['taskTemplateId'] ?? '') !== '') ? $updates['taskTemplateId'] : null;
+            $payload['task_template_id'] = (($updates['taskTemplateId'] ?? '') !== '')
+                ? $updates['taskTemplateId']
+                : null;
         }
 
         if (array_key_exists('taskTemplateName', $updates)) {
@@ -194,8 +242,14 @@ trait CreatesAndUpdatesCourses
                 return;
             }
 
-            $nextWindows = $this->decodeJsonObject($nextCourse->assessment_windows, ['global' => [], 'male' => [], 'female' => []]);
-            $templates = $this->decodeJsonObject($nextCourse->assessment_notification_templates, ['pre' => '', 'post' => '', 'tasks' => '']);
+            $nextWindows = $this->decodeJsonObject(
+                $nextCourse->assessment_windows,
+                ['global' => [], 'male' => [], 'female' => []]
+            );
+            $templates = $this->decodeJsonObject(
+                $nextCourse->assessment_notification_templates,
+                ['pre' => '', 'post' => '', 'tasks' => '']
+            );
             $tasksJustOpened = (bool) ($nextCourse->is_tasks_enabled ?? false)
                 && (! $wasTasksEnabled || $this->hasAssessmentWindowOpened($previousWindows, $nextWindows, 'tasks'));
 
@@ -206,8 +260,14 @@ trait CreatesAndUpdatesCourses
 
         if ($tasksJustOpened) {
             $nextCourse = DB::table('courses')->where('id', $courseId)->first();
-            $nextWindows = $this->decodeJsonObject($nextCourse?->assessment_windows, ['global' => [], 'male' => [], 'female' => []]);
-            $templates = $this->decodeJsonObject($nextCourse?->assessment_notification_templates, ['pre' => '', 'post' => '', 'tasks' => '']);
+            $nextWindows = $this->decodeJsonObject(
+                $nextCourse?->assessment_windows,
+                ['global' => [], 'male' => [], 'female' => []]
+            );
+            $templates = $this->decodeJsonObject(
+                $nextCourse?->assessment_notification_templates,
+                ['pre' => '', 'post' => '', 'tasks' => '']
+            );
             $this->dispatchAssessmentOpenNotification($nextCourse, 'tasks', $templates, $nextWindows);
         }
     }
@@ -220,7 +280,10 @@ trait CreatesAndUpdatesCourses
             ->orderBy('sort_order')
             ->get()
             ->each(function (object $task): void {
-                $windows = $this->decodeJsonObject($task->assessment_windows, ['global' => [], 'male' => [], 'female' => []]);
+                $windows = $this->decodeJsonObject(
+                    $task->assessment_windows,
+                    ['global' => [], 'male' => [], 'female' => []]
+                );
 
                 $windows['global'] = [
                     ...((array) ($windows['global'] ?? [])),

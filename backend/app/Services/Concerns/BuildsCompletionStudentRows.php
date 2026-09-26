@@ -58,7 +58,16 @@ trait BuildsCompletionStudentRows
             ->get()
             ->groupBy('submission_id');
 
-        return $students->map(function (Student $student) use ($settings, $attendance, $taskTotal, $approvedTasks, $parts, $finalQuestions, $finalSubmissions, $finalAnswers): array {
+        return $students->map(function (Student $student) use (
+            $settings,
+            $attendance,
+            $taskTotal,
+            $approvedTasks,
+            $parts,
+            $finalQuestions,
+            $finalSubmissions,
+            $finalAnswers
+        ): array {
             $attendanceCount = (int) ($attendance[$student->login_code] ?? 0);
             $approvedTaskCount = (int) ($approvedTasks[$student->login_code] ?? 0);
             $taskPercentage = $taskTotal > 0 ? round(($approvedTaskCount / $taskTotal) * 100, 1) : null;
@@ -67,7 +76,9 @@ trait BuildsCompletionStudentRows
             $finalCalculation = $this->finalCalculation($finalSubmission, $finalQuestions, $finalAnswers);
             $finalScore = $finalCalculation['score'];
             $finalTotal = $finalCalculation['total'];
-            $finalPercentage = $finalScore !== null && $finalTotal > 0 ? round(($finalScore / $finalTotal) * 100, 1) : null;
+            $finalPercentage = $finalScore !== null && $finalTotal > 0
+                ? round(($finalScore / $finalTotal) * 100, 1)
+                : null;
 
             $details = [
                 'attendance' => [
@@ -80,7 +91,9 @@ trait BuildsCompletionStudentRows
                     'total' => $taskTotal,
                     'percentage' => $taskPercentage,
                     'requiredPercentage' => (int) $settings->tasks_percentage_required,
-                    'requiredCount' => $taskTotal > 0 ? (int) ceil($taskTotal * ((int) $settings->tasks_percentage_required / 100)) : 0,
+                    'requiredCount' => $taskTotal > 0
+                        ? (int) ceil($taskTotal * ((int) $settings->tasks_percentage_required / 100))
+                        : 0,
                     'met' => $taskPercentage !== null && $taskPercentage >= (int) $settings->tasks_percentage_required,
                 ],
                 'finalExam' => [
@@ -88,7 +101,8 @@ trait BuildsCompletionStudentRows
                     'total' => $finalTotal,
                     'percentage' => $finalPercentage,
                     'requiredPercentage' => (int) $settings->final_exam_percentage_required,
-                    'met' => $finalPercentage !== null && $finalPercentage >= (int) $settings->final_exam_percentage_required,
+                    'met' => $finalPercentage !== null
+                        && $finalPercentage >= (int) $settings->final_exam_percentage_required,
                 ],
                 'quran' => [
                     'current' => $quranPartsCount,
@@ -137,8 +151,11 @@ trait BuildsCompletionStudentRows
         }
 
         if ($resolvedQuestions->isEmpty() || $resolvedQuestions->contains(
-            fn (array $question): bool => ($question['type'] === 'text' || $question['correct'] === '' || $question['hasFile'])
-                && $question['manualPoints'] === null,
+            fn (array $question): bool => (
+                $question['type'] === 'text'
+                || $question['correct'] === ''
+                || $question['hasFile']
+            ) && $question['manualPoints'] === null,
         )) {
             return ['score' => null, 'total' => $total];
         }

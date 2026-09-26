@@ -100,6 +100,8 @@
         class="people-card"
         :class="{ 'people-card--active': !reciterMode && selectedStudentId === person.id }"
         @click="!reciterMode && $emit('select', person.id)"
+        @keydown.enter.self="!reciterMode && $emit('select', person.id)"
+        @keydown.space.self.prevent="!reciterMode && $emit('select', person.id)"
       >
         <div class="people-card__header">
           <div class="people-card__actions">
@@ -184,7 +186,11 @@
             :key="metric.key"
             class="people-metric"
             :class="{ 'people-metric--clickable': metric.key === 'parts' }"
+            role="button"
+            tabindex="0"
             @click.stop="$emit('metric', { person, key: metric.key })"
+            @keydown.enter.stop="$emit('metric', { person, key: metric.key })"
+            @keydown.space.stop.prevent="$emit('metric', { person, key: metric.key })"
           >
             <div class="people-metric__row">
               <div class="people-metric__value">
@@ -204,13 +210,12 @@
         </div>
       </article>
     </section>
-    <p
-      role="status"
+    <output
       aria-live="polite"
       class="people-directory-status"
     >
       {{ loading ? 'جارٍ تحميل القائمة...' : (error ? '' : `عدد النتائج: ${total}`) }}
-    </p>
+    </output>
     <AppPagination
       v-if="!loading && !error && pageCount > 1"
       :value="page"
@@ -248,6 +253,20 @@ export default {
     canAssignReciter: { type: Boolean, default: false },
     organizationLabel: { type: Function, required: true },
   },
+  emits: [
+    'assign-reciter',
+    'branch-change',
+    'create',
+    'delete',
+    'edit',
+    'metric',
+    'page',
+    'retry',
+    'search',
+    'select',
+    'update:branch',
+    'update:filter',
+  ],
   methods: {
     handleBranchChange(value) {
       this.$emit('update:branch', value);
@@ -260,5 +279,5 @@ export default {
 .people-search-field { display: grid; grid-column: 1 / -1; min-width: 0; }
 .people-directory-search { width: 100%; min-width: 0; min-height: 48px; padding: 10px 12px; border: 1px solid #afc5d0; border-radius: 12px; background: #fff; color: #123b52; font: inherit; }
 .people-directory-search:focus-visible { outline: 2px solid #1f6f96; outline-offset: 2px; }
-.people-directory-status { margin-block: 16px; color: #375b70; }
+.people-directory-status { display: block; margin-block: 16px; color: #375b70; }
 </style>

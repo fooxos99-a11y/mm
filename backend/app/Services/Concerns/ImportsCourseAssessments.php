@@ -27,17 +27,30 @@ trait ImportsCourseAssessments
         $normalizedSubmissions = array_values($dedupedByLogin);
         $loginIds = array_values(array_map(fn (array $submission) => $submission['loginId'], $normalizedSubmissions));
         $actionableSubmissions = array_values(array_filter($normalizedSubmissions, function (array $submission): bool {
-            $hasManualScore = isset($submission['manualScore']) && is_numeric($submission['manualScore']) && (float) $submission['manualScore'] >= 0;
+            $hasManualScore = isset($submission['manualScore'])
+                && is_numeric($submission['manualScore'])
+                && (float) $submission['manualScore'] >= 0;
             $hasAnswers = collect($submission['answers'] ?? [])->contains(function (array $answer): bool {
                 return ($answer['questionId'] ?? '') !== '__score_override__'
-                    && (trim((string) ($answer['value'] ?? '')) !== '' || ! empty($answer['file']) || ! empty($answer['fileDataUrl']));
+                    && (
+                        trim((string) ($answer['value'] ?? '')) !== ''
+                            || ! empty($answer['file'])
+                            || ! empty($answer['fileDataUrl'])
+                    );
             });
 
             return $hasManualScore || $hasAnswers;
         }));
         $questionSnapshots = $this->questionService->snapshots($courseId, $assessmentType, $actionableSubmissions);
 
-        return DB::transaction(function () use ($courseId, $assessmentType, $loginIds, $actionableSubmissions, $normalizedSubmissions, $questionSnapshots): array {
+        return DB::transaction(function () use (
+            $courseId,
+            $assessmentType,
+            $loginIds,
+            $actionableSubmissions,
+            $normalizedSubmissions,
+            $questionSnapshots
+        ): array {
             $existingIds = DB::table('course_submissions')
                 ->where('course_id', $courseId)->where('assessment_type', $assessmentType)
                 ->whereNull('archive_id')->whereIn('login_code', $loginIds)->pluck('id')->all();
@@ -53,7 +66,10 @@ trait ImportsCourseAssessments
             }
 
             $studentIdByLogin = Student::query()
-                ->whereIn('login_code', array_map(fn (array $submission) => $submission['loginId'], $actionableSubmissions))
+                ->whereIn(
+                    'login_code',
+                    array_map(fn (array $submission) => $submission['loginId'], $actionableSubmissions)
+                )
                 ->pluck('id', 'login_code')->all();
             $inserted = [];
             $answersToInsert = [];
@@ -68,7 +84,9 @@ trait ImportsCourseAssessments
                     'student_id' => $studentIdByLogin[$submission['loginId']] ?? null,
                     'student_name' => $submission['studentName'],
                     'login_code' => $submission['loginId'],
-                    'manual_score' => isset($submission['manualScore']) && is_numeric($submission['manualScore']) ? (float) $submission['manualScore'] : null,
+                    'manual_score' => isset($submission['manualScore']) && is_numeric($submission['manualScore'])
+                        ? (float) $submission['manualScore']
+                        : null,
                     'task_review_status' => $assessmentType === 'tasks' ? 'pending' : null,
                     'submitted_at' => $submittedAt,
                 ]);
@@ -88,7 +106,11 @@ trait ImportsCourseAssessments
                         ...$this->questionService->snapshotColumns($question),
                     ];
                 }
-                $inserted[] = ['id' => $submissionId, 'submittedAt' => $submittedAt->toISOString(), 'loginId' => $submission['loginId']];
+                $inserted[] = [
+                    'id' => $submissionId,
+                    'submittedAt' => $submittedAt->toISOString(),
+                    'loginId' => $submission['loginId'],
+                ];
             }
 
             if ($answersToInsert !== []) {
@@ -96,7 +118,8 @@ trait ImportsCourseAssessments
             }
 
             return array_values(array_filter($inserted, function (array $row) use ($normalizedSubmissions): bool {
-                return collect($normalizedSubmissions)->contains(fn (array $submission) => $submission['loginId'] === $row['loginId']);
+                return collect($normalizedSubmissions)
+                    ->contains(fn (array $submission) => $submission['loginId'] === $row['loginId']);
             }));
         });
     }

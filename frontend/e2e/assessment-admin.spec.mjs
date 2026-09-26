@@ -1,9 +1,10 @@
 import { expect, test } from '@playwright/test';
+import { rolePassword } from './support/credentials.mjs';
 
 const login = async (page) => {
   await page.goto('login', { waitUntil: 'domcontentloaded' });
   await page.locator('input[autocomplete="username"]').fill('e2e-male-manager');
-  await page.locator('input[autocomplete="current-password"]').fill('E2E-Role-2026!');
+  await page.locator('input[autocomplete="current-password"]').fill(rolePassword);
   await Promise.all([
     page.waitForURL((url) => url.pathname.endsWith('/dashboard')),
     page.locator('form button[type="submit"]').click(),

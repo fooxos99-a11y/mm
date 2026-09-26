@@ -4,6 +4,7 @@ import {
   AppSelect,
   AppTextField,
 } from '../../components/ui';
+import { normalizeFixedFieldLabels } from '../registration/registrationFieldLabels.mjs';
 import { fetchPublicRegistrationStatus, submitPublicRegistrationRequest } from '../../services/registrationApi';
 
 const REGISTRATION_STATES = Object.freeze({
@@ -28,6 +29,7 @@ export default {
       registrationState: REGISTRATION_STATES.LOADING,
       loadError: '',
       registrationFields: [],
+      fixedLabels: normalizeFixedFieldLabels(),
       genderOptions: [
         { label: 'ذكر', value: 'male' },
         { label: 'أنثى', value: 'female' },
@@ -54,6 +56,7 @@ export default {
           ? REGISTRATION_STATES.OPEN
           : REGISTRATION_STATES.CLOSED;
         this.registrationFields = Array.isArray(payload?.fields) ? payload.fields : [];
+        this.fixedLabels = normalizeFixedFieldLabels(payload?.fixedLabels);
         this.resetAnswers();
       } catch (error) {
         this.loadError = error?.response?.data?.message

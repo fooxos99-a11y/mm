@@ -28,7 +28,10 @@ class DashboardDatasetService
             $query->where('login_code', $filters['loginCode']);
         }
 
-        if (($filters['courseId'] ?? '') !== '' && in_array($dataset, ['submissions', 'attendance', 'satisfaction-responses'], true)) {
+        if (
+            ($filters['courseId'] ?? '') !== ''
+                && in_array($dataset, ['submissions', 'attendance', 'satisfaction-responses'], true)
+        ) {
             $query->where('course_id', $filters['courseId']);
         }
 

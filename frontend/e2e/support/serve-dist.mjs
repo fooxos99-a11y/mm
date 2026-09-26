@@ -1,4 +1,4 @@
-import { createReadStream, existsSync, statSync } from 'node:fs';
+import { createReadStream, existsSync, readdirSync } from 'node:fs';
 import { createServer, request as proxyRequest } from 'node:http';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -34,36 +34,90 @@ if (!existsSync(indexPath)) {
   process.exit(1);
 }
 
+// Only files that exist in dist/ at startup can be served. Request paths are
+// looked up in this index and never joined onto the file system directly.
+const buildAssetIndex = (root) => {
+  const assets = new Map();
+  const walk = (directory) => {
+    for (const entry of readdirSync(directory, { withFileTypes: true })) {
+      const absolutePath = path.join(directory, entry.name);
+
+      if (entry.isDirectory()) {
+        walk(absolutePath);
+      } else if (entry.isFile()) {
+        assets.set(path.relative(root, absolutePath).split(path.sep).join('/'), absolutePath);
+      }
+    }
+  };
+
+  walk(root);
+
+  return assets;
+};
+
+const assetIndex = buildAssetIndex(distRoot);
+
+const trimLeadingSlashes = (value) => {
+  let start = 0;
+
+  while (value[start] === '/') {
+    start += 1;
+  }
+
+  return value.slice(start);
+};
+
 const resolveAsset = (requestUrl) => {
   const url = new URL(requestUrl || '/', `http://${host}:${port}`);
-  let pathname = decodeURIComponent(url.pathname);
+  let pathname;
 
-  if (pathname === '/momars' || pathname === '/momars/') {
+  try {
+    pathname = decodeURIComponent(url.pathname);
+  } catch {
     return indexPath;
   }
 
-  if (pathname.startsWith('/momars/')) {
-    pathname = pathname.slice('/momars/'.length);
-  } else {
-    pathname = pathname.replace(/^\/+/, '');
+  const relativePath = pathname.startsWith('/momars/')
+    ? pathname.slice('/momars/'.length)
+    : trimLeadingSlashes(pathname);
+
+  return assetIndex.get(relativePath) || indexPath;
+};
+
+const apiPathPattern = /^\/api(?:\/[\w\-.~%!$&'()*+,;=:@]*)*$/;
+
+const toUpstreamPath = (requestUrl) => {
+  const pathname = requestUrl.pathname.slice('/momars'.length);
+
+  if (!apiPathPattern.test(pathname)) {
+    return null;
   }
 
-  const candidate = path.resolve(distRoot, pathname);
+  return `${pathname}${requestUrl.search}`;
+};
 
-  if (
-    candidate.startsWith(`${distRoot}${path.sep}`)
-    && existsSync(candidate)
-    && statSync(candidate).isFile()
-  ) {
-    return candidate;
+// The test API lives on 127.0.0.1; never forward a redirect that points elsewhere.
+const sanitizeUpstreamHeaders = (headers) => {
+  const safeHeaders = { ...headers };
+  const location = String(safeHeaders.location || '');
+
+  if (location && !(location.startsWith('/') && !location.startsWith('//'))) {
+    delete safeHeaders.location;
   }
 
-  return indexPath;
+  return safeHeaders;
 };
 
 const proxyApiRequest = (request, response) => {
   const requestUrl = new URL(request.url || '/', `http://${host}:${port}`);
-  const upstreamPath = `${requestUrl.pathname.slice('/momars'.length)}${requestUrl.search}`;
+  const upstreamPath = toUpstreamPath(requestUrl);
+
+  if (!upstreamPath) {
+    response.writeHead(400, { 'Content-Type': 'text/plain; charset=utf-8' });
+    response.end('Invalid API path.');
+    return;
+  }
+
   const upstream = proxyRequest({
     hostname: '127.0.0.1',
     port: backendPort,
@@ -79,7 +133,7 @@ const proxyApiRequest = (request, response) => {
     const useGzip = acceptsGzip
       && !upstreamResponse.headers['content-encoding']
       && /(?:json|javascript|text|xml|svg)/i.test(contentType);
-    const headers = { ...upstreamResponse.headers };
+    const headers = sanitizeUpstreamHeaders(upstreamResponse.headers);
 
     if (useGzip) {
       delete headers['content-length'];

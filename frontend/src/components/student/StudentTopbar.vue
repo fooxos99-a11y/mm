@@ -31,5 +31,6 @@ export default {
     menuOpen: Boolean,
     studentName: { type: String, default: '' },
   },
+  emits: ['toggle-menu'],
 };
 </script>

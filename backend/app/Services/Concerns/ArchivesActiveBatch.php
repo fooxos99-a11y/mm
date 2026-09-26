@@ -74,7 +74,10 @@ trait ArchivesActiveBatch
             }
 
             $courseQuestionIdMap = [];
-            $activeCourseQuestions = DB::table('course_questions')->whereNull('archive_id')->whereIn('course_id', $courseIds)->get();
+            $activeCourseQuestions = DB::table('course_questions')
+                ->whereNull('archive_id')
+                ->whereIn('course_id', $courseIds)
+                ->get();
             foreach ($activeCourseQuestions as $question) {
                 $newQuestionId = (string) Str::uuid();
                 $courseQuestionIdMap[$question->id] = $newQuestionId;
@@ -92,7 +95,9 @@ trait ArchivesActiveBatch
                 $satisfactionQuestionIdMap[$question->id] = $newQuestionId;
                 $payload = (array) $question;
                 $payload['id'] = $newQuestionId;
-                $payload['course_id'] = $question->course_id ? ($courseIdMap[$question->course_id] ?? $question->course_id) : null;
+                $payload['course_id'] = $question->course_id
+                    ? ($courseIdMap[$question->course_id] ?? $question->course_id)
+                    : null;
                 $payload['archive_id'] = $archiveId;
                 DB::table('satisfaction_questions')->insert($payload);
             }

@@ -58,13 +58,16 @@ trait ManagesCompletionSettings
 
         $content['requirements'][0] = $male->attendance_required === $female->attendance_required
             ? "حضور ما لا يقل عن ({$male->attendance_required}) لقاءات من اللقاءات التدريبية"
-            : "الحضور المطلوب: المعلمون ({$male->attendance_required}) لقاءات، والمعلمات ({$female->attendance_required}) لقاءات";
+            : "الحضور المطلوب: المعلمون ({$male->attendance_required}) لقاءات، "
+                ."والمعلمات ({$female->attendance_required}) لقاءات";
         $content['requirements'][1] = $male->tasks_percentage_required === $female->tasks_percentage_required
             ? "تنفيذ ({$male->tasks_percentage_required}%) من المهام الأدائية"
-            : "المهام المطلوبة: المعلمون ({$male->tasks_percentage_required}%)، والمعلمات ({$female->tasks_percentage_required}%)";
+            : "المهام المطلوبة: المعلمون ({$male->tasks_percentage_required}%)، "
+                ."والمعلمات ({$female->tasks_percentage_required}%)";
         $content['requirements'][2] = $male->final_exam_percentage_required === $female->final_exam_percentage_required
             ? "اجتياز الاختبار النهائي بنسبة لا تقل عن ({$male->final_exam_percentage_required}%)"
-            : "نسبة الاختبار النهائي: المعلمون ({$male->final_exam_percentage_required}%)، والمعلمات ({$female->final_exam_percentage_required}%)";
+            : "نسبة الاختبار النهائي: المعلمون ({$male->final_exam_percentage_required}%)، "
+                ."والمعلمات ({$female->final_exam_percentage_required}%)";
         $content['recitation'][0]['text'] = "المعلمون: عرض ({$male->quran_parts_required}) جزءًا";
         $content['recitation'][1]['text'] = "المعلمات: عرض ({$female->quran_parts_required}) أجزاء";
 

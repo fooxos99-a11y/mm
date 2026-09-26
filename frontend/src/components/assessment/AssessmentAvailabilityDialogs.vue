@@ -145,5 +145,16 @@ export default {
     manageOptions: { type: Array, default: () => [] },
     manageSubmitting: { type: Boolean, default: false },
   },
+  emits: [
+    'update:availability-open',
+    'update:availability-branch',
+    'update:availability-minutes',
+    'cancel-availability',
+    'confirm-availability',
+    'update:manage-open',
+    'update:manage-choice',
+    'cancel-manage',
+    'confirm-manage',
+  ],
 };
 </script>

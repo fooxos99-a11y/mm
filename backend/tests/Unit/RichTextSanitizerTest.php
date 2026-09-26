@@ -9,9 +9,10 @@ class RichTextSanitizerTest extends TestCase
 {
     public function test_it_removes_active_content_and_unsafe_attributes(): void
     {
-        $html = <<<'HTML'
-<script>alert(1)</script><p onclick="alert(2)" class="ql-align-center evil" style="color: red; background-image: url(javascript:alert(3))">آمن <a href="javascript:alert(4)">رابط</a><img src="data:text/html;base64,PHNjcmlwdD4=" onerror="alert(5)" onloadstart="alert(6)"></p>
-HTML;
+        $html = '<script>alert(1)</script><p onclick="alert(2)" class="ql-align-center evil" '
+            .'style="color: red; background-image: url(javascript:alert(3))">آمن '
+            .'<a href="javascript:alert(4)">رابط</a>'
+            .'<img src="data:text/html;base64,PHNjcmlwdD4=" onerror="alert(5)" onloadstart="alert(6)"></p>';
 
         $sanitized = (new RichTextSanitizer)->sanitize($html);
 

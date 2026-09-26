@@ -75,20 +75,20 @@ export default {
           updates: {
             [enabledKey]: remainingActive,
             branchAvailability: {
-              ...(course.branchAvailability || {}),
+              ...course.branchAvailability,
               [branchId]: {
-                ...(course.branchAvailability?.[branchId] || {}),
+                ...course.branchAvailability?.[branchId],
                 [type]: false,
               },
             },
             assessmentWindows: {
-              ...(course.assessmentWindows || {}),
+              ...course.assessmentWindows,
               global: {
-                ...(course.assessmentWindows?.global || {}),
+                ...course.assessmentWindows?.global,
                 [type]: undefined,
               },
               [branchId]: {
-                ...(course.assessmentWindows?.[branchId] || {}),
+                ...course.assessmentWindows?.[branchId],
                 [type]: undefined,
               },
             },
@@ -101,26 +101,26 @@ export default {
             [enabledKey]: false,
             branchAvailability: {
               male: {
-                ...(course.branchAvailability?.male || {}),
+                ...course.branchAvailability?.male,
                 [type]: false,
               },
               female: {
-                ...(course.branchAvailability?.female || {}),
+                ...course.branchAvailability?.female,
                 [type]: false,
               },
             },
             assessmentWindows: {
-              ...(course.assessmentWindows || {}),
+              ...course.assessmentWindows,
               global: {
-                ...(course.assessmentWindows?.global || {}),
+                ...course.assessmentWindows?.global,
                 [type]: undefined,
               },
               male: {
-                ...(course.assessmentWindows?.male || {}),
+                ...course.assessmentWindows?.male,
                 [type]: undefined,
               },
               female: {
-                ...(course.assessmentWindows?.female || {}),
+                ...course.assessmentWindows?.female,
                 [type]: undefined,
               },
             },

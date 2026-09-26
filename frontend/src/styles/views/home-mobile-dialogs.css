@@ -53,6 +53,7 @@
   .home-page .hero-text {
     font-size: 0.98rem;
     margin-bottom: 28px;
+    margin-inline: auto;
   }
 
   .home-page .hero-stats-strip,
@@ -309,10 +310,6 @@
     margin-inline: auto;
   }
 
-  .home-page .hero-text {
-    margin-inline: auto;
-  }
-
   .home-page .landing-footer__bottom {
     flex-direction: column;
     text-align: center;
@@ -430,6 +427,7 @@
   border-radius: 999px;
   background: #2a94b2;
   opacity: 0.72;
+  order: 3;
 }
 
 .home-page .our-numbers__graduate-item span {
@@ -448,8 +446,4 @@
   line-height: 1;
   font-variant-numeric: tabular-nums;
   order: 1;
-}
-
-.home-page .our-numbers__graduate-item::after {
-  order: 3;
 }

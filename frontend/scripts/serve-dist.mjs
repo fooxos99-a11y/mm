@@ -9,7 +9,8 @@ import { STATIC_SECURITY_HEADERS } from './securityHeaders.mjs';
 const frontendRoot = path.resolve(fileURLToPath(new URL('..', import.meta.url)));
 const distRoot = path.join(frontendRoot, 'dist');
 const port = Number(process.env.PORT || 8082);
-const basePath = `/${String(process.env.PUBLIC_PATH || 'momars').replace(/^\/+|\/+$/g, '')}`;
+const trimSlashes = (value) => value.split('/').filter(Boolean).join('/');
+const basePath = `/${trimSlashes(String(process.env.PUBLIC_PATH || 'momars'))}`;
 const contentTypes = new Map([
   ['.css', 'text/css; charset=utf-8'],
   ['.html', 'text/html; charset=utf-8'],

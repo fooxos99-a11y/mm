@@ -158,7 +158,7 @@ export const normalizeHomePageContent = (content = {}) => {
   };
 };
 
-export const cloneHomePageContent = (content = null) => JSON.parse(JSON.stringify(normalizeHomePageContent(content || DEFAULT_HOME_PAGE_CONTENT)));
+export const cloneHomePageContent = (content = null) => structuredClone(normalizeHomePageContent(content || DEFAULT_HOME_PAGE_CONTENT));
 
 export default DEFAULT_HOME_PAGE_CONTENT;
 import { repairArabicMojibake } from './textEncoding';

@@ -1,6 +1,6 @@
-const DASHBOARD_ROLES = ['admin', 'male_manager', 'female_manager'];
+const DASHBOARD_ROLES = new Set(['admin', 'male_manager', 'female_manager']);
 
-export const canUseDashboard = (role) => DASHBOARD_ROLES.includes(role);
+export const canUseDashboard = (role) => DASHBOARD_ROLES.has(role);
 
 export const resolveUserHomeRoute = (user) => {
   const role = user?.role || '';

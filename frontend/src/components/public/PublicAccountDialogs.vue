@@ -28,6 +28,7 @@
             :value="loginCode"
             class="login-modal__field"
             label="رقم الدخول"
+            type="text"
             autocomplete="username"
             @input="$emit('update:loginCode', String($event).trim())"
           />
@@ -113,6 +114,15 @@ export default {
     profileName: { type: String, default: '' },
     accountRoleLabel: { type: String, default: '' },
   },
+  emits: [
+    'close-login',
+    'close-profile',
+    'submit-login',
+    'update:loginCode',
+    'update:loginOpen',
+    'update:password',
+    'update:profileOpen',
+  ],
   data() {
     return { passwordVisible: false };
   },

@@ -2,8 +2,12 @@
   <div>
     <div class="assessment-toolbar assessment-toolbar--embedded">
       <div class="assessment-toolbar__field">
-        <label class="assessment-toolbar__label">{{ isTasksPage ? 'المهام الأدائية' : 'الدورات' }}</label>
+        <label
+          for="assessment-toolbar-course"
+          class="assessment-toolbar__label"
+        >{{ isTasksPage ? 'المهام الأدائية' : 'الدورات' }}</label>
         <AppSelect
+          id="assessment-toolbar-course"
           :value="courseValue"
           :items="courseOptions"
           item-text="label"
@@ -81,8 +85,12 @@
         v-if="!isTasksPage"
         class="assessment-toolbar__field"
       >
-        <label class="assessment-toolbar__label">النوع</label>
+        <label
+          for="assessment-toolbar-mode"
+          class="assessment-toolbar__label"
+        >النوع</label>
         <AppSelect
+          id="assessment-toolbar-mode"
           :value="viewMode"
           :items="modeOptions"
           item-text="label"
@@ -187,5 +195,14 @@ export default {
     taskDescription: { type: String, default: '' },
     showDescription: { type: Boolean, default: false },
   },
+  emits: [
+    'update:course-value',
+    'edit-course',
+    'delete-course',
+    'update:view-mode',
+    'update:task-points',
+    'update:task-video-url',
+    'update:task-description',
+  ],
 };
 </script>

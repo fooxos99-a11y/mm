@@ -6,8 +6,11 @@ use Carbon\Carbon;
 
 trait FinalExamNotifications
 {
-    private function dispatchFinalExamOpenNotification(string $branchCode, ?string $closesAt, string $notificationTemplate): void
-    {
+    private function dispatchFinalExamOpenNotification(
+        string $branchCode,
+        ?string $closesAt,
+        string $notificationTemplate
+    ): void {
         $template = trim($notificationTemplate);
 
         if ($template === '') {

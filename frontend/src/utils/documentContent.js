@@ -1,7 +1,28 @@
-export const stripRichTextMarkup = (value) => String(value || '')
+// Linear-time equivalent of `.replace(/<[^>]+>/g, ' ')`.
+const replaceMarkupTags = (text) => {
+  let result = '';
+  let cursor = 0;
+  let start = text.indexOf('<');
+
+  while (start !== -1) {
+    const end = text.indexOf('>', start + 1);
+    if (end === -1) break;
+
+    if (end > start + 1) {
+      result += `${text.slice(cursor, start)} `;
+      cursor = end + 1;
+      start = text.indexOf('<', cursor);
+    } else {
+      start = text.indexOf('<', start + 1);
+    }
+  }
+
+  return result + text.slice(cursor);
+};
+
+export const stripRichTextMarkup = (value) => replaceMarkupTags(String(value || '')
   .replace(/<style[\s\S]*?<\/style>/gi, ' ')
-  .replace(/<script[\s\S]*?<\/script>/gi, ' ')
-  .replace(/<[^>]+>/g, ' ')
+  .replace(/<script[\s\S]*?<\/script>/gi, ' '))
   .replace(/&nbsp;|&#160;/gi, ' ')
   .replace(/&amp;/gi, '&')
   .replace(/&lt;/gi, '<')
@@ -58,7 +79,7 @@ const ALLOWED_ATTRIBUTES = {
 };
 
 const SAFE_URL_PATTERN = /^(https?:|mailto:|tel:)/i;
-const SAFE_DATA_IMAGE_URL_PATTERN = /^data:image\/(?:png|jpe?g|gif|webp);base64,[A-Za-z0-9+/=\s]+$/i;
+const SAFE_DATA_IMAGE_URL_PATTERN = /^data:image\/(?:png|jpe?g|gif|webp);base64,[A-Z0-9+/=\s]+$/i;
 const UNSAFE_STYLE_VALUE_PATTERN = /(expression\s*\(|javascript:|vbscript:|data:text\/html|url\s*\()/i;
 const ALLOWED_STYLE_PROPERTIES = new Set([
   'background',

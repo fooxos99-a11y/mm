@@ -53,6 +53,7 @@
             :label="pageContent.loginPasswordLabel"
             outlined
             dense
+            type="password"
             autocomplete="current-password"
             @input="updateLoginField('password', $event)"
           />
@@ -126,6 +127,14 @@ export default {
     profileName: { type: String, default: '' },
     accountRoleLabel: { type: String, default: '' },
   },
+  emits: [
+    'close-login',
+    'close-profile',
+    'submit-login',
+    'update:login-dialog-open',
+    'update:login-form',
+    'update:profile-dialog-open',
+  ],
   methods: {
     updateLoginField(key, value) {
       this.$emit('update:login-form', {

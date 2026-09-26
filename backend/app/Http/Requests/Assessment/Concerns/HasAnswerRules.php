@@ -76,7 +76,11 @@ trait HasAnswerRules
             }
 
             $payload = substr($fileDataUrl, strlen($expectedPrefix));
-            if ($payload === '' || ! preg_match('/^[A-Za-z0-9+\/=\r\n]+$/', $payload) || base64_decode($payload, true) === false) {
+            if (
+                $payload === ''
+                    || ! preg_match('/^[A-Za-z0-9+\/=\r\n]+$/', $payload)
+                    || base64_decode($payload, true) === false
+            ) {
                 $validator->errors()->add($field, 'بيانات المرفق غير صالحة.');
             }
         }

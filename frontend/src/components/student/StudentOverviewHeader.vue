@@ -99,6 +99,7 @@ export default {
     completedCount: { type: Number, default: 0 },
     partsLimit: { type: Number, default: 0 },
   },
+  emits: ['update:course-id', 'update:task-id'],
   computed: {
     summaryItems() {
       return [

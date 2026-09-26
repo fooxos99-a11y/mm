@@ -40,7 +40,9 @@ trait SerializesDashboardSnapshots
                 'isCertified' => $student->is_certified,
                 'completedParts' => $student->parts->pluck('part_number')->sort()->values()->all(),
                 'createdAt' => optional($student->created_at)->toISOString() ?? now()->toISOString(),
-                'registrationProfile' => $this->registrationService->serializeStudentRegistrationProfile($student->registrationRequest),
+                'registrationProfile' => $this->registrationService->serializeStudentRegistrationProfile(
+                    $student->registrationRequest
+                ),
             ])->values()->all(),
             'reciters' => $reciters->map(fn (Reciter $reciter) => [
                 'id' => $reciter->id,
@@ -87,8 +89,14 @@ trait SerializesDashboardSnapshots
                             'tasks' => (bool) $course->female_tasks_enabled,
                         ],
                     ],
-                    'assessmentWindows' => $this->decodeJsonObject($course->assessment_windows, ['global' => [], 'male' => [], 'female' => []]),
-                    'assessmentNotificationTemplates' => $this->decodeJsonObject($course->assessment_notification_templates, ['pre' => '', 'post' => '', 'tasks' => '']),
+                    'assessmentWindows' => $this->decodeJsonObject(
+                        $course->assessment_windows,
+                        ['global' => [], 'male' => [], 'female' => []]
+                    ),
+                    'assessmentNotificationTemplates' => $this->decodeJsonObject(
+                        $course->assessment_notification_templates,
+                        ['pre' => '', 'post' => '', 'tasks' => '']
+                    ),
                     'taskMode' => $course->task_mode,
                     'taskTemplateId' => $course->task_template_id ?? '',
                     'taskTemplateName' => $course->task_template_name ?? '',
@@ -108,27 +116,32 @@ trait SerializesDashboardSnapshots
                 'content' => $template->content ?? '',
                 'createdAt' => (string) $template->created_at,
             ])->values()->all(),
-            'submissions' => collect($submissions)->map(function ($submission) use ($submissionAnswers, $courseQuestionsById, $canViewCourseAnswerKeys) {
-                return [
-                    'id' => $submission->id,
-                    'courseId' => $submission->course_id,
-                    'assessmentType' => $submission->assessment_type,
-                    'studentName' => $submission->student_name,
-                    'loginId' => $submission->login_code,
-                    'manualScore' => $submission->manual_score !== null ? (float) $submission->manual_score : null,
-                    'taskReviewStatus' => $submission->assessment_type === 'tasks' ? ($submission->task_review_status ?: 'pending') : null,
-                    'taskReviewedAt' => $submission->task_reviewed_at ? (string) $submission->task_reviewed_at : null,
-                    'answers' => collect($submissionAnswers->get($submission->id, []))
-                        ->map(fn ($answer) => $this->normalizeSubmissionAnswer(
-                            $answer,
-                            $courseQuestionsById->get($answer->question_id),
-                            $canViewCourseAnswerKeys,
-                        ))
-                        ->values()
-                        ->all(),
-                    'submittedAt' => (string) $submission->submitted_at,
-                ];
-            })->values()->all(),
+            'submissions' => collect($submissions)
+                ->map(function ($submission) use ($submissionAnswers, $courseQuestionsById, $canViewCourseAnswerKeys) {
+                    return [
+                        'id' => $submission->id,
+                        'courseId' => $submission->course_id,
+                        'assessmentType' => $submission->assessment_type,
+                        'studentName' => $submission->student_name,
+                        'loginId' => $submission->login_code,
+                        'manualScore' => $submission->manual_score !== null ? (float) $submission->manual_score : null,
+                        'taskReviewStatus' => $submission->assessment_type === 'tasks'
+                            ? ($submission->task_review_status ?: 'pending')
+                            : null,
+                        'taskReviewedAt' => $submission->task_reviewed_at
+                            ? (string) $submission->task_reviewed_at
+                            : null,
+                        'answers' => collect($submissionAnswers->get($submission->id, []))
+                            ->map(fn ($answer) => $this->normalizeSubmissionAnswer(
+                                $answer,
+                                $courseQuestionsById->get($answer->question_id),
+                                $canViewCourseAnswerKeys,
+                            ))
+                            ->values()
+                            ->all(),
+                        'submittedAt' => (string) $submission->submitted_at,
+                    ];
+                })->values()->all(),
             'attendance' => collect($attendance)->map(fn ($item) => [
                 'id' => $item->id,
                 'courseId' => $item->course_id,
@@ -190,24 +203,25 @@ trait SerializesDashboardSnapshots
                 'sortOrder' => (int) $item->sort_order,
                 'createdAt' => (string) $item->created_at,
             ])->values()->all(),
-            'finalExamSubmissions' => collect($finalExamSubmissions)->map(function ($item) use ($finalExamAnswers, $finalQuestionsById, $canViewFinalExamAnswerKeys) {
-                return [
-                    'id' => $item->id,
-                    'branchCode' => $item->branch_code,
-                    'studentName' => $item->student_name,
-                    'loginCode' => $item->login_code,
-                    'manualScore' => $item->manual_score !== null ? (float) $item->manual_score : null,
-                    'answers' => collect($finalExamAnswers->get($item->id, []))
-                        ->map(fn ($answer) => $this->normalizeSubmissionAnswer(
-                            $answer,
-                            $finalQuestionsById->get($answer->question_id),
-                            $canViewFinalExamAnswerKeys,
-                        ))
-                        ->values()
-                        ->all(),
-                    'submittedAt' => (string) $item->submitted_at,
-                ];
-            })->values()->all(),
+            'finalExamSubmissions' => collect($finalExamSubmissions)
+                ->map(function ($item) use ($finalExamAnswers, $finalQuestionsById, $canViewFinalExamAnswerKeys) {
+                    return [
+                        'id' => $item->id,
+                        'branchCode' => $item->branch_code,
+                        'studentName' => $item->student_name,
+                        'loginCode' => $item->login_code,
+                        'manualScore' => $item->manual_score !== null ? (float) $item->manual_score : null,
+                        'answers' => collect($finalExamAnswers->get($item->id, []))
+                            ->map(fn ($answer) => $this->normalizeSubmissionAnswer(
+                                $answer,
+                                $finalQuestionsById->get($answer->question_id),
+                                $canViewFinalExamAnswerKeys,
+                            ))
+                            ->values()
+                            ->all(),
+                        'submittedAt' => (string) $item->submitted_at,
+                    ];
+                })->values()->all(),
             'finalExamSettings' => [
                 'male' => $managedBranchId !== '' && $managedBranchId !== 'male'
                     ? ['isEnabled' => false, 'closesAt' => null, 'notificationTemplate' => '']
@@ -230,7 +244,9 @@ trait SerializesDashboardSnapshots
             'practitionerPageContent' => $this->pageContentService->loadPractitionerPageContent(),
             'rolePermissions' => $rolePermissions
                 ->groupBy('role')
-                ->map(fn (Collection $items) => $items->mapWithKeys(fn ($item) => [$item->permission_key => (bool) $item->is_enabled])->all())
+                ->map(fn (Collection $items) => $items
+                    ->mapWithKeys(fn ($item) => [$item->permission_key => (bool) $item->is_enabled])
+                    ->all())
                 ->all(),
         ];
     }

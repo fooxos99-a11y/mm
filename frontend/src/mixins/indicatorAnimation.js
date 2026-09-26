@@ -1,4 +1,4 @@
-const DISPLAY_NUMBER_PATTERN = /^(.*?)([+-]?\d+(?:\.\d+)?)([^\d]*)$/;
+import { splitDisplayNumber } from '../utils/displayNumber.mjs';
 
 const easeOutCubic = (value) => 1 - ((1 - value) ** 3);
 
@@ -28,7 +28,7 @@ export default {
         return;
       }
 
-      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      if (window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches) {
         this.indicatorAnimationProgress = 1;
         return;
       }
@@ -67,13 +67,13 @@ export default {
         return text;
       }
 
-      const match = text.match(DISPLAY_NUMBER_PATTERN);
+      const parts = splitDisplayNumber(text);
 
-      if (!match) {
+      if (!parts) {
         return text;
       }
 
-      const [, prefix, rawValue, suffix] = match;
+      const [prefix, rawValue, suffix] = parts;
       const targetValue = Number(rawValue);
 
       if (!Number.isFinite(targetValue)) {

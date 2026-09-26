@@ -1,4 +1,5 @@
 import { spawn, spawnSync } from 'node:child_process';
+import { resolveTrustedExecutable } from '../../scripts/trustedExecutable.mjs';
 import { request } from 'node:http';
 import { createServer } from 'node:net';
 import path from 'node:path';
@@ -38,8 +39,9 @@ const terminateChrome = async (instance) => {
     await instance.kill();
     return;
   } catch (error) {
-    if (process.platform === 'win32' && pid) {
-      spawnSync('taskkill', ['/pid', String(pid), '/T', '/F'], {
+    const taskkill = process.platform === 'win32' ? resolveTrustedExecutable('taskkill') : null;
+    if (taskkill && pid) {
+      spawnSync(taskkill, ['/pid', String(pid), '/T', '/F'], {
         stdio: 'ignore',
         windowsHide: true,
       });

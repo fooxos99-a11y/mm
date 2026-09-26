@@ -5,8 +5,18 @@ namespace App\Services\Concerns;
 trait SerializesResultsPages
 {
     // Reuse the same answer snapshots, attachment URLs and permission rules as the legacy dashboard.
-    public function serializeResultsPage($courses, $questions, $submissions, $answers, $attendance, $finalQuestions, $finalSubmissions, $finalAnswers, bool $courseKeys, bool $finalKeys): array
-    {
+    public function serializeResultsPage(
+        $courses,
+        $questions,
+        $submissions,
+        $answers,
+        $attendance,
+        $finalQuestions,
+        $finalSubmissions,
+        $finalAnswers,
+        bool $courseKeys,
+        bool $finalKeys
+    ): array {
         $grouped = $questions->groupBy('course_id')->map(fn ($items) => [
             'pre' => $this->normalizeCourseQuestions($items->where('assessment_type', 'pre'), $courseKeys),
             'post' => $this->normalizeCourseQuestions($items->where('assessment_type', 'post'), $courseKeys),

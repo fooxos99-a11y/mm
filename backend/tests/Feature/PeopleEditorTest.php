@@ -23,7 +23,9 @@ class PeopleEditorTest extends TestCase
         $this->student('female', 'hidden');
         $this->getJson('/api/dashboard/people/options?perPage=20&page=2')->assertOk()
             ->assertJsonCount(5, 'data')->assertJsonPath('total', 25);
-        $response = $this->getJson('/api/dashboard/people/options?search=teacher24')->assertOk()->assertJsonCount(1, 'data');
+        $response = $this->getJson('/api/dashboard/people/options?search=teacher24')
+            ->assertOk()
+            ->assertJsonCount(1, 'data');
         $this->assertSame(['value', 'label'], array_keys($response->json('data.0')));
         $this->getJson('/api/dashboard/people/options?perPage=101')->assertUnprocessable();
         $this->getJson('/api/dashboard/people/options?type=invalid')->assertUnprocessable();
@@ -34,7 +36,8 @@ class PeopleEditorTest extends TestCase
         $this->acting('admin');
         $student = $this->student('female', 'teacher');
         $user = User::factory()->create(['role' => 'reciter', 'login_code' => 'reader']);
-        $reciter = Reciter::query()->create(['full_name' => 'Reader', 'user_id' => $user->id, 'branch_id' => $student->branch_id]);
+        $reciter = Reciter::query()
+            ->create(['full_name' => 'Reader', 'user_id' => $user->id, 'branch_id' => $student->branch_id]);
         $reciter->students()->attach($student->id);
         DB::table('student_parts')->insert(['student_id' => $student->id, 'part_number' => 2]);
         $this->getJson('/api/dashboard/people/student/'.$student->id)->assertOk()
@@ -57,7 +60,10 @@ class PeopleEditorTest extends TestCase
         $this->getJson('/api/dashboard/people/student/'.$female->id)->assertNotFound();
         $this->getJson('/api/dashboard/people/options?branchCode=female')->assertForbidden();
         $this->getJson('/api/dashboard/people/options?search=hidden')->assertOk()->assertJsonCount(0, 'data');
-        DB::table('role_permissions')->where('role', 'male_manager')->where('permission_key', 'page_users')->update(['is_enabled' => false]);
+        DB::table('role_permissions')
+            ->where('role', 'male_manager')
+            ->where('permission_key', 'page_users')
+            ->update(['is_enabled' => false]);
         $this->getJson('/api/dashboard/people/options')->assertForbidden();
         $this->getJson('/api/dashboard/people/student/'.$male->id)->assertForbidden();
         $this->acting('student');
@@ -74,7 +80,8 @@ class PeopleEditorTest extends TestCase
 
     private function acting(string $role): void
     {
-        DB::table('role_permissions')->updateOrInsert(['role' => $role, 'permission_key' => 'page_users'], ['is_enabled' => true]);
+        DB::table('role_permissions')
+            ->updateOrInsert(['role' => $role, 'permission_key' => 'page_users'], ['is_enabled' => true]);
         Sanctum::actingAs(User::factory()->create(['role' => $role]));
     }
 

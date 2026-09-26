@@ -1,5 +1,10 @@
 import { fetchResultsCatalog, fetchResultsPage } from '../../services/resultsDirectoryApi';
 
+const resolveResultsAssessmentType = (vm) => {
+  if (vm.isFinalExamResultsSection) return 'final';
+  return vm.isTaskResultsSection ? 'tasks' : vm.resultsType;
+};
+
 export default {
   async loadResultsCatalog() {
     this.resultsLoading = true;
@@ -51,7 +56,7 @@ export default {
       const result = await fetchResultsPage({
         branchCode: this.effectiveResultsBranchId,
         courseId: this.isFinalExamResultsSection ? undefined : this.resultsCourseId.replace(/^task:/, ''),
-        assessmentType: this.isFinalExamResultsSection ? 'final' : (this.isTaskResultsSection ? 'tasks' : this.resultsType),
+        assessmentType: resolveResultsAssessmentType(this),
         state: this.isAttendanceResultsType ? (this.studentFilter || 'all') : 'all',
         search: this.resultsSearch.trim(), page, perPage: 20,
       }, this.resultsController.signal);

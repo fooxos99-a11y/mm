@@ -76,11 +76,6 @@ CREATE TABLE `cache` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
-LOCK TABLES `cache` WRITE;
-/*!40000 ALTER TABLE `cache` DISABLE KEYS */;
-INSERT INTO `cache` VALUES ('laravel-cache-dashboard:notifications','a:0:{}',1781660409);
-/*!40000 ALTER TABLE `cache` ENABLE KEYS */;
-UNLOCK TABLES;
 DROP TABLE IF EXISTS `cache_locks`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -965,7 +960,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES ('019e2619-320c-71ac-8e13-14ba366286b6','مدير النمو المهني','admin','1483',NULL,NULL,'$2y$12$k7QFC0SYB9nExcnT6iv.W.hv5fJ/v9wQJaDYt1H58nGs5Z2uG3ZJC',0,NULL,'2026-05-14 07:47:25','2026-07-21 18:42:05');
+INSERT INTO `users` VALUES ('019e2619-320c-71ac-8e13-14ba366286b6','مدير النمو المهني','admin','1483',NULL,NULL,NULL,0,NULL,'2026-05-14 07:47:25','2026-07-21 18:42:05');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

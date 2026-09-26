@@ -134,7 +134,9 @@ final class DashboardPermissionResolver
     {
         $permissions = [];
 
-        foreach (['pre' => 'open_pre_exam', 'post' => 'open_post_exam', 'tasks' => 'edit_tasks'] as $field => $permission) {
+        foreach (
+            ['pre' => 'open_pre_exam', 'post' => 'open_post_exam', 'tasks' => 'edit_tasks'] as $field => $permission
+        ) {
             if ($request->exists($field)) {
                 $permissions[] = $permission;
             }

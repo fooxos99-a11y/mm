@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
 import test from 'node:test';
-import { runMonitor, sendAlert } from './monitor-production.mjs';
+import { runMonitor, sendAlert, toSingleLineLogValue } from './monitor-production.mjs';
 
 const withServer = async (handler, callback) => {
   const server = createServer(handler);
@@ -57,4 +57,9 @@ test('degraded operations fail monitoring and alert webhook receives details', a
     assert.equal(alertPayload.status, 'failure');
     assert.match(alertPayload.text, /operations/);
   });
+});
+
+test('monitor log values cannot inject extra log lines', () => {
+  assert.equal(toSingleLineLogValue('HTTP 500\nFAIL forged\r\u0000'), 'HTTP 500 FAIL forged  ');
+  assert.equal(toSingleLineLogValue(undefined), '');
 });

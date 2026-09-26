@@ -114,9 +114,11 @@
     </div>
 
     <input
+      :id="`rich-text-editor-image-input-${$.uid}`"
       ref="imageInput"
       class="rich-text-editor__image-input"
       type="file"
+      aria-label="إدراج صورة"
       accept="image/png,image/jpeg,image/gif,image/webp"
       @change="handleImageSelection"
     >

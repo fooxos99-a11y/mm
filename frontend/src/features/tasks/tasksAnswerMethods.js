@@ -64,7 +64,7 @@ export default {
           src: `https://www.youtube-nocookie.com/embed/${videoId}?rel=0`,
         };
       }
-    } catch (error) {
+    } catch {
       return null;
     }
 

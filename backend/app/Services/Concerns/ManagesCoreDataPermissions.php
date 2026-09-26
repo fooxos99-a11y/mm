@@ -139,7 +139,11 @@ trait ManagesCoreDataPermissions
             $this->decodeJsonArray($options),
         );
 
-        if (count($normalizedOptions) === 2 && in_array('صح', $normalizedOptions, true) && in_array('خطأ', $normalizedOptions, true)) {
+        if (
+            count($normalizedOptions) === 2
+                && in_array('صح', $normalizedOptions, true)
+                && in_array('خطأ', $normalizedOptions, true)
+        ) {
             return 'truefalse';
         }
 

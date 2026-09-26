@@ -43,7 +43,9 @@ class PeopleEditorService
         }
         $page = $query->orderBy('full_name')->orderBy('id')->paginate((int) ($filters['perPage'] ?? 20));
         $page->setCollection($page->getCollection()->map(fn ($person) => [
-            'value' => $person->id, 'label' => $person->full_name.' - '.($type === 'reciter' ? $person->user?->login_code : $person->login_code),
+            'value' => $person->id,
+            'label' => $person->full_name.' - '
+                .($type === 'reciter' ? $person->user?->login_code : $person->login_code),
         ]));
 
         return $page->toArray();
@@ -61,6 +63,8 @@ class PeopleEditorService
         return [...$record, 'loginId' => $person->login_code, 'note' => $person->note,
             'completedParts' => $person->parts()->pluck('part_number')->all(),
             'reciterId' => $person->reciters()->whereNull('reciters.archive_id')->value('reciters.id'),
-            'registrationProfile' => $this->registration->serializeStudentRegistrationProfile($person->registrationRequest)];
+            'registrationProfile' => $this->registration->serializeStudentRegistrationProfile(
+                $person->registrationRequest
+            )];
     }
 }

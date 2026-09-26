@@ -62,26 +62,31 @@ export default {
     const existingGlobalClose = this.getWindowMeta(task.assessmentWindows?.global?.tasks).closesAt;
     const nextGlobalClose = !existingGlobalClose || new Date(existingGlobalClose) < new Date(closesAt) ? closesAt : existingGlobalClose;
     const branchAvailability = {
-      male: { ...(task.branchAvailability?.male || {}) },
-      female: { ...(task.branchAvailability?.female || {}) },
+      male: { ...task.branchAvailability?.male },
+      female: { ...task.branchAvailability?.female },
     };
     const assessmentWindows = {
-      global: { ...(task.assessmentWindows?.global || {}), tasks: nextGlobalClose },
-      male: { ...(task.assessmentWindows?.male || {}) },
-      female: { ...(task.assessmentWindows?.female || {}) },
+      global: { ...task.assessmentWindows?.global, tasks: nextGlobalClose },
+      male: { ...task.assessmentWindows?.male },
+      female: { ...task.assessmentWindows?.female },
     };
     targetBranches.forEach((branchId) => {
       branchAvailability[branchId] = { ...branchAvailability[branchId], tasks: true };
       assessmentWindows[branchId] = { ...assessmentWindows[branchId], tasks: closesAt };
     });
     otherBranches.forEach((branchId) => {
+      if (targetBranch === 'all') {
+        assessmentWindows[branchId] = { ...assessmentWindows[branchId], tasks: closesAt };
+        branchAvailability[branchId] = { ...branchAvailability[branchId], tasks: true };
+        return;
+      }
+
+      const keepsActiveBranch = shouldBypassBranchConflict && this.isTaskBranchActive(task, branchId);
       assessmentWindows[branchId] = {
         ...assessmentWindows[branchId],
-        tasks: targetBranch === 'all' ? closesAt
-          : (shouldBypassBranchConflict && this.isTaskBranchActive(task, branchId) ? assessmentWindows[branchId].tasks : undefined),
+        tasks: keepsActiveBranch ? assessmentWindows[branchId].tasks : undefined,
       };
-      if (targetBranch === 'all') branchAvailability[branchId] = { ...branchAvailability[branchId], tasks: true };
-      else if (!(shouldBypassBranchConflict && this.isTaskBranchActive(task, branchId))) {
+      if (!keepsActiveBranch) {
         branchAvailability[branchId] = { ...branchAvailability[branchId], tasks: false };
       }
     });
@@ -96,10 +101,10 @@ export default {
         updates: {
           isTasksEnabled: false,
           assessmentWindows: {
-            ...(item.assessmentWindows || {}),
-            global: { ...(item.assessmentWindows?.global || {}), tasks: undefined },
-            male: { ...(item.assessmentWindows?.male || {}), tasks: undefined },
-            female: { ...(item.assessmentWindows?.female || {}), tasks: undefined },
+            ...item.assessmentWindows,
+            global: { ...item.assessmentWindows?.global, tasks: undefined },
+            male: { ...item.assessmentWindows?.male, tasks: undefined },
+            female: { ...item.assessmentWindows?.female, tasks: undefined },
           },
         },
       }).catch(() => undefined)));
@@ -127,16 +132,16 @@ export default {
           updates: {
             isTasksEnabled: remainingBranchActive,
             branchAvailability: {
-              ...(task.branchAvailability || {}),
-              [branchId]: { ...(task.branchAvailability?.[branchId] || {}), tasks: false },
+              ...task.branchAvailability,
+              [branchId]: { ...task.branchAvailability?.[branchId], tasks: false },
             },
             assessmentWindows: {
-              ...(task.assessmentWindows || {}),
+              ...task.assessmentWindows,
               global: {
-                ...(task.assessmentWindows?.global || {}),
+                ...task.assessmentWindows?.global,
                 tasks: remainingBranchActive ? this.getWindowMeta(task.assessmentWindows?.global?.tasks).closesAt : undefined,
               },
-              [branchId]: { ...(task.assessmentWindows?.[branchId] || {}), tasks: undefined },
+              [branchId]: { ...task.assessmentWindows?.[branchId], tasks: undefined },
             },
           },
         });
@@ -146,10 +151,10 @@ export default {
           updates: {
             isTasksEnabled: false,
             assessmentWindows: {
-              ...(task.assessmentWindows || {}),
-              global: { ...(task.assessmentWindows?.global || {}), tasks: undefined },
-              male: { ...(task.assessmentWindows?.male || {}), tasks: undefined },
-              female: { ...(task.assessmentWindows?.female || {}), tasks: undefined },
+              ...task.assessmentWindows,
+              global: { ...task.assessmentWindows?.global, tasks: undefined },
+              male: { ...task.assessmentWindows?.male, tasks: undefined },
+              female: { ...task.assessmentWindows?.female, tasks: undefined },
             },
           },
         });

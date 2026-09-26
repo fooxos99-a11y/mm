@@ -2,6 +2,17 @@ import AttachmentPreviewDialog from '../../components/tasks/AttachmentPreviewDia
 import { AppButton, AppChoiceButton } from '../../components/ui';
 import { ASSESSMENT_LABELS } from './courseViewConfig';
 import courseMethods from './courseViewMethods';
+
+const ENABLED_FLAG_BY_TYPE = { pre: 'isPreEnabled', tasks: 'isTasksEnabled', post: 'isPostEnabled' };
+
+const isAssessmentEnabledBySettings = (course, assessmentType, branchId) => {
+  const type = assessmentType === 'pre' || assessmentType === 'tasks' ? assessmentType : 'post';
+  if (!course[ENABLED_FLAG_BY_TYPE[type]]) return false;
+  if (!branchId) return true;
+  const branchAvailability = course.branchAvailability?.[branchId] || {};
+  return branchAvailability[type] !== false;
+};
+
 export default {
   name: 'CourseView',
   components: {
@@ -94,14 +105,8 @@ export default {
       }
 
       const branchId = this.student?.branchId;
-      const branchAvailability = branchId ? this.activeCourse.branchAvailability?.[branchId] || {} : {};
-      const isEnabledBySettings = this.resolvedAssessmentType === 'pre'
-        ? Boolean(this.activeCourse.isPreEnabled && (branchId ? branchAvailability.pre !== false : true))
-        : this.resolvedAssessmentType === 'tasks'
-          ? Boolean(this.activeCourse.isTasksEnabled && (branchId ? branchAvailability.tasks !== false : true))
-          : Boolean(this.activeCourse.isPostEnabled && (branchId ? branchAvailability.post !== false : true));
 
-      if (!isEnabledBySettings) {
+      if (!isAssessmentEnabledBySettings(this.activeCourse, this.resolvedAssessmentType, branchId)) {
         return false;
       }
 

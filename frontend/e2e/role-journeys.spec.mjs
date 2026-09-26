@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
+import { rolePassword } from './support/credentials.mjs';
 
-const password = 'E2E-Role-2026!';
+const password = rolePassword;
 
 const roles = [
   {

@@ -63,8 +63,13 @@ trait ManagesDashboardTemplatesAndCommunications
         }
     }
 
-    public function createStudent(string $name, string $loginCode, string $branchCode, string $note, ?string $passwordHash): Student
-    {
+    public function createStudent(
+        string $name,
+        string $loginCode,
+        string $branchCode,
+        string $note,
+        ?string $passwordHash
+    ): Student {
         return $this->studentAccountService->create($name, $loginCode, $branchCode, $note, $passwordHash);
     }
 

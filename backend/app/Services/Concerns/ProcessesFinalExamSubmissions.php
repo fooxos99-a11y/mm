@@ -22,7 +22,15 @@ trait ProcessesFinalExamSubmissions
         $submissionId = (string) str()->uuid();
         $submittedAt = now();
 
-        DB::transaction(function () use ($submissionId, $submittedAt, $branchCode, $studentName, $submission, $loginCode, $questionSnapshots): void {
+        DB::transaction(function () use (
+            $submissionId,
+            $submittedAt,
+            $branchCode,
+            $studentName,
+            $submission,
+            $loginCode,
+            $questionSnapshots
+        ): void {
             DB::table('final_exam_submissions')->insert([
                 'id' => $submissionId,
                 'branch_code' => $branchCode,

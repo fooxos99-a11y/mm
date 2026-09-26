@@ -12,8 +12,13 @@ use Illuminate\Validation\ValidationException;
 
 class StudentAccountService
 {
-    public function create(string $name, string $loginCode, string $branchCode, string $note, ?string $passwordHash): Student
-    {
+    public function create(
+        string $name,
+        string $loginCode,
+        string $branchCode,
+        string $note,
+        ?string $passwordHash
+    ): Student {
         $name = trim($name);
         $loginCode = trim($loginCode);
         $branch = $this->resolveBranch($branchCode);
@@ -22,7 +27,10 @@ class StudentAccountService
             throw ValidationException::withMessages(['login_code' => 'أدخل اسم المعلم/ة والفرع ورقم الدخول.']);
         }
 
-        if (Student::query()->where('login_code', $loginCode)->exists() || User::query()->where('login_code', $loginCode)->exists()) {
+        if (
+            Student::query()->where('login_code', $loginCode)->exists()
+                || User::query()->where('login_code', $loginCode)->exists()
+        ) {
             throw ValidationException::withMessages(['login_code' => 'رقم الدخول مستخدم مسبقًا.']);
         }
 

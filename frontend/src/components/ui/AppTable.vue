@@ -89,6 +89,7 @@ export default {
     emptyDescription: { type: String, default: '' },
     rowAriaLabel: { type: [String, Function], default: '' },
   },
+  emits: ['row-click'],
   computed: {
     hasRowClickListener() {
       return typeof this.$attrs.onRowClick === 'function';

@@ -9,7 +9,8 @@ use Throwable;
 
 class MigrateAssessmentAttachments extends Command
 {
-    protected $signature = 'assessment-attachments:migrate {--dry-run : Count legacy attachments without writing files}';
+    protected $signature = 'assessment-attachments:migrate '
+        .'{--dry-run : Count legacy attachments without writing files}';
 
     protected $description = 'Move legacy assessment Base64 attachments from database columns to private storage';
 

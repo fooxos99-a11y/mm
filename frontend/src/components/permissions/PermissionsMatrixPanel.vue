@@ -74,5 +74,6 @@ export default {
     savingKey: { type: String, default: '' },
     isEnabled: { type: Function, required: true },
   },
+  emits: ['change', 'update:role'],
 };
 </script>

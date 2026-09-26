@@ -11,9 +11,12 @@ export default {
     return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
   },
   buildTopbarCountdownItems(timers, defaultText, fallbackBranchLabel = '', fallbackClosesAt = null) {
-    const normalizedTimers = Array.isArray(timers) && timers.length
-      ? timers
-      : (fallbackClosesAt ? [{ branchCode: '', branchLabel: fallbackBranchLabel, closesAt: fallbackClosesAt }] : []);
+    let normalizedTimers = [];
+    if (Array.isArray(timers) && timers.length) {
+      normalizedTimers = timers;
+    } else if (fallbackClosesAt) {
+      normalizedTimers = [{ branchCode: '', branchLabel: fallbackBranchLabel, closesAt: fallbackClosesAt }];
+    }
 
     return normalizedTimers.reduce((items, timer) => {
       const parsed = new Date(timer?.closesAt || '');

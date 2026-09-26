@@ -88,5 +88,6 @@ export default {
     content: { type: Object, required: true },
     animatedValue: { type: Function, required: true },
   },
+  emits: ['open'],
 };
 </script>

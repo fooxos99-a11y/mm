@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import postcss from 'postcss';
+import { resolveStylesheetPath } from './resolveStylesheetPath.mjs';
 
 const [rootSelector, ...inputPaths] = process.argv.slice(2);
 
@@ -9,7 +10,7 @@ if (!rootSelector || inputPaths.length === 0) {
 
 const unwrapDeepSelectors = selector => selector.replace(/:deep\(([^()]*)\)/g, '$1');
 
-inputPaths.forEach((inputPath) => {
+inputPaths.map(resolveStylesheetPath).forEach((inputPath) => {
   const root = postcss.parse(fs.readFileSync(inputPath, 'utf8'), { from: inputPath });
 
   root.walkRules((rule) => {

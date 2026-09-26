@@ -13,7 +13,15 @@ return new class extends Migration
             'page_tasks' => ['edit_tasks'],
             'page_final_exam' => false,
             'page_satisfaction' => false,
-            'page_users' => ['add_student', 'delete_student', 'edit_student', 'add_reciter', 'delete_reciter', 'edit_reciter', 'transfer_reciter_student'],
+            'page_users' => [
+                'add_student',
+                'delete_student',
+                'edit_student',
+                'add_reciter',
+                'delete_reciter',
+                'edit_reciter',
+                'transfer_reciter_student',
+            ],
             'page_materials' => ['page_notifications'],
             'page_archive' => false,
             'page_registration' => ['add_student', 'edit_student'],
@@ -30,7 +38,8 @@ return new class extends Migration
             foreach ($rules as $key => $source) {
                 $enabled = is_bool($source)
                     ? $source
-                    : collect($source)->contains(fn (string $permission): bool => (bool) ($existing[$permission] ?? false));
+                    : collect($source)
+                        ->contains(fn (string $permission): bool => (bool) ($existing[$permission] ?? false));
 
                 DB::table('role_permissions')->updateOrInsert(
                     ['role' => $role, 'permission_key' => $key],

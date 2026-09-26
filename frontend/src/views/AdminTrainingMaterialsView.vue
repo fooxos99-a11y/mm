@@ -6,8 +6,12 @@
     <section class="admin-training-materials__controls">
       <div class="admin-training-materials__toolbar">
         <div class="prep-field admin-training-materials__filter-field">
-          <label class="prep-field__label">المادة التدريبية</label>
+          <label
+            class="prep-field__label"
+            for="training-materials-select"
+          >المادة التدريبية</label>
           <AppSelect
+            id="training-materials-select"
             :key="materialSelectResetKey"
             v-model="materialSelectValue"
             aria-label="المادة التدريبية"
@@ -71,9 +75,13 @@
             >
           </label>
 
-          <label class="admin-training-materials__field">
-            <span class="admin-training-materials__label">الفرع</span>
+          <div class="admin-training-materials__field">
+            <label
+              class="admin-training-materials__label"
+              for="training-materials-branch"
+            >الفرع</label>
             <AppSelect
+              id="training-materials-branch"
               v-model="form.branchId"
               aria-label="الفرع"
               :items="branchOptions"
@@ -84,7 +92,7 @@
               hide-details
               class="admin-training-materials__select"
             />
-          </label>
+          </div>
 
           <label class="admin-training-materials__field">
             <span class="admin-training-materials__label">الوصف</span>
@@ -118,7 +126,12 @@
                 class="admin-training-materials__attachment-block"
               >
                 <div class="admin-training-materials__attachment-row">
+                  <label
+                    class="d-sr-only"
+                    :for="`training-materials-attachment-${attachment.id}`"
+                  >اسم الملف أو رابط المقطع</label>
                   <input
+                    :id="`training-materials-attachment-${attachment.id}`"
                     v-model.trim="attachment.label"
                     type="text"
                     class="admin-training-materials__input admin-training-materials__attachment-name-input"

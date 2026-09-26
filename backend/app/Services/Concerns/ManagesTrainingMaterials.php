@@ -33,9 +33,19 @@ trait ManagesTrainingMaterials
     public function create(string $title, string $description, ?string $branchCode, array $attachments): array
     {
         $branchCode = $this->writableBranchCode($branchCode);
-        [$title, $description, $targetBranchCode] = $this->normalizeInput($title, $description, $branchCode, $attachments);
+        [$title, $description, $targetBranchCode] = $this->normalizeInput(
+            $title,
+            $description,
+            $branchCode,
+            $attachments
+        );
 
-        $material = DB::transaction(function () use ($title, $description, $targetBranchCode, $attachments): TrainingMaterial {
+        $material = DB::transaction(function () use (
+            $title,
+            $description,
+            $targetBranchCode,
+            $attachments
+        ): TrainingMaterial {
             $material = TrainingMaterial::query()->create([
                 'title' => $title,
                 'description' => $description !== '' ? $description : null,
@@ -53,8 +63,13 @@ trait ManagesTrainingMaterials
         return $this->serialize($material);
     }
 
-    public function update(string $materialId, string $title, string $description, ?string $branchCode, array $attachments): array
-    {
+    public function update(
+        string $materialId,
+        string $title,
+        string $description,
+        ?string $branchCode,
+        array $attachments
+    ): array {
         $material = TrainingMaterial::query()->with(['media', 'branch'])->find($materialId);
         if (! $material) {
             throw ValidationException::withMessages(['materialId' => 'المادة التدريبية المحددة غير موجودة.']);
@@ -62,9 +77,20 @@ trait ManagesTrainingMaterials
 
         $this->assertCanManageMaterial($material);
         $branchCode = $this->writableBranchCode($branchCode);
-        [$title, $description, $targetBranchCode] = $this->normalizeInput($title, $description, $branchCode, $attachments);
+        [$title, $description, $targetBranchCode] = $this->normalizeInput(
+            $title,
+            $description,
+            $branchCode,
+            $attachments
+        );
 
-        $updatedMaterial = DB::transaction(function () use ($material, $title, $description, $targetBranchCode, $attachments): TrainingMaterial {
+        $updatedMaterial = DB::transaction(function () use (
+            $material,
+            $title,
+            $description,
+            $targetBranchCode,
+            $attachments
+        ): TrainingMaterial {
             $material->forceFill([
                 'title' => $title,
                 'description' => $description !== '' ? $description : null,

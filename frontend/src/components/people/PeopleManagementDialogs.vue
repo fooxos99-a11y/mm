@@ -98,9 +98,13 @@
           compact
         >
           <div class="people-dialog__field">
-            <label class="people-dialog__label">اختر المقرئ/ة</label>
+            <label
+              class="people-dialog__label"
+              for="people-manage-reciter"
+            >اختر المقرئ/ة</label>
             <PeopleRemotePicker
               v-if="reciterOpen"
+              input-id="people-manage-reciter"
               type="reciter"
               :branch="reciterBranch"
               label="البحث عن مقرئ للإسناد"
@@ -150,8 +154,12 @@
           class="people-dialog__form people-manage-dialog__form"
         >
           <div class="people-dialog__field">
-            <label class="people-dialog__label">اختر النوع</label>
+            <label
+              class="people-dialog__label"
+              for="people-manage-entity-type"
+            >اختر النوع</label>
             <AppSelect
+              id="people-manage-entity-type"
               :value="manageEntityType"
               :items="entityOptions"
               item-text="label"
@@ -166,8 +174,12 @@
             />
           </div>
           <div class="people-dialog__field">
-            <label class="people-dialog__label">اختر الفرع</label>
+            <label
+              class="people-dialog__label"
+              for="people-manage-branch"
+            >اختر الفرع</label>
             <AppSelect
+              id="people-manage-branch"
               :value="manageBranchId"
               :items="branchOptions"
               item-text="label"
@@ -185,9 +197,13 @@
             v-if="!directCardEdit"
             class="people-dialog__field"
           >
-            <label class="people-dialog__label">{{ manageTargetLabel }}</label>
+            <label
+              class="people-dialog__label"
+              for="people-manage-target"
+            >{{ manageTargetLabel }}</label>
             <PeopleRemotePicker
               v-if="manageOpen"
+              input-id="people-manage-target"
               :type="manageEntityType"
               :branch="manageBranchId"
               :label="manageTargetLabel"
@@ -271,5 +287,25 @@ export default {
     canManageSelected: { type: Boolean, default: false },
     manageSubmitting: { type: Boolean, default: false },
   },
+  emits: [
+    'delete-close',
+    'delete-confirm',
+    'delete-toggle',
+    'manage-close',
+    'manage-context-change',
+    'manage-delete',
+    'manage-edit',
+    'manage-toggle',
+    'part-toggle',
+    'parts-close',
+    'parts-toggle',
+    'reciter-close',
+    'reciter-submit',
+    'reciter-toggle',
+    'update:manage-branch-id',
+    'update:manage-entity-type',
+    'update:manage-target-id',
+    'update:reciter-id',
+  ],
 };
 </script>

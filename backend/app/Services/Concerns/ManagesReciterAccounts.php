@@ -12,8 +12,14 @@ use Illuminate\Validation\ValidationException;
 
 trait ManagesReciterAccounts
 {
-    public function saveReciter(?string $currentLoginCode, string $name, string $loginCode, string $branchCode, array $linkedStudentIds = [], ?string $passwordHash = null): Reciter
-    {
+    public function saveReciter(
+        ?string $currentLoginCode,
+        string $name,
+        string $loginCode,
+        string $branchCode,
+        array $linkedStudentIds = [],
+        ?string $passwordHash = null
+    ): Reciter {
         $name = trim($name);
         $loginCode = trim($loginCode);
         $currentLoginCode = trim((string) $currentLoginCode);
@@ -23,7 +29,14 @@ trait ManagesReciterAccounts
             throw ValidationException::withMessages(['login_code' => 'أدخل اسم المقرئ والفرع ورقم الدخول.']);
         }
 
-        return DB::transaction(function () use ($currentLoginCode, $name, $loginCode, $branch, $linkedStudentIds, $passwordHash): Reciter {
+        return DB::transaction(function () use (
+            $currentLoginCode,
+            $name,
+            $loginCode,
+            $branch,
+            $linkedStudentIds,
+            $passwordHash
+        ): Reciter {
             $currentUser = $currentLoginCode === ''
                 ? null
                 : User::query()->where('login_code', $currentLoginCode)->where('role', 'reciter')->first();

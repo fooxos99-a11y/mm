@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { createStudentResultFixture } from './support/studentResultFixture.mjs';
+import { studentPassword } from './support/credentials.mjs';
 
 test('student results remain usable across the responsive viewport matrix', async ({ page }, testInfo) => {
   const suffix = testInfo.project.name.replace(/\D/g, '') || '1440';
@@ -7,7 +8,7 @@ test('student results remain usable across the responsive viewport matrix', asyn
 
   await page.goto('login', { waitUntil: 'domcontentloaded' });
   await page.locator('input[autocomplete="username"]').fill(loginId);
-  await page.locator('input[autocomplete="current-password"]').fill('Student-2026!');
+  await page.locator('input[autocomplete="current-password"]').fill(studentPassword);
 
   await Promise.all([
     page.waitForURL((url) => url.pathname === '/momars/student', { timeout: 90_000 }),

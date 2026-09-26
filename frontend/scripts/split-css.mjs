@@ -1,11 +1,13 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import postcss from 'postcss';
+import { resolveStylesheetPath } from './resolveStylesheetPath.mjs';
 
 const MAX_LINES = 450;
-const inputPath = process.argv[2];
 
-if (!inputPath) throw new Error('Usage: node scripts/split-css.mjs <css-file>');
+if (!process.argv[2]) throw new Error('Usage: node scripts/split-css.mjs <css-file>');
+
+const inputPath = resolveStylesheetPath(process.argv[2]);
 
 const lineCount = (value) => String(value).split(/\r?\n/).length;
 
@@ -45,7 +47,9 @@ if (current.nodes.length) chunks.push(current);
 
 const parsed = path.parse(inputPath);
 const outputPaths = chunks.map((chunk, index) => {
-  const output = index === 0 ? inputPath : path.join(parsed.dir, `${parsed.name}-part-${index + 1}${parsed.ext}`);
+  const output = index === 0
+    ? inputPath
+    : resolveStylesheetPath(path.join(parsed.dir, `${parsed.name}-part-${index + 1}${parsed.ext}`));
   fs.writeFileSync(output, `${chunk.toString()}\n`, 'utf8');
   return output.replaceAll('\\', '/');
 });

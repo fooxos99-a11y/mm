@@ -273,7 +273,7 @@ export const normalizePractitionerPageContent = (content = {}) => {
   };
 };
 
-export const clonePractitionerPageContent = (content = null) => JSON.parse(JSON.stringify(normalizePractitionerPageContent(content || DEFAULT_PRACTITIONER_PAGE_CONTENT)));
+export const clonePractitionerPageContent = (content = null) => structuredClone(normalizePractitionerPageContent(content || DEFAULT_PRACTITIONER_PAGE_CONTENT));
 
 export default DEFAULT_PRACTITIONER_PAGE_CONTENT;
 import { repairArabicMojibake } from './textEncoding';

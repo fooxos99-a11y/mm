@@ -50,12 +50,12 @@
 
 .results-view .results-entry__status-pill--present {
   background: rgba(34, 197, 94, 0.1);
-  color: #16a34a;
+  color: #12823b;
 }
 
 .results-view .results-entry__status-pill--absent {
   background: rgba(239, 68, 68, 0.1);
-  color: #dc2626;
+  color: #d52222;
 }
 
 .results-view .results-empty-state {
@@ -252,7 +252,7 @@
   min-height: 46px;
   padding: 8px 18px;
   border-radius: 10px;
-  background: #1183a4;
+  background: #1180a0;
   color: #fff;
   font-weight: 900;
 }
@@ -402,7 +402,7 @@
 
 .results-view .results-score-editor__save-btn {
   padding: 6px 16px;
-  background: #4e7fc5;
+  background: #4377c1;
   color: #fff;
   border: none;
   border-radius: 6px;

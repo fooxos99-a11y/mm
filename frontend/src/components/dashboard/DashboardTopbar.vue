@@ -208,5 +208,21 @@ export default {
     showAssessmentAction: { type: Boolean, default: false },
     showCountdown: { type: Boolean, default: false },
   },
+  emits: [
+    'toggle-menu',
+    'open-completion-settings',
+    'open-completion-close',
+    'toggle-permissions',
+    'add-satisfaction',
+    'archive-all',
+    'create-archive',
+    'copy-registration-link',
+    'open-registration-fields',
+    'toggle-registration',
+    'assessment-action',
+    'overview-action',
+    'copy-final-exam',
+    'toggle-final-exam',
+  ],
 };
 </script>

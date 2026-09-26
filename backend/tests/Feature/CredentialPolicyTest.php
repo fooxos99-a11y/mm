@@ -14,7 +14,12 @@ class CredentialPolicyTest extends TestCase
 {
     public static function requests(): array
     {
-        return [[StoreStudentRequest::class], [UpdateStudentRequest::class], [StoreReciterRequest::class], [AcceptRegistrationRequest::class]];
+        return [
+            [StoreStudentRequest::class],
+            [UpdateStudentRequest::class],
+            [StoreReciterRequest::class],
+            [AcceptRegistrationRequest::class],
+        ];
     }
 
     #[DataProvider('requests')]
@@ -22,7 +27,9 @@ class CredentialPolicyTest extends TestCase
     {
         $rules = ['password' => (new $request)->rules()['password']];
         foreach (['1', 'abcdefghijk', '12345678901'] as $password) {
-            $this->assertTrue(Validator::make(['password' => $password, 'passwordConfirmation' => $password], $rules)->fails());
+            $this->assertTrue(
+                Validator::make(['password' => $password, 'passwordConfirmation' => $password], $rules)->fails()
+            );
         }
         $this->assertTrue(Validator::make([
             'password' => 'Secure-pass-123', 'passwordConfirmation' => 'Secure-pass-123',

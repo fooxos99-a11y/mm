@@ -54,6 +54,7 @@
             label="كلمة المرور"
             outlined
             dense
+            type="password"
             autocomplete="current-password"
             class="login-form__field"
           />

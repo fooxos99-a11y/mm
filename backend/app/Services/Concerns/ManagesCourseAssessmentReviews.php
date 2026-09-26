@@ -18,12 +18,15 @@ trait ManagesCourseAssessmentReviews
 
     public function setTaskReviewStatus(string $submissionId, string $status, string $reviewerId): void
     {
-        $updated = DB::table('course_submissions')->where('id', $submissionId)->where('assessment_type', 'tasks')->update([
-            'task_review_status' => $status,
-            'task_reviewed_by' => $reviewerId,
-            'task_reviewed_at' => now(),
-            'manual_score' => null,
-        ]);
+        $updated = DB::table('course_submissions')
+            ->where('id', $submissionId)
+            ->where('assessment_type', 'tasks')
+            ->update([
+                'task_review_status' => $status,
+                'task_reviewed_by' => $reviewerId,
+                'task_reviewed_at' => now(),
+                'manual_score' => null,
+            ]);
 
         if ($updated === 0) {
             throw ValidationException::withMessages(['submissionId' => 'تعذر العثور على المهمة المرسلة.']);

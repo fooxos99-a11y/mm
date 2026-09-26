@@ -22,7 +22,8 @@ trait SerializesTrainingMaterials
                 'mimeType' => $media->mime_type,
                 'size' => (int) $media->size,
                 'type' => 'file',
-                'url' => request()->getSchemeAndHttpHost().$pathPrefix.'/api/training-material-attachments/'.rawurlencode($attachmentId),
+                'url' => request()->getSchemeAndHttpHost().$pathPrefix
+                    .'/api/training-material-attachments/'.rawurlencode($attachmentId),
             ];
         });
         $externalAttachments = collect($material->external_attachments ?? [])->map(fn (array $attachment): array => [
@@ -61,7 +62,10 @@ trait SerializesTrainingMaterials
         } elseif (in_array($host, ['youtube.com', 'www.youtube.com', 'm.youtube.com'], true)) {
             parse_str((string) ($parts['query'] ?? ''), $query);
             $videoId = (string) ($query['v'] ?? '');
-            if ($videoId === '' && preg_match('~^/(?:embed|shorts)/([^/?]+)~', (string) ($parts['path'] ?? ''), $matches)) {
+            if (
+                $videoId === ''
+                    && preg_match('~^/(?:embed|shorts)/([^/?]+)~', (string) ($parts['path'] ?? ''), $matches)
+            ) {
                 $videoId = $matches[1];
             }
         }

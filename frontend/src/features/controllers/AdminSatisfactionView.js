@@ -4,6 +4,18 @@ import {
 } from '../../components/ui';
 import indicatorAnimation from '../../mixins/indicatorAnimation';
 
+const buildIndicatorValue = (isRating, average, textCount) => {
+  if (!isRating) {
+    return { progress: textCount > 0 ? 100 : 0, display: String(textCount) };
+  }
+
+  if (average === null) {
+    return { progress: 0, display: '--' };
+  }
+
+  return { progress: average * 10, display: average.toFixed(1) };
+};
+
 export default {
   name: 'AdminSatisfactionView',
   components: {
@@ -116,8 +128,7 @@ export default {
             questionKey: this.getQuestionKey(question),
             prompt: question.prompt,
             meta: `${isRating ? values.length : textCount} طالب`,
-            progress: isRating ? (average === null ? 0 : average * 10) : (textCount > 0 ? 100 : 0),
-            display: isRating ? (average === null ? '--' : average.toFixed(1)) : String(textCount),
+            ...buildIndicatorValue(isRating, average, textCount),
           };
         });
     },

@@ -31,18 +31,32 @@ trait SubmitsCourseAssessments
 
         if (DB::table('course_submissions')->where('course_id', $courseId)
             ->where('assessment_type', $assessmentType)->where('login_code', $loginId)->exists()) {
-            throw ValidationException::withMessages(['loginId' => 'تم إرسال هذا الاختبار مسبقًا، ولا يمكن إعادة الاختبار مرة أخرى.']);
+            throw ValidationException::withMessages(
+                ['loginId' => 'تم إرسال هذا الاختبار مسبقًا، ولا يمكن إعادة الاختبار مرة أخرى.']
+            );
         }
 
         $studentId = Student::query()->where('login_code', $loginId)->value('id');
         $submissionId = (string) str()->uuid();
         $submittedAt = now();
 
-        DB::transaction(function () use ($submissionId, $submittedAt, $courseId, $assessmentType, $studentId, $studentName, $loginId, $submission, $questionSnapshots) {
+        DB::transaction(function () use (
+            $submissionId,
+            $submittedAt,
+            $courseId,
+            $assessmentType,
+            $studentId,
+            $studentName,
+            $loginId,
+            $submission,
+            $questionSnapshots
+        ) {
             if (DB::table('course_submissions')->where('course_id', $courseId)
                 ->where('assessment_type', $assessmentType)->where('login_code', $loginId)
                 ->lockForUpdate()->exists()) {
-                throw ValidationException::withMessages(['loginId' => 'تم إرسال هذا الاختبار مسبقًا، ولا يمكن إعادة الاختبار مرة أخرى.']);
+                throw ValidationException::withMessages(
+                    ['loginId' => 'تم إرسال هذا الاختبار مسبقًا، ولا يمكن إعادة الاختبار مرة أخرى.']
+                );
             }
 
             DB::table('course_submissions')->insert([
@@ -82,7 +96,11 @@ trait SubmitsCourseAssessments
         if ($assessmentType === 'tasks') {
             $this->dashboardCommunicationService->addNotification([
                 'title' => 'مهمة تحتاج مراجعة',
-                'message' => sprintf('%s انتهى من مهمة %s وتحتاج مراجعة للإتمام.', $studentName, $course->title ?? 'المهمة'),
+                'message' => sprintf(
+                    '%s انتهى من مهمة %s وتحتاج مراجعة للإتمام.',
+                    $studentName,
+                    $course->title ?? 'المهمة'
+                ),
                 'targetBranchId' => $student?->branch?->code,
                 'targetLoginIds' => [],
                 'createdByName' => 'النظام',

@@ -360,7 +360,7 @@
   color: #006c67;
   font-size: 0.78rem;
   font-weight: 800;
-  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .results-view .results-entry__actions {

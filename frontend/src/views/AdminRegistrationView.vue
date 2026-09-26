@@ -6,6 +6,7 @@
     <RegistrationFieldsDialog
       v-model="fieldsDialogOpen"
       :fields="registrationFields"
+      :fixed-labels="fixedLabels"
       :loading="fieldsSubmitting || loading"
       @save="saveRegistrationFields"
     />
@@ -14,6 +15,7 @@
       v-model="acceptanceDialogOpen"
       :request="acceptanceRequest"
       :fields="registrationFields"
+      :fixed-labels="fixedLabels"
       :branches="branchOptions"
       :loading="Boolean(busyRequestId)"
       @accept="acceptRequest"
@@ -107,10 +109,10 @@
                   {{ request.name }}
                 </h3>
                 <div class="registration-admin__request-meta">
-                  الجنس: {{ genderLabel(request.gender) }}
+                  {{ fixedLabels.gender }}: {{ genderLabel(request.gender) }}
                 </div>
                 <div class="registration-admin__request-meta">
-                  رقم الجوال: {{ request.phone || '--' }}
+                  {{ fixedLabels.phone }}: {{ request.phone || '--' }}
                 </div>
                 <div
                   v-if="request.branchId"
@@ -174,6 +176,7 @@
             v-if="request.status === 'pending'"
             class="registration-admin__request-actions"
             @click.stop
+            @keydown.stop
           >
             <AppButton
               variant="danger"

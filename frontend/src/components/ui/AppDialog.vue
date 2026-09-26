@@ -7,6 +7,7 @@
     @cancel="handleNativeClose"
     @close="handleNativeClose"
     @click="handleBackdropClick"
+    @keydown.esc="handleEscapeKey"
   >
     <div
       class="modal-box"
@@ -142,6 +143,13 @@ export default {
       }
 
       this.$refs.dialog.close();
+    },
+    handleEscapeKey(event) {
+      const ownerDialog = event.target?.closest?.('dialog');
+
+      if (this.persistent && (!ownerDialog || ownerDialog === this.$refs.dialog)) {
+        event.preventDefault();
+      }
     },
     showModal() {
       this.syncState(true);

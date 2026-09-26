@@ -221,6 +221,61 @@ const router = createRouter({
   ],
 });
 
+const needsPasswordChange = (user) => user?.role !== 'student' && user?.mustChangePassword;
+
+const scheduleDeferredAuthCheck = () => {
+  window.setTimeout(() => {
+    ensureAuthChecked().then(() => {
+      if (needsPasswordChange(store.state.currentUser) && router.currentRoute.value.name !== 'change-password') {
+        router.replace({ name: 'change-password' }).catch(() => {});
+        return;
+      }
+
+      store.dispatch('initializeDashboard').catch(() => {});
+    }).catch(() => {});
+  }, 600);
+};
+
+const routeHasMeta = (to, key) => to.matched.some((record) => record.meta[key]);
+
+const resolveGuestOnlyTarget = (to, user) => {
+  if (typeof to.query.redirect === 'string' && to.query.redirect) {
+    return to.query.redirect;
+  }
+
+  return resolveUserHomeRoute(user);
+};
+
+const resolveNavigationTarget = (to) => {
+  const redirectPath = resolveRedirectPath(to);
+  const user = store.state.currentUser;
+
+  if (user?.role === 'student' && to.name === 'change-password') {
+    return resolveUserHomeRoute(user);
+  }
+
+  if (needsPasswordChange(user) && to.name !== 'change-password') {
+    return { name: 'change-password' };
+  }
+
+  if (routeHasMeta(to, 'requiresAuth') && !store.getters.isAuthenticated) {
+    return {
+      name: 'login',
+      query: redirectPath ? { redirect: redirectPath } : {},
+    };
+  }
+
+  if (routeHasMeta(to, 'requiresDashboardAccess') && !canAccessAdminRoute(to, user, store.state.dashboardSnapshot)) {
+    return resolveUserHomeRoute(user);
+  }
+
+  if (routeHasMeta(to, 'guestOnly') && store.getters.isAuthenticated) {
+    return resolveGuestOnlyTarget(to, user);
+  }
+
+  return null;
+};
+
 router.beforeEach(async (to, from, next) => {
   const requiresAuthResolution = to.matched.some((record) => (
     record.meta.requiresAuth || record.meta.guestOnly
@@ -228,17 +283,7 @@ router.beforeEach(async (to, from, next) => {
 
   if (!store.state.authChecked && !requiresAuthResolution) {
     next();
-
-    window.setTimeout(() => {
-      ensureAuthChecked().then(() => {
-        if (store.state.currentUser?.role !== 'student' && store.state.currentUser?.mustChangePassword && router.currentRoute.value.name !== 'change-password') {
-          router.replace({ name: 'change-password' }).catch(() => {});
-          return;
-        }
-
-        store.dispatch('initializeDashboard').catch(() => {});
-      }).catch(() => {});
-    }, 600);
+    scheduleDeferredAuthCheck();
     return;
   }
 
@@ -246,44 +291,10 @@ router.beforeEach(async (to, from, next) => {
     await ensureAuthChecked();
   }
 
-  const redirectPath = resolveRedirectPath(to);
+  const target = resolveNavigationTarget(to);
 
-  if (store.state.currentUser?.role === 'student' && to.name === 'change-password') {
-    next(resolveUserHomeRoute(store.state.currentUser));
-    return;
-  }
-
-  if (store.state.currentUser?.role !== 'student' && store.state.currentUser?.mustChangePassword && to.name !== 'change-password') {
-    next({ name: 'change-password' });
-    return;
-  }
-
-  if (to.matched.some((record) => record.meta.requiresAuth) && !store.getters.isAuthenticated) {
-    next({
-      name: 'login',
-      query: {
-        ...(redirectPath ? { redirect: redirectPath } : {}),
-      },
-    });
-    return;
-  }
-
-  if (to.matched.some((record) => record.meta.requiresDashboardAccess) && !canAccessAdminRoute(
-    to,
-    store.state.currentUser,
-    store.state.dashboardSnapshot,
-  )) {
-    next(resolveUserHomeRoute(store.state.currentUser));
-    return;
-  }
-
-  if (to.matched.some((record) => record.meta.guestOnly) && store.getters.isAuthenticated) {
-    if (typeof to.query.redirect === 'string' && to.query.redirect) {
-      next(to.query.redirect);
-      return;
-    }
-
-    next(resolveUserHomeRoute(store.state.currentUser));
+  if (target) {
+    next(target);
     return;
   }
 

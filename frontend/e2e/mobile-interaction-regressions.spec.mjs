@@ -1,6 +1,6 @@
 import {test,expect} from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import {swipe,login} from '../scripts/mobile-audit/gesture-helpers.mjs';
+import { login, swipe } from './support/gesture-helpers.mjs';
 
 test('mobile sidebar scrolls, contains focus and cleans up on resize',async({page},info)=>{
   test.skip(!info.project.use.hasTouch,'Touch input requires a touch-enabled project');

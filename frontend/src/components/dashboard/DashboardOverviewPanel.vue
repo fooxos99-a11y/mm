@@ -34,11 +34,10 @@
 
     <div class="dashboard-card dashboard-card--indicators">
       <div class="dashboard-indicators-grid">
-        <article
+        <fieldset
           v-for="indicator in indicators"
           :key="indicator.key"
           class="dashboard-indicator-card"
-          role="group"
           :aria-label="`${indicator.label}: ${indicator.display}، ${indicator.meta}`"
         >
           <div
@@ -97,7 +96,7 @@
           <div class="dashboard-indicator-card__meta">
             {{ indicator.meta }}
           </div>
-        </article>
+        </fieldset>
       </div>
     </div>
   </section>
@@ -117,5 +116,15 @@ export default {
     selectedBranch: { type: String, default: 'all' },
     showBranchFilter: { type: Boolean, default: false },
   },
+  emits: ['update:selected-branch'],
 };
 </script>
+
+<style scoped>
+.dashboard-indicator-card {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+</style>

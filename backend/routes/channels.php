@@ -7,8 +7,14 @@ use Illuminate\Support\Facades\Broadcast;
 
 Broadcast::channel('dashboard.notifications.admin', fn (User $user): bool => $user->role === 'admin');
 Broadcast::channel('dashboard.activity.admin', fn (User $user): bool => $user->role === 'admin');
-Broadcast::channel('dashboard.notifications.all', fn (User $user): bool => in_array($user->role, ['admin', 'male_manager', 'female_manager'], true));
-Broadcast::channel('dashboard.notifications.user.{loginCode}', fn (User $user, string $loginCode): bool => hash_equals((string) $user->login_code, $loginCode));
+Broadcast::channel(
+    'dashboard.notifications.all',
+    fn (User $user): bool => in_array($user->role, ['admin', 'male_manager', 'female_manager'], true)
+);
+Broadcast::channel(
+    'dashboard.notifications.user.{loginCode}',
+    fn (User $user, string $loginCode): bool => hash_equals((string) $user->login_code, $loginCode)
+);
 Broadcast::channel('dashboard.notifications.{branchCode}', function (User $user, string $branchCode): bool {
     if (! in_array($branchCode, ['male', 'female'], true)) {
         return false;

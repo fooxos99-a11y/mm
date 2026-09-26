@@ -13,6 +13,7 @@ import {
   updateRegistrationFields,
   updateRegistrationSettings,
 } from '../../services/registrationApi';
+import { normalizeFixedFieldLabels } from '../registration/registrationFieldLabels.mjs';
 
 export default {
   name: 'AdminRegistrationView',
@@ -42,6 +43,7 @@ export default {
       isOpen: false,
       registrationUrl: '',
       registrationFields: [],
+      fixedLabels: normalizeFixedFieldLabels(),
       requests: [],
     };
   },
@@ -99,6 +101,7 @@ export default {
           ? `${window.location.origin}/registration`
           : (payload?.registrationUrl || '');
         this.registrationFields = Array.isArray(payload?.fields) ? payload.fields : [];
+        this.fixedLabels = normalizeFixedFieldLabels(payload?.fixedLabels);
         this.requests = Array.isArray(payload?.requests) ? payload.requests : [];
         this.emitTopbarState();
       } catch (error) {
@@ -126,7 +129,7 @@ export default {
     openFieldsDialog() {
       this.fieldsDialogOpen = true;
     },
-    async saveRegistrationFields(fields) {
+    async saveRegistrationFields(fields, fixedLabels = this.fixedLabels) {
       if (fields.some((field) => field.type === 'select' && field.options.length === 0)) {
         this.$toast.error('أضف خيارًا واحدًا على الأقل لكل قائمة منسدلة');
         return;
@@ -135,8 +138,9 @@ export default {
       this.fieldsSubmitting = true;
 
       try {
-        const payload = await updateRegistrationFields(fields);
+        const payload = await updateRegistrationFields(fields, fixedLabels);
         this.registrationFields = Array.isArray(payload?.fields) ? payload.fields : fields;
+        this.fixedLabels = normalizeFixedFieldLabels(payload?.fixedLabels || fixedLabels);
         this.fieldsDialogOpen = false;
         this.$toast.success('تم حفظ بيانات التسجيل');
       } catch (error) {
@@ -229,7 +233,7 @@ export default {
           input.setSelectionRange(0, input.value.length);
 
           const copied = document.execCommand('copy');
-          document.body.removeChild(input);
+          input.remove();
 
           if (copied) {
             this.$toast.success('تم نسخ رابط التسجيل');

@@ -68,7 +68,7 @@ export default {
 .completion-panel__empty { padding: 38px 16px 18px; color: #526675; text-align: center; font-size: .9rem; font-weight: 700; }
 .completion-panel__head { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .completion-panel__head h2 { margin: 0; color: #0b3f5b; font-size: 1.1rem; font-weight: 900; }
-.completion-panel__head span { color: #718694; font-size: .76rem; }
+.completion-panel__head span { color: #5f7482; font-size: .76rem; }
 .completion-panel__status { padding: 7px 12px; border-radius: 999px; font-size: .78rem; }
 .completion-panel__status--passed { background: #dcfce7; color: #166534; }
 .completion-panel__status--in_progress { background: #fef3c7; color: #92400e; }

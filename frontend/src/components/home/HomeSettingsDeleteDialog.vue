@@ -48,5 +48,6 @@ export default {
     value: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
   },
+  emits: ['input', 'confirm'],
 };
 </script>

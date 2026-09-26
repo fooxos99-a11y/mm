@@ -3,6 +3,7 @@
     :value="open"
     max-width="920"
     @input="$emit('update:open', $event)"
+    @close="$emit('close')"
   >
     <v-card class="assessment-dialog pa-4 pa-sm-6">
       <div class="assessment-dialog__title">
@@ -61,6 +62,7 @@ export default {
     kind: { type: String, default: 'other' },
     source: { type: String, default: '' },
   },
+  emits: ['close', 'update:open'],
 };
 </script>
 

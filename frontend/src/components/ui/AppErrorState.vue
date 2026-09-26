@@ -40,5 +40,6 @@ export default {
     retryLabel: { type: String, default: 'إعادة المحاولة' },
     icon: { type: String, default: 'mdi-alert-circle-outline' },
   },
+  emits: ['retry'],
 };
 </script>

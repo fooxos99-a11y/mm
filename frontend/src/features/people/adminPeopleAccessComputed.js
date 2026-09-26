@@ -1,3 +1,13 @@
+const RECITER_DIRECTORY_BRANCHES = {
+  'reciters-male': 'male',
+  'reciters-female': 'female',
+};
+
+const resolveStudentBranch = (branchId) => {
+  if (Object.hasOwn(RECITER_DIRECTORY_BRANCHES, branchId)) return RECITER_DIRECTORY_BRANCHES[branchId];
+  return branchId;
+};
+
 export default {
   isAdmin() {
     return this.currentUser?.role === 'admin';
@@ -56,9 +66,7 @@ export default {
     return ['reciters-male', 'reciters-female'].includes(this.effectiveSelectedBranch);
   },
   effectiveStudentBranch() {
-    if (this.effectiveSelectedBranch === 'reciters-male') return 'male';
-    if (this.effectiveSelectedBranch === 'reciters-female') return 'female';
-    return this.effectiveSelectedBranch;
+    return resolveStudentBranch(this.effectiveSelectedBranch);
   },
   filterOptions() {
     if (this.isReciterDirectoryMode) {

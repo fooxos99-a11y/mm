@@ -295,9 +295,6 @@
   padding: 0;
 }
 
-.practitioner-page .landing-header--scrolled .header-icon-link {
-}
-
 .practitioner-page .landing-header--scrolled .header-icon-link,
 .practitioner-page .landing-header--scrolled .mobile-menu-toggle,
 .practitioner-page .landing-header--scrolled .licenses-menu-toggle {
@@ -410,7 +407,7 @@
   height: 48px;
   border-radius: 18px;
   background: #f3f9fc;
-  color: #1484a7;
+  color: #137b9c;
 }
 
 .practitioner-page .hero-account-trigger__icon-wrap--header {

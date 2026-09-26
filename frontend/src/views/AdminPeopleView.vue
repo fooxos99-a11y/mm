@@ -1,11 +1,11 @@
 <template>
   <div class="people-page">
-    <p
+    <output
       v-if="dialogDataLoading"
-      role="status"
+      class="d-block"
     >
       جارٍ تحميل بيانات النافذة…
-    </p>
+    </output>
     <PeopleDirectoryPanel
       :error="directoryError || dashboardError || dialogDataError"
       :loading="directoryLoading"

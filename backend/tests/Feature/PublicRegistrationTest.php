@@ -146,7 +146,13 @@ class PublicRegistrationTest extends CoreDataApiTestCase
             [
                 'value' => json_encode([
                     ['id' => 'legacy-phone', 'label' => 'رقم الجوال', 'type' => 'text', 'required' => true],
-                    ['id' => 'qualification', 'label' => 'المؤهل', 'type' => 'select', 'required' => true, 'options' => ['ثانوي']],
+                    [
+                        'id' => 'qualification',
+                        'label' => 'المؤهل',
+                        'type' => 'select',
+                        'required' => true,
+                        'options' => ['ثانوي'],
+                    ],
                 ], JSON_UNESCAPED_UNICODE),
                 'updated_at' => now(),
             ],
@@ -159,5 +165,65 @@ class PublicRegistrationTest extends CoreDataApiTestCase
             ->assertJsonPath('fields.0.label', 'العمر')
             ->assertJsonPath('fields.0.type', 'number')
             ->assertJsonPath('fields.1.id', 'qualification');
+    }
+
+    public function test_admin_can_rename_fixed_registration_fields_without_changing_their_types(): void
+    {
+        $this->getJson('/api/public/registration')
+            ->assertOk()
+            ->assertJsonPath('fixedLabels.name', 'الاسم')
+            ->assertJsonPath('fixedLabels.gender', 'الجنس')
+            ->assertJsonPath('fixedLabels.phone', 'رقم الجوال');
+
+        $this->putJson('/api/dashboard/registration/fields', [
+            'fields' => [
+                ['id' => 'age', 'label' => 'العمر', 'type' => 'number', 'required' => true],
+            ],
+            'fixedLabels' => [
+                'name' => '  الاسم الثلاثي  ',
+                'gender' => '',
+                'phone' => 'رقم الجوال للتواصل',
+            ],
+        ])
+            ->assertOk()
+            ->assertJsonPath('fields.0.id', 'age')
+            ->assertJsonPath('fixedLabels.name', 'الاسم الثلاثي')
+            ->assertJsonPath('fixedLabels.gender', 'الجنس')
+            ->assertJsonPath('fixedLabels.phone', 'رقم الجوال للتواصل');
+
+        $this->getJson('/api/public/registration')
+            ->assertOk()
+            ->assertJsonPath('fixedLabels.name', 'الاسم الثلاثي')
+            ->assertJsonPath('fixedLabels.phone', 'رقم الجوال للتواصل')
+            ->assertJsonMissing(['id' => 'name']);
+
+        $this->getJson('/api/dashboard/registration')
+            ->assertOk()
+            ->assertJsonPath('fixedLabels.name', 'الاسم الثلاثي');
+
+        // Saving fields without labels keeps the renamed labels.
+        $this->putJson('/api/dashboard/registration/fields', [
+            'fields' => [['id' => 'age', 'label' => 'العمر', 'type' => 'number']],
+        ])
+            ->assertOk()
+            ->assertJsonPath('fixedLabels.name', 'الاسم الثلاثي');
+
+        // Only the three built-in fields can be renamed.
+        $this->putJson('/api/dashboard/registration/fields', [
+            'fields' => [],
+            'fixedLabels' => ['branch' => 'الفرع'],
+        ])->assertUnprocessable()->assertJsonValidationErrors(['fixedLabels']);
+
+        // Renaming does not relax the fixed phone validation.
+        DB::table('registration_settings')->updateOrInsert(
+            ['key' => 'is_open'],
+            ['value' => '1', 'updated_at' => now()],
+        );
+        $this->postJson('/api/public/registration-requests', [
+            'name' => 'طالب تجريبي',
+            'phone' => '05ABC',
+            'gender' => 'male',
+            'answers' => ['age' => '20'],
+        ])->assertUnprocessable()->assertJsonValidationErrors(['phone']);
     }
 }

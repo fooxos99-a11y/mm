@@ -33,7 +33,10 @@ class PageContentService
 
     public function loadPractitionerPageContent(): array
     {
-        $stored = $this->appSettingsService->loadJson('practitioner_page_content', $this->defaultPractitionerPageContent());
+        $stored = $this->appSettingsService->loadJson(
+            'practitioner_page_content',
+            $this->defaultPractitionerPageContent()
+        );
 
         return $this->normalizePractitionerPageContent($stored);
     }

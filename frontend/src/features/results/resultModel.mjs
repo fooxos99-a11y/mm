@@ -65,6 +65,22 @@ export const calculateSubmissionScore = (questions, submission) => {
   return pendingManualReview ? null : score
 }
 
+const resolveResultCorrectness = (answer, question, studentAnswer, correctAnswer) => {
+  if (typeof answer?.isCorrect === 'boolean') return answer.isCorrect
+  if (!question.correctAnswer) return null
+  return normalizeResultAnswer(studentAnswer) === normalizeResultAnswer(correctAnswer)
+}
+
+const buildManualReviewStatus = (manualPoints, points) => {
+  if (manualPoints === null || manualPoints === undefined) return 'بانتظار التصحيح اليدوي'
+  return `تم التصحيح: ${formatScoreValue(manualPoints)} / ${formatScoreValue(points || 0)}`
+}
+
+const buildCorrectnessStatus = isCorrect => {
+  if (isCorrect === null) return ''
+  return isCorrect ? 'صحيحة' : 'غير صحيحة'
+}
+
 export const buildResultDetailCards = (questions, submission, {
   richTextAnswers = false,
   attachmentResolver = null,
@@ -83,12 +99,9 @@ export const buildResultDetailCards = (questions, submission, {
       const correctAnswer = resolveCorrectAnswer(question)
       const manualReview = requiresManualReview(question, answer)
       const manualPoints = answer?.manualPoints ?? null
-      const isCorrect = manualReview ? null
-        : (typeof answer?.isCorrect === 'boolean'
-          ? answer.isCorrect
-          : (question.correctAnswer
-            ? normalizeResultAnswer(studentAnswer) === normalizeResultAnswer(correctAnswer)
-            : null))
+      const isCorrect = manualReview
+        ? null
+        : resolveResultCorrectness(answer, question, studentAnswer, correctAnswer)
 
       return {
         key: `${question.id}-${index}`,
@@ -105,10 +118,8 @@ export const buildResultDetailCards = (questions, submission, {
         manualPoints,
         isCorrect,
         statusText: manualReview
-          ? (manualPoints === null || manualPoints === undefined
-            ? 'بانتظار التصحيح اليدوي'
-            : `تم التصحيح: ${formatScoreValue(manualPoints)} / ${formatScoreValue(question.points || 0)}`)
-          : (isCorrect === null ? '' : (isCorrect ? 'صحيحة' : 'غير صحيحة')),
+          ? buildManualReviewStatus(manualPoints, question.points)
+          : buildCorrectnessStatus(isCorrect),
       }
     })
   }
@@ -130,11 +141,7 @@ export const buildResultDetailCards = (questions, submission, {
       requiresManualReview: manualReview,
       manualPoints,
       isCorrect: null,
-      statusText: manualReview
-        ? (manualPoints === null || manualPoints === undefined
-          ? 'بانتظار التصحيح اليدوي'
-          : `تم التصحيح: ${formatScoreValue(manualPoints)} / ${formatScoreValue(answer.points || 0)}`)
-        : '',
+      statusText: manualReview ? buildManualReviewStatus(manualPoints, answer.points) : '',
     }
   })
 }

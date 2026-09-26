@@ -65,6 +65,7 @@
             <AppPasswordField
               id="dashboard-account-password"
               v-model="form.password"
+              type="password"
               autocomplete="new-password"
               :placeholder="PASSWORD_REQUIREMENTS_TEXT"
               dense
@@ -184,6 +185,7 @@ export default {
       default: false,
     },
   },
+  emits: ['busy-change'],
   data() {
     return {
       PASSWORD_REQUIREMENTS_TEXT,

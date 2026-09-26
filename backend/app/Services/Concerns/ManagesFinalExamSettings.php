@@ -7,8 +7,12 @@ use Illuminate\Support\Facades\DB;
 
 trait ManagesFinalExamSettings
 {
-    public function updateFinalExamSetting(string $branchCode, bool $isEnabled, ?string $closesAt, ?string $notificationTemplate = null): void
-    {
+    public function updateFinalExamSetting(
+        string $branchCode,
+        bool $isEnabled,
+        ?string $closesAt,
+        ?string $notificationTemplate = null
+    ): void {
         $branchCode = $this->normalizeBranchCode($branchCode);
         $this->assertCanManageBranch($branchCode);
         $existingSetting = DB::table('final_exam_settings')->where('branch_code', $branchCode)->first();

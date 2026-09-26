@@ -4,7 +4,7 @@ export const escapeCsvCell = (value) => {
   const text = String(value ?? '');
   const safeText = FORMULA_PREFIX.test(text) ? `'${text}` : text;
 
-  return `"${safeText.replace(/"/g, '""')}"`;
+  return `"${safeText.replaceAll('"', '""')}"`;
 };
 
 export const buildCsv = (rows) => rows

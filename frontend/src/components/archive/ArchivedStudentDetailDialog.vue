@@ -143,5 +143,6 @@ export default {
     formatScore: { type: Function, required: true },
     formatDateTime: { type: Function, required: true },
   },
+  emits: ['input', 'close'],
 };
 </script>

@@ -77,7 +77,11 @@ class OperationalHealthController extends Controller
                 'failed' => Schema::hasTable('failed_jobs') ? DB::table('failed_jobs')->count() : 0,
             ];
         } catch (Throwable) {
-            return ['connection' => (string) config('queue.default'), 'pending' => PHP_INT_MAX, 'failed' => PHP_INT_MAX];
+            return [
+                'connection' => (string) config('queue.default'),
+                'pending' => PHP_INT_MAX,
+                'failed' => PHP_INT_MAX,
+            ];
         }
     }
 }

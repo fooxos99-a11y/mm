@@ -1,6 +1,57 @@
 import { BULK_LOGIN_HEADER_KEYS, BULK_NAME_HEADER_KEYS, BULK_PASSWORD_HEADER_KEYS } from './peopleModel.mjs';
 import { createStudent as createStudentRequest, saveReciter as saveReciterRequest } from '../../services/api';
 
+const endCsvCell = (state) => {
+  state.row.push(state.cell);
+  state.cell = '';
+};
+
+// Consumes one character and returns how many extra characters were consumed.
+const consumeCsvChar = (state, char, nextChar) => {
+  if (char === '"') {
+    if (state.inQuotes && nextChar === '"') {
+      state.cell += '"';
+      return 1;
+    }
+
+    state.inQuotes = !state.inQuotes;
+    return 0;
+  }
+
+  if (state.inQuotes) {
+    state.cell += char;
+    return 0;
+  }
+
+  if (char === ',') {
+    endCsvCell(state);
+    return 0;
+  }
+
+  if (char === '\n' || char === '\r') {
+    endCsvCell(state);
+    state.rows.push(state.row);
+    state.row = [];
+    return char === '\r' && nextChar === '\n' ? 1 : 0;
+  }
+
+  state.cell += char;
+  return 0;
+};
+
+const parseCsvText = (text) => {
+  const state = { rows: [], row: [], cell: '', inQuotes: false };
+
+  for (let index = 0; index < text.length; index += 1) {
+    index += consumeCsvChar(state, text[index], text[index + 1]);
+  }
+
+  endCsvCell(state);
+  state.rows.push(state.row);
+
+  return state.rows;
+};
+
 export default {
     openBulkFilePicker() {
       if (this.bulkImporting || this.dialogEntityType !== 'student' || !this.canAddStudent) {
@@ -55,50 +106,7 @@ export default {
       return /^[A-Za-z0-9_-]{4,}$/.test(normalized) && /\d/.test(normalized);
     },
     parseCsvRows(text) {
-      const rows = [];
-      let row = [];
-      let cell = '';
-      let inQuotes = false;
-
-      for (let index = 0; index < text.length; index += 1) {
-        const char = text[index];
-        const nextChar = text[index + 1];
-
-        if (char === '"' && inQuotes && nextChar === '"') {
-          cell += '"';
-          index += 1;
-          continue;
-        }
-
-        if (char === '"') {
-          inQuotes = !inQuotes;
-          continue;
-        }
-
-        if (char === ',' && !inQuotes) {
-          row.push(cell);
-          cell = '';
-          continue;
-        }
-
-        if ((char === '\n' || char === '\r') && !inQuotes) {
-          if (char === '\r' && nextChar === '\n') {
-            index += 1;
-          }
-          row.push(cell);
-          rows.push(row);
-          row = [];
-          cell = '';
-          continue;
-        }
-
-        cell += char;
-      }
-
-      row.push(cell);
-      rows.push(row);
-
-      return rows;
+      return parseCsvText(text);
     },
     async readBulkRows(file) {
       const extension = (file.name || '').split('.').pop()?.toLowerCase();
@@ -129,7 +137,7 @@ export default {
 
       const rows = rawRows
         .map((row) => Array.isArray(row) ? row.map((cell) => this.normalizeBulkCell(cell)) : [])
-        .filter((row) => row.some((cell) => cell));
+        .filter((row) => row.some(Boolean));
 
       if (!rows.length) {
         return [];
@@ -159,7 +167,7 @@ export default {
 
       return dataRows
         .map((row) => {
-          const compactValues = row.filter((cell) => cell);
+          const compactValues = row.filter(Boolean);
           let name = this.normalizeBulkCell(row[nameIndex] || compactValues[0] || '');
           let loginCode = this.normalizeBulkCell(row[loginIndex] || compactValues[1] || '');
           const password = this.normalizeBulkCell(row[passwordIndex] || compactValues[2] || '');
@@ -171,6 +179,46 @@ export default {
           return { name, loginCode, password };
         })
         .filter((entry) => entry.name);
+    },
+    importBulkEntry(entry, branchId) {
+      if (this.dialogEntityType === 'student') {
+        return createStudentRequest({
+          name: entry.name,
+          loginId: entry.loginCode,
+          password: entry.password,
+          passwordConfirmation: entry.password,
+          branchId,
+          note: '',
+        });
+      }
+
+      return saveReciterRequest({
+        currentLoginCode: null,
+        name: entry.name,
+        loginCode: entry.loginCode,
+        password: entry.password,
+        passwordConfirmation: entry.password,
+        branchId,
+        linkedStudentIds: [],
+      });
+    },
+    async reportBulkImportResult(successCount, failures) {
+      if (successCount > 0) {
+        await this.refreshDashboardSnapshot();
+      }
+
+      if (successCount > 0 && failures.length === 0) {
+        this.showTimedToast('success', `تمت إضافة ${successCount} ${this.dialogEntityType === 'student' ? 'معلم' : 'مقرئ'} من الملف.`);
+        return;
+      }
+
+      if (successCount > 0 && failures.length > 0) {
+        const sampleFailures = failures.slice(0, 3).map((item) => `${item.name}: ${item.message}`).join(' | ');
+        this.showTimedToast('info', `تمت إضافة ${successCount} عنصر، وتعذر استيراد ${failures.length}. ${sampleFailures}`, { timeout: 6500 });
+        return;
+      }
+
+      this.showTimedToast('error', failures[0]?.message || 'تعذر استيراد الملف.');
     },
     async handleBulkFileChange(event) {
       if (this.dialogEntityType !== 'student' || !this.canAddStudent) {
@@ -199,27 +247,7 @@ export default {
 
         for (const entry of entries) {
           try {
-            if (this.dialogEntityType === 'student') {
-              await createStudentRequest({
-                name: entry.name,
-                loginId: entry.loginCode,
-                password: entry.password,
-                passwordConfirmation: entry.password,
-                branchId,
-                note: '',
-              });
-            } else {
-              await saveReciterRequest({
-                currentLoginCode: null,
-                name: entry.name,
-                loginCode: entry.loginCode,
-                password: entry.password,
-                passwordConfirmation: entry.password,
-                branchId,
-                linkedStudentIds: [],
-              });
-            }
-
+            await this.importBulkEntry(entry, branchId);
             successCount += 1;
           } catch (error) {
             failures.push({
@@ -229,23 +257,8 @@ export default {
           }
         }
 
-        if (successCount > 0) {
-          await this.refreshDashboardSnapshot();
-        }
-
-        if (successCount > 0 && failures.length === 0) {
-          this.showTimedToast('success', `تمت إضافة ${successCount} ${this.dialogEntityType === 'student' ? 'معلم' : 'مقرئ'} من الملف.`);
-          return;
-        }
-
-        if (successCount > 0 && failures.length > 0) {
-          const sampleFailures = failures.slice(0, 3).map((item) => `${item.name}: ${item.message}`).join(' | ');
-          this.showTimedToast('info', `تمت إضافة ${successCount} عنصر، وتعذر استيراد ${failures.length}. ${sampleFailures}`, { timeout: 6500 });
-          return;
-        }
-
-        this.showTimedToast('error', failures[0]?.message || 'تعذر استيراد الملف.');
-      } catch (error) {
+        await this.reportBulkImportResult(successCount, failures);
+      } catch {
         this.showTimedToast('error', 'تعذر قراءة ملف الإكسل. تأكد من أن أول ورقة تحتوي على الأسماء والأرقام.');
       } finally {
         this.bulkImporting = false;

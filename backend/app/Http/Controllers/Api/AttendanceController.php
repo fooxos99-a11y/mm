@@ -16,7 +16,12 @@ class AttendanceController extends Controller
     public function store(SetManualAttendanceRequest $request): JsonResponse
     {
         $data = $request->validated();
-        $this->attendanceService->save($request->user(), $data['courseId'], $data['presentStudents'], $data['branchCode'] ?? null);
+        $this->attendanceService->save(
+            $request->user(),
+            $data['courseId'],
+            $data['presentStudents'],
+            $data['branchCode'] ?? null
+        );
 
         return response()->json(status: 204);
     }

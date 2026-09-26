@@ -54,7 +54,8 @@ export default {
       }
 
       this.resetForms();
-      this.dialogEntityType = this.isReciterDirectoryMode && this.canAddReciter ? 'reciter' : (this.canAddStudent ? 'student' : 'reciter');
+      const prefersReciter = this.isReciterDirectoryMode && this.canAddReciter;
+      this.dialogEntityType = !prefersReciter && this.canAddStudent ? 'student' : 'reciter';
       const initialBranchId = this.effectiveStudentBranch;
       this.studentForm.branchId = initialBranchId;
       this.reciterForm.branchId = initialBranchId;

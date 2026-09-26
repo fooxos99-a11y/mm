@@ -29,7 +29,7 @@
   margin: 0;
   padding: 18px 36px;
   border-radius: 0 0 28px 28px;
-  background: linear-gradient(135deg, #2a94b2 0%, #167190 48%, #084159 100%);
+  background: linear-gradient(135deg, #24809a 0%, #167190 48%, #084159 100%);
   color: #fff;
   font-size: clamp(1.5rem, 4vw, 2.55rem);
   font-weight: 900;
@@ -88,7 +88,7 @@
   width: 48px;
   height: 48px;
   border-radius: 18px;
-  background: linear-gradient(135deg, #2a94b2 0%, #167190 48%, #084159 100%);
+  background: linear-gradient(135deg, #24809a 0%, #167190 48%, #084159 100%);
   color: #fff;
 }
 
@@ -154,7 +154,7 @@
   border-radius: 20px;
   display: grid;
   place-items: center;
-  background: linear-gradient(135deg, #2a94b2 0%, #167190 48%, #084159 100%);
+  background: linear-gradient(135deg, #24809a 0%, #167190 48%, #084159 100%);
   color: #fff;
   font-weight: 900;
   box-shadow: 0 16px 28px -18px rgba(22, 113, 144, 0.5);
@@ -204,7 +204,7 @@
   width: 38px;
   height: 38px;
   border-radius: 999px;
-  background: linear-gradient(135deg, #2a94b2 0%, #167190 46%, #084159 100%);
+  background: linear-gradient(135deg, #24809a 0%, #167190 46%, #084159 100%);
   color: #fff;
   flex: 0 0 38px;
   box-shadow: 0 14px 24px -18px rgba(8, 65, 89, 0.5);
@@ -359,7 +359,7 @@
   right: 18px;
   padding: 6px 12px;
   border-radius: 999px;
-  background: linear-gradient(135deg, #2a94b2 0%, #167190 48%, #084159 100%);
+  background: linear-gradient(135deg, #24809a 0%, #167190 48%, #084159 100%);
   color: #fff;
   font-size: 0.82rem;
   font-weight: 900;
@@ -387,6 +387,9 @@
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(241, 249, 251, 0.94) 100%);
   border: 1px solid rgba(131, 181, 196, 0.18);
   box-shadow: 0 14px 28px -22px rgba(8, 65, 89, 0.28);
+  margin-top: 22px;
+  padding: 26px;
+  line-height: 2;
 }
 
 .practitioner-page .duration-quick-card__label {
@@ -403,12 +406,6 @@
 .practitioner-page .duration-quick-card__body {
   min-height: 48px;
   justify-content: flex-end;
-}
-
-.practitioner-page .duration-text-card {
-  margin-top: 22px;
-  padding: 26px;
-  line-height: 2;
 }
 
 .practitioner-page .duration-text-card p {

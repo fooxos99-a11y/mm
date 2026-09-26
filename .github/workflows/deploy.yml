@@ -26,20 +26,20 @@ jobs:
     timeout-minutes: 35
     environment: ${{ inputs.environment }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           ref: ${{ inputs.ref }}
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: '22'
           cache: npm
           cache-dependency-path: frontend/package-lock.json
-      - uses: shivammathur/setup-php@v2
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: '8.3'
           coverage: none
           tools: composer:v2
-      - run: npm ci --prefix frontend --no-audit --no-fund
+      - run: npm ci --prefix frontend --no-audit --no-fund --ignore-scripts
       - run: composer install --working-dir=backend --no-interaction --prefer-dist --no-progress --no-ansi
       - run: cp backend/.env.example backend/.env && php backend/artisan key:generate
       - run: npm run verify:release

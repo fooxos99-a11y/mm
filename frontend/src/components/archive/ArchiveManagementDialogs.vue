@@ -10,8 +10,12 @@
         <AppDialogHeader title="إضافة أرشيف جديد" />
         <AppDialogBody>
           <div class="archive-dialog__field">
-            <label class="archive-dialog__label">اسم الأرشيف</label>
+            <label
+              for="archive-create-name"
+              class="archive-dialog__label"
+            >اسم الأرشيف</label>
             <input
+              id="archive-create-name"
               :value="archiveName"
               type="text"
               class="archive-dialog__input"
@@ -21,8 +25,12 @@
             >
           </div>
           <div class="archive-dialog__field">
-            <label class="archive-dialog__label">عدد الدورات</label>
+            <label
+              for="archive-create-courses-count"
+              class="archive-dialog__label"
+            >عدد الدورات</label>
             <input
+              id="archive-create-courses-count"
               :value="coursesCount"
               type="number"
               min="0"
@@ -35,6 +43,7 @@
             >
           </div>
           <BatchTypeField
+            field-id="archive-create-batch-type"
             :value="batchType"
             :options="batchTypeOptions"
             @input="$emit('update:batch-type', $event)"
@@ -105,8 +114,12 @@
         <AppDialogHeader title="أرشفة المحتوى الحالي" />
         <AppDialogBody>
           <div class="archive-dialog__field">
-            <label class="archive-dialog__label">اسم الأرشيف</label>
+            <label
+              for="archive-all-name"
+              class="archive-dialog__label"
+            >اسم الأرشيف</label>
             <input
+              id="archive-all-name"
               :value="archiveAllName"
               type="text"
               class="archive-dialog__input"
@@ -116,6 +129,7 @@
             >
           </div>
           <BatchTypeField
+            field-id="archive-all-batch-type"
             :value="archiveAllBatchType"
             :options="batchTypeOptions"
             @input="$emit('update:archive-all-batch-type', $event)"
@@ -150,8 +164,12 @@
         <AppDialogHeader title="إضافة طالب إلى الأرشيف" />
         <AppDialogBody>
           <div class="archive-dialog__field">
-            <label class="archive-dialog__label">اسم الطالب</label>
+            <label
+              for="archive-student-name"
+              class="archive-dialog__label"
+            >اسم الطالب</label>
             <input
+              id="archive-student-name"
               :value="studentName"
               type="text"
               class="archive-dialog__input"
@@ -209,5 +227,25 @@ export default {
     studentOpen: { type: Boolean, default: false },
     studentName: { type: String, default: '' },
   },
+  emits: [
+    'update:create-open',
+    'create-close',
+    'update:archive-name',
+    'create',
+    'update:courses-count',
+    'update:batch-type',
+    'update:delete-open',
+    'delete-close',
+    'delete-confirm',
+    'update:archive-all-open',
+    'archive-all-close',
+    'update:archive-all-name',
+    'archive-all',
+    'update:archive-all-batch-type',
+    'update:student-open',
+    'student-close',
+    'update:student-name',
+    'student-add',
+  ],
 };
 </script>

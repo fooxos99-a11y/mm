@@ -43,10 +43,25 @@ return new class extends Migration
             ->where('setting_key', 'registration_form_fields')
             ->value('value'), true);
         $fields = is_array($storedFields) ? $storedFields : [];
-        $fields = array_values(array_filter($fields, fn ($field): bool => trim((string) ($field['label'] ?? '')) !== 'رقم الجوال'));
+        $fields = array_values(
+            array_filter($fields, fn ($field): bool => trim((string) ($field['label'] ?? '')) !== 'رقم الجوال')
+        );
 
-        if (! collect($fields)->contains(fn ($field): bool => ($field['id'] ?? '') === 'age' || ($field['label'] ?? '') === 'العمر')) {
-            array_unshift($fields, ['id' => 'age', 'label' => 'العمر', 'type' => 'number', 'required' => true, 'showInRequests' => true, 'options' => []]);
+        if (
+            ! collect($fields)
+                ->contains(fn ($field): bool => ($field['id'] ?? '') === 'age' || ($field['label'] ?? '') === 'العمر')
+        ) {
+            array_unshift(
+                $fields,
+                [
+                    'id' => 'age',
+                    'label' => 'العمر',
+                    'type' => 'number',
+                    'required' => true,
+                    'showInRequests' => true,
+                    'options' => [],
+                ]
+            );
         }
 
         foreach ($fields as &$field) {
@@ -59,12 +74,30 @@ return new class extends Migration
         }
         unset($field);
 
-        if (! collect($fields)->contains(fn ($field): bool => ($field['id'] ?? '') === 'complex_name' || ($field['label'] ?? '') === 'اسم المجمع')) {
-            $fields[] = ['id' => 'complex_name', 'label' => 'اسم المجمع', 'type' => 'select', 'required' => false, 'showInRequests' => true, 'options' => ['غير محدد']];
+        if (! collect($fields)->contains(
+            fn ($field): bool => ($field['id'] ?? '') === 'complex_name' || ($field['label'] ?? '') === 'اسم المجمع'
+        )) {
+            $fields[] = [
+                'id' => 'complex_name',
+                'label' => 'اسم المجمع',
+                'type' => 'select',
+                'required' => false,
+                'showInRequests' => true,
+                'options' => ['غير محدد'],
+            ];
         }
 
-        if (! collect($fields)->contains(fn ($field): bool => ($field['id'] ?? '') === 'house_name' || ($field['label'] ?? '') === 'اسم الدار')) {
-            $fields[] = ['id' => 'house_name', 'label' => 'اسم الدار', 'type' => 'select', 'required' => false, 'showInRequests' => true, 'options' => ['غير محدد']];
+        if (! collect($fields)->contains(
+            fn ($field): bool => ($field['id'] ?? '') === 'house_name' || ($field['label'] ?? '') === 'اسم الدار'
+        )) {
+            $fields[] = [
+                'id' => 'house_name',
+                'label' => 'اسم الدار',
+                'type' => 'select',
+                'required' => false,
+                'showInRequests' => true,
+                'options' => ['غير محدد'],
+            ];
         }
 
         DB::table('app_settings')->updateOrInsert(

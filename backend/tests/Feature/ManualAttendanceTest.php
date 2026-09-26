@@ -51,7 +51,8 @@ class ManualAttendanceTest extends TestCase
             $this->postJson('/api/dashboard/manual-attendance', $this->payload($branch))->assertNoContent();
             $this->assertDatabaseCount('course_attendance', 2);
         }
-        $this->postJson('/api/dashboard/manual-attendance', ['courseId' => $this->courseId, 'presentStudents' => []])->assertNoContent();
+        $this->postJson('/api/dashboard/manual-attendance', ['courseId' => $this->courseId, 'presentStudents' => []])
+            ->assertNoContent();
         $this->assertDatabaseCount('course_attendance', 1);
         $this->assertDatabaseHas('course_attendance', (array) $untouched);
     }
@@ -59,7 +60,8 @@ class ManualAttendanceTest extends TestCase
     public function test_manager_cannot_override_branch_or_submit_other_branch_students(): void
     {
         $this->actAs('male_manager');
-        $this->postJson('/api/dashboard/manual-attendance', [...$this->payload('male'), 'branchCode' => 'female'])->assertForbidden();
+        $this->postJson('/api/dashboard/manual-attendance', [...$this->payload('male'), 'branchCode' => 'female'])
+            ->assertForbidden();
         $this->postJson('/api/dashboard/manual-attendance', $this->payload('female'))->assertForbidden();
         $this->assertDatabaseCount('course_attendance', 2);
     }
@@ -107,14 +109,16 @@ class ManualAttendanceTest extends TestCase
     {
         $this->actAs('admin');
         $this->postJson('/api/dashboard/manual-attendance', ['courseId' => $this->courseId])->assertUnprocessable();
-        $this->postJson('/api/dashboard/manual-attendance', [...$this->payload('male'), 'courseId' => 'missing'])->assertUnprocessable();
+        $this->postJson('/api/dashboard/manual-attendance', [...$this->payload('male'), 'courseId' => 'missing'])
+            ->assertUnprocessable();
         $this->assertDatabaseCount('course_attendance', 2);
     }
 
     public function test_manager_without_results_permission_cannot_clear_attendance(): void
     {
         $this->actAs('male_manager', false);
-        $this->postJson('/api/dashboard/manual-attendance', ['courseId' => $this->courseId, 'presentStudents' => []])->assertForbidden();
+        $this->postJson('/api/dashboard/manual-attendance', ['courseId' => $this->courseId, 'presentStudents' => []])
+            ->assertForbidden();
         $this->assertDatabaseCount('course_attendance', 2);
     }
 

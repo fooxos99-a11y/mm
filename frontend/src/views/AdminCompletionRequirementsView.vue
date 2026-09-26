@@ -1,9 +1,10 @@
 <template>
   <div class="completion-page">
     <div class="completion-filter-bar">
-      <label class="completion-field">
-        <span>الحالة</span>
+      <div class="completion-field">
+        <label for="completion-status-filter">الحالة</label>
         <AppSelect
+          id="completion-status-filter"
           v-model="statusFilter"
           aria-label="الحالة"
           :items="statusOptions"
@@ -13,10 +14,11 @@
           outlined
           hide-details
         />
-      </label>
-      <label class="completion-field">
-        <span>{{ selectedBranch === 'female' ? 'المعلمة' : 'المعلم' }}</span>
+      </div>
+      <div class="completion-field">
+        <label for="completion-student">{{ selectedBranch === 'female' ? 'المعلمة' : 'المعلم' }}</label>
         <AppSelect
+          id="completion-student"
           v-model="selectedStudentId"
           :aria-label="selectedBranch === 'female' ? 'المعلمة' : 'المعلم'"
           :items="studentOptions"
@@ -28,7 +30,7 @@
           hide-details
           clearable
         />
-      </label>
+      </div>
     </div>
 
     <section class="completion-students">
@@ -50,12 +52,13 @@
             تُحسب حالة الطلاب تلقائيًا بناءً على القيم المحفوظة للفرع.
           </p>
           <div class="completion-settings__grid">
-            <label
+            <div
               v-if="isAdmin"
               class="completion-field"
             >
-              <span>الفرع</span>
+              <label for="completion-settings-branch">الفرع</label>
               <AppSelect
+                id="completion-settings-branch"
                 v-model="selectedBranch"
                 aria-label="الفرع"
                 :items="branchOptions"
@@ -66,7 +69,7 @@
                 hide-details
                 @change="loadRequirements"
               />
-            </label>
+            </div>
             <div
               v-else
               class="completion-field completion-field--readonly"
@@ -74,9 +77,10 @@
               <span>الفرع</span>
               <strong>{{ payload.branchLabel }}</strong>
             </div>
-            <label class="completion-field">
-              <span>الحد الأدنى للحضور</span>
+            <div class="completion-field">
+              <label for="completion-settings-attendance">الحد الأدنى للحضور</label>
               <AppTextField
+                id="completion-settings-attendance"
                 v-model.number="settingsDraft.attendanceRequired"
                 type="number"
                 min="1"
@@ -86,10 +90,11 @@
                 hide-details
                 :disabled="payload.settings.isClosed"
               />
-            </label>
-            <label class="completion-field">
-              <span>نسبة المهام المعتمدة</span>
+            </div>
+            <div class="completion-field">
+              <label for="completion-settings-tasks">نسبة المهام المعتمدة</label>
               <AppTextField
+                id="completion-settings-tasks"
                 v-model.number="settingsDraft.tasksPercentageRequired"
                 type="number"
                 min="1"
@@ -100,10 +105,11 @@
                 hide-details
                 :disabled="payload.settings.isClosed"
               />
-            </label>
-            <label class="completion-field">
-              <span>نسبة الاختبار النهائي</span>
+            </div>
+            <div class="completion-field">
+              <label for="completion-settings-final-exam">نسبة الاختبار النهائي</label>
               <AppTextField
+                id="completion-settings-final-exam"
                 v-model.number="settingsDraft.finalExamPercentageRequired"
                 type="number"
                 min="1"
@@ -114,10 +120,11 @@
                 hide-details
                 :disabled="payload.settings.isClosed"
               />
-            </label>
-            <label class="completion-field">
-              <span>الأجزاء المطلوبة</span>
+            </div>
+            <div class="completion-field">
+              <label for="completion-settings-quran-parts">الأجزاء المطلوبة</label>
               <AppTextField
+                id="completion-settings-quran-parts"
                 v-model.number="settingsDraft.quranPartsRequired"
                 type="number"
                 min="1"
@@ -127,7 +134,7 @@
                 hide-details
                 :disabled="payload.settings.isClosed"
               />
-            </label>
+            </div>
           </div>
         </AppDialogBody>
         <AppDialogFooter>

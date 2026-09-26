@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; connect-src 'self' https: wss: ws: http://127.0.0.1:* http://localhost:*; font-src 'self' data:; form-action 'self'; frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com; img-src 'self' data: blob: https:; media-src 'self' blob: https:; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; worker-src 'self' blob:">
+    <meta http-equiv="Content-Security-Policy" content="__APP_CONTENT_SECURITY_POLICY__">
     <meta name="description" content="منصة الرخص المهنية لإدارة البرامج والتسجيل والتقييمات والمواد التدريبية.">
     <meta name="theme-color" content="#0f766e">
     <meta property="og:type" content="website">
@@ -33,7 +33,7 @@
   </head>
   <body>
     <noscript><strong>هذه الواجهة تحتاج JavaScript للعمل.</strong></noscript>
-    <div id="app"><main class="app-boot" role="status">جارٍ تحميل منصة الرخص المهنية…</main></div>
+    <div id="app"><output class="app-boot">جارٍ تحميل منصة الرخص المهنية…</output></div>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

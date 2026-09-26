@@ -10,8 +10,8 @@ export const updateRegistrationSettings = async (isOpen) => {
   await apiClient.put('/dashboard/registration/settings', { isOpen });
 };
 
-export const updateRegistrationFields = async (fields) => {
-  const response = await apiClient.put('/dashboard/registration/fields', { fields });
+export const updateRegistrationFields = async (fields, fixedLabels) => {
+  const response = await apiClient.put('/dashboard/registration/fields', { fields, fixedLabels });
 
   return response.data;
 };

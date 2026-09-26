@@ -20,8 +20,12 @@
         class="admin-templates__grid"
       >
         <div class="admin-templates__field">
-          <label class="admin-templates__label">قالب القبلي</label>
+          <label
+            class="admin-templates__label"
+            for="admin-templates-pre"
+          >قالب القبلي</label>
           <v-textarea
+            id="admin-templates-pre"
             v-model="templateDraft.pre"
             rows="4"
             outlined
@@ -31,8 +35,12 @@
         </div>
 
         <div class="admin-templates__field">
-          <label class="admin-templates__label">قالب البعدي</label>
+          <label
+            class="admin-templates__label"
+            for="admin-templates-post"
+          >قالب البعدي</label>
           <v-textarea
+            id="admin-templates-post"
             v-model="templateDraft.post"
             rows="4"
             outlined
@@ -42,8 +50,12 @@
         </div>
 
         <div class="admin-templates__field admin-templates__field--full">
-          <label class="admin-templates__label">قالب المهام</label>
+          <label
+            class="admin-templates__label"
+            for="admin-templates-tasks"
+          >قالب المهام</label>
           <v-textarea
+            id="admin-templates-tasks"
             v-model="templateDraft.tasks"
             rows="4"
             outlined
@@ -53,8 +65,12 @@
         </div>
 
         <div class="admin-templates__field admin-templates__field--full">
-          <label class="admin-templates__label">قالب الاختبار النهائي</label>
+          <label
+            class="admin-templates__label"
+            for="admin-templates-final-exam"
+          >قالب الاختبار النهائي</label>
           <v-textarea
+            id="admin-templates-final-exam"
             v-model="templateDraft.finalExam"
             rows="4"
             outlined
@@ -190,6 +206,7 @@ export default {
 }
 
 .admin-templates__card {
+  padding: 24px;
   border: 1px solid rgba(255, 255, 255, 0.82);
   border-radius: 28px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(245, 250, 250, 0.96) 100%);
@@ -201,10 +218,6 @@ export default {
   color: #0f3554;
   font-size: 1.7rem;
   font-weight: 900;
-}
-
-.admin-templates__card {
-  padding: 24px;
 }
 
 .admin-templates__grid {

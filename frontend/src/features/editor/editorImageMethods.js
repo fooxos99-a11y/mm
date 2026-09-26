@@ -1,6 +1,16 @@
 import { MIN_IMAGE_DIMENSION } from './editorConstants';
 import { Quill } from './editorRuntime';
 
+const readInlineDimension = (value) => (value && value !== 'auto' ? Number.parseFloat(value) : Number.NaN);
+
+const readInlineOffset = (value) => (value ? Number.parseFloat(value) : Number.NaN);
+
+const pickFiniteMetric = (storedValue, inlineValue, fallbackValue) => {
+  if (Number.isFinite(storedValue)) return storedValue;
+  if (Number.isFinite(inlineValue)) return inlineValue;
+  return fallbackValue;
+};
+
 export default {
     setSelectedImage(imageElement) {
       if (this.lockImages) {
@@ -35,29 +45,14 @@ export default {
       const editorWidth = editorRoot?.clientWidth || imageElement.clientWidth || 480;
       const imageRect = imageElement.getBoundingClientRect();
       const editorRect = editorRoot?.getBoundingClientRect() || null;
-      const storedWidth = Number.parseFloat(imageElement.getAttribute('data-width-px'));
-      const inlineWidth = imageElement.style.width && imageElement.style.width !== 'auto'
-        ? Number.parseFloat(imageElement.style.width)
-        : Number.NaN;
-      const inlineHeight = imageElement.style.height && imageElement.style.height !== 'auto'
-        ? Number.parseFloat(imageElement.style.height)
-        : Number.NaN;
-      const storedHeight = Number.parseFloat(imageElement.getAttribute('data-height-px'));
-      const storedX = Number.parseFloat(imageElement.getAttribute('data-x'));
-      const storedY = Number.parseFloat(imageElement.getAttribute('data-y'));
-      const inlineLeft = imageElement.style.left
-        ? Number.parseFloat(imageElement.style.left)
-        : Number.NaN;
-      const inlineTop = imageElement.style.top
-        ? Number.parseFloat(imageElement.style.top)
-        : Number.NaN;
-      const hasStoredX = imageElement.hasAttribute('data-x') && Number.isFinite(storedX);
-      const hasStoredY = imageElement.hasAttribute('data-y') && Number.isFinite(storedY);
+      const { dataset, style } = imageElement;
       const fallbackWidth = Math.round(Math.min(editorWidth * 0.6, 420));
       const measuredWidth = Math.round(imageRect.width || imageElement.clientWidth || fallbackWidth);
-      const resolvedWidth = Number.isFinite(storedWidth)
-        ? storedWidth
-        : (Number.isFinite(inlineWidth) ? inlineWidth : measuredWidth);
+      const resolvedWidth = pickFiniteMetric(
+        Number.parseFloat(dataset.widthPx),
+        readInlineDimension(style.width),
+        measuredWidth,
+      );
       const naturalRatio = imageElement.naturalWidth > 0 && imageElement.naturalHeight > 0
         ? imageElement.naturalHeight / imageElement.naturalWidth
         : 1;
@@ -66,17 +61,23 @@ export default {
         || (resolvedWidth * naturalRatio)
         || resolvedWidth,
       );
-      const resolvedHeight = Number.isFinite(storedHeight)
-        ? storedHeight
-        : (Number.isFinite(inlineHeight) ? inlineHeight : measuredHeight);
+      const resolvedHeight = pickFiniteMetric(
+        Number.parseFloat(dataset.heightPx),
+        readInlineDimension(style.height),
+        measuredHeight,
+      );
       const fallbackX = editorRect ? Math.round(imageRect.left - editorRect.left) : 0;
       const fallbackY = editorRect ? Math.round(imageRect.top - editorRect.top) : 0;
-      const resolvedX = hasStoredX
-        ? storedX
-        : (Number.isFinite(inlineLeft) ? inlineLeft : Math.max(0, fallbackX));
-      const resolvedY = hasStoredY
-        ? storedY
-        : (Number.isFinite(inlineTop) ? inlineTop : Math.max(0, fallbackY));
+      const resolvedX = pickFiniteMetric(
+        Number.parseFloat(dataset.x),
+        readInlineOffset(style.left),
+        Math.max(0, fallbackX),
+      );
+      const resolvedY = pickFiniteMetric(
+        Number.parseFloat(dataset.y),
+        readInlineOffset(style.top),
+        Math.max(0, fallbackY),
+      );
       const normalizedMetrics = this.normalizeImageMetrics({
         width: resolvedWidth,
         height: resolvedHeight,
@@ -92,12 +93,12 @@ export default {
       imageElement.style.maxWidth = 'none';
       imageElement.style.width = `${normalizedMetrics.width}px`;
       imageElement.style.height = `${normalizedMetrics.height}px`;
-      imageElement.setAttribute('data-width-px', String(normalizedMetrics.width));
+      imageElement.dataset.widthPx = String(normalizedMetrics.width);
       if (Number.isFinite(normalizedMetrics.height)) {
-        imageElement.setAttribute('data-height-px', String(normalizedMetrics.height));
+        imageElement.dataset.heightPx = String(normalizedMetrics.height);
       }
-      imageElement.setAttribute('data-x', String(normalizedMetrics.translateX));
-      imageElement.setAttribute('data-y', String(normalizedMetrics.translateY));
+      imageElement.dataset.x = String(normalizedMetrics.translateX);
+      imageElement.dataset.y = String(normalizedMetrics.translateY);
     },
     refreshEditorImages() {
       if (!this.editor?.root) {
@@ -138,10 +139,10 @@ export default {
       imageElement.style.width = `${metrics.width}px`;
       imageElement.style.height = `${metrics.height}px`;
       imageElement.style.transform = 'none';
-      imageElement.setAttribute('data-width-px', String(metrics.width));
-      imageElement.setAttribute('data-height-px', String(metrics.height));
-      imageElement.setAttribute('data-x', String(metrics.translateX));
-      imageElement.setAttribute('data-y', String(metrics.translateY));
+      imageElement.dataset.widthPx = String(metrics.width);
+      imageElement.dataset.heightPx = String(metrics.height);
+      imageElement.dataset.x = String(metrics.translateX);
+      imageElement.dataset.y = String(metrics.translateY);
     },
     resolveLiveImageElement(imageIndex, previousImage = this.selectedImage, forcedMetrics = null) {
       if (!this.editor?.root || !previousImage) {
@@ -173,13 +174,13 @@ export default {
             return false;
           }
 
-          const width = Number.parseFloat(imageNode.getAttribute('data-width-px')) || 0;
-          const height = Number.parseFloat(imageNode.getAttribute('data-height-px'))
+          const width = Number.parseFloat(imageNode.dataset.widthPx) || 0;
+          const height = Number.parseFloat(imageNode.dataset.heightPx)
             || (imageNode.style.height && imageNode.style.height !== 'auto' ? Number.parseFloat(imageNode.style.height) : 0)
             || imageNode.getBoundingClientRect().height
             || 0;
-          const translateX = Number.parseFloat(imageNode.getAttribute('data-x')) || 0;
-          const translateY = Number.parseFloat(imageNode.getAttribute('data-y')) || 0;
+          const translateX = Number.parseFloat(imageNode.dataset.x) || 0;
+          const translateY = Number.parseFloat(imageNode.dataset.y) || 0;
 
           return Math.abs(width - previousWidth) <= 8
             && Math.abs(height - previousHeight) <= 8
@@ -277,13 +278,13 @@ export default {
       }
 
       return {
-        width: Number.parseFloat(imageElement.getAttribute('data-width-px')) || imageElement.getBoundingClientRect().width || 0,
-        height: Number.parseFloat(imageElement.getAttribute('data-height-px'))
+        width: Number.parseFloat(imageElement.dataset.widthPx) || imageElement.getBoundingClientRect().width || 0,
+        height: Number.parseFloat(imageElement.dataset.heightPx)
           || (imageElement.style.height && imageElement.style.height !== 'auto' ? Number.parseFloat(imageElement.style.height) : 0)
           || imageElement.getBoundingClientRect().height
           || 0,
-        translateX: Number.parseFloat(imageElement.getAttribute('data-x')) || 0,
-        translateY: Number.parseFloat(imageElement.getAttribute('data-y')) || 0,
+        translateX: Number.parseFloat(imageElement.dataset.x) || 0,
+        translateY: Number.parseFloat(imageElement.dataset.y) || 0,
       };
     },
     normalizeImageMetrics(metrics = {}) {

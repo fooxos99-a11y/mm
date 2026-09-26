@@ -1,7 +1,7 @@
 import apiClient from './httpClient';
 
 const normalizeCoursePayload = (payload = {}) => {
-  if (!payload || typeof payload !== 'object' || !Object.prototype.hasOwnProperty.call(payload, 'taskTemplateContent')) {
+  if (!payload || typeof payload !== 'object' || !Object.hasOwn(payload, 'taskTemplateContent')) {
     return payload;
   }
 

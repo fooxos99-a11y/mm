@@ -8,6 +8,7 @@
       المحدد: {{ currentLabel }}
     </p>
     <input
+      :id="inputId"
       v-model="search"
       type="search"
       :aria-label="label"
@@ -16,12 +17,11 @@
       class="people-remote-picker__search"
       @input="scheduleSearch"
     >
-    <p
+    <output
       v-if="multiple"
-      role="status"
     >
       المحدد: {{ selectedIds.length }}
-    </p>
+    </output>
     <AppButton
       v-if="allowEmpty"
       variant="secondary"
@@ -29,12 +29,11 @@
     >
       غير مرتبط
     </AppButton>
-    <p
+    <output
       v-if="loading"
-      role="status"
     >
       جارٍ البحث…
-    </p>
+    </output>
     <div
       v-else-if="error"
       role="alert"
@@ -60,12 +59,11 @@
           {{ selectedIds.includes(option.value) ? '✓ ' : '' }}{{ option.label }}
         </AppRawButton>
       </div>
-      <p
+      <output
         v-if="!rows.length"
-        role="status"
       >
         لا توجد نتائج مطابقة.
-      </p>
+      </output>
       <AppPagination
         :value="page"
         :page-count="pages"
@@ -87,6 +85,7 @@ export default {
     type: { type: String, default: 'student' },
     branch: { type: String, required: true },
     label: { type: String, default: 'البحث عن مستخدم' },
+    inputId: { type: String, default: undefined },
     currentLabel: { type: String, default: '' },
     selectedIds: { type: Array, default: () => [] },
     multiple: Boolean,

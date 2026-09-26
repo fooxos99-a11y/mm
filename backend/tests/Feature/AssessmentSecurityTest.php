@@ -23,7 +23,8 @@ class AssessmentSecurityTest extends TestCase
         [$courseId, $questionId] = $this->createCourseQuestion(true);
         Sanctum::actingAs($user);
 
-        $dataUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=';
+        $dataUrl = 'data:image/png;base64,'
+            .'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=';
 
         $response = $this->postJson('/api/public/assessment-submissions', [
             'courseId' => $courseId,
