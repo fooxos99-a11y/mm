@@ -51,7 +51,7 @@ jobs:
       - if: github.event_name != 'push'
         run: npm run verify:release
       - name: Package immutable release
-        run: tar --exclude=release.tgz --exclude=.git --exclude='.*-logs' --exclude=frontend/node_modules --exclude=backend/vendor --exclude=backend/storage --exclude=backend/.env -czf release.tgz .
+        run: tar --exclude=release.tgz --exclude=.git --exclude='.*-logs' --exclude=frontend/node_modules --exclude=backend/vendor --exclude=backend/storage --exclude=backend/.env -czf "$RUNNER_TEMP/release.tgz" .
       - name: Configure SSH host verification
         env:
           DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
@@ -69,7 +69,7 @@ jobs:
         run: |
           release_id="$(git rev-parse HEAD)"
           remote_archive="/tmp/momars-${release_id}.tgz"
-          scp release.tgz "${DEPLOY_USER}@${DEPLOY_HOST}:${remote_archive}"
+          scp "$RUNNER_TEMP/release.tgz" "${DEPLOY_USER}@${DEPLOY_HOST}:${remote_archive}"
           scp scripts/deploy-release.sh "${DEPLOY_USER}@${DEPLOY_HOST}:/tmp/deploy-release.sh"
           ssh "${DEPLOY_USER}@${DEPLOY_HOST}" "bash /tmp/deploy-release.sh '$DEPLOY_ROOT' '$remote_archive' '$release_id'"
           ssh "${DEPLOY_USER}@${DEPLOY_HOST}" "rm -f '$remote_archive' /tmp/deploy-release.sh"
