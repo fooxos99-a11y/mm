@@ -13,7 +13,6 @@ import studentMethods from './peopleStudentMethods';
 import submitMethods from './peopleSubmitMethods';
 import directoryMethods from './peopleDirectoryMethods';
 import dialogDataMethods from './peopleDialogDataMethods';
-import { PASSWORD_REQUIREMENTS_TEXT } from '../../utils/passwordPolicy.mjs';
 
 export default {
   name: 'AdminPeopleView',
@@ -31,7 +30,6 @@ export default {
       directoryRows: [], directorySearch: '', directoryPage: 1, directoryPages: 1, directoryTotal: 0,
       directoryLoading: false, directoryError: '', directoryGeneration: 0,
       directoryController: null, directorySearchTimer: null,
-      PASSWORD_REQUIREMENTS_TEXT: `اتركها فارغة دون تفعيل الدخول، أو أدخل كلمة مرور: ${PASSWORD_REQUIREMENTS_TEXT}.`,
       selectedStudentId: '',
       selectedBranch: 'male',
       selectedFilter: 'all',

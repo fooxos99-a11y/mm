@@ -192,7 +192,6 @@
             :aria-label="editing ? 'كلمة المرور الجديدة (اختياري)' : 'كلمة المرور (اختياري)'"
             type="password"
             autocomplete="new-password"
-            :placeholder="passwordRequirements"
             dense
             outlined
             hide-details
@@ -302,7 +301,6 @@ export default {
     loginCode: { type: String, default: '' },
     password: { type: String, default: '' },
     passwordConfirmation: { type: String, default: '' },
-    passwordRequirements: { type: String, default: '' },
     registrationRows: { type: Array, default: () => [] },
     errors: { type: Array, default: () => [] },
     submitting: Boolean,

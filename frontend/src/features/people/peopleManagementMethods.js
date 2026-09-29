@@ -104,14 +104,15 @@ export default {
       this.dialogOpen = true;
     },
     handleDialogContextChange() {
+      const branchId = this.dialogBranchId;
       this.editingTargetId = '';
 
       if (this.dialogEntityType === 'student') {
         this.populateStudentForm(null);
-        this.studentForm.branchId = this.editingBranchId || this.studentForm.branchId;
+        this.studentForm.branchId = branchId;
       } else {
         this.populateReciterForm(null);
-        this.reciterForm.branchId = this.editingBranchId || this.reciterForm.branchId;
+        this.reciterForm.branchId = branchId;
         this.reciterForm.studentIds = [];
       }
     },

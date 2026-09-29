@@ -115,7 +115,6 @@
       :login-code="activeLoginCode"
       :password="activePassword"
       :password-confirmation="activePasswordConfirmation"
-      :password-requirements="PASSWORD_REQUIREMENTS_TEXT"
       :registration-rows="registrationProfileRows((editingStudentRecord || {}).registrationProfile)"
       :errors="dialogErrors"
       :submitting="dialogSubmitting || dialogDataLoading"

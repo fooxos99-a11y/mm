@@ -15,16 +15,23 @@
 
     <section class="people-toolbar">
       <div class="people-toolbar__filters">
-        <label class="people-search-field">
-          <span class="people-filter-field__label">البحث بالاسم أو رقم الدخول</span>
-          <input
+        <div class="people-search-field">
+          <label
+            for="people-directory-search"
+            class="people-filter-field__label"
+          >البحث بالاسم أو رقم الدخول</label>
+          <AppTextField
+            id="people-directory-search"
             :value="search"
             type="search"
             class="people-directory-search"
             autocomplete="off"
-            @input="$emit('search', $event.target.value)"
-          >
-        </label>
+            dense
+            outlined
+            hide-details
+            @input="$emit('search', $event)"
+          />
+        </div>
         <div
           v-if="!managedBranchId"
           class="people-filter-field"
@@ -224,11 +231,11 @@
 </template>
 
 <script>
-import { AppRawButton, AppSelect, AppPagination } from '../ui';
+import { AppRawButton, AppSelect, AppTextField, AppPagination } from '../ui';
 
 export default {
   name: 'PeopleDirectoryPanel',
-  components: { AppRawButton, AppSelect, AppPagination },
+  components: { AppRawButton, AppSelect, AppTextField, AppPagination },
   props: {
     loading: { type: Boolean, default: false },
     search: { type: String, default: '' },
@@ -274,8 +281,5 @@ export default {
 };
 </script>
 <style scoped>
-.people-search-field { display: grid; grid-column: 1 / -1; min-width: 0; }
-.people-directory-search { width: 100%; min-width: 0; min-height: 48px; padding: 10px 12px; border: 1px solid #afc5d0; border-radius: 12px; background: #fff; color: #123b52; font: inherit; }
-.people-directory-search:focus-visible { outline: 2px solid #1f6f96; outline-offset: 2px; }
 .people-directory-status { display: block; margin-block: 16px; color: #375b70; }
 </style>
