@@ -40,7 +40,7 @@ test('management panels remain usable across the viewport matrix', async ({ page
   await page.locator('.people-toolbar__filters .app-select').first().click();
   await expect(page.locator('.app-dropdown-menu')).toBeVisible();
   await page.keyboard.press('Escape');
-  const addButton = page.locator('.people-toolbar-button--primary');
+  const addButton = page.locator('.dashboard-topbar').getByRole('button', { name: 'إضافة', exact: true });
   await expect(addButton).toBeVisible();
   expect((await addButton.boundingBox())?.height).toBeGreaterThanOrEqual(44);
   await expectNoOverflow(page);

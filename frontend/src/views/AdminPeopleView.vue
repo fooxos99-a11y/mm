@@ -18,7 +18,7 @@
       :branch-options="branchFilterOptions"
       :filter="selectedFilter"
       :filter-options="filterOptions"
-      :can-create="canCreateAny"
+      :can-create="canCreateAny && !embedded"
       :people="visiblePeopleCards"
       :reciter-mode="isReciterDirectoryMode"
       :selected-student-id="selectedStudentId"

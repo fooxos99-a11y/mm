@@ -51,7 +51,7 @@ test('user and satisfaction dialogs have accessible field names and contrast',as
   await login(page);
   for(const panel of ['users','satisfaction']){
     await page.goto(`dashboard?panel=${panel}`);
-    if(panel==='users')await page.locator('.people-toolbar-button--primary').click();
+    if(panel==='users')await page.locator('.dashboard-topbar').getByRole('button', { name: 'إضافة', exact: true }).click();
     else await page.locator('.dashboard-topbar').getByRole('button',{name:'إضافة',exact:true}).click();
     await expect(page.locator('dialog[open]')).toBeVisible();
     const results=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21a','wcag21aa']).analyze();

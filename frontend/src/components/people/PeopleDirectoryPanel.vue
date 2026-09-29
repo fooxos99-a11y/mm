@@ -13,7 +13,10 @@
       </AppRawButton>
     </div>
 
-    <section class="people-toolbar">
+    <section
+      class="people-toolbar"
+      :class="{ 'people-toolbar--with-actions': canCreate }"
+    >
       <div class="people-toolbar__filters">
         <div class="people-search-field">
           <label
@@ -78,9 +81,11 @@
         </div>
       </div>
 
-      <div class="people-toolbar__actions">
+      <div
+        v-if="canCreate"
+        class="people-toolbar__actions"
+      >
         <AppRawButton
-          v-if="canCreate"
           type="button"
           class="people-toolbar-button people-toolbar-button--primary"
           @click="$emit('create')"

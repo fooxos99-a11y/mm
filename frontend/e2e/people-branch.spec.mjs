@@ -12,7 +12,7 @@ test('people editor changes branch and saves female users', async ({ page }, tes
   await page.goto('dashboard?panel=users');
 
   for (const type of ['student', 'reciter']) {
-    await page.locator('.people-toolbar-button--primary').click();
+    await page.locator('.dashboard-topbar').getByRole('button', { name: 'إضافة', exact: true }).click();
     const dialog = page.getByRole('dialog');
     if (type === 'reciter') {
       await dialog.locator('.app-select').filter({ has: page.locator('#people-editor-entity-type') }).click();

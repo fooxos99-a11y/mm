@@ -20,11 +20,15 @@
 
 .people-page .people-toolbar {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr);
   align-items: flex-end;
   gap: 18px;
   width: 100%;
   margin-bottom: 22px;
+}
+
+.people-page .people-toolbar--with-actions {
+  grid-template-columns: minmax(0, 1fr) auto;
 }
 
 .people-page .people-toolbar__actions {

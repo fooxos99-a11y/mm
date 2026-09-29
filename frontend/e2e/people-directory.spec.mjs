@@ -70,7 +70,7 @@ test('people directory searches and pages real server results with usable touch 
   await expect(part).toBeEnabled();
   await page.keyboard.press('Escape');
   expect(fullSnapshots).toBe(0);
-  await page.locator('.people-toolbar-button--primary').click();
+  await page.locator('.dashboard-topbar').getByRole('button', { name: 'إضافة', exact: true }).click();
   await dialog.locator('.app-select').first().click();
   await page.getByRole('option', { name: 'مقرئ', exact: true }).click();
   await dialog.getByPlaceholder('اسم المقرئ', { exact: true }).fill(prefix + ' Reader');

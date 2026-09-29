@@ -54,7 +54,7 @@ test('remaining dashboard panels expose usable controls and dialogs', async ({ p
   await page.getByRole('button', { name: 'إلغاء', exact: true }).click();
 
   await page.goto('dashboard?panel=users');
-  await page.locator('.people-toolbar-button--primary').click();
+  await page.locator('.dashboard-topbar').getByRole('button', { name: 'إضافة', exact: true }).click();
   await expect(page.locator('.people-dialog:visible')).toBeVisible();
   await page.locator('.people-dialog__cancel:visible').click();
 

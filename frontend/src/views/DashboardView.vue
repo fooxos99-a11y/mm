@@ -18,6 +18,7 @@
       <DashboardTopbar
         :active-menu="activeMenu"
         :admin-name="adminName"
+        :can-create-users="hasPermission('add_student') || hasPermission('add_reciter')"
         :assessment-state="assessmentTopbarState"
         :completion-state="completionTopbarState"
         :countdown-items="topbarCountdownItems"
@@ -36,6 +37,7 @@
         @open-completion-close="openCompletionCloseDialog"
         @toggle-permissions="togglePermissionsWorkspaceSection"
         @add-satisfaction="openSatisfactionWorkspaceAddDialog"
+        @add-user="openUsersCreateDialog"
         @archive-all="openArchiveWorkspaceArchiveAllDialog"
         @create-archive="openArchiveWorkspaceCreateDialog"
         @copy-registration-link="copyRegistrationWorkspaceLink"

@@ -56,13 +56,14 @@
     </div>
 
     <div
-      v-if="activeMenu === 'satisfaction'"
+      v-if="activeMenu === 'satisfaction' || (activeMenu === 'users' && canCreateUsers)"
       class="dashboard-topbar__actions"
     >
       <AppButton
         variant="primary"
         class="dashboard-topbar__action"
-        @click="$emit('add-satisfaction')"
+        :disabled="activeMenu === 'users' && panelLoading"
+        @click="$emit(activeMenu === 'users' ? 'add-user' : 'add-satisfaction')"
       >
         إضافة
       </AppButton>
@@ -194,6 +195,7 @@ export default {
   props: {
     activeMenu: { type: String, required: true },
     adminName: { type: String, default: '' },
+    canCreateUsers: { type: Boolean, default: false },
     assessmentState: { type: Object, required: true },
     completionState: { type: Object, required: true },
     countdownItems: { type: Array, default: () => [] },
@@ -214,6 +216,7 @@ export default {
     'open-completion-close',
     'toggle-permissions',
     'add-satisfaction',
+    'add-user',
     'archive-all',
     'create-archive',
     'copy-registration-link',
