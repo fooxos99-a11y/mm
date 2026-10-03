@@ -11,6 +11,31 @@ class PageContentEncodingTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_both_pages_preserve_defaults_and_normalize_saved_text_fields(): void
+    {
+        $service = app(PageContentService::class);
+
+        foreach (['Home', 'Practitioner'] as $page) {
+            $load = 'load'.$page.'PageContent';
+            $update = 'update'.$page.'PageContent';
+            $defaults = $service->{$load}();
+            $expected = $defaults;
+            $expected['heroTitle'] = 'عنوان مخصص';
+            $expected['footerCopyright'] = 'حقوق الصفحة';
+
+            $saved = $service->{$update}([
+                'brandTitle' => ['invalid'],
+                'heroTitle' => '  عنوان مخصص  ',
+                'heroText' => null,
+                'footerPhone' => 123,
+                'footerCopyright' => '  حقوق الصفحة  ',
+            ]);
+
+            $this->assertSame($expected, $saved);
+            $this->assertSame($saved, $service->{$load}());
+        }
+    }
+
     public function test_default_page_content_is_returned_as_valid_arabic(): void
     {
         $content = app(PageContentService::class)->loadHomePageContent();

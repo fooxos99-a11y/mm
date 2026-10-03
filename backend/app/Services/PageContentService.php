@@ -18,6 +18,17 @@ class PageContentService
     {
     }
 
+    private function normalizePageTextFields(array $content, array $defaults, array $fields): array
+    {
+        $normalized = [];
+
+        foreach ($fields as $field) {
+            $normalized[$field] = $this->normalizeHomePageText($content[$field] ?? null, $defaults[$field]);
+        }
+
+        return $normalized;
+    }
+
     public function loadHomePageContent(): array
     {
         $stored = $this->appSettingsService->loadJson('home_page_content', $this->defaultHomePageContent());

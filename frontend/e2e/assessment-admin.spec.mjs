@@ -53,7 +53,7 @@ test('manager can add and save a task question from the plus menu', async ({ pag
   await expect(savedQuestion.getByRole('textbox', { name: 'الخيار 1 للسؤال 1' })).toHaveValue('صح');
   await expect(savedQuestion.getByRole('textbox', { name: 'الخيار 2 للسؤال 1' })).toHaveValue('خطأ');
   await expect(savedQuestion.getByRole('button', { name: 'تحديد الخيار 1 إجابة صحيحة' })).toHaveAttribute('aria-pressed', 'true');
-  const questionLayout = await savedQuestion.evaluate((card) => {
+  const readQuestionLayout = () => savedQuestion.evaluate((card) => {
     const field = card.querySelector('.assessment-input');
     const cardStyle = getComputedStyle(card);
     const fieldStyle = field ? getComputedStyle(field) : null;
@@ -63,9 +63,9 @@ test('manager can add and save a task question from the plus menu', async ({ pag
       fieldHeight: field?.getBoundingClientRect().height ?? 0,
     };
   });
-  expect(questionLayout.cardBorderWidth).toBeGreaterThanOrEqual(1);
-  expect(questionLayout.fieldBorderWidth).toBeGreaterThanOrEqual(1);
-  expect(questionLayout.fieldHeight).toBeGreaterThanOrEqual(58);
+  await expect.poll(async () => (await readQuestionLayout()).cardBorderWidth).toBeGreaterThanOrEqual(1);
+  await expect.poll(async () => (await readQuestionLayout()).fieldBorderWidth).toBeGreaterThanOrEqual(1);
+  await expect.poll(async () => (await readQuestionLayout()).fieldHeight).toBeGreaterThanOrEqual(58);
   const pointsContainment = await savedQuestion.evaluate((card) => {
     const cardRect = card.getBoundingClientRect();
     const pointsRect = card.querySelector('.assessment-input--points')?.getBoundingClientRect();

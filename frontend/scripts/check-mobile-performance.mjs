@@ -1,4 +1,5 @@
 import { spawn, spawnSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
 import { resolveTrustedExecutable } from '../../scripts/trustedExecutable.mjs';
 import { request } from 'node:http';
 import { createServer } from 'node:net';
@@ -79,7 +80,13 @@ const runAudit = async (url) => {
 };
 
 const port = await getAvailablePort();
-const url = `http://127.0.0.1:${port}/momars/`;
+// Audit the built application's base path, rather than a hard-coded route that can render a 404.
+const builtHtml = readFileSync(path.join(frontendRoot, 'dist', 'index.html'), 'utf8');
+const entryPath = builtHtml.match(/<script\b[^>]*\bsrc="([^"]*\/assets\/[^"]+)"/)?.[1];
+if (!entryPath) throw new Error('Unable to determine the built application base path.');
+const publicPath = entryPath.slice(0, entryPath.lastIndexOf('/assets/') + 1);
+const routerBase = process.env.VUE_APP_ROUTER_BASE || publicPath;
+const url = new URL(routerBase, `http://127.0.0.1:${port}`).href;
 const staticServer = spawn(process.execPath, ['e2e/support/serve-dist.mjs'], {
   cwd: frontendRoot,
   env: { ...process.env, E2E_PORT: String(port), E2E_BACKEND_PORT: '9' },

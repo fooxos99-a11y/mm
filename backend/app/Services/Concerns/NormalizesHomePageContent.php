@@ -52,85 +52,33 @@ trait NormalizesHomePageContent
         }
 
         return [
-            'brandTitle' => $this->normalizeHomePageText($content['brandTitle'] ?? null, $defaults['brandTitle']),
-            'licensesMenuTitle' => $this->normalizeHomePageText(
-                $content['licensesMenuTitle'] ?? null,
-                $defaults['licensesMenuTitle']
-            ),
-            'heroTitle' => $this->normalizeHomePageText($content['heroTitle'] ?? null, $defaults['heroTitle']),
-            'heroText' => $this->normalizeHomePageText($content['heroText'] ?? null, $defaults['heroText']),
-            'heroPrimaryButtonLabel' => $this->normalizeHomePageText(
-                $content['heroPrimaryButtonLabel'] ?? null,
-                $defaults['heroPrimaryButtonLabel']
-            ),
-            'heroSecondaryButtonLabel' => $this->normalizeHomePageText(
-                $content['heroSecondaryButtonLabel'] ?? null,
-                $defaults['heroSecondaryButtonLabel']
-            ),
-            'programsSectionTitle' => $this->normalizeHomePageText(
-                $content['programsSectionTitle'] ?? null,
-                $defaults['programsSectionTitle']
-            ),
-            'programAvailableActionLabel' => $this->normalizeHomePageText(
-                $content['programAvailableActionLabel'] ?? null,
-                $defaults['programAvailableActionLabel']
-            ),
-            'programUpcomingActionLabel' => $this->normalizeHomePageText(
-                $content['programUpcomingActionLabel'] ?? null,
-                $defaults['programUpcomingActionLabel']
-            ),
-            'faqEyebrow' => $this->normalizeHomePageText($content['faqEyebrow'] ?? null, $defaults['faqEyebrow']),
-            'faqTitle' => $this->normalizeHomePageText($content['faqTitle'] ?? null, $defaults['faqTitle']),
-            'faqText' => $this->normalizeHomePageText($content['faqText'] ?? null, $defaults['faqText']),
-            'footerBrandTitle' => $this->normalizeHomePageText(
-                $content['footerBrandTitle'] ?? null,
-                $defaults['footerBrandTitle']
-            ),
-            'footerDescription' => $this->normalizeHomePageText(
-                $content['footerDescription'] ?? null,
-                $defaults['footerDescription']
-            ),
-            'footerAboutTitle' => $this->normalizeHomePageText(
-                $content['footerAboutTitle'] ?? null,
-                $defaults['footerAboutTitle']
-            ),
-            'footerHomeLabel' => $this->normalizeHomePageText(
-                $content['footerHomeLabel'] ?? null,
-                $defaults['footerHomeLabel']
-            ),
-            'footerLicensesLabel' => $this->normalizeHomePageText(
-                $content['footerLicensesLabel'] ?? null,
-                $defaults['footerLicensesLabel']
-            ),
-            'footerContactTitle' => $this->normalizeHomePageText(
-                $content['footerContactTitle'] ?? null,
-                $defaults['footerContactTitle']
-            ),
-            'footerAddress' => $this->normalizeHomePageText(
-                $content['footerAddress'] ?? null,
-                $defaults['footerAddress']
-            ),
-            'footerPhone' => $this->normalizeHomePageText($content['footerPhone'] ?? null, $defaults['footerPhone']),
-            'footerPoliciesTitle' => $this->normalizeHomePageText(
-                $content['footerPoliciesTitle'] ?? null,
-                $defaults['footerPoliciesTitle']
-            ),
-            'footerPrivacyLabel' => $this->normalizeHomePageText(
-                $content['footerPrivacyLabel'] ?? null,
-                $defaults['footerPrivacyLabel']
-            ),
-            'footerTermsLabel' => $this->normalizeHomePageText(
-                $content['footerTermsLabel'] ?? null,
-                $defaults['footerTermsLabel']
-            ),
-            'footerCopyright' => $this->normalizeHomePageText(
-                $content['footerCopyright'] ?? null,
-                $defaults['footerCopyright']
-            ),
-            'footerDevelopedBy' => $this->normalizeHomePageText(
-                $content['footerDevelopedBy'] ?? null,
-                $defaults['footerDevelopedBy']
-            ),
+            ...$this->normalizePageTextFields($content, $defaults, [
+                'brandTitle',
+                'licensesMenuTitle',
+                'heroTitle',
+                'heroText',
+                'heroPrimaryButtonLabel',
+                'heroSecondaryButtonLabel',
+                'programsSectionTitle',
+                'programAvailableActionLabel',
+                'programUpcomingActionLabel',
+                'faqEyebrow',
+                'faqTitle',
+                'faqText',
+                'footerBrandTitle',
+                'footerDescription',
+                'footerAboutTitle',
+                'footerHomeLabel',
+                'footerLicensesLabel',
+                'footerContactTitle',
+                'footerAddress',
+                'footerPhone',
+                'footerPoliciesTitle',
+                'footerPrivacyLabel',
+                'footerTermsLabel',
+                'footerCopyright',
+                'footerDevelopedBy',
+            ]),
             'achievements' => [
                 'maleTraineesTitle' => $this->normalizeHomePageText(
                     $achievementsInput['maleTraineesTitle'] ?? null,

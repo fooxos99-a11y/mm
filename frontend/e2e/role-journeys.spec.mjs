@@ -87,7 +87,10 @@ for (const account of roles) {
       await expect(page.locator('.dashboard-topbar')).toBeVisible();
       await expect(page.locator('.student-navigation')).toBeAttached();
       const menuButton = page.getByRole('button', { name: 'فتح القائمة' });
-      if (await menuButton.isVisible()) await menuButton.click();
+      if (page.viewportSize().width <= 1024) {
+        await expect(menuButton).toBeVisible();
+        await menuButton.click();
+      }
       await page.getByRole('button', { name: 'المؤشرات', exact: true }).click();
       await expect(page.locator('.student-indicators-card')).toBeVisible();
       await expect(page.locator('.student-indicators-card .completion-panel__item')).toHaveCount(4);

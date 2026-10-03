@@ -36,7 +36,13 @@ test('management panels remain usable across the viewport matrix', async ({ page
   await expect(page.locator('.people-toolbar__filters .app-native-select')).toHaveCount(0);
   const branchFilterBox = await peopleFilters.nth(0).boundingBox();
   const entityFilterBox = await peopleFilters.nth(1).boundingBox();
-  expect(Math.abs((branchFilterBox?.y || 0) - (entityFilterBox?.y || 0))).toBeLessThanOrEqual(1);
+  expect(branchFilterBox).not.toBeNull();
+  expect(entityFilterBox).not.toBeNull();
+  if (page.viewportSize().width < 480) {
+    expect(entityFilterBox.y).toBeGreaterThanOrEqual(branchFilterBox.y + branchFilterBox.height);
+  } else {
+    expect(Math.abs(branchFilterBox.y - entityFilterBox.y)).toBeLessThanOrEqual(1);
+  }
   await page.locator('.people-toolbar__filters .app-select').first().click();
   await expect(page.locator('.app-dropdown-menu')).toBeVisible();
   await page.keyboard.press('Escape');

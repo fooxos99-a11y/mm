@@ -20,6 +20,6 @@ export async function login(page, name = adminLogin, password = adminPassword) {
   await page.goto('login');
   await page.locator('[autocomplete=username]').fill(name);
   await page.locator('[autocomplete=current-password]').fill(password);
-  await page.locator('form button[type=submit]').tap();
+  await page.locator('form button[type=submit]').click();
   await page.waitForURL((url) => !url.pathname.endsWith('/login'));
 }

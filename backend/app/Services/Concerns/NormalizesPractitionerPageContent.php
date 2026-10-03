@@ -97,17 +97,13 @@ trait NormalizesPractitionerPageContent
         }
 
         return [
-            'brandTitle' => $this->normalizeHomePageText($content['brandTitle'] ?? null, $defaults['brandTitle']),
-            'heroTitle' => $this->normalizeHomePageText($content['heroTitle'] ?? null, $defaults['heroTitle']),
-            'heroText' => $this->normalizeHomePageText($content['heroText'] ?? null, $defaults['heroText']),
-            'heroPrimaryButtonLabel' => $this->normalizeHomePageText(
-                $content['heroPrimaryButtonLabel'] ?? null,
-                $defaults['heroPrimaryButtonLabel']
-            ),
-            'heroSecondaryButtonLabel' => $this->normalizeHomePageText(
-                $content['heroSecondaryButtonLabel'] ?? null,
-                $defaults['heroSecondaryButtonLabel']
-            ),
+            ...$this->normalizePageTextFields($content, $defaults, [
+                'brandTitle',
+                'heroTitle',
+                'heroText',
+                'heroPrimaryButtonLabel',
+                'heroSecondaryButtonLabel',
+            ]),
             'navItems' => collect($navItemsInput)->map(function ($itemInput, int $index) use ($defaults) {
                 $defaultItem = $defaults['navItems'][$index] ?? ['label' => ''];
                 $itemInput = is_array($itemInput) ? $itemInput : [];
@@ -116,38 +112,24 @@ trait NormalizesPractitionerPageContent
                     'label' => $this->normalizeHomePageText($itemInput['label'] ?? null, $defaultItem['label']),
                 ];
             })->values()->all(),
-            'aboutEyebrow' => $this->normalizeHomePageText($content['aboutEyebrow'] ?? null, $defaults['aboutEyebrow']),
-            'aboutTitlePrefix' => $this->normalizeHomePageText(
-                $content['aboutTitlePrefix'] ?? null,
-                $defaults['aboutTitlePrefix']
-            ),
-            'aboutTitleHighlight' => $this->normalizeHomePageText(
-                $content['aboutTitleHighlight'] ?? null,
-                $defaults['aboutTitleHighlight']
-            ),
-            'aboutLead' => $this->normalizeHomePageText($content['aboutLead'] ?? null, $defaults['aboutLead']),
-            'aboutBody' => $this->normalizeHomePageText($content['aboutBody'] ?? null, $defaults['aboutBody']),
-            'goalsHeadingPrefix' => $this->normalizeHomePageText(
-                $content['goalsHeadingPrefix'] ?? null,
-                $defaults['goalsHeadingPrefix']
-            ),
-            'goalsHeadingHighlight' => $this->normalizeHomePageText(
-                $content['goalsHeadingHighlight'] ?? null,
-                $defaults['goalsHeadingHighlight']
-            ),
+            ...$this->normalizePageTextFields($content, $defaults, [
+                'aboutEyebrow',
+                'aboutTitlePrefix',
+                'aboutTitleHighlight',
+                'aboutLead',
+                'aboutBody',
+                'goalsHeadingPrefix',
+                'goalsHeadingHighlight',
+            ]),
             'goals' => collect($goalsInput)
                 ->map(fn ($item, int $index) => $this->normalizeHomePageText($item, $defaults['goals'][$index] ?? ''))
                 ->values()
                 ->all(),
-            'statsEyebrow' => $this->normalizeHomePageText($content['statsEyebrow'] ?? null, $defaults['statsEyebrow']),
-            'statsTitlePrefix' => $this->normalizeHomePageText(
-                $content['statsTitlePrefix'] ?? null,
-                $defaults['statsTitlePrefix']
-            ),
-            'statsTitleHighlight' => $this->normalizeHomePageText(
-                $content['statsTitleHighlight'] ?? null,
-                $defaults['statsTitleHighlight']
-            ),
+            ...$this->normalizePageTextFields($content, $defaults, [
+                'statsEyebrow',
+                'statsTitlePrefix',
+                'statsTitleHighlight',
+            ]),
             'indicatorLabels' => $indicatorLabels,
             'competenciesTitle' => $this->normalizeHomePageText(
                 $content['competenciesTitle'] ?? null,
@@ -195,76 +177,29 @@ trait NormalizesPractitionerPageContent
                 $defaults['durationTitle']
             ),
             'durationQuickInfo' => $durationQuickInfo,
-            'durationDescriptionPrimary' => $this->normalizeHomePageText(
-                $content['durationDescriptionPrimary'] ?? null,
-                $defaults['durationDescriptionPrimary']
-            ),
-            'durationDescriptionSecondary' => $this->normalizeHomePageText(
-                $content['durationDescriptionSecondary'] ?? null,
-                $defaults['durationDescriptionSecondary']
-            ),
-            'startDatesTitle' => $this->normalizeHomePageText(
-                $content['startDatesTitle'] ?? null,
-                $defaults['startDatesTitle']
-            ),
+            ...$this->normalizePageTextFields($content, $defaults, [
+                'durationDescriptionPrimary',
+                'durationDescriptionSecondary',
+                'startDatesTitle',
+            ]),
             'startDates' => $startDates,
-            'footerBrandTitle' => $this->normalizeHomePageText(
-                $content['footerBrandTitle'] ?? null,
-                $defaults['footerBrandTitle']
-            ),
-            'footerDescription' => $this->normalizeHomePageText(
-                $content['footerDescription'] ?? null,
-                $defaults['footerDescription']
-            ),
-            'footerQuickLinksTitle' => $this->normalizeHomePageText(
-                $content['footerQuickLinksTitle'] ?? null,
-                $defaults['footerQuickLinksTitle']
-            ),
-            'footerContactTitle' => $this->normalizeHomePageText(
-                $content['footerContactTitle'] ?? null,
-                $defaults['footerContactTitle']
-            ),
-            'footerAddress' => $this->normalizeHomePageText(
-                $content['footerAddress'] ?? null,
-                $defaults['footerAddress']
-            ),
-            'footerPhone' => $this->normalizeHomePageText($content['footerPhone'] ?? null, $defaults['footerPhone']),
-            'footerPoliciesTitle' => $this->normalizeHomePageText(
-                $content['footerPoliciesTitle'] ?? null,
-                $defaults['footerPoliciesTitle']
-            ),
-            'footerPrivacyLabel' => $this->normalizeHomePageText(
-                $content['footerPrivacyLabel'] ?? null,
-                $defaults['footerPrivacyLabel']
-            ),
-            'footerTermsLabel' => $this->normalizeHomePageText(
-                $content['footerTermsLabel'] ?? null,
-                $defaults['footerTermsLabel']
-            ),
-            'footerCopyright' => $this->normalizeHomePageText(
-                $content['footerCopyright'] ?? null,
-                $defaults['footerCopyright']
-            ),
-            'footerDevelopedBy' => $this->normalizeHomePageText(
-                $content['footerDevelopedBy'] ?? null,
-                $defaults['footerDevelopedBy']
-            ),
-            'loginDialogTitle' => $this->normalizeHomePageText(
-                $content['loginDialogTitle'] ?? null,
-                $defaults['loginDialogTitle']
-            ),
-            'loginCodeLabel' => $this->normalizeHomePageText(
-                $content['loginCodeLabel'] ?? null,
-                $defaults['loginCodeLabel']
-            ),
-            'loginPasswordLabel' => $this->normalizeHomePageText(
-                $content['loginPasswordLabel'] ?? null,
-                $defaults['loginPasswordLabel']
-            ),
-            'loginSubmitLabel' => $this->normalizeHomePageText(
-                $content['loginSubmitLabel'] ?? null,
-                $defaults['loginSubmitLabel']
-            ),
+            ...$this->normalizePageTextFields($content, $defaults, [
+                'footerBrandTitle',
+                'footerDescription',
+                'footerQuickLinksTitle',
+                'footerContactTitle',
+                'footerAddress',
+                'footerPhone',
+                'footerPoliciesTitle',
+                'footerPrivacyLabel',
+                'footerTermsLabel',
+                'footerCopyright',
+                'footerDevelopedBy',
+                'loginDialogTitle',
+                'loginCodeLabel',
+                'loginPasswordLabel',
+                'loginSubmitLabel',
+            ]),
         ];
     }
 }
