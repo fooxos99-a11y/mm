@@ -31,5 +31,8 @@ app.config.globalProperties.$publicAsset = (path) => `${publicAssetBaseUrl}${Str
 app
   .use(router)
   .use(store)
-  .use(vuetify)
-  .mount('#app');
+  .use(vuetify);
+
+// Resolve the initial route before mounting so its content paints immediately,
+// without playing the transition intended for navigation between pages.
+router.isReady().then(() => app.mount('#app'));
