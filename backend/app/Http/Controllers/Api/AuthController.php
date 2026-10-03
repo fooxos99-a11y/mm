@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Laravel\Sanctum\PersonalAccessToken;
 use Symfony\Component\HttpFoundation\Response;
 
 class AuthController extends Controller
@@ -71,7 +72,10 @@ class AuthController extends Controller
 
     public function logout(Request $request): JsonResponse
     {
-        $request->user()?->currentAccessToken()?->delete();
+        $token = $request->user()?->currentAccessToken();
+        if ($token instanceof PersonalAccessToken) {
+            $token->delete();
+        }
 
         if ($request->hasSession()) {
             Auth::guard('web')->logout();
@@ -110,7 +114,6 @@ class AuthController extends Controller
             'must_change_password' => false,
         ])->save();
 
-        $request->user()?->currentAccessToken()?->delete();
         if ($request->hasSession()) {
             Auth::guard('web')->logout();
             $request->session()->invalidate();

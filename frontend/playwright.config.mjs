@@ -51,6 +51,8 @@ export default defineConfig({
     {
       command: `node ../scripts/run-php.mjs -d max_execution_time=300 -d opcache.enable_cli=1 -S 127.0.0.1:${backendPort} -t public server.php`,
       cwd: backendRoot,
+      // Browser tests must exercise CSRF; Laravel bypasses it in the testing environment.
+      env: { APP_ENV: 'local' },
       url: `${backendOrigin}/up`,
       timeout: 300_000,
       reuseExistingServer: false,

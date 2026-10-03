@@ -45,7 +45,7 @@ class DashboardAccountService
             'role' => $role,
             'login_code' => $loginCode,
             'password' => Hash::make($password),
-            'must_change_password' => true,
+            'must_change_password' => false,
         ]);
     }
 

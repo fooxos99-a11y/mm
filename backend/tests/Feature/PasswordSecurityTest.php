@@ -12,6 +12,26 @@ class PasswordSecurityTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_browser_session_can_change_password_and_is_logged_out(): void
+    {
+        $user = User::factory()->create([
+            'role' => 'admin',
+            'password' => Hash::make('Current-password-2026'),
+        ]);
+
+        $this->actingAs($user, 'web')
+            ->withHeader('Referer', 'http://127.0.0.1:8080')
+            ->putJson('/api/auth/password', [
+                'currentPassword' => 'Current-password-2026',
+                'password' => 'Updated-password-2026',
+                'passwordConfirmation' => 'Updated-password-2026',
+            ])
+            ->assertOk();
+
+        $this->assertGuest('web');
+        $this->assertTrue(Hash::check('Updated-password-2026', (string) $user->fresh()->password));
+    }
+
     public function test_password_change_revokes_every_token_and_session(): void
     {
         $user = User::factory()->create([

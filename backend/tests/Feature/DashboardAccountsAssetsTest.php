@@ -47,7 +47,7 @@ class DashboardAccountsAssetsTest extends CoreDataApiTestCase
             ->assertJsonMissing(['loginCode' => '5001']);
     }
 
-    public function test_dashboard_accounts_require_strong_temporary_passwords(): void
+    public function test_dashboard_accounts_require_strong_passwords_without_forcing_a_change(): void
     {
         $this->postJson('/api/dashboard/accounts', [
             'name' => 'Admin1',
@@ -67,7 +67,7 @@ class DashboardAccountsAssetsTest extends CoreDataApiTestCase
 
         $this->assertDatabaseHas('users', [
             'login_code' => '5002',
-            'must_change_password' => true,
+            'must_change_password' => false,
         ]);
 
         $this->postJson('/api/dashboard/accounts', [

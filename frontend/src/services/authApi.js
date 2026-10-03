@@ -64,6 +64,8 @@ export const logout = async () => {
 };
 
 export const updatePassword = async (payload) => {
+  await initializeCsrfProtection();
+
   const response = await apiClient.put('/auth/password', payload);
 
   return response.data;

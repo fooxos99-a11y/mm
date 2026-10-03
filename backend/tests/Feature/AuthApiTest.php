@@ -14,6 +14,18 @@ class AuthApiTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_browser_session_can_log_out_without_deleting_a_transient_token(): void
+    {
+        $user = User::factory()->create(['role' => 'admin']);
+
+        $this->actingAs($user, 'web')
+            ->withHeader('Referer', 'http://127.0.0.1:8080')
+            ->postJson('/api/auth/logout')
+            ->assertNoContent();
+
+        $this->assertGuest('web');
+    }
+
     public function test_user_can_log_in_and_receive_api_token(): void
     {
         User::query()->create([
