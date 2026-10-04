@@ -32,7 +32,10 @@ trait LoadsRegistrationData
                     ->orWhere(function ($legacyQuery) use ($managedBranch): void {
                         $legacyQuery->where(function ($emptyBranchQuery): void {
                             $emptyBranchQuery->whereNull('branch_code')->orWhere('branch_code', '');
-                        })->where('gender', $managedBranch);
+                        })->where(function ($genderQuery) use ($managedBranch): void {
+                            $genderQuery->where('gender', $managedBranch)
+                                ->orWhereNull('gender')->orWhere('gender', '');
+                        });
                     });
             });
         }
@@ -40,6 +43,13 @@ trait LoadsRegistrationData
         $requests = $requestsQuery
             ->orderByRaw("case when status = 'pending' then 0 when status = 'accepted' then 1 else 2 end")
             ->orderByDesc('created_at')->get();
+
+        if ($managedBranch !== '') {
+            // Legacy requests can still keep their gender in registration metadata.
+            $requests = $requests->filter(
+                fn (RegistrationRequest $request) => $this->resolveRegistrationRequestBranch($request) === $managedBranch
+            )->values();
+        }
 
         return [
             'isOpen' => $this->isRegistrationOpen(),

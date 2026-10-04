@@ -6,6 +6,7 @@ use App\Models\Reciter;
 use App\Models\RegistrationRequest;
 use App\Models\Student;
 use App\Services\CoreDataService;
+use App\Services\RegistrationService;
 use App\Support\Security\DashboardPermissionResolver;
 use Closure;
 use Illuminate\Http\JsonResponse;
@@ -17,6 +18,7 @@ class EnsureDashboardAccess
     public function __construct(
         private readonly CoreDataService $coreDataService,
         private readonly DashboardPermissionResolver $permissionResolver,
+        private readonly RegistrationService $registrationService,
     ) {
     }
 
@@ -108,8 +110,9 @@ class EnsureDashboardAccess
         if ($registrationRequestId !== '') {
             $registration = RegistrationRequest::query()
                 ->whereKey($registrationRequestId)
-                ->first(['branch_code', 'gender']);
-            $targetBranch = $registration?->branch_code ?: $registration?->gender;
+                ->first(['id', 'branch_code', 'gender']);
+            $targetBranch = $registration === null ? ''
+                : $this->registrationService->resolveRegistrationRequestBranch($registration);
 
             if ($registration === null || $targetBranch !== $managedBranch) {
                 return false;

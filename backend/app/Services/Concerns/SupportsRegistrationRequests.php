@@ -70,6 +70,12 @@ trait SupportsRegistrationRequests
         return $gender === 'female' ? 'female' : 'male';
     }
 
+    public function resolveRegistrationRequestBranch(RegistrationRequest $request): string
+    {
+        return (string) ($request->branch_code ?: $request->gender
+            ?: $this->registrationMetadataService->gender($request->id));
+    }
+
     public function serializeStudentRegistrationProfile(?RegistrationRequest $request): ?array
     {
         if (! $request) {
