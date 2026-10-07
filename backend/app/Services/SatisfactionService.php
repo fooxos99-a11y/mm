@@ -2,11 +2,16 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class SatisfactionService
 {
+    public function __construct(private readonly SatisfactionTemplateService $templates)
+    {
+    }
+
     public function addSatisfactionQuestion(
         string $prompt,
         string $type,
@@ -31,7 +36,7 @@ class SatisfactionService
             $targetCourses = DB::table('courses')
                 ->where('id', $courseId)
                 ->where('entity_type', '!=', 'task')
-                ->where('is_post_enabled', true)
+                ->whereNull('archive_id')
                 ->orderBy('sort_order')
                 ->get();
 
@@ -39,11 +44,12 @@ class SatisfactionService
                 throw ValidationException::withMessages(['courseId' => 'تعذر العثور على الدورة المحددة.']);
             }
         } else {
-            $targetCourses = DB::table('courses')
-                ->where('entity_type', '!=', 'task')
-                ->where('is_post_enabled', true)
-                ->orderBy('sort_order')
-                ->get();
+            return $this->templates->register($prompt, $type, $isRequired)
+                ->map(fn ($question) => [
+                    'id' => $question->id,
+                    'courseId' => $question->course_id,
+                    'createdAt' => Carbon::parse($question->created_at)->toISOString(),
+                ])->all();
         }
 
         if ($targetCourses->isEmpty()) {
@@ -77,7 +83,14 @@ class SatisfactionService
 
     public function deleteSatisfactionQuestion(string $questionId): void
     {
-        DB::table('satisfaction_questions')->where('id', $questionId)->delete();
+        DB::transaction(function () use ($questionId): void {
+            $templateId = DB::table('satisfaction_questions')->where('id', $questionId)->value('global_template_id');
+            DB::table('satisfaction_questions')->where('id', $questionId)->delete();
+            if ($templateId && ! DB::table('satisfaction_questions')->whereNull('archive_id')
+                ->where('global_template_id', $templateId)->exists()) {
+                DB::table('satisfaction_templates')->where('id', $templateId)->delete();
+            }
+        });
     }
 
     public function submitSatisfactionResponses(array $responses): array

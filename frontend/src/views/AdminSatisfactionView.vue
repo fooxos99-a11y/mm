@@ -39,7 +39,7 @@
           v-if="!selectedCourse"
           class="satisfaction-admin__empty"
         >
-          {{ hasAvailableCourses ? 'اختر دورة لعرض مؤشرات الاستبيان.' : 'لا توجد دورات تحتوي على اختبار بعدي حاليًا.' }}
+          {{ hasAvailableCourses ? 'اختر دورة لعرض مؤشرات الاستبيان.' : 'لا توجد دورات حاليًا.' }}
         </div>
         <template v-else>
           <section class="satisfaction-admin__metrics">

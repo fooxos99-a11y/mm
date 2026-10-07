@@ -67,6 +67,10 @@ trait CreatesAndUpdatesCourses
                 'created_at' => $createdAt,
             ]);
 
+            if ($entityType !== 'task') {
+                $this->satisfactionTemplates->inherit($courseId);
+            }
+
             if ($entityType === 'task' && $taskMode === 'document') {
                 DB::table('course_questions')->insert([
                     'id' => (string) str()->uuid(),

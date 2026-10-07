@@ -54,7 +54,7 @@ export default {
   computed: {
     ...mapState(['dashboardSnapshot', 'dashboardError']),
     availableCourseOptions() {
-      return [...((this.dashboardSnapshot?.courses || []).filter((course) => course.entityType !== 'task' && course.isPostEnabled))]
+      return [...((this.dashboardSnapshot?.courses || []).filter((course) => course.entityType !== 'task'))]
         .sort((left, right) => (left.sortOrder || 0) - (right.sortOrder || 0))
         .map((course) => ({
           label: course.title,
