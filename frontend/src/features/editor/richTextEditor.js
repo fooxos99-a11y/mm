@@ -10,6 +10,7 @@ import tableMethods from './editorTableMethods';
 export default {
   name: 'RichTextEditor',
   components: { AppNativeSelect, AppRawButton },
+  emits: ['input'],
   props: {
     value: { type: String, default: '' },
     protectedContent: { type: String, default: '' },

@@ -31,6 +31,14 @@ export default {
 
       this.editor.root.setAttribute('dir', 'rtl');
       this.editor.root.setAttribute('lang', 'ar');
+      this.editor.root.setAttribute('role', 'textbox');
+      this.editor.root.setAttribute('aria-label', 'محتوى المستند');
+      this.editor.root.setAttribute('aria-multiline', 'true');
+      const fontPicker = this.$refs.toolbar.querySelector('.ql-font.ql-picker');
+      fontPicker?.querySelector('.ql-picker-label')?.setAttribute('aria-label', 'اختيار الخط');
+      fontPicker?.querySelectorAll('.ql-picker-item').forEach((item) => {
+        item.setAttribute('aria-label', item.getAttribute('data-label') || 'الخط الافتراضي');
+      });
       this.setEditorHtml(this.sanitizeEditorHtml(this.value || ''));
       this.updateProtectedBoundary();
       this.editor.enable(!this.disabled);

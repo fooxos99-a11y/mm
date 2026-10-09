@@ -106,7 +106,14 @@ export default {
         this.stopViewport = observeOverlayViewport(dialog);
         if (!this.$attrs['aria-label'] && !this.$attrs['aria-labelledby']) {
           const title = dialog.querySelector('.app-dialog-header__title, .app-dialog__title, h1, h2, h3');
-          dialog.setAttribute('aria-label', title?.textContent?.trim() || 'نافذة');
+          if (title) {
+            title.id ||= `app-dialog-title-${this.$.uid}`;
+            dialog.removeAttribute('aria-label');
+            dialog.setAttribute('aria-labelledby', title.id);
+          } else {
+            dialog.removeAttribute('aria-labelledby');
+            dialog.setAttribute('aria-label', 'نافذة');
+          }
         }
         this.releaseScrollLock = lockPageScroll();
         dialog.showModal();

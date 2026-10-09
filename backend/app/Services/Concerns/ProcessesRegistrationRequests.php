@@ -16,10 +16,6 @@ trait ProcessesRegistrationRequests
         array $answers = [],
         ?int $legacyAge = null
     ): array {
-        if (! $this->isRegistrationOpen()) {
-            throw ValidationException::withMessages(['registration' => 'التسجيل مغلق حاليًا.']);
-        }
-
         $name = trim($name);
         $phone = trim($phone);
 
@@ -37,7 +33,19 @@ trait ProcessesRegistrationRequests
         }
 
         $answers = $this->registrationFormService->normalizeAnswers($answers);
-        $request = RegistrationRequest::query()->create([
+        return DB::transaction(function () use ($name, $phone, $gender, $answers, $legacyAge): array {
+            // Lock the existing settings row so simultaneous first requests cannot both pass the check.
+            $isOpen = DB::table('registration_settings')->where('key', 'is_open')->lockForUpdate()->value('value');
+            if ((string) $isOpen !== '1') {
+                throw ValidationException::withMessages(['registration' => 'التسجيل مغلق حاليًا.']);
+            }
+            if (RegistrationRequest::query()->where('phone', $phone)->where('status', 'pending')->exists()) {
+                throw ValidationException::withMessages([
+                    'phone' => 'يوجد طلب بهذا الرقم قيد المراجعة. انتظر معالجة الطلب.',
+                ]);
+            }
+
+            $request = RegistrationRequest::query()->create([
             'full_name' => $name,
             'login_code' => null,
             'initial_password' => null,
@@ -49,9 +57,10 @@ trait ProcessesRegistrationRequests
             'status' => 'pending',
         ]);
 
-        $this->registrationMetadataService->store($request->id, $phone, $gender, $answers, $legacyAge);
+            $this->registrationMetadataService->store($request->id, $phone, $gender, $answers, $legacyAge);
 
-        return $this->serializeRegistrationRequest($request);
+            return $this->serializeRegistrationRequest($request);
+        }, 3);
     }
 
     public function acceptRegistrationRequest(string $requestId, array $data): array

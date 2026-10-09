@@ -11,6 +11,7 @@
       <span class="ql-formats">
         <AppNativeSelect
           class="ql-font"
+          aria-label="اختيار الخط"
           default-value=""
         >
           <option
@@ -28,25 +29,37 @@
       <span class="ql-formats">
         <AppRawButton
           class="ql-bold"
+          aria-label="عريض"
+          title="عريض"
         />
         <AppRawButton
           class="ql-italic"
+          aria-label="مائل"
+          title="مائل"
         />
         <AppRawButton
           class="ql-underline"
+          aria-label="تسطير"
+          title="تسطير"
         />
       </span>
       <span class="ql-formats">
         <AppRawButton
           class="ql-list"
           value="ordered"
+          aria-label="قائمة مرقمة"
+          title="قائمة مرقمة"
         />
         <AppRawButton
           class="ql-list"
           value="bullet"
+          aria-label="قائمة نقطية"
+          title="قائمة نقطية"
         />
         <AppRawButton
           class="ql-blockquote"
+          aria-label="اقتباس"
+          title="اقتباس"
         />
         <AppRawButton
           class="ql-table rich-text-editor__table-trigger"
@@ -64,22 +77,32 @@
         <AppRawButton
           class="ql-indent"
           value="-1"
+          aria-label="تقليل المسافة البادئة"
+          title="تقليل المسافة البادئة"
         />
         <AppRawButton
           class="ql-indent"
           value="+1"
+          aria-label="زيادة المسافة البادئة"
+          title="زيادة المسافة البادئة"
         />
         <AppRawButton
           class="ql-link"
+          aria-label="إدراج رابط"
+          title="إدراج رابط"
         />
         <AppRawButton
           v-if="!lockImages"
           class="ql-image"
+          aria-label="إدراج صورة"
+          title="إدراج صورة"
         />
       </span>
       <span class="ql-formats">
         <AppRawButton
           class="ql-clean"
+          aria-label="إزالة التنسيق"
+          title="إزالة التنسيق"
         />
       </span>
       <span class="ql-formats">
@@ -147,6 +170,7 @@
           v-for="handle in imageHandles"
           :key="handle"
           class="rich-text-editor__image-handle"
+          aria-label="تغيير حجم الصورة"
           :class="`rich-text-editor__image-handle--${handle}`"
           @pointerdown.prevent="startImageResize(handle, $event)"
         />
