@@ -139,7 +139,9 @@ export const finalExamQuestionMethods = {
       this.questionForms = this.questionForms.map((form, index) => (index === formIndex ? { ...form, options: [...form.options, ''] } : form));
     },
     handleAddQuestionSlot(type = 'multiple') {
-      this.questionForms = [...this.questionForms, emptyQuestionForm(type === 'text' ? 'text' : 'multiple')];
+      const form = emptyQuestionForm(type === 'text' ? 'text' : 'multiple');
+      if (type === 'truefalse') form.options = ['صح', 'خطأ'];
+      this.questionForms = [...this.questionForms, form];
       this.questionErrors = [...this.questionErrors, ''];
     },
     handleRemoveQuestionSlot(index) {

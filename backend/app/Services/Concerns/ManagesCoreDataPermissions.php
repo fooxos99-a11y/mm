@@ -9,6 +9,8 @@ use Illuminate\Validation\ValidationException;
 
 trait ManagesCoreDataPermissions
 {
+    use MapsQuestionTypes;
+
     public function loadRolePermissions(): array
     {
         $result = ['male_manager' => [], 'female_manager' => []];
@@ -126,27 +128,5 @@ trait ManagesCoreDataPermissions
                 ? $setting->notification_template
                 : 'تم فتح الاختبار النهائي لفرع {branchLabel} لمدة {durationMinutes} دقيقة.',
         ];
-    }
-
-    private function mapQuestionType(?string $questionType, mixed $options): string
-    {
-        if ($questionType === 'text') {
-            return 'text';
-        }
-
-        $normalizedOptions = array_map(
-            static fn ($option) => mb_strtolower(trim((string) $option)),
-            $this->decodeJsonArray($options),
-        );
-
-        if (
-            count($normalizedOptions) === 2
-                && in_array('صح', $normalizedOptions, true)
-                && in_array('خطأ', $normalizedOptions, true)
-        ) {
-            return 'truefalse';
-        }
-
-        return 'multiple';
     }
 }

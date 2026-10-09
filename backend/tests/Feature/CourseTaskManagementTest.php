@@ -217,7 +217,9 @@ class CourseTaskManagementTest extends CoreDataApiTestCase
                 'youtubeUrl' => 'https://example.com/task-video',
                 'taskDescription' => 'وصف المهمة',
             ],
-        ])->assertNoContent();
+        ])->assertOk()->assertJsonCount(2, 'questions')
+            ->assertJsonPath('questions.0.id', $firstQuestionId)
+            ->assertJsonPath('questions.1.correctAnswer', 'أ');
 
         $this->assertDatabaseHas('course_questions', [
             'id' => $firstQuestionId,

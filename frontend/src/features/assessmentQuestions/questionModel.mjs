@@ -28,6 +28,7 @@ export const normalizeAssessmentAnswer = value => stripTrailingPunctuation(foldA
   .trim()
 
 const createDraftOptions = question => {
+  if (question?.type === 'truefalse') return question.options?.length ? [...question.options] : ['صح', 'خطأ']
   if (question?.type !== 'multiple') return []
   return (question?.options || []).length ? [...question.options] : ['', '']
 }

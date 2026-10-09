@@ -57,12 +57,12 @@ for (const type of ['pre', 'post', 'tasks']) {
     await deleteCard(page, 'السؤال المحذوف');
     const firstSave = page.waitForResponse(response => response.url().endsWith(`/courses/${course.id}/questions/sync`));
     await page.getByRole('button', { name: 'حفظ', exact: true }).click();
-    expect((await firstSave).status()).toBe(204);
+    expect((await firstSave).status()).toBe(200);
     await expect.poll(() => questionValues(page)).toEqual(['السؤال المتبقي']);
     await deleteCard(page, 'السؤال المتبقي');
     const secondSave = page.waitForResponse(response => response.url().endsWith(`/courses/${course.id}/questions/sync`));
     await page.getByRole('button', { name: 'حفظ', exact: true }).click();
-    expect((await secondSave).status()).toBe(204);
+    expect((await secondSave).status()).toBe(200);
     await page.reload();
     const snapshot = await api('GET', 'snapshot');
     const saved = snapshot.courses.find(item => item.id === course.id);

@@ -8,6 +8,8 @@ use Illuminate\Validation\ValidationException;
 
 trait CourseManagementSupport
 {
+    use MapsQuestionTypes;
+
     private function dispatchAssessmentOpenNotification(
         ?object $course,
         string $assessmentType,

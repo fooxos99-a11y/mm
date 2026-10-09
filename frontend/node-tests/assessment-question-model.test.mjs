@@ -33,6 +33,23 @@ test('answer normalization handles Arabic variants labels and punctuation', () =
   assert.equal(normalizeAssessmentAnswer('  إجابة.  '), 'اجابه')
 })
 
+test('saved true/false questions retain their options and correct answer when edited', () => {
+  for (const options of [undefined, [], ['صح', 'خطأ']]) {
+    const question = { type: 'truefalse', prompt: 'صح أم خطأ؟', options, points: 2, correctAnswer: 'صح' }
+    const draft = createQuestionDraft(question)
+    assert.equal(draft.type, 'multiple')
+    assert.deepEqual(draft.options, ['صح', 'خطأ'])
+    assert.equal(draft.correctAnswer, 'صح')
+    assert.equal(validateQuestionDraft(draft), '')
+    assert.equal(hasQuestionDraftChanges(question, draft), false)
+    assert.equal(validateQuestionDraft({ ...draft, prompt: 'السؤال المعدل' }), '')
+    if (options?.length) {
+      draft.options[0] = 'متغير'
+      assert.deepEqual(question.options, ['صح', 'خطأ'])
+    }
+  }
+})
+
 test('saving deletion skips unchanged questions but detects meaningful draft edits', () => {
   const question = { type: 'multiple', prompt: 'اختر', options: ['أ', 'ب'], points: 2, correctAnswer: 'أ' }
   const draft = createQuestionDraft(question)

@@ -47,7 +47,8 @@ class QuestionDeletionTest extends CoreDataApiTestCase
             $this->putJson('/api/dashboard/courses/'.$course.'/questions/sync', $payload)->assertForbidden();
             $this->assertNull(DB::table('course_questions')->where('id', $answered)->value('deleted_at'));
             Sanctum::actingAs(User::factory()->create(['role' => 'admin']));
-            $this->putJson('/api/dashboard/courses/'.$course.'/questions/sync', $payload)->assertNoContent();
+            $this->putJson('/api/dashboard/courses/'.$course.'/questions/sync', $payload)
+                ->assertOk()->assertJsonPath('questions', []);
             $this->assertNotNull(DB::table('course_questions')->where('id', $answered)->value('deleted_at'));
             $this->assertNotNull(DB::table('course_questions')->where('id', $unanswered)->value('deleted_at'));
             $this->assertDatabaseHas('course_submission_answers', [

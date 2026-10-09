@@ -75,9 +75,19 @@ export const courseActions = {
     await deleteCourseQuestion(questionId);
     await reloadSnapshot(dispatch);
   },
-  async syncCourseQuestions({ dispatch }, { courseId, payload }) {
-    await syncCourseQuestionsRequest(courseId, payload);
-    await reloadSnapshot(dispatch);
+  async syncCourseQuestions({ state, commit }, { courseId, payload }) {
+    const authGeneration = state.authGeneration;
+    const response = await syncCourseQuestionsRequest(courseId, payload);
+    if (state.authGeneration !== authGeneration || !state.dashboardSnapshot) return;
+    const questionKey = { pre: 'preQuestions', post: 'postQuestions', tasks: 'taskQuestions' }[payload.assessmentType];
+    commit('setDashboardSnapshot', {
+      ...state.dashboardSnapshot,
+      courses: state.dashboardSnapshot.courses.map(course => course.id === courseId ? {
+        ...course,
+        ...payload.courseUpdates,
+        [questionKey]: response.data.questions,
+      } : course),
+    });
   },
   async bulkImportAssessments({ dispatch }, payload) {
     const result = await bulkImportAssessmentsRequest(payload);

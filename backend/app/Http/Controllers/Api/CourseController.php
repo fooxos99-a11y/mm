@@ -92,7 +92,7 @@ class CourseController extends Controller
     {
         $data = $request->validated();
 
-        $this->courseManagementService->syncCourseQuestions(
+        $questions = $this->courseManagementService->syncCourseQuestions(
             $courseId,
             $data['assessmentType'],
             $data['questions'],
@@ -100,7 +100,7 @@ class CourseController extends Controller
             $data['courseUpdates'] ?? [],
         );
 
-        return response()->json(status: 204);
+        return response()->json(['questions' => $questions]);
     }
 
     public function destroyQuestion(string $questionId): JsonResponse

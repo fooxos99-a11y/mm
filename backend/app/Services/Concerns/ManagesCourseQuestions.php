@@ -13,14 +13,18 @@ trait ManagesCourseQuestions
         array $questions,
         array $deletedQuestionIds = [],
         array $courseUpdates = [],
-    ): void {
-        DB::transaction(function () use (
+    ): array {
+        return DB::transaction(function () use (
             $courseId,
             $assessmentType,
             $questions,
             $deletedQuestionIds,
             $courseUpdates
-        ): void {
+        ): array {
+            $course = DB::table('courses')->where('id', $courseId)->whereNull('archive_id')->lockForUpdate()->first();
+            if (! $course) {
+                throw ValidationException::withMessages(['courseId' => ['الدورة المحددة غير موجودة.']]);
+            }
             $referencedIds = collect($questions)->pluck('id')->filter()
                 ->merge($deletedQuestionIds)->unique()->values();
 
@@ -58,6 +62,12 @@ trait ManagesCourseQuestions
 
                 $this->courseQuestionService->create($courseId, $assessmentType, $question);
             }
+
+            $saved = DB::table('course_questions')->where('course_id', $courseId)
+                ->where('assessment_type', $assessmentType)->whereNull('archive_id')->whereNull('deleted_at')
+                ->orderBy('sort_order')->orderBy('created_at')->get();
+
+            return $this->normalizeCourseQuestions($saved, true);
         });
     }
 

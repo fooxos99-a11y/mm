@@ -12,6 +12,11 @@ import {
   updateFinalExamSetting,
 } from '../../services/api';
 
+const setFinalExamQuestions = (state, commit, questions) => commit('setDashboardSnapshot', {
+  ...state.dashboardSnapshot,
+  finalExamQuestions: questions,
+});
+
 export const feedbackActions = {
   async addSatisfactionQuestion({ dispatch }, payload) {
     const result = await createSatisfactionQuestion(payload);
@@ -31,18 +36,34 @@ export const feedbackActions = {
     await dispatch('loadDashboardSnapshot');
     return result;
   },
-  async addFinalExamQuestion({ dispatch }, payload) {
+  async addFinalExamQuestion({ state, commit }, payload) {
+    const authGeneration = state.authGeneration;
     const result = await createFinalExamQuestion(payload);
-    await dispatch('loadDashboardSnapshot');
+    if (state.authGeneration !== authGeneration || !state.dashboardSnapshot) return result;
+    setFinalExamQuestions(state, commit, [...state.dashboardSnapshot.finalExamQuestions, {
+      ...payload,
+      ...result,
+      type: payload.type === 'text' ? 'text' : 'multiple',
+      options: payload.type === 'truefalse' ? ['صح', 'خطأ'] : (payload.options || []),
+    }]);
     return result;
   },
-  async updateFinalExamQuestion({ dispatch }, { questionId, question }) {
+  async updateFinalExamQuestion({ state, commit }, { questionId, question }) {
+    const authGeneration = state.authGeneration;
     await updateFinalExamQuestionRequest(questionId, question);
-    await dispatch('loadDashboardSnapshot');
+    if (state.authGeneration !== authGeneration || !state.dashboardSnapshot) return;
+    setFinalExamQuestions(state, commit, state.dashboardSnapshot.finalExamQuestions.map(item => item.id === questionId ? {
+      ...item,
+      ...question,
+      type: question.type === 'text' ? 'text' : 'multiple',
+      options: question.type === 'truefalse' ? ['صح', 'خطأ'] : (question.options || []),
+    } : item));
   },
-  async deleteFinalExamQuestion({ dispatch }, questionId) {
+  async deleteFinalExamQuestion({ state, commit }, questionId) {
+    const authGeneration = state.authGeneration;
     await deleteFinalExamQuestionRequest(questionId);
-    await dispatch('loadDashboardSnapshot');
+    if (state.authGeneration !== authGeneration || !state.dashboardSnapshot) return;
+    setFinalExamQuestions(state, commit, state.dashboardSnapshot.finalExamQuestions.filter(item => item.id !== questionId));
   },
   async toggleFinalExamEnabled({ dispatch }, { branchCode, closesAt, notificationTemplate }) {
     await updateFinalExamSetting(branchCode, {
