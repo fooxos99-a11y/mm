@@ -10,6 +10,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AssessmentAccessService
 {
+    public function __construct(
+        private readonly StudentAssessmentAnswerValidator $answerValidator,
+        private readonly StudentSatisfactionResponseValidator $satisfactionValidator,
+    ) {}
+
     public function prepareCourseSubmission(?User $user, bool $publicRoute, array $data): array
     {
         if (! $this->requiresStudentIdentity($user, $publicRoute)) {
@@ -18,6 +23,11 @@ class AssessmentAccessService
 
         $student = $this->authenticatedStudent($user, $data['loginId'], 'loginId');
         $data['studentName'] = $student->full_name;
+        $this->answerValidator->validate(
+            DB::table('course_questions')->where('course_id', $data['courseId'])
+                ->where('assessment_type', $data['assessmentType']),
+            $data['answers'],
+        );
 
         return $data;
     }
@@ -42,6 +52,7 @@ class AssessmentAccessService
         }
 
         $student = $this->authenticatedStudent($user, (string) $loginCodes->first());
+        $this->satisfactionValidator->validate((string) $student->login_code, $responses);
 
         return collect($responses)
             ->map(fn (array $response): array => [
@@ -60,6 +71,10 @@ class AssessmentAccessService
         $student = $this->authenticatedStudent($user, $data['loginCode']);
         $data['studentName'] = $student->full_name;
         $data['branchCode'] = (string) $student->branch?->code;
+        $this->answerValidator->validate(
+            DB::table('final_exam_questions')->where('branch_code', $data['branchCode']),
+            $data['answers'],
+        );
 
         return $data;
     }

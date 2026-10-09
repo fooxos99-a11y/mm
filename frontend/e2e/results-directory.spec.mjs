@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './support/isolatedTest.mjs';
 
 test('results page searches, paginates and retains full attendance totals without a snapshot', async ({ page, request }, info) => {
   const api = `http://127.0.0.1:${process.env.E2E_BACKEND_PORT}/api`;

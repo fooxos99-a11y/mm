@@ -6,6 +6,7 @@ use App\Models\Student;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use Throwable;
 
 trait SubmitsCourseAssessments
 {
@@ -40,6 +41,7 @@ trait SubmitsCourseAssessments
         $studentId = Student::query()->where('login_code', $loginId)->value('id');
         $submissionId = (string) str()->uuid();
         $submittedAt = now();
+        $storedPaths = [];
 
         try {
             DB::transaction(function () use (
@@ -51,7 +53,8 @@ trait SubmitsCourseAssessments
                 $studentName,
                 $loginId,
                 $submission,
-                $questionSnapshots
+                $questionSnapshots,
+                &$storedPaths
             ) {
                 // The unique scope rejects simultaneous retries without locking gaps for other students.
                 DB::table('course_submissions')->insert([
@@ -70,15 +73,19 @@ trait SubmitsCourseAssessments
 
                 $answers = collect($submission['answers'] ?? [])
                     ->filter(fn (array $answer) => ($answer['questionId'] ?? '') !== '__score_override__')
-                    ->map(function (array $answer) use ($submissionId, $questionSnapshots): array {
+                    ->map(function (array $answer) use ($submissionId, $questionSnapshots, &$storedPaths): array {
                         $question = $questionSnapshots->get(trim((string) $answer['questionId']));
+                        $attachment = $this->assessmentAttachmentService->storeAnswer($answer);
+                        if ($attachment['file_path']) {
+                            $storedPaths[] = $attachment['file_path'];
+                        }
 
                         return [
                             'id' => (string) str()->uuid(),
                             'submission_id' => $submissionId,
                             'question_id' => $answer['questionId'],
                             'answer_text' => $answer['value'] ?? null,
-                            ...$this->assessmentAttachmentService->storeAnswer($answer),
+                            ...$attachment,
                             'created_at' => now(),
                             ...$this->questionService->snapshotColumns($question),
                         ];
@@ -87,9 +94,13 @@ trait SubmitsCourseAssessments
                     DB::table('course_submission_answers')->insert($answers);
                 }
             });
-        } catch (UniqueConstraintViolationException $exception) {
-            if (! DB::table('course_submissions')->where('course_id', $courseId)
-                ->where('assessment_type', $assessmentType)->where('login_code', $loginId)->exists()) {
+        } catch (Throwable $exception) {
+            foreach ($storedPaths as $path) {
+                $this->assessmentAttachmentService->delete($path);
+            }
+            if (! $exception instanceof UniqueConstraintViolationException
+                || ! DB::table('course_submissions')->where('course_id', $courseId)
+                    ->where('assessment_type', $assessmentType)->where('login_code', $loginId)->exists()) {
                 throw $exception;
             }
 

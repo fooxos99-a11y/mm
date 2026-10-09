@@ -205,6 +205,7 @@
                     <span>10</span>
                   </div>
                   <v-slider
+                    :name="question.prompt"
                     :model-value="satisfactionAnswers[question.id]?.ratingValue ?? 1"
                     min="1"
                     max="10"
@@ -215,11 +216,14 @@
                     class="assessment-rating-bar__slider"
                     :class="{ 'assessment-rating-bar__slider--unanswered': satisfactionAnswers[question.id]?.ratingValue == null }"
                     @update:model-value="setSatisfactionRating(question.id, $event)"
+                    @end="setSatisfactionRating(question.id, $event)"
+                    @keydown.home.prevent="setSatisfactionRating(question.id, 1)"
                   />
                 </div>
 
                 <v-textarea
                   v-else
+                  :aria-label="question.prompt"
                   :model-value="satisfactionAnswers[question.id]?.textValue || ''"
                   outlined
                   rows="4"

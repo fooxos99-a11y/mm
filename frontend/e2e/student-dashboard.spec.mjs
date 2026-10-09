@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './support/isolatedTest.mjs';
 import { createStudentResultFixture } from './support/studentResultFixture.mjs';
 import { studentPassword } from './support/credentials.mjs';
 

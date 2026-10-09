@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './support/isolatedTest.mjs';
 import { login } from './support/gesture-helpers.mjs';
 import { studentPassword } from './support/credentials.mjs';
 
@@ -93,7 +93,7 @@ for (const [typeIndex, assessmentType] of ['pre', 'post', 'tasks', 'final'].entr
     }
     for (let index = 0; index < await survey.getByRole('slider').count(); index++) {
       await survey.getByRole('slider').nth(index).focus();
-      await survey.getByRole('slider').nth(index).press('ArrowRight');
+      await survey.getByRole('slider').nth(index).press('End');
     }
     const dimensions = await page.evaluate(() => ({ content: document.documentElement.scrollWidth, viewport: innerWidth }));
     expect(dimensions.content).toBeLessThanOrEqual(dimensions.viewport + 1);

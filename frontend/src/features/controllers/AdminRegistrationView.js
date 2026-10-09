@@ -32,6 +32,7 @@ export default {
   data() {
     return {
       loading: false,
+      registrationLoadRequest: null,
       settingsSubmitting: false,
       busyRequestId: '',
       busyAction: '',
@@ -73,7 +74,7 @@ export default {
     emitTopbarState(extra = {}) {
       this.$emit('registration-topbar-state', {
         isOpen: this.isOpen,
-        loading: this.settingsSubmitting,
+        loading: this.loading || this.settingsSubmitting,
         ...extra,
       });
     },
@@ -92,7 +93,13 @@ export default {
       return 'غير محدد';
     },
     async loadRegistrationData() {
+      if (this.registrationLoadRequest) return this.registrationLoadRequest;
+      this.registrationLoadRequest = this.fetchRegistrationData();
+      return this.registrationLoadRequest;
+    },
+    async fetchRegistrationData() {
       this.loading = true;
+      this.emitTopbarState();
 
       try {
         const payload = await fetchRegistrationDashboardData();
@@ -103,11 +110,14 @@ export default {
         this.registrationFields = Array.isArray(payload?.fields) ? payload.fields : [];
         this.fixedLabels = normalizeFixedFieldLabels(payload?.fixedLabels);
         this.requests = Array.isArray(payload?.requests) ? payload.requests : [];
-        this.emitTopbarState();
+        return true;
       } catch (error) {
         this.$toast.error(error?.response?.data?.message || 'تعذر تحميل بيانات التسجيل');
+        return false;
       } finally {
         this.loading = false;
+        this.registrationLoadRequest = null;
+        this.emitTopbarState();
       }
     },
     async toggleRegistration() {
@@ -126,8 +136,8 @@ export default {
         this.emitTopbarState();
       }
     },
-    openFieldsDialog() {
-      this.fieldsDialogOpen = true;
+    async openFieldsDialog() {
+      if (await this.loadRegistrationData()) this.fieldsDialogOpen = true;
     },
     async saveRegistrationFields(fields, fixedLabels = this.fixedLabels) {
       if (fields.some((field) => field.type === 'select' && field.options.length === 0)) {

@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './support/isolatedTest.mjs';
 import { adminLogin, adminPassword, newAccountPassword } from './support/credentials.mjs';
 
 const phones = {

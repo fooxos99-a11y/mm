@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './support/isolatedTest.mjs';
 import { login } from './support/gesture-helpers.mjs';
 
 test.use({ screenshot: 'off' });

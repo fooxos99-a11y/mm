@@ -18,8 +18,13 @@ const mysqlBin = process.env.CAPACITY_MYSQL_BIN || 'C:/Program Files/MySQL/MySQL
 if (!existsSync(path.join(mysqlBin, 'mysqld.exe'))) throw new Error('Set CAPACITY_MYSQL_BIN to the installed MySQL bin directory.');
 const levels = (process.env.CAPACITY_LEVELS || '1,10,25,50,100,200').split(',').map(Number);
 const workers = Number(process.env.CAPACITY_WORKERS || 8);
+if (process.env.CAPACITY_ASSESSMENT_TYPE === 'final' && levels.length !== 1) {
+  throw new Error('Final exams require one capacity level per disposable run because attempts cannot be repeated.');
+}
 if (levels.some(value => !Number.isInteger(value) || value < 1 || value > 500)
   || !Number.isInteger(workers) || workers < 1 || workers > 16) throw new Error('Unsupported bounded local test configuration.');
+const participantCount = levels.reduce((sum, count) => sum + count, 0)
+  + (process.env.CAPACITY_CONTINUE_AFTER_FAILURE ? 0 : Math.max(...levels)) + 2;
 const port = () => new Promise((resolve, reject) => {
   const server = createNetServer();
   server.once('error', reject);
@@ -48,7 +53,7 @@ const env = { ...process.env, APP_ENV: 'local', APP_DEBUG: 'false',
   CACHE_STORE: 'database', QUEUE_CONNECTION: 'database', BROADCAST_CONNECTION: 'log', BCRYPT_ROUNDS: '12',
   SANCTUM_STATEFUL_DOMAINS: `127.0.0.1:${proxyPort}`, CORS_ALLOWED_ORIGINS: base,
   CAPACITY_DB_PORT: String(dbPort), CAPACITY_RUN_DIR: runDir, CAPACITY_PASSWORD: password,
-  CAPACITY_USERS: String(Math.max(...levels) + 1),
+  CAPACITY_USERS: String(participantCount),
 };
 const children = [];
 const command = (binary, args, options = {}) => {
@@ -60,6 +65,14 @@ const command = (binary, args, options = {}) => {
   }
   return result.stdout;
 };
+const opcacheAlreadyLoaded = command(php, ['-r', 'echo extension_loaded("Zend OPcache") ? "1" : "0";']).trim() === '1';
+const serverPhpArgs = [];
+if (process.env.CAPACITY_OPCACHE === '1' && !opcacheAlreadyLoaded) {
+  const extension = path.join(path.dirname(php), 'ext', 'php_opcache.dll');
+  if (!existsSync(extension)) throw new Error('Requested OPcache extension is unavailable for this PHP binary.');
+  serverPhpArgs.push('-d', `zend_extension=${extension}`);
+}
+const opcacheLoaded = command(php, [...serverPhpArgs, '-r', 'echo extension_loaded("Zend OPcache") ? "1" : "0";']).trim() === '1';
 const fixture = action => JSON.parse(command(php, [path.join(root, 'scripts/capacity/fixture.php'), action]));
 const waitFor = async (probe, label) => {
   const deadline = Date.now() + 45_000;
@@ -71,14 +84,18 @@ const waitFor = async (probe, label) => {
 };
 const report = { startedAt: new Date().toISOString(), commit: spawnSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).stdout.trim(),
   source: { dirty: spawnSync('git', ['diff', '--quiet'], { cwd: root }).status !== 0,
-    assessmentServiceSha256: createHash('sha256').update(readFileSync(path.join(backend, 'app/Services/Concerns/SubmitsCourseAssessments.php'))).digest('hex') },
+    assessmentServiceSha256: createHash('sha256').update(readFileSync(path.join(backend, 'app/Services/Concerns/SubmitsCourseAssessments.php'))).digest('hex'),
+    finalExamServiceSha256: createHash('sha256').update(readFileSync(path.join(backend, 'app/Services/Concerns/ProcessesFinalExamSubmissions.php'))).digest('hex'),
+    studentAnswerValidatorSha256: createHash('sha256').update(readFileSync(path.join(backend, 'app/Services/StudentAssessmentAnswerValidator.php'))).digest('hex') },
   environment: { kind: 'isolated-local', cpu: os.cpus()[0].model, logicalProcessors: os.cpus().length,
     memoryGiB: +(os.totalmem() / 1024 ** 3).toFixed(1), workers, database: 'MySQL 8.4 disposable instance',
     php: command(php, ['-r', 'echo PHP_VERSION;']).trim(), cache: 'database', sessions: 'database', bcryptRounds: 12,
+    opcacheLoaded,
     configAndRouteCache: true, loadGeneratorSharesHost: true },
   serverErrors: { total: 0, sqlStates: {} },
   scenario: { backgroundCourses: 30, questionsPerExam: 20, attachments: false,
     assessmentType: env.CAPACITY_ASSESSMENT_TYPE || 'pre',
+    entityType: env.CAPACITY_ASSESSMENT_TYPE === 'tasks' ? 'task' : env.CAPACITY_ASSESSMENT_TYPE === 'final' ? 'finalExam' : 'course',
     transport: 'HTTP with separate authenticated sessions and CSRF cookies',
     phases: ['csrf', 'login', 'openExam', 'submitExam', 'results'],
     thinkTimeSeconds: 0, retries: 0, timeoutsMs: 30_000,
@@ -105,7 +122,7 @@ try {
   const targets = [];
   for (let index = 0; index < workers; index++) {
     const workerPort = await port();
-    const child = spawn(php, ['-d', 'opcache.enable_cli=1', '-d', 'opcache.validate_timestamps=0',
+    const child = spawn(php, [...serverPhpArgs, '-d', 'opcache.enable_cli=1', '-d', 'opcache.validate_timestamps=0',
       '-d', 'max_execution_time=60', '-S', `127.0.0.1:${workerPort}`, '-t', 'public', 'server.php'],
     { cwd: backend, env, stdio: 'ignore', windowsHide: true });
     children.push(child);
@@ -131,12 +148,12 @@ try {
   console.log(`Ready: ${workers} PHP workers, MySQL, 30 background courses, 20 questions per exam.`);
   env.CAPACITY_WAVE = 'security';
   const guardCourse = fixture('wave');
-  report.securityChecks = await validateGuards({ base, index: Math.max(...levels), password, course: guardCourse });
+  report.securityChecks = await validateGuards({ base, index: participantCount - 2, password, course: guardCourse });
   if (Object.values(report.securityChecks).some(check => !check.ok)) throw new Error('Authenticated workload guard checks failed.');
   console.log('Verified authentication, CSRF, account ownership, and duplicate-submission rejection.');
   env.CAPACITY_WAVE = 'concurrent-retry';
   const retryCourse = fixture('wave');
-  report.concurrentRetry = await validateConcurrentRetry({ base, index: Math.max(...levels), password, course: retryCourse });
+  report.concurrentRetry = await validateConcurrentRetry({ base, index: participantCount - 1, password, course: retryCourse });
   const retryIntegrity = fixture('verify');
   report.concurrentRetry.ok &&= retryIntegrity.submissions === 2 && retryIntegrity.answers === 40
     && retryIntegrity.duplicates === 0 && retryIntegrity.incomplete === 0;
@@ -146,6 +163,7 @@ try {
   const measurements = [...levels];
   let previousPassed;
   let boundaryRepeated = false;
+  let participantOffset = 0;
   for (let index = 0; index < measurements.length; index++) {
     const count = measurements[index];
     env.CAPACITY_WAVE = String(++waveIndex);
@@ -153,7 +171,8 @@ try {
     const before = fixture('verify');
     const startUtilization = performance.eventLoopUtilization();
     console.log(`Starting synchronized wave: ${count} independent students.`);
-    const wave = await runWave({ base, count, offset: 0, password, course, verify: () => fixture('verify') });
+    const wave = await runWave({ base, count, offset: participantOffset, password, course, verify: () => fixture('verify') });
+    participantOffset += count;
     wave.persistedInThisWave = wave.persisted.submissions - before.submissions;
     wave.answersInThisWave = wave.persisted.answers - before.answers;
     wave.persistencePassed = Object.values(wave.phases).every(phase => phase.failed === 0)

@@ -168,8 +168,10 @@ export const finalExamQuestionMethods = {
         return;
       }
 
+      const questionCount = this.questionForms.length;
       try {
-        for (const form of this.questionForms) {
+        while (this.questionForms.length) {
+          const form = this.questionForms[0];
           const options = form.type === 'multiple'
             ? form.options.map((option) => option.trim()).filter(Boolean)
             : [];
@@ -183,9 +185,11 @@ export const finalExamQuestionMethods = {
             points: Number(form.points || 1),
             correctAnswer: form.correctAnswer.trim(),
           });
+          this.questionForms = this.questionForms.slice(1);
+          this.questionErrors = this.questionErrors.slice(1);
         }
 
-        this.$toast.success(this.questionForms.length > 1 ? 'تمت إضافة الأسئلة' : 'تمت إضافة السؤال');
+        this.$toast.success(questionCount > 1 ? 'تمت إضافة الأسئلة' : 'تمت إضافة السؤال');
         this.handleCreateQuestionDialogChange(false);
       } catch (error) {
         this.$toast.error(error?.response?.data?.message || 'تعذر إضافة السؤال');
@@ -257,7 +261,8 @@ export const finalExamQuestionMethods = {
           this.pendingDeletedQuestionIds = this.pendingDeletedQuestionIds.filter((id) => id !== questionId);
         }
 
-        for (const form of this.questionForms) {
+        while (this.questionForms.length) {
+          const form = this.questionForms[0];
           const options = form.type === 'multiple'
             ? form.options.map((option) => option.trim()).filter(Boolean)
             : [];
@@ -271,6 +276,8 @@ export const finalExamQuestionMethods = {
             points: Number(form.points || 1),
             correctAnswer: String(form.correctAnswer || '').trim(),
           });
+          this.questionForms = this.questionForms.slice(1);
+          this.questionErrors = this.questionErrors.slice(1);
         }
 
         this.$toast.success('تم حفظ الأسئلة بنجاح');

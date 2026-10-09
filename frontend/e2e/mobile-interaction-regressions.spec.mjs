@@ -1,4 +1,4 @@
-import {test,expect} from '@playwright/test';
+import { expect, test } from './support/isolatedTest.mjs';
 import AxeBuilder from '@axe-core/playwright';
 import { login, swipe } from './support/gesture-helpers.mjs';
 

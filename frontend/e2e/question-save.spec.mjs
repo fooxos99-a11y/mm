@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './support/isolatedTest.mjs';
 import { login } from './support/gesture-helpers.mjs';
 
 test.use({ screenshot: 'off' });
@@ -86,6 +86,18 @@ test('final exam saves and edits all question types without losing true/false op
     if (type !== 'نصي') await form.getByRole('button', { name: 'تحديد الخيار 1 إجابة صحيحة', exact: true }).click();
   }
   await page.route('**/api/dashboard/snapshot**', route => route.abort());
+  let additions = 0;
+  await page.route('**/api/dashboard/final-exam/questions', async route => {
+    additions++;
+    if (additions === 2) {
+      await route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ message: 'Save interrupted' }) });
+    } else await route.continue();
+  });
+  await page.getByRole('button', { name: 'حفظ', exact: true }).click();
+  await expect(page.locator('.assessment-inline-builder .assessment-form-card')).toHaveCount(2);
+  await expect.poll(() => page.locator('.assessment-inline-list__item input[placeholder="اكتب السؤال"]')
+    .evaluateAll(inputs => inputs.map(input => input.value))).toContain(prompts[0]);
+  await page.unroute('**/api/dashboard/final-exam/questions');
   await page.getByRole('button', { name: 'حفظ', exact: true }).click();
   await expect(page.locator('.assessment-inline-builder .assessment-form-card')).toHaveCount(0);
   const cards = page.locator('.assessment-inline-list__item');

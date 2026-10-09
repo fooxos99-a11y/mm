@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './support/isolatedTest.mjs';
 
 test('people editor changes branch and saves female users', async ({ page }, testInfo) => {
   await Promise.all([
@@ -31,7 +31,9 @@ test('people editor changes branch and saves female users', async ({ page }, tes
     const login = `Branch${type}${testInfo.project.name.replace(/[^a-z0-9]/gi, '')}`;
     await dialog.locator('#people-editor-name').fill(`تجربة الفرع ${type}`);
     await dialog.locator('#people-editor-login-code').fill(login);
-    await page.screenshot({ path: testInfo.outputPath(`${type}-female.png`) });
+    if (process.env.E2E_CAPTURE_SCREENSHOTS === '1') {
+      await page.screenshot({ path: testInfo.outputPath(`${type}-female.png`) });
+    }
     const saved = page.waitForResponse(response => response.request().method() === 'POST'
       && response.url().endsWith(type === 'student' ? '/students' : '/reciters'));
     await dialog.getByRole('button', { name: 'إضافة', exact: true }).click();

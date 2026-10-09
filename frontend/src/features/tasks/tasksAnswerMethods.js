@@ -1,5 +1,6 @@
 import { submitPublicAssessment } from '../../services/api';
 import { hasMeaningfulDocumentContent } from '../../utils/documentContent';
+import { acknowledgeSubmission, hasQuestionAnswer, recoverSavedSubmission } from '../assessmentQuestions/submissionState.mjs';
 
 const readTaskFileAsDataUrl = (file) => new Promise((resolve, reject) => {
   const reader = new FileReader();
@@ -162,13 +163,15 @@ export default {
       }
     } else {
       for (const question of this.taskQuestions) {
-        if (!(this.answers[question.id] || '').trim()) {
+        if (!hasQuestionAnswer(question, this.answers, this.files)) {
           this.pageError = 'الرجاء إكمال جميع الأسئلة';
           return;
         }
       }
     }
 
+    const courseId = this.selectedTask.id;
+    const loginId = this.student.loginId;
     this.submitting = true;
 
     try {
@@ -178,18 +181,32 @@ export default {
 
       const answers = await this.buildSubmissionAnswers(questionList);
 
-      await submitPublicAssessment({
+      const payload = {
         courseId: this.selectedTask.id,
         assessmentType: 'tasks',
         studentName: this.student.name,
         loginId: this.student.loginId,
         answers,
-      });
+      };
+      const result = await submitPublicAssessment(payload);
+      this.publicSnapshot = acknowledgeSubmission(this.publicSnapshot, 'submissions', result, payload);
 
       this.pageError = '';
-      this.publicSnapshot = Object.freeze(await this.fetchPublicSnapshotWithTimeout());
+      try {
+        this.publicSnapshot = Object.freeze(await this.fetchPublicSnapshotWithTimeout());
+      } catch {
+        // Keep the accepted result when the subsequent read is unavailable.
+      }
     } catch (error) {
-      this.pageError = error?.response?.data?.message || error?.message || 'تعذر إرسال المهمة الأدائية.';
+      const saved = await recoverSavedSubmission(() => this.fetchPublicSnapshotWithTimeout(), snapshot => snapshot?.submissions?.some(
+        item => item.courseId === courseId && item.assessmentType === 'tasks' && item.loginId === loginId,
+      ));
+      if (saved) {
+        this.publicSnapshot = saved;
+        this.pageError = '';
+      } else {
+        this.pageError = error?.response?.data?.message || error?.message || 'تعذر إرسال المهمة الأدائية.';
+      }
     } finally {
       this.submitting = false;
     }

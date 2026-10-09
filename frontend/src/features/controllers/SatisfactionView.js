@@ -1,5 +1,7 @@
 import { mapActions, mapState } from 'vuex';
 import { AppButton } from '../../components/ui';
+import { fetchDashboardSnapshot, submitPublicSatisfactionResponses } from '../../services/api';
+import { recoverSavedSubmission } from '../assessmentQuestions/submissionState.mjs';
 
 export default {
   name: 'SatisfactionView',
@@ -71,7 +73,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['loadDashboardSnapshot', 'submitSatisfactionResponses']),
+    ...mapActions(['loadDashboardSnapshot']),
     setRating(questionId, value) {
       this.answers[questionId] = {
         ratingValue: value,
@@ -117,9 +119,13 @@ export default {
       }
 
       this.submitting = true;
+      const authGeneration = this.$store.state.authGeneration;
+      const courseId = this.activeCourse.id;
+      const loginCode = this.student.loginId;
+      const questionIds = this.satisfactionQuestions.map(question => question.id);
 
       try {
-        await this.submitSatisfactionResponses(this.satisfactionQuestions.map((question) => ({
+        const savedResponses = await submitPublicSatisfactionResponses(this.satisfactionQuestions.map((question) => ({
           courseId: this.activeCourse.id,
           questionId: question.id,
           loginCode: this.student.loginId,
@@ -127,10 +133,36 @@ export default {
           ratingValue: question.type === 'rating' ? (this.answers[question.id]?.ratingValue ?? null) : null,
           textValue: question.type === 'text' ? (this.answers[question.id]?.textValue || '') : '',
         })));
+        if (this.$store.state.authGeneration !== authGeneration) return;
+        const snapshot = this.$store.state.dashboardSnapshot;
+        const ids = new Set(savedResponses.map(response => response.id));
+        this.$store.commit('setDashboardSnapshot', {
+          ...snapshot,
+          satisfactionResponses: [
+            ...(snapshot?.satisfactionResponses || []).filter(response => !ids.has(response.id)),
+            ...savedResponses,
+          ],
+        });
         this.pageError = '';
         this.answers = {};
+        try {
+          await this.loadDashboardSnapshot();
+        } catch {
+          // A refresh failure does not undo the accepted responses.
+        }
       } catch (error) {
-        this.pageError = error?.response?.data?.message || error?.message || 'تعذر إرسال الاستبيان.';
+        const saved = await recoverSavedSubmission(fetchDashboardSnapshot, snapshot => questionIds.every(questionId => (
+          snapshot?.satisfactionResponses?.some(response => response.courseId === courseId
+            && response.questionId === questionId && response.loginCode === loginCode)
+        )));
+        if (this.$store.state.authGeneration !== authGeneration) return;
+        if (saved) {
+          this.$store.commit('setDashboardSnapshot', saved);
+          this.answers = {};
+          this.pageError = '';
+        } else {
+          this.pageError = error?.response?.data?.message || error?.message || 'تعذر إرسال الاستبيان.';
+        }
       } finally {
         this.submitting = false;
       }

@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './support/isolatedTest.mjs';
 import { rolePassword } from './support/credentials.mjs';
 
 const password = rolePassword;

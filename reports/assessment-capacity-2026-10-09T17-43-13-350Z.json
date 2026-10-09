@@ -1,0 +1,513 @@
+{
+  "startedAt": "2026-10-09T17:42:15.549Z",
+  "commit": "f87038441461a2a0d655ba0ed9ea6a51a948bf51",
+  "source": {
+    "dirty": true,
+    "assessmentServiceSha256": "c488cdf6494545811aa8d1b414f035cab86efba24f3c49dc31051b913534be59",
+    "finalExamServiceSha256": "d72fe43cd892f7528cf5911384a65f5d97f991c4b48a2e38017433400dafb3ce",
+    "studentAnswerValidatorSha256": "b474eac6ab50df0ddcacb85bba45b428cc40c6339423b32d91fb59568b8122e5"
+  },
+  "environment": {
+    "kind": "isolated-local",
+    "cpu": "Intel(R) Core(TM) i5-14400F",
+    "logicalProcessors": 16,
+    "memoryGiB": 31.8,
+    "workers": 8,
+    "database": "MySQL 8.4 disposable instance",
+    "php": "8.2.31",
+    "cache": "database",
+    "sessions": "database",
+    "bcryptRounds": 12,
+    "opcacheLoaded": true,
+    "configAndRouteCache": true,
+    "loadGeneratorSharesHost": true
+  },
+  "serverErrors": {
+    "total": 0,
+    "sqlStates": {}
+  },
+  "scenario": {
+    "backgroundCourses": 30,
+    "questionsPerExam": 20,
+    "attachments": false,
+    "assessmentType": "post",
+    "transport": "HTTP with separate authenticated sessions and CSRF cookies",
+    "phases": [
+      "csrf",
+      "login",
+      "openExam",
+      "submitExam",
+      "results"
+    ],
+    "thinkTimeSeconds": 0,
+    "retries": 0,
+    "timeoutsMs": 30000,
+    "limits": {
+      "errors": 0,
+      "loginP95Ms": 3000,
+      "openP95Ms": 2000,
+      "submitP95Ms": 3000,
+      "resultsP95Ms": 2000
+    }
+  },
+  "waves": [
+    {
+      "concurrentStudents": 1,
+      "completed": 1,
+      "durationMs": 1275,
+      "phases": {
+        "csrf": {
+          "requests": 1,
+          "failed": 0,
+          "statusCounts": {
+            "204": 1
+          },
+          "p50Ms": 48,
+          "p95Ms": 48,
+          "maxMs": 48
+        },
+        "login": {
+          "requests": 1,
+          "failed": 0,
+          "statusCounts": {
+            "200": 1
+          },
+          "p50Ms": 406,
+          "p95Ms": 406,
+          "maxMs": 406
+        },
+        "openExam": {
+          "requests": 1,
+          "failed": 0,
+          "statusCounts": {
+            "200": 1
+          },
+          "p50Ms": 176,
+          "p95Ms": 176,
+          "maxMs": 176
+        },
+        "submitExam": {
+          "requests": 1,
+          "failed": 0,
+          "statusCounts": {
+            "201": 1
+          },
+          "p50Ms": 78,
+          "p95Ms": 78,
+          "maxMs": 78
+        },
+        "results": {
+          "requests": 1,
+          "failed": 0,
+          "statusCounts": {
+            "200": 1
+          },
+          "p50Ms": 140,
+          "p95Ms": 140,
+          "maxMs": 140
+        }
+      },
+      "persisted": {
+        "submissions": 3,
+        "answers": 60,
+        "duplicates": 0,
+        "incomplete": 0
+      },
+      "acceptable": true,
+      "persistedInThisWave": 1,
+      "answersInThisWave": 20,
+      "persistencePassed": true,
+      "loadGeneratorEventLoopPercent": 36.3
+    },
+    {
+      "concurrentStudents": 10,
+      "completed": 10,
+      "durationMs": 1328,
+      "phases": {
+        "csrf": {
+          "requests": 10,
+          "failed": 0,
+          "statusCounts": {
+            "204": 10
+          },
+          "p50Ms": 35,
+          "p95Ms": 75,
+          "maxMs": 75
+        },
+        "login": {
+          "requests": 10,
+          "failed": 0,
+          "statusCounts": {
+            "200": 10
+          },
+          "p50Ms": 281,
+          "p95Ms": 534,
+          "maxMs": 534
+        },
+        "openExam": {
+          "requests": 10,
+          "failed": 0,
+          "statusCounts": {
+            "200": 10
+          },
+          "p50Ms": 78,
+          "p95Ms": 146,
+          "maxMs": 146
+        },
+        "submitExam": {
+          "requests": 10,
+          "failed": 0,
+          "statusCounts": {
+            "201": 10
+          },
+          "p50Ms": 76,
+          "p95Ms": 133,
+          "maxMs": 133
+        },
+        "results": {
+          "requests": 10,
+          "failed": 0,
+          "statusCounts": {
+            "200": 10
+          },
+          "p50Ms": 60,
+          "p95Ms": 110,
+          "maxMs": 110
+        }
+      },
+      "persisted": {
+        "submissions": 13,
+        "answers": 260,
+        "duplicates": 0,
+        "incomplete": 0
+      },
+      "acceptable": true,
+      "persistedInThisWave": 10,
+      "answersInThisWave": 200,
+      "persistencePassed": true,
+      "loadGeneratorEventLoopPercent": 38.3
+    },
+    {
+      "concurrentStudents": 25,
+      "completed": 25,
+      "durationMs": 3028,
+      "phases": {
+        "csrf": {
+          "requests": 25,
+          "failed": 0,
+          "statusCounts": {
+            "204": 25
+          },
+          "p50Ms": 55,
+          "p95Ms": 97,
+          "maxMs": 112
+        },
+        "login": {
+          "requests": 25,
+          "failed": 0,
+          "statusCounts": {
+            "200": 25
+          },
+          "p50Ms": 514,
+          "p95Ms": 1536,
+          "maxMs": 1763
+        },
+        "openExam": {
+          "requests": 25,
+          "failed": 0,
+          "statusCounts": {
+            "200": 25
+          },
+          "p50Ms": 134,
+          "p95Ms": 219,
+          "maxMs": 262
+        },
+        "submitExam": {
+          "requests": 25,
+          "failed": 0,
+          "statusCounts": {
+            "201": 25
+          },
+          "p50Ms": 153,
+          "p95Ms": 235,
+          "maxMs": 294
+        },
+        "results": {
+          "requests": 25,
+          "failed": 0,
+          "statusCounts": {
+            "200": 25
+          },
+          "p50Ms": 162,
+          "p95Ms": 254,
+          "maxMs": 271
+        }
+      },
+      "persisted": {
+        "submissions": 38,
+        "answers": 760,
+        "duplicates": 0,
+        "incomplete": 0
+      },
+      "acceptable": true,
+      "persistedInThisWave": 25,
+      "answersInThisWave": 500,
+      "persistencePassed": true,
+      "loadGeneratorEventLoopPercent": 23.6
+    },
+    {
+      "concurrentStudents": 50,
+      "completed": 50,
+      "durationMs": 3649,
+      "phases": {
+        "csrf": {
+          "requests": 50,
+          "failed": 0,
+          "statusCounts": {
+            "204": 50
+          },
+          "p50Ms": 92,
+          "p95Ms": 149,
+          "maxMs": 179
+        },
+        "login": {
+          "requests": 50,
+          "failed": 0,
+          "statusCounts": {
+            "200": 50
+          },
+          "p50Ms": 1010,
+          "p95Ms": 1576,
+          "maxMs": 1782
+        },
+        "openExam": {
+          "requests": 50,
+          "failed": 0,
+          "statusCounts": {
+            "200": 50
+          },
+          "p50Ms": 239,
+          "p95Ms": 399,
+          "maxMs": 428
+        },
+        "submitExam": {
+          "requests": 50,
+          "failed": 0,
+          "statusCounts": {
+            "201": 50
+          },
+          "p50Ms": 273,
+          "p95Ms": 433,
+          "maxMs": 470
+        },
+        "results": {
+          "requests": 50,
+          "failed": 0,
+          "statusCounts": {
+            "200": 50
+          },
+          "p50Ms": 251,
+          "p95Ms": 407,
+          "maxMs": 446
+        }
+      },
+      "persisted": {
+        "submissions": 88,
+        "answers": 1760,
+        "duplicates": 0,
+        "incomplete": 0
+      },
+      "acceptable": true,
+      "persistedInThisWave": 50,
+      "answersInThisWave": 1000,
+      "persistencePassed": true,
+      "loadGeneratorEventLoopPercent": 32
+    },
+    {
+      "concurrentStudents": 100,
+      "completed": 100,
+      "durationMs": 7148,
+      "phases": {
+        "csrf": {
+          "requests": 100,
+          "failed": 0,
+          "statusCounts": {
+            "204": 100
+          },
+          "p50Ms": 159,
+          "p95Ms": 287,
+          "maxMs": 347
+        },
+        "login": {
+          "requests": 100,
+          "failed": 0,
+          "statusCounts": {
+            "200": 100
+          },
+          "p50Ms": 1747,
+          "p95Ms": 3188,
+          "maxMs": 3647
+        },
+        "openExam": {
+          "requests": 100,
+          "failed": 0,
+          "statusCounts": {
+            "200": 100
+          },
+          "p50Ms": 454,
+          "p95Ms": 787,
+          "maxMs": 840
+        },
+        "submitExam": {
+          "requests": 100,
+          "failed": 0,
+          "statusCounts": {
+            "201": 100
+          },
+          "p50Ms": 553,
+          "p95Ms": 869,
+          "maxMs": 947
+        },
+        "results": {
+          "requests": 100,
+          "failed": 0,
+          "statusCounts": {
+            "200": 100
+          },
+          "p50Ms": 485,
+          "p95Ms": 843,
+          "maxMs": 933
+        }
+      },
+      "persisted": {
+        "submissions": 188,
+        "answers": 3760,
+        "duplicates": 0,
+        "incomplete": 0
+      },
+      "acceptable": false,
+      "persistedInThisWave": 100,
+      "answersInThisWave": 2000,
+      "persistencePassed": true,
+      "loadGeneratorEventLoopPercent": 30.9
+    },
+    {
+      "concurrentStudents": 200,
+      "completed": 200,
+      "durationMs": 14557,
+      "phases": {
+        "csrf": {
+          "requests": 200,
+          "failed": 0,
+          "statusCounts": {
+            "204": 200
+          },
+          "p50Ms": 322,
+          "p95Ms": 549,
+          "maxMs": 606
+        },
+        "login": {
+          "requests": 200,
+          "failed": 0,
+          "statusCounts": {
+            "200": 200
+          },
+          "p50Ms": 3699,
+          "p95Ms": 6939,
+          "maxMs": 7286
+        },
+        "openExam": {
+          "requests": 200,
+          "failed": 0,
+          "statusCounts": {
+            "200": 200
+          },
+          "p50Ms": 1077,
+          "p95Ms": 2001,
+          "maxMs": 2090
+        },
+        "submitExam": {
+          "requests": 200,
+          "failed": 0,
+          "statusCounts": {
+            "201": 200
+          },
+          "p50Ms": 1164,
+          "p95Ms": 1870,
+          "maxMs": 1977
+        },
+        "results": {
+          "requests": 200,
+          "failed": 0,
+          "statusCounts": {
+            "200": 200
+          },
+          "p50Ms": 1047,
+          "p95Ms": 1856,
+          "maxMs": 1960
+        }
+      },
+      "persisted": {
+        "submissions": 388,
+        "answers": 7760,
+        "duplicates": 0,
+        "incomplete": 0
+      },
+      "acceptable": false,
+      "persistedInThisWave": 200,
+      "answersInThisWave": 4000,
+      "persistencePassed": true,
+      "loadGeneratorEventLoopPercent": 31.5
+    }
+  ],
+  "dataset": {
+    "users": 388,
+    "backgroundCourses": 30,
+    "questionsPerExam": 20
+  },
+  "securityChecks": {
+    "unauthenticated": {
+      "ok": true,
+      "status": 401,
+      "ms": 133
+    },
+    "csrfCookie": {
+      "ok": true,
+      "status": 204,
+      "ms": 109
+    },
+    "login": {
+      "ok": true,
+      "status": 200,
+      "ms": 374
+    },
+    "missingCsrf": {
+      "ok": true,
+      "status": 419,
+      "ms": 42
+    },
+    "anotherIdentity": {
+      "ok": true,
+      "status": 422,
+      "ms": 97
+    },
+    "validSubmission": {
+      "ok": true,
+      "status": 201,
+      "ms": 99
+    },
+    "duplicateSubmission": {
+      "ok": true,
+      "status": 422,
+      "ms": 63
+    }
+  },
+  "concurrentRetry": {
+    "ok": true,
+    "statuses": [
+      201,
+      422
+    ]
+  },
+  "completedAt": "2026-10-09T17:43:13.263Z"
+}

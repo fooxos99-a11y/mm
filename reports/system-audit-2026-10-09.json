@@ -1,0 +1,5158 @@
+{
+  "date": "2026-10-09",
+  "workspace": "C:\\Users\\RAIQ\\Desktop\\المواقع\\ممارس",
+  "baselineCommit": "f87038441461a2a0d655ba0ed9ea6a51a948bf51",
+  "backend": {
+    "tests": 207,
+    "assertions": 1676,
+    "durationSeconds": 21.75,
+    "passed": true
+  },
+  "frontend": {
+    "tests": 131,
+    "coverage": {
+      "lines": 99.41,
+      "branches": 86.8,
+      "functions": 100
+    },
+    "passed": true
+  },
+  "capacityFiles": {
+    "baseline": "assessment-capacity-2026-10-09T17-39-53-493Z.json",
+    "pre": "assessment-capacity-2026-10-09T17-42-15-192Z.json",
+    "post": "assessment-capacity-2026-10-09T17-43-13-350Z.json",
+    "tasks": "assessment-capacity-2026-10-09T17-50-46-167Z.json",
+    "final": "assessment-capacity-2026-10-09T17-46-42-005Z.json",
+    "legacyTasks": "assessment-capacity-2026-10-09T17-45-20-704Z.json"
+  },
+  "findings": [
+    {
+      "id": "F01",
+      "title": "تسليم النهائي المتزامن للحساب نفسه",
+      "trigger": "طلبان يصلان معًا بعد فحص عدم وجود محاولة.",
+      "before": "كان الطلب الثاني يرجع 500 بسبب قيد التفرد.",
+      "fix": "أصبح يرجع 422 واضحة، مع محاولة واحدة وإجابات كاملة.",
+      "evidence": "FinalExamSubmissionConcurrencyTest: فشل 500 قبل الإصلاح ثم نجح؛ وفحص MySQL بطلبين متزامنين.",
+      "files": [
+        "backend/app/Services/Concerns/ProcessesFinalExamSubmissions.php"
+      ],
+      "kind": "عطل"
+    },
+    {
+      "id": "F02",
+      "title": "إكمال أسئلة التقييم على الخادم",
+      "trigger": "إرسال سؤال ناقص أو جواب نصي فارغ من حساب الطالب.",
+      "before": "كان يُقبل التسليم الناقص برمز 201.",
+      "fix": "يرفض الخادم المحاولة الناقصة أو معرفات الأسئلة المكررة أو غير الحالية قبل الحفظ.",
+      "evidence": "StudentAssessmentAnswerValidationTest عبر القبلي والبعدي والمهام والنهائي.",
+      "files": [
+        "backend/app/Services/StudentAssessmentAnswerValidator.php"
+      ],
+      "kind": "عطل"
+    },
+    {
+      "id": "F03",
+      "title": "مطابقة الإجابة للخيارات المحفوظة",
+      "trigger": "إرسال قيمة لا توجد ضمن خيارات السؤال.",
+      "before": "كان تُحفظ كإجابة رغم عدم مطابقتها للخيارات.",
+      "fix": "الخيارات وصح/خطأ تقبل فقط قيمة من الخيارات الفعلية للسؤال.",
+      "evidence": "اختبارات الرفض 422، ورحلات الطالب التي تقارن الاختيار بالإجابة المسترجعة.",
+      "files": [
+        "backend/app/Services/StudentAssessmentAnswerValidator.php"
+      ],
+      "kind": "عطل"
+    },
+    {
+      "id": "F04",
+      "title": "إرفاق ملف لسؤال لا يسمح بالمرفقات",
+      "trigger": "طلب طالب يتضمن ملفًا لسؤال يمنع الملفات.",
+      "before": "كان يُقبل الملف ويُحفظ.",
+      "fix": "يرفض الطلب قبل إنشاء محاولة أو تخزين الملف.",
+      "evidence": "اختبارات الأنواع الأربعة تؤكد صفر محاولات وصفر ملفات عند الرفض.",
+      "files": [
+        "backend/app/Services/StudentAssessmentAnswerValidator.php"
+      ],
+      "kind": "عطل"
+    },
+    {
+      "id": "F05",
+      "title": "ملفات متبقية بعد فشل معاملة التسليم",
+      "trigger": "يُحفظ المرفق الأول ثم يفشل مرفق لاحق.",
+      "before": "كانت المعاملة تتراجع وتبقى الملفات السابقة دون إجابات مرتبطة.",
+      "fix": "يحذف مسارات الملفات المكتوبة في المحاولة الفاشلة عند التراجع.",
+      "evidence": "AssessmentAttachmentRollbackTest: أربع حالات فشلت قبل الإصلاح ثم نجحت.",
+      "files": [
+        "backend/app/Services/Concerns/SubmitsCourseAssessments.php",
+        "backend/app/Services/Concerns/ProcessesFinalExamSubmissions.php"
+      ],
+      "kind": "عطل"
+    },
+    {
+      "id": "F06",
+      "title": "الجواب النصي المسموح بالمرفق فقط",
+      "trigger": "إرفاق ملف صالح لسؤال نصي يسمح بالملفات مع ترك النص فارغًا.",
+      "before": "كانت الواجهة تعتبر السؤال غير مكتمل.",
+      "fix": "يُقبل النص أو الملف الفعلي المسموح؛ يظل اختيار جواب إلزاميًا في أسئلة الخيارات.",
+      "evidence": "اختبارات السلوك ورحلات الملفات التي تسترجع ملف PDF وتقارن محتواه.",
+      "files": [
+        "frontend/src/features/assessmentQuestions/submissionState.mjs"
+      ],
+      "kind": "عطل"
+    },
+    {
+      "id": "F07",
+      "title": "فشل تحديث النتائج بعد تأكيد الحفظ",
+      "trigger": "الخادم يقبل التسليم ثم يتعطل طلب قراءة النتائج.",
+      "before": "كانت الواجهة تعرض فشلًا أو تتيح إعادة المحاولة كأن التسليم لم يحفظ.",
+      "fix": "تُثبت نتيجة الطلب المقبول في الحالة المحلية قبل محاولة تحديثها.",
+      "evidence": "اختبارات الواجهة وحالات المتصفح مع قطع طلب قراءة النتائج.",
+      "files": [
+        "frontend/src/features/course/courseSubmissionMethods.js",
+        "frontend/src/features/tasks/tasksAnswerMethods.js",
+        "frontend/src/features/finalExam/publicFinalExamSubmissionMethods.js"
+      ],
+      "kind": "عطل"
+    },
+    {
+      "id": "F08",
+      "title": "حفظ البعدي ثم فشل الاستبيان",
+      "trigger": "تنجح إجابات الاختبار البعدي ويتعطل إرسال الرضا.",
+      "before": "لم تكن الواجهة تثبت نجاح الجزء الأول، فتكرر تسليم الاختبار.",
+      "fix": "يبقى الاختبار محفوظًا، وتُحفظ إجابات الاستبيان في النموذج لإعادة إرسال الاستبيان فقط.",
+      "evidence": "اختبار 503 متعمد للاستبيان ثم إعادة الإرسال دون طلب اختبار إضافي.",
+      "files": [
+        "frontend/src/features/course/courseSubmissionMethods.js"
+      ],
+      "kind": "عطل"
+    },
+    {
+      "id": "F09",
+      "title": "حفظ مجموعة أسئلة النهائي جزئيًا",
+      "trigger": "ينجح السؤال الأول ثم يفشل حفظ سؤال لاحق.",
+      "before": "بقي السؤال المقبول ضمن المسودة وقد يُضاف ثانية عند إعادة الحفظ.",
+      "fix": "تُزال كل مسودة بعد نجاح حفظها فقط، وتبقى المسودات الفاشلة للتعديل وإعادة المحاولة.",
+      "evidence": "اختبار طريقتي الحفظ، ورحلة فشل الإضافة الثانية ثم تعديل الأسئلة وإعادة التحميل.",
+      "files": [
+        "frontend/src/features/finalExam/finalExamQuestionMethods.js"
+      ],
+      "kind": "عطل"
+    },
+    {
+      "id": "F10",
+      "title": "تسمية حقول الاستبيان لقارئ الشاشة",
+      "trigger": "التنقل بين تقييمات وحقول الرأي باستخدام أدوات الوصول.",
+      "before": "لم تكن للحقول تسميات واضحة مرتبطة بكل سؤال.",
+      "fix": "أُضيف اسم سؤال التقييم واسم السؤال النصي إلى الحقل نفسه.",
+      "evidence": "تؤكد رحلات المتصفح الاسم المتاح لكل حقل.",
+      "files": [
+        "frontend/src/views/CourseView.vue",
+        "frontend/src/views/SatisfactionView.vue"
+      ],
+      "kind": "تحسين وصول"
+    },
+    {
+      "id": "F11",
+      "title": "رفض الاستبيان في صفحته المستقلة",
+      "trigger": "الطالب يفتح صفحة الرضا بعد تسليم البعدي ويضغط إرسال.",
+      "before": "يرجع 403 لأن الصفحة تستخدم مسار إدارة لا يملكه الطالب.",
+      "fix": "تستخدم مسار الطالب المصرح له، وتثبت الردود المقبولة قبل تحديث النتائج مع حماية تبديل الحساب.",
+      "evidence": "student-satisfaction: ثبت 403 قبل الإصلاح، ثم الحفظ وإعادة التحميل.",
+      "files": [
+        "frontend/src/features/controllers/SatisfactionView.js"
+      ],
+      "kind": "عطل"
+    },
+    {
+      "id": "F12",
+      "title": "عدم احتساب أقل تقييم في الاستبيان",
+      "trigger": "اختيار 1 من موضع المؤشر الافتراضي أو بمفتاح Home.",
+      "before": "بقيت القيمة «غير محدد» لأن القيمة الافتراضية لم تتغير.",
+      "fix": "تسجل نهاية التفاعل واختيار Home قيمة 1 صراحة في الصفحتين.",
+      "evidence": "فشل متصفح متوقع 1 / فعلي غير محدد قبل الإصلاح، ثم حفظ 1 واسترجاعه.",
+      "files": [
+        "frontend/src/views/CourseView.vue",
+        "frontend/src/views/SatisfactionView.vue"
+      ],
+      "kind": "عطل"
+    },
+    {
+      "id": "F13",
+      "title": "صلاحية إجابات الاستبيان على الخادم",
+      "trigger": "إرسال إجابات إلزامية ناقصة، قيمة خارج 1–10، سؤال مكرر أو نوع جواب مخالف.",
+      "before": "كان الخادم يقبلها، وقد يستبدل إجابة صحيحة بقيمة غير صحيحة.",
+      "fix": "يتحقق من الأسئلة الإلزامية ونوع الإجابة والنطاق والتكرار قبل الكتابة؛ يسمح بترك السؤال الاختياري دون إجابة.",
+      "evidence": "StudentSatisfactionValidationTest: حالات رفض، قبول التقييم 1، والحفاظ على جواب سابق عند رفض إعادة إرسال غير صالحة.",
+      "files": [
+        "backend/app/Services/StudentSatisfactionResponseValidator.php"
+      ],
+      "kind": "عطل"
+    },
+    {
+      "id": "F14",
+      "title": "إرسال رضا قبل تسليم البعدي",
+      "trigger": "إرسال طلب مباشر من الطالب قبل وجود محاولته البعدية للدورة.",
+      "before": "كانت قاعدة الترتيب مفروضة في الواجهة فقط.",
+      "fix": "الخادم يشترط وجود تسليم بعدي للحساب نفسه والدورة نفسها.",
+      "evidence": "اختبار رفض 422 دون إضافة أي رد رضا.",
+      "files": [
+        "backend/app/Services/StudentSatisfactionResponseValidator.php"
+      ],
+      "kind": "عطل"
+    },
+    {
+      "id": "F15",
+      "title": "ضياع رسالة التأكيد بعد حفظ فعلي",
+      "trigger": "يُحفظ الطلب على الخادم ثم ينقطع رد الشبكة قبل وصوله للواجهة.",
+      "before": "تظل الواجهة تعتبر المحاولة فاشلة وقد تصطدم إعادة الإرسال بمحاولة محفوظة.",
+      "fix": "تحاول قراءة النتيجة والتحقق من الحساب والدورة ونوع التقييم؛ تعرض المحفوظ وتستكمل استبيان البعدي وحده عند الحاجة. وتبقى المدخلات إذا تعذر التحقق.",
+      "evidence": "أربع حالات سلوك فشلت قبل الإصلاح؛ رحلات المتصفح تحفظ فعلًا ثم تقطع رد التأكيد وتتحقق من محاولة واحدة.",
+      "files": [
+        "frontend/src/features/assessmentQuestions/submissionState.mjs",
+        "frontend/src/features/controllers/SatisfactionView.js",
+        "frontend/src/features/course/courseSubmissionMethods.js",
+        "frontend/src/features/tasks/tasksAnswerMethods.js",
+        "frontend/src/features/finalExam/publicFinalExamSubmissionMethods.js"
+      ],
+      "kind": "عطل"
+    },
+    {
+      "id": "F16",
+      "title": "تحميل التسجيل المتأخر يمسح تعديل الحقول",
+      "trigger": "فتح تعديل بيانات التسجيل والكتابة قبل اكتمال قراءة الإعدادات.",
+      "before": "يرجع اسم الحقل للاسم القديم، ويصل طلب الحفظ 200 بالقيمة القديمة بدل التعديل.",
+      "fix": "يفتح المحرر بعد اكتمال قراءة الإعدادات بنجاح؛ يعيد استخدام الطلب الجاري ويمنع فتح نموذج فارغ عند فشل القراءة مع السماح بإعادة المحاولة.",
+      "evidence": "فشل رحلة المتصفح عند قراءة الاسم الثلاثي؛ أكد سجل الشبكة إرسال الاسم القديم. أضيف اختبار انتظار الطلب واختبار فشل القراءة ثم إعادة المحاولة.",
+      "files": [
+        "frontend/src/features/controllers/AdminRegistrationView.js"
+      ],
+      "kind": "عطل"
+    }
+  ],
+  "temporaryEvidence": "C:\\Users\\RAIQ\\AppData\\Local\\Temp\\momars-full-audit-14480428-195331",
+  "browser": {
+    "startTime": "2026-10-09T18:07:55.508Z",
+    "duration": 2723543.106,
+    "expected": 271,
+    "skipped": 4,
+    "unexpected": 0,
+    "flaky": 0,
+    "cases": [
+      {
+        "file": "accessibility.spec.mjs",
+        "title": "public pages have no serious accessibility violations",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 5148
+      },
+      {
+        "file": "accessibility.spec.mjs",
+        "title": "management pages have no serious accessibility violations",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 45625
+      },
+      {
+        "file": "accessibility.spec.mjs",
+        "title": "public pages have no serious accessibility violations",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 2426
+      },
+      {
+        "file": "accessibility.spec.mjs",
+        "title": "management pages have no serious accessibility violations",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 41747
+      },
+      {
+        "file": "accessibility.spec.mjs",
+        "title": "public pages have no serious accessibility violations",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 1782
+      },
+      {
+        "file": "accessibility.spec.mjs",
+        "title": "management pages have no serious accessibility violations",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 43604
+      },
+      {
+        "file": "accessibility.spec.mjs",
+        "title": "public pages have no serious accessibility violations",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 1645
+      },
+      {
+        "file": "accessibility.spec.mjs",
+        "title": "management pages have no serious accessibility violations",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 22846
+      },
+      {
+        "file": "accessibility.spec.mjs",
+        "title": "public pages have no serious accessibility violations",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 2309
+      },
+      {
+        "file": "accessibility.spec.mjs",
+        "title": "management pages have no serious accessibility violations",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 23494
+      },
+      {
+        "file": "assessment-admin.spec.mjs",
+        "title": "dashboard overview shows truthful indicator context",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 4022
+      },
+      {
+        "file": "assessment-admin.spec.mjs",
+        "title": "manager can add and save a task question from the plus menu",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 6734
+      },
+      {
+        "file": "assessment-admin.spec.mjs",
+        "title": "task start action opens its availability dialog",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 5442
+      },
+      {
+        "file": "assessment-admin.spec.mjs",
+        "title": "final exam question editor keeps the same clear assessment layout",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 5503
+      },
+      {
+        "file": "assessment-admin.spec.mjs",
+        "title": "course and task management actions stay inside the shared dropdown",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 4753
+      },
+      {
+        "file": "assessment-admin.spec.mjs",
+        "title": "dashboard overview shows truthful indicator context",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 4191
+      },
+      {
+        "file": "assessment-admin.spec.mjs",
+        "title": "manager can add and save a task question from the plus menu",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 6059
+      },
+      {
+        "file": "assessment-admin.spec.mjs",
+        "title": "task start action opens its availability dialog",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 5594
+      },
+      {
+        "file": "assessment-admin.spec.mjs",
+        "title": "final exam question editor keeps the same clear assessment layout",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 6535
+      },
+      {
+        "file": "assessment-admin.spec.mjs",
+        "title": "course and task management actions stay inside the shared dropdown",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 5355
+      },
+      {
+        "file": "assessment-admin.spec.mjs",
+        "title": "dashboard overview shows truthful indicator context",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 4296
+      },
+      {
+        "file": "assessment-admin.spec.mjs",
+        "title": "manager can add and save a task question from the plus menu",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 6469
+      },
+      {
+        "file": "assessment-admin.spec.mjs",
+        "title": "task start action opens its availability dialog",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 5983
+      },
+      {
+        "file": "assessment-admin.spec.mjs",
+        "title": "final exam question editor keeps the same clear assessment layout",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 5643
+      },
+      {
+        "file": "assessment-admin.spec.mjs",
+        "title": "course and task management actions stay inside the shared dropdown",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 5313
+      },
+      {
+        "file": "assessment-admin.spec.mjs",
+        "title": "dashboard overview shows truthful indicator context",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 2218
+      },
+      {
+        "file": "assessment-admin.spec.mjs",
+        "title": "manager can add and save a task question from the plus menu",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 3758
+      },
+      {
+        "file": "assessment-admin.spec.mjs",
+        "title": "task start action opens its availability dialog",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 3222
+      },
+      {
+        "file": "assessment-admin.spec.mjs",
+        "title": "final exam question editor keeps the same clear assessment layout",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 3134
+      },
+      {
+        "file": "assessment-admin.spec.mjs",
+        "title": "course and task management actions stay inside the shared dropdown",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 2768
+      },
+      {
+        "file": "assessment-admin.spec.mjs",
+        "title": "dashboard overview shows truthful indicator context",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 2319
+      },
+      {
+        "file": "assessment-admin.spec.mjs",
+        "title": "manager can add and save a task question from the plus menu",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 3970
+      },
+      {
+        "file": "assessment-admin.spec.mjs",
+        "title": "task start action opens its availability dialog",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 3212
+      },
+      {
+        "file": "assessment-admin.spec.mjs",
+        "title": "final exam question editor keeps the same clear assessment layout",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 3163
+      },
+      {
+        "file": "assessment-admin.spec.mjs",
+        "title": "course and task management actions stay inside the shared dropdown",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 2939
+      },
+      {
+        "file": "assessment-recovery.spec.mjs",
+        "title": "pre retains failed answers and confirms saved file-only attempts despite a refresh outage",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 12820
+      },
+      {
+        "file": "assessment-recovery.spec.mjs",
+        "title": "pre recovers a confirmation lost after the server has saved the answers",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 13006
+      },
+      {
+        "file": "assessment-recovery.spec.mjs",
+        "title": "post retains failed answers and confirms saved file-only attempts despite a refresh outage",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 13709
+      },
+      {
+        "file": "assessment-recovery.spec.mjs",
+        "title": "post recovers a confirmation lost after the server has saved the answers",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 14269
+      },
+      {
+        "file": "assessment-recovery.spec.mjs",
+        "title": "tasks retains failed answers and confirms saved file-only attempts despite a refresh outage",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 12445
+      },
+      {
+        "file": "assessment-recovery.spec.mjs",
+        "title": "tasks recovers a confirmation lost after the server has saved the answers",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 12945
+      },
+      {
+        "file": "assessment-recovery.spec.mjs",
+        "title": "final retains failed answers and confirms saved file-only attempts despite a refresh outage",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 12373
+      },
+      {
+        "file": "assessment-recovery.spec.mjs",
+        "title": "final recovers a confirmation lost after the server has saved the answers",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 13443
+      },
+      {
+        "file": "assessment-recovery.spec.mjs",
+        "title": "pre retains failed answers and confirms saved file-only attempts despite a refresh outage",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 12684
+      },
+      {
+        "file": "assessment-recovery.spec.mjs",
+        "title": "pre recovers a confirmation lost after the server has saved the answers",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 13355
+      },
+      {
+        "file": "assessment-recovery.spec.mjs",
+        "title": "post retains failed answers and confirms saved file-only attempts despite a refresh outage",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 14430
+      },
+      {
+        "file": "assessment-recovery.spec.mjs",
+        "title": "post recovers a confirmation lost after the server has saved the answers",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 14484
+      },
+      {
+        "file": "assessment-recovery.spec.mjs",
+        "title": "tasks retains failed answers and confirms saved file-only attempts despite a refresh outage",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 13477
+      },
+      {
+        "file": "assessment-recovery.spec.mjs",
+        "title": "tasks recovers a confirmation lost after the server has saved the answers",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 11799
+      },
+      {
+        "file": "assessment-recovery.spec.mjs",
+        "title": "final retains failed answers and confirms saved file-only attempts despite a refresh outage",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 12672
+      },
+      {
+        "file": "assessment-recovery.spec.mjs",
+        "title": "final recovers a confirmation lost after the server has saved the answers",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 12989
+      },
+      {
+        "file": "assessment-recovery.spec.mjs",
+        "title": "pre retains failed answers and confirms saved file-only attempts despite a refresh outage",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 12647
+      },
+      {
+        "file": "assessment-recovery.spec.mjs",
+        "title": "pre recovers a confirmation lost after the server has saved the answers",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 12694
+      },
+      {
+        "file": "assessment-recovery.spec.mjs",
+        "title": "post retains failed answers and confirms saved file-only attempts despite a refresh outage",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 14553
+      },
+      {
+        "file": "assessment-recovery.spec.mjs",
+        "title": "post recovers a confirmation lost after the server has saved the answers",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 14489
+      },
+      {
+        "file": "assessment-recovery.spec.mjs",
+        "title": "tasks retains failed answers and confirms saved file-only attempts despite a refresh outage",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 13605
+      },
+      {
+        "file": "assessment-recovery.spec.mjs",
+        "title": "tasks recovers a confirmation lost after the server has saved the answers",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 13145
+      },
+      {
+        "file": "assessment-recovery.spec.mjs",
+        "title": "final retains failed answers and confirms saved file-only attempts despite a refresh outage",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 14317
+      },
+      {
+        "file": "assessment-recovery.spec.mjs",
+        "title": "final recovers a confirmation lost after the server has saved the answers",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 12980
+      },
+      {
+        "file": "assessment-recovery.spec.mjs",
+        "title": "pre retains failed answers and confirms saved file-only attempts despite a refresh outage",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 6873
+      },
+      {
+        "file": "assessment-recovery.spec.mjs",
+        "title": "pre recovers a confirmation lost after the server has saved the answers",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 6981
+      },
+      {
+        "file": "assessment-recovery.spec.mjs",
+        "title": "post retains failed answers and confirms saved file-only attempts despite a refresh outage",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 7632
+      },
+      {
+        "file": "assessment-recovery.spec.mjs",
+        "title": "post recovers a confirmation lost after the server has saved the answers",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 7885
+      },
+      {
+        "file": "assessment-recovery.spec.mjs",
+        "title": "tasks retains failed answers and confirms saved file-only attempts despite a refresh outage",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 7149
+      },
+      {
+        "file": "assessment-recovery.spec.mjs",
+        "title": "tasks recovers a confirmation lost after the server has saved the answers",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 7273
+      },
+      {
+        "file": "assessment-recovery.spec.mjs",
+        "title": "final retains failed answers and confirms saved file-only attempts despite a refresh outage",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 6773
+      },
+      {
+        "file": "assessment-recovery.spec.mjs",
+        "title": "final recovers a confirmation lost after the server has saved the answers",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 7194
+      },
+      {
+        "file": "assessment-recovery.spec.mjs",
+        "title": "pre retains failed answers and confirms saved file-only attempts despite a refresh outage",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 6925
+      },
+      {
+        "file": "assessment-recovery.spec.mjs",
+        "title": "pre recovers a confirmation lost after the server has saved the answers",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 7033
+      },
+      {
+        "file": "assessment-recovery.spec.mjs",
+        "title": "post retains failed answers and confirms saved file-only attempts despite a refresh outage",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 8034
+      },
+      {
+        "file": "assessment-recovery.spec.mjs",
+        "title": "post recovers a confirmation lost after the server has saved the answers",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 7835
+      },
+      {
+        "file": "assessment-recovery.spec.mjs",
+        "title": "tasks retains failed answers and confirms saved file-only attempts despite a refresh outage",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 7448
+      },
+      {
+        "file": "assessment-recovery.spec.mjs",
+        "title": "tasks recovers a confirmation lost after the server has saved the answers",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 7319
+      },
+      {
+        "file": "assessment-recovery.spec.mjs",
+        "title": "final retains failed answers and confirms saved file-only attempts despite a refresh outage",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 7276
+      },
+      {
+        "file": "assessment-recovery.spec.mjs",
+        "title": "final recovers a confirmation lost after the server has saved the answers",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 7076
+      },
+      {
+        "file": "auth.spec.mjs",
+        "title": "protected dashboard redirects guests to login",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 712
+      },
+      {
+        "file": "auth.spec.mjs",
+        "title": "admin can sign in and use the responsive dashboard shell",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 7188
+      },
+      {
+        "file": "auth.spec.mjs",
+        "title": "protected dashboard redirects guests to login",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 669
+      },
+      {
+        "file": "auth.spec.mjs",
+        "title": "admin can sign in and use the responsive dashboard shell",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 5989
+      },
+      {
+        "file": "auth.spec.mjs",
+        "title": "protected dashboard redirects guests to login",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 752
+      },
+      {
+        "file": "auth.spec.mjs",
+        "title": "admin can sign in and use the responsive dashboard shell",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 6555
+      },
+      {
+        "file": "auth.spec.mjs",
+        "title": "protected dashboard redirects guests to login",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 549
+      },
+      {
+        "file": "auth.spec.mjs",
+        "title": "admin can sign in and use the responsive dashboard shell",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 3554
+      },
+      {
+        "file": "auth.spec.mjs",
+        "title": "protected dashboard redirects guests to login",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 541
+      },
+      {
+        "file": "auth.spec.mjs",
+        "title": "admin can sign in and use the responsive dashboard shell",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 3513
+      },
+      {
+        "file": "critical-workflows.spec.mjs",
+        "title": "admin critical data workflows persist through the browser API session",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 11314
+      },
+      {
+        "file": "critical-workflows.spec.mjs",
+        "title": "admin critical data workflows persist through the browser API session",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 11758
+      },
+      {
+        "file": "critical-workflows.spec.mjs",
+        "title": "admin critical data workflows persist through the browser API session",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 11374
+      },
+      {
+        "file": "critical-workflows.spec.mjs",
+        "title": "admin critical data workflows persist through the browser API session",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 5526
+      },
+      {
+        "file": "critical-workflows.spec.mjs",
+        "title": "admin critical data workflows persist through the browser API session",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 5450
+      },
+      {
+        "file": "management-panels.spec.mjs",
+        "title": "management panels remain usable across the viewport matrix",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 16316
+      },
+      {
+        "file": "management-panels.spec.mjs",
+        "title": "management panels remain usable across the viewport matrix",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 16640
+      },
+      {
+        "file": "management-panels.spec.mjs",
+        "title": "management panels remain usable across the viewport matrix",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 16748
+      },
+      {
+        "file": "management-panels.spec.mjs",
+        "title": "management panels remain usable across the viewport matrix",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 8840
+      },
+      {
+        "file": "management-panels.spec.mjs",
+        "title": "management panels remain usable across the viewport matrix",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 8864
+      },
+      {
+        "file": "mobile-interaction-regressions.spec.mjs",
+        "title": "mobile sidebar scrolls, contains focus and cleans up on resize",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 6151
+      },
+      {
+        "file": "mobile-interaction-regressions.spec.mjs",
+        "title": "short mobile dialogs expose save and cancel after a touch swipe",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 34645
+      },
+      {
+        "file": "mobile-interaction-regressions.spec.mjs",
+        "title": "user and satisfaction dialogs have accessible field names and contrast",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 8905
+      },
+      {
+        "file": "mobile-interaction-regressions.spec.mjs",
+        "title": "mobile sidebar scrolls, contains focus and cleans up on resize",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 6401
+      },
+      {
+        "file": "mobile-interaction-regressions.spec.mjs",
+        "title": "short mobile dialogs expose save and cancel after a touch swipe",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 35378
+      },
+      {
+        "file": "mobile-interaction-regressions.spec.mjs",
+        "title": "user and satisfaction dialogs have accessible field names and contrast",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 9406
+      },
+      {
+        "file": "mobile-interaction-regressions.spec.mjs",
+        "title": "mobile sidebar scrolls, contains focus and cleans up on resize",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 6639
+      },
+      {
+        "file": "mobile-interaction-regressions.spec.mjs",
+        "title": "short mobile dialogs expose save and cancel after a touch swipe",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 36035
+      },
+      {
+        "file": "mobile-interaction-regressions.spec.mjs",
+        "title": "user and satisfaction dialogs have accessible field names and contrast",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 8588
+      },
+      {
+        "file": "mobile-interaction-regressions.spec.mjs",
+        "title": "mobile sidebar scrolls, contains focus and cleans up on resize",
+        "project": "laptop-1024",
+        "status": "skipped",
+        "durationMs": 102
+      },
+      {
+        "file": "mobile-interaction-regressions.spec.mjs",
+        "title": "short mobile dialogs expose save and cancel after a touch swipe",
+        "project": "laptop-1024",
+        "status": "skipped",
+        "durationMs": 103
+      },
+      {
+        "file": "mobile-interaction-regressions.spec.mjs",
+        "title": "user and satisfaction dialogs have accessible field names and contrast",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 4523
+      },
+      {
+        "file": "mobile-interaction-regressions.spec.mjs",
+        "title": "mobile sidebar scrolls, contains focus and cleans up on resize",
+        "project": "desktop-1440",
+        "status": "skipped",
+        "durationMs": 102
+      },
+      {
+        "file": "mobile-interaction-regressions.spec.mjs",
+        "title": "short mobile dialogs expose save and cancel after a touch swipe",
+        "project": "desktop-1440",
+        "status": "skipped",
+        "durationMs": 114
+      },
+      {
+        "file": "mobile-interaction-regressions.spec.mjs",
+        "title": "user and satisfaction dialogs have accessible field names and contrast",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 4529
+      },
+      {
+        "file": "password-csrf.spec.mjs",
+        "title": "password change refreshes stale CSRF while preserving authentication and validation",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 17530
+      },
+      {
+        "file": "password-csrf.spec.mjs",
+        "title": "password change refreshes stale CSRF while preserving authentication and validation",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 9000
+      },
+      {
+        "file": "password-csrf.spec.mjs",
+        "title": "password change refreshes stale CSRF while preserving authentication and validation",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 9923
+      },
+      {
+        "file": "password-csrf.spec.mjs",
+        "title": "password change refreshes stale CSRF while preserving authentication and validation",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 8912
+      },
+      {
+        "file": "password-csrf.spec.mjs",
+        "title": "password change refreshes stale CSRF while preserving authentication and validation",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 8452
+      },
+      {
+        "file": "people-branch.spec.mjs",
+        "title": "people editor changes branch and saves female users",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 17697
+      },
+      {
+        "file": "people-branch.spec.mjs",
+        "title": "people editor changes branch and saves female users",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 25377
+      },
+      {
+        "file": "people-branch.spec.mjs",
+        "title": "people editor changes branch and saves female users",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 16980
+      },
+      {
+        "file": "people-branch.spec.mjs",
+        "title": "people editor changes branch and saves female users",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 10771
+      },
+      {
+        "file": "people-branch.spec.mjs",
+        "title": "people editor changes branch and saves female users",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 9900
+      },
+      {
+        "file": "people-directory.spec.mjs",
+        "title": "people directory searches and pages real server results with usable touch controls",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 47179
+      },
+      {
+        "file": "people-directory.spec.mjs",
+        "title": "people directory searches and pages real server results with usable touch controls",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 43590
+      },
+      {
+        "file": "people-directory.spec.mjs",
+        "title": "people directory searches and pages real server results with usable touch controls",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 47704
+      },
+      {
+        "file": "people-directory.spec.mjs",
+        "title": "people directory searches and pages real server results with usable touch controls",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 26980
+      },
+      {
+        "file": "people-directory.spec.mjs",
+        "title": "people directory searches and pages real server results with usable touch controls",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 26713
+      },
+      {
+        "file": "question-deletion.spec.mjs",
+        "title": "delete every pre question through the UI while keeping previous answers",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 11515
+      },
+      {
+        "file": "question-deletion.spec.mjs",
+        "title": "delete every post question through the UI while keeping previous answers",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 11196
+      },
+      {
+        "file": "question-deletion.spec.mjs",
+        "title": "delete every tasks question through the UI while keeping previous answers",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 11875
+      },
+      {
+        "file": "question-deletion.spec.mjs",
+        "title": "final exam supports successive delete-only saves without forcing a new question",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 9246
+      },
+      {
+        "file": "question-deletion.spec.mjs",
+        "title": "deleting a global satisfaction indicator keeps answers and stops future inheritance",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 10645
+      },
+      {
+        "file": "question-deletion.spec.mjs",
+        "title": "delete every pre question through the UI while keeping previous answers",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 5943
+      },
+      {
+        "file": "question-deletion.spec.mjs",
+        "title": "delete every post question through the UI while keeping previous answers",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 5844
+      },
+      {
+        "file": "question-deletion.spec.mjs",
+        "title": "delete every tasks question through the UI while keeping previous answers",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 10265
+      },
+      {
+        "file": "question-deletion.spec.mjs",
+        "title": "final exam supports successive delete-only saves without forcing a new question",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 9393
+      },
+      {
+        "file": "question-deletion.spec.mjs",
+        "title": "deleting a global satisfaction indicator keeps answers and stops future inheritance",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 9956
+      },
+      {
+        "file": "question-deletion.spec.mjs",
+        "title": "delete every pre question through the UI while keeping previous answers",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 5906
+      },
+      {
+        "file": "question-deletion.spec.mjs",
+        "title": "delete every post question through the UI while keeping previous answers",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 6471
+      },
+      {
+        "file": "question-deletion.spec.mjs",
+        "title": "delete every tasks question through the UI while keeping previous answers",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 12136
+      },
+      {
+        "file": "question-deletion.spec.mjs",
+        "title": "final exam supports successive delete-only saves without forcing a new question",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 9346
+      },
+      {
+        "file": "question-deletion.spec.mjs",
+        "title": "deleting a global satisfaction indicator keeps answers and stops future inheritance",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 10617
+      },
+      {
+        "file": "question-deletion.spec.mjs",
+        "title": "delete every pre question through the UI while keeping previous answers",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 5740
+      },
+      {
+        "file": "question-deletion.spec.mjs",
+        "title": "delete every post question through the UI while keeping previous answers",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 5642
+      },
+      {
+        "file": "question-deletion.spec.mjs",
+        "title": "delete every tasks question through the UI while keeping previous answers",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 5725
+      },
+      {
+        "file": "question-deletion.spec.mjs",
+        "title": "final exam supports successive delete-only saves without forcing a new question",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 4907
+      },
+      {
+        "file": "question-deletion.spec.mjs",
+        "title": "deleting a global satisfaction indicator keeps answers and stops future inheritance",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 5029
+      },
+      {
+        "file": "question-deletion.spec.mjs",
+        "title": "delete every pre question through the UI while keeping previous answers",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 5847
+      },
+      {
+        "file": "question-deletion.spec.mjs",
+        "title": "delete every post question through the UI while keeping previous answers",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 5707
+      },
+      {
+        "file": "question-deletion.spec.mjs",
+        "title": "delete every tasks question through the UI while keeping previous answers",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 5796
+      },
+      {
+        "file": "question-deletion.spec.mjs",
+        "title": "final exam supports successive delete-only saves without forcing a new question",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 4836
+      },
+      {
+        "file": "question-deletion.spec.mjs",
+        "title": "deleting a global satisfaction indicator keeps answers and stops future inheritance",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 5123
+      },
+      {
+        "file": "question-save.spec.mjs",
+        "title": "saved pre questions remain visible and editable for every question type",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 14507
+      },
+      {
+        "file": "question-save.spec.mjs",
+        "title": "saved post questions remain visible and editable for every question type",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 14198
+      },
+      {
+        "file": "question-save.spec.mjs",
+        "title": "saved tasks questions remain visible and editable for every question type",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 17449
+      },
+      {
+        "file": "question-save.spec.mjs",
+        "title": "final exam saves and edits all question types without losing true/false options",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 18662
+      },
+      {
+        "file": "question-save.spec.mjs",
+        "title": "saved pre questions remain visible and editable for every question type",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 12896
+      },
+      {
+        "file": "question-save.spec.mjs",
+        "title": "saved post questions remain visible and editable for every question type",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 12657
+      },
+      {
+        "file": "question-save.spec.mjs",
+        "title": "saved tasks questions remain visible and editable for every question type",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 13605
+      },
+      {
+        "file": "question-save.spec.mjs",
+        "title": "final exam saves and edits all question types without losing true/false options",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 14927
+      },
+      {
+        "file": "question-save.spec.mjs",
+        "title": "saved pre questions remain visible and editable for every question type",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 8871
+      },
+      {
+        "file": "question-save.spec.mjs",
+        "title": "saved post questions remain visible and editable for every question type",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 9138
+      },
+      {
+        "file": "question-save.spec.mjs",
+        "title": "saved tasks questions remain visible and editable for every question type",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 10232
+      },
+      {
+        "file": "question-save.spec.mjs",
+        "title": "final exam saves and edits all question types without losing true/false options",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 8841
+      },
+      {
+        "file": "question-save.spec.mjs",
+        "title": "saved pre questions remain visible and editable for every question type",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 10021
+      },
+      {
+        "file": "question-save.spec.mjs",
+        "title": "saved post questions remain visible and editable for every question type",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 9904
+      },
+      {
+        "file": "question-save.spec.mjs",
+        "title": "saved tasks questions remain visible and editable for every question type",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 7657
+      },
+      {
+        "file": "question-save.spec.mjs",
+        "title": "final exam saves and edits all question types without losing true/false options",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 8616
+      },
+      {
+        "file": "question-save.spec.mjs",
+        "title": "saved pre questions remain visible and editable for every question type",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 7627
+      },
+      {
+        "file": "question-save.spec.mjs",
+        "title": "saved post questions remain visible and editable for every question type",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 7878
+      },
+      {
+        "file": "question-save.spec.mjs",
+        "title": "saved tasks questions remain visible and editable for every question type",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 7319
+      },
+      {
+        "file": "question-save.spec.mjs",
+        "title": "final exam saves and edits all question types without losing true/false options",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 8542
+      },
+      {
+        "file": "registration.spec.mjs",
+        "title": "public registration persists a complete request",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 15422
+      },
+      {
+        "file": "registration.spec.mjs",
+        "title": "admin renames fixed registration questions without changing their types",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 9949
+      },
+      {
+        "file": "registration.spec.mjs",
+        "title": "registration question toggles show a visible checkbox state",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 6252
+      },
+      {
+        "file": "registration.spec.mjs",
+        "title": "public registration persists a complete request",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 16623
+      },
+      {
+        "file": "registration.spec.mjs",
+        "title": "admin renames fixed registration questions without changing their types",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 10758
+      },
+      {
+        "file": "registration.spec.mjs",
+        "title": "registration question toggles show a visible checkbox state",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 5637
+      },
+      {
+        "file": "registration.spec.mjs",
+        "title": "public registration persists a complete request",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 15562
+      },
+      {
+        "file": "registration.spec.mjs",
+        "title": "admin renames fixed registration questions without changing their types",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 12858
+      },
+      {
+        "file": "registration.spec.mjs",
+        "title": "registration question toggles show a visible checkbox state",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 6230
+      },
+      {
+        "file": "registration.spec.mjs",
+        "title": "public registration persists a complete request",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 7983
+      },
+      {
+        "file": "registration.spec.mjs",
+        "title": "admin renames fixed registration questions without changing their types",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 8706
+      },
+      {
+        "file": "registration.spec.mjs",
+        "title": "registration question toggles show a visible checkbox state",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 3154
+      },
+      {
+        "file": "registration.spec.mjs",
+        "title": "public registration persists a complete request",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 8274
+      },
+      {
+        "file": "registration.spec.mjs",
+        "title": "admin renames fixed registration questions without changing their types",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 5621
+      },
+      {
+        "file": "registration.spec.mjs",
+        "title": "registration question toggles show a visible checkbox state",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 3230
+      },
+      {
+        "file": "remaining-panels.spec.mjs",
+        "title": "remaining dashboard panels expose usable controls and dialogs",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 30080
+      },
+      {
+        "file": "remaining-panels.spec.mjs",
+        "title": "remaining dashboard panels expose usable controls and dialogs",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 29887
+      },
+      {
+        "file": "remaining-panels.spec.mjs",
+        "title": "remaining dashboard panels expose usable controls and dialogs",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 29586
+      },
+      {
+        "file": "remaining-panels.spec.mjs",
+        "title": "remaining dashboard panels expose usable controls and dialogs",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 16246
+      },
+      {
+        "file": "remaining-panels.spec.mjs",
+        "title": "remaining dashboard panels expose usable controls and dialogs",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 20320
+      },
+      {
+        "file": "responsive.spec.mjs",
+        "title": "public pages fit the viewport and expose usable controls",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 3079
+      },
+      {
+        "file": "responsive.spec.mjs",
+        "title": "public pages fit the viewport and expose usable controls",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 2629
+      },
+      {
+        "file": "responsive.spec.mjs",
+        "title": "public pages fit the viewport and expose usable controls",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 2476
+      },
+      {
+        "file": "responsive.spec.mjs",
+        "title": "public pages fit the viewport and expose usable controls",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 1533
+      },
+      {
+        "file": "responsive.spec.mjs",
+        "title": "public pages fit the viewport and expose usable controls",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 1713
+      },
+      {
+        "file": "results-directory.spec.mjs",
+        "title": "results page searches, paginates and retains full attendance totals without a snapshot",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 23851
+      },
+      {
+        "file": "results-directory.spec.mjs",
+        "title": "results page searches, paginates and retains full attendance totals without a snapshot",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 27001
+      },
+      {
+        "file": "results-directory.spec.mjs",
+        "title": "results page searches, paginates and retains full attendance totals without a snapshot",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 28145
+      },
+      {
+        "file": "results-directory.spec.mjs",
+        "title": "results page searches, paginates and retains full attendance totals without a snapshot",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 16722
+      },
+      {
+        "file": "results-directory.spec.mjs",
+        "title": "results page searches, paginates and retains full attendance totals without a snapshot",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 18136
+      },
+      {
+        "file": "rich-text-security.spec.mjs",
+        "title": "client rich text sanitizer strips executable HTML before rendering",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 217
+      },
+      {
+        "file": "rich-text-security.spec.mjs",
+        "title": "client rich text sanitizer strips executable HTML before rendering",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 315
+      },
+      {
+        "file": "rich-text-security.spec.mjs",
+        "title": "client rich text sanitizer strips executable HTML before rendering",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 338
+      },
+      {
+        "file": "rich-text-security.spec.mjs",
+        "title": "client rich text sanitizer strips executable HTML before rendering",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 239
+      },
+      {
+        "file": "rich-text-security.spec.mjs",
+        "title": "client rich text sanitizer strips executable HTML before rendering",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 271
+      },
+      {
+        "file": "role-journeys.spec.mjs",
+        "title": "e2e-male-manager can sign in and use its responsive home",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 1941
+      },
+      {
+        "file": "role-journeys.spec.mjs",
+        "title": "e2e-female-manager can sign in and use its responsive home",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 2526
+      },
+      {
+        "file": "role-journeys.spec.mjs",
+        "title": "e2e-reciter-role can sign in and use its responsive home",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 2039
+      },
+      {
+        "file": "role-journeys.spec.mjs",
+        "title": "e2e-student-role can sign in and use its responsive home",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 5235
+      },
+      {
+        "file": "role-journeys.spec.mjs",
+        "title": "e2e-trainee-role can sign in and use its responsive home",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 3818
+      },
+      {
+        "file": "role-journeys.spec.mjs",
+        "title": "manager panels load without browser or server errors",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 23863
+      },
+      {
+        "file": "role-journeys.spec.mjs",
+        "title": "e2e-male-manager can sign in and use its responsive home",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 3817
+      },
+      {
+        "file": "role-journeys.spec.mjs",
+        "title": "e2e-female-manager can sign in and use its responsive home",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 2513
+      },
+      {
+        "file": "role-journeys.spec.mjs",
+        "title": "e2e-reciter-role can sign in and use its responsive home",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 1972
+      },
+      {
+        "file": "role-journeys.spec.mjs",
+        "title": "e2e-student-role can sign in and use its responsive home",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 5150
+      },
+      {
+        "file": "role-journeys.spec.mjs",
+        "title": "e2e-trainee-role can sign in and use its responsive home",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 3858
+      },
+      {
+        "file": "role-journeys.spec.mjs",
+        "title": "manager panels load without browser or server errors",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 15704
+      },
+      {
+        "file": "role-journeys.spec.mjs",
+        "title": "e2e-male-manager can sign in and use its responsive home",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 4715
+      },
+      {
+        "file": "role-journeys.spec.mjs",
+        "title": "e2e-female-manager can sign in and use its responsive home",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 3969
+      },
+      {
+        "file": "role-journeys.spec.mjs",
+        "title": "e2e-reciter-role can sign in and use its responsive home",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 3858
+      },
+      {
+        "file": "role-journeys.spec.mjs",
+        "title": "e2e-student-role can sign in and use its responsive home",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 8285
+      },
+      {
+        "file": "role-journeys.spec.mjs",
+        "title": "e2e-trainee-role can sign in and use its responsive home",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 7680
+      },
+      {
+        "file": "role-journeys.spec.mjs",
+        "title": "manager panels load without browser or server errors",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 28933
+      },
+      {
+        "file": "role-journeys.spec.mjs",
+        "title": "e2e-male-manager can sign in and use its responsive home",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 2466
+      },
+      {
+        "file": "role-journeys.spec.mjs",
+        "title": "e2e-female-manager can sign in and use its responsive home",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 2010
+      },
+      {
+        "file": "role-journeys.spec.mjs",
+        "title": "e2e-reciter-role can sign in and use its responsive home",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 1950
+      },
+      {
+        "file": "role-journeys.spec.mjs",
+        "title": "e2e-student-role can sign in and use its responsive home",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 5105
+      },
+      {
+        "file": "role-journeys.spec.mjs",
+        "title": "e2e-trainee-role can sign in and use its responsive home",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 3890
+      },
+      {
+        "file": "role-journeys.spec.mjs",
+        "title": "manager panels load without browser or server errors",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 15593
+      },
+      {
+        "file": "role-journeys.spec.mjs",
+        "title": "e2e-male-manager can sign in and use its responsive home",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 2125
+      },
+      {
+        "file": "role-journeys.spec.mjs",
+        "title": "e2e-female-manager can sign in and use its responsive home",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 2485
+      },
+      {
+        "file": "role-journeys.spec.mjs",
+        "title": "e2e-reciter-role can sign in and use its responsive home",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 2009
+      },
+      {
+        "file": "role-journeys.spec.mjs",
+        "title": "e2e-student-role can sign in and use its responsive home",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 5127
+      },
+      {
+        "file": "role-journeys.spec.mjs",
+        "title": "e2e-trainee-role can sign in and use its responsive home",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 4352
+      },
+      {
+        "file": "role-journeys.spec.mjs",
+        "title": "manager panels load without browser or server errors",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 15839
+      },
+      {
+        "file": "satisfaction-courses.spec.mjs",
+        "title": "satisfaction includes courses with closed post tests and inherits general questions",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 4725
+      },
+      {
+        "file": "satisfaction-courses.spec.mjs",
+        "title": "satisfaction includes courses with closed post tests and inherits general questions",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 8401
+      },
+      {
+        "file": "satisfaction-courses.spec.mjs",
+        "title": "satisfaction includes courses with closed post tests and inherits general questions",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 4198
+      },
+      {
+        "file": "satisfaction-courses.spec.mjs",
+        "title": "satisfaction includes courses with closed post tests and inherits general questions",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 4289
+      },
+      {
+        "file": "satisfaction-courses.spec.mjs",
+        "title": "satisfaction includes courses with closed post tests and inherits general questions",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 4324
+      },
+      {
+        "file": "student-dashboard.spec.mjs",
+        "title": "student results remain usable across the responsive viewport matrix",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 11594
+      },
+      {
+        "file": "student-dashboard.spec.mjs",
+        "title": "student results remain usable across the responsive viewport matrix",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 6211
+      },
+      {
+        "file": "student-dashboard.spec.mjs",
+        "title": "student results remain usable across the responsive viewport matrix",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 9638
+      },
+      {
+        "file": "student-dashboard.spec.mjs",
+        "title": "student results remain usable across the responsive viewport matrix",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 6117
+      },
+      {
+        "file": "student-dashboard.spec.mjs",
+        "title": "student results remain usable across the responsive viewport matrix",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 5916
+      },
+      {
+        "file": "student-question-types.spec.mjs",
+        "title": "student pre displays saved question types and submits the exact selected answers",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 7797
+      },
+      {
+        "file": "student-question-types.spec.mjs",
+        "title": "student post displays saved question types and submits the exact selected answers",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 12936
+      },
+      {
+        "file": "student-question-types.spec.mjs",
+        "title": "student tasks displays saved question types and submits the exact selected answers",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 13680
+      },
+      {
+        "file": "student-question-types.spec.mjs",
+        "title": "student final displays saved question types and submits the exact selected answers",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 14050
+      },
+      {
+        "file": "student-question-types.spec.mjs",
+        "title": "student pre displays saved question types and submits the exact selected answers",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 12127
+      },
+      {
+        "file": "student-question-types.spec.mjs",
+        "title": "student post displays saved question types and submits the exact selected answers",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 12532
+      },
+      {
+        "file": "student-question-types.spec.mjs",
+        "title": "student tasks displays saved question types and submits the exact selected answers",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 13695
+      },
+      {
+        "file": "student-question-types.spec.mjs",
+        "title": "student final displays saved question types and submits the exact selected answers",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 12473
+      },
+      {
+        "file": "student-question-types.spec.mjs",
+        "title": "student pre displays saved question types and submits the exact selected answers",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 5868
+      },
+      {
+        "file": "student-question-types.spec.mjs",
+        "title": "student post displays saved question types and submits the exact selected answers",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 5901
+      },
+      {
+        "file": "student-question-types.spec.mjs",
+        "title": "student tasks displays saved question types and submits the exact selected answers",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 6003
+      },
+      {
+        "file": "student-question-types.spec.mjs",
+        "title": "student final displays saved question types and submits the exact selected answers",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 6127
+      },
+      {
+        "file": "student-question-types.spec.mjs",
+        "title": "student pre displays saved question types and submits the exact selected answers",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 6907
+      },
+      {
+        "file": "student-question-types.spec.mjs",
+        "title": "student post displays saved question types and submits the exact selected answers",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 6732
+      },
+      {
+        "file": "student-question-types.spec.mjs",
+        "title": "student tasks displays saved question types and submits the exact selected answers",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 6927
+      },
+      {
+        "file": "student-question-types.spec.mjs",
+        "title": "student final displays saved question types and submits the exact selected answers",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 6984
+      },
+      {
+        "file": "student-question-types.spec.mjs",
+        "title": "student pre displays saved question types and submits the exact selected answers",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 5891
+      },
+      {
+        "file": "student-question-types.spec.mjs",
+        "title": "student post displays saved question types and submits the exact selected answers",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 5926
+      },
+      {
+        "file": "student-question-types.spec.mjs",
+        "title": "student tasks displays saved question types and submits the exact selected answers",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 6541
+      },
+      {
+        "file": "student-question-types.spec.mjs",
+        "title": "student final displays saved question types and submits the exact selected answers",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 6129
+      },
+      {
+        "file": "student-satisfaction.spec.mjs",
+        "title": "student can save the separate satisfaction page and select the lowest rating",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 15781
+      },
+      {
+        "file": "student-satisfaction.spec.mjs",
+        "title": "separate survey recovers when its saved confirmation is lost",
+        "project": "mobile-320",
+        "status": "expected",
+        "durationMs": 15125
+      },
+      {
+        "file": "student-satisfaction.spec.mjs",
+        "title": "student can save the separate satisfaction page and select the lowest rating",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 7385
+      },
+      {
+        "file": "student-satisfaction.spec.mjs",
+        "title": "separate survey recovers when its saved confirmation is lost",
+        "project": "mobile-390",
+        "status": "expected",
+        "durationMs": 7811
+      },
+      {
+        "file": "student-satisfaction.spec.mjs",
+        "title": "student can save the separate satisfaction page and select the lowest rating",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 7068
+      },
+      {
+        "file": "student-satisfaction.spec.mjs",
+        "title": "separate survey recovers when its saved confirmation is lost",
+        "project": "tablet-768",
+        "status": "expected",
+        "durationMs": 8256
+      },
+      {
+        "file": "student-satisfaction.spec.mjs",
+        "title": "student can save the separate satisfaction page and select the lowest rating",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 7154
+      },
+      {
+        "file": "student-satisfaction.spec.mjs",
+        "title": "separate survey recovers when its saved confirmation is lost",
+        "project": "laptop-1024",
+        "status": "expected",
+        "durationMs": 7566
+      },
+      {
+        "file": "student-satisfaction.spec.mjs",
+        "title": "student can save the separate satisfaction page and select the lowest rating",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 7057
+      },
+      {
+        "file": "student-satisfaction.spec.mjs",
+        "title": "separate survey recovers when its saved confirmation is lost",
+        "project": "desktop-1440",
+        "status": "expected",
+        "durationMs": 7588
+      }
+    ]
+  },
+  "capacity": {
+    "baseline": {
+      "filename": "assessment-capacity-2026-10-09T17-39-53-493Z.json",
+      "startedAt": "2026-10-09T17:34:33.176Z",
+      "commit": "f87038441461a2a0d655ba0ed9ea6a51a948bf51",
+      "source": {
+        "dirty": true,
+        "assessmentServiceSha256": "c488cdf6494545811aa8d1b414f035cab86efba24f3c49dc31051b913534be59",
+        "finalExamServiceSha256": "d72fe43cd892f7528cf5911384a65f5d97f991c4b48a2e38017433400dafb3ce",
+        "studentAnswerValidatorSha256": "b474eac6ab50df0ddcacb85bba45b428cc40c6339423b32d91fb59568b8122e5"
+      },
+      "environment": {
+        "kind": "isolated-local",
+        "cpu": "Intel(R) Core(TM) i5-14400F",
+        "logicalProcessors": 16,
+        "memoryGiB": 31.8,
+        "workers": 8,
+        "database": "MySQL 8.4 disposable instance",
+        "php": "8.2.31",
+        "cache": "database",
+        "sessions": "database",
+        "bcryptRounds": 12,
+        "configAndRouteCache": true,
+        "loadGeneratorSharesHost": true
+      },
+      "serverErrors": {
+        "total": 0,
+        "sqlStates": {}
+      },
+      "scenario": {
+        "backgroundCourses": 30,
+        "questionsPerExam": 20,
+        "attachments": false,
+        "assessmentType": "pre",
+        "transport": "HTTP with separate authenticated sessions and CSRF cookies",
+        "phases": [
+          "csrf",
+          "login",
+          "openExam",
+          "submitExam",
+          "results"
+        ],
+        "thinkTimeSeconds": 0,
+        "retries": 0,
+        "timeoutsMs": 30000,
+        "limits": {
+          "errors": 0,
+          "loginP95Ms": 3000,
+          "openP95Ms": 2000,
+          "submitP95Ms": 3000,
+          "resultsP95Ms": 2000
+        }
+      },
+      "waves": [
+        {
+          "concurrentStudents": 1,
+          "completed": 1,
+          "durationMs": 2733,
+          "phases": {
+            "csrf": {
+              "requests": 1,
+              "failed": 0,
+              "statusCounts": {
+                "204": 1
+              },
+              "p50Ms": 267,
+              "p95Ms": 267,
+              "maxMs": 267
+            },
+            "login": {
+              "requests": 1,
+              "failed": 0,
+              "statusCounts": {
+                "200": 1
+              },
+              "p50Ms": 885,
+              "p95Ms": 885,
+              "maxMs": 885
+            },
+            "openExam": {
+              "requests": 1,
+              "failed": 0,
+              "statusCounts": {
+                "200": 1
+              },
+              "p50Ms": 414,
+              "p95Ms": 414,
+              "maxMs": 414
+            },
+            "submitExam": {
+              "requests": 1,
+              "failed": 0,
+              "statusCounts": {
+                "201": 1
+              },
+              "p50Ms": 461,
+              "p95Ms": 461,
+              "maxMs": 461
+            },
+            "results": {
+              "requests": 1,
+              "failed": 0,
+              "statusCounts": {
+                "200": 1
+              },
+              "p50Ms": 432,
+              "p95Ms": 432,
+              "maxMs": 432
+            }
+          },
+          "persisted": {
+            "submissions": 3,
+            "answers": 60,
+            "duplicates": 0,
+            "incomplete": 0
+          },
+          "acceptable": true,
+          "persistedInThisWave": 1,
+          "answersInThisWave": 20,
+          "persistencePassed": true,
+          "loadGeneratorEventLoopPercent": 11.4
+        },
+        {
+          "concurrentStudents": 10,
+          "completed": 10,
+          "durationMs": 10029,
+          "phases": {
+            "csrf": {
+              "requests": 10,
+              "failed": 0,
+              "statusCounts": {
+                "204": 10
+              },
+              "p50Ms": 875,
+              "p95Ms": 1338,
+              "maxMs": 1338
+            },
+            "login": {
+              "requests": 10,
+              "failed": 0,
+              "statusCounts": {
+                "200": 10
+              },
+              "p50Ms": 2107,
+              "p95Ms": 2688,
+              "maxMs": 2688
+            },
+            "openExam": {
+              "requests": 10,
+              "failed": 0,
+              "statusCounts": {
+                "200": 10
+              },
+              "p50Ms": 1583,
+              "p95Ms": 2223,
+              "maxMs": 2223
+            },
+            "submitExam": {
+              "requests": 10,
+              "failed": 0,
+              "statusCounts": {
+                "201": 10
+              },
+              "p50Ms": 1290,
+              "p95Ms": 1690,
+              "maxMs": 1690
+            },
+            "results": {
+              "requests": 10,
+              "failed": 0,
+              "statusCounts": {
+                "200": 10
+              },
+              "p50Ms": 1316,
+              "p95Ms": 1758,
+              "maxMs": 1758
+            }
+          },
+          "persisted": {
+            "submissions": 13,
+            "answers": 260,
+            "duplicates": 0,
+            "incomplete": 0
+          },
+          "acceptable": false,
+          "persistedInThisWave": 10,
+          "answersInThisWave": 200,
+          "persistencePassed": true,
+          "loadGeneratorEventLoopPercent": 9.9
+        },
+        {
+          "concurrentStudents": 25,
+          "completed": 25,
+          "durationMs": 23223,
+          "phases": {
+            "csrf": {
+              "requests": 25,
+              "failed": 0,
+              "statusCounts": {
+                "204": 25
+              },
+              "p50Ms": 1748,
+              "p95Ms": 2808,
+              "maxMs": 3058
+            },
+            "login": {
+              "requests": 25,
+              "failed": 0,
+              "statusCounts": {
+                "200": 25
+              },
+              "p50Ms": 3597,
+              "p95Ms": 5402,
+              "maxMs": 5986
+            },
+            "openExam": {
+              "requests": 25,
+              "failed": 0,
+              "statusCounts": {
+                "200": 25
+              },
+              "p50Ms": 3005,
+              "p95Ms": 4271,
+              "maxMs": 4742
+            },
+            "submitExam": {
+              "requests": 25,
+              "failed": 0,
+              "statusCounts": {
+                "201": 25
+              },
+              "p50Ms": 2618,
+              "p95Ms": 3800,
+              "maxMs": 4221
+            },
+            "results": {
+              "requests": 25,
+              "failed": 0,
+              "statusCounts": {
+                "200": 25
+              },
+              "p50Ms": 2677,
+              "p95Ms": 4236,
+              "maxMs": 4858
+            }
+          },
+          "persisted": {
+            "submissions": 38,
+            "answers": 760,
+            "duplicates": 0,
+            "incomplete": 0
+          },
+          "acceptable": false,
+          "persistedInThisWave": 25,
+          "answersInThisWave": 500,
+          "persistencePassed": true,
+          "loadGeneratorEventLoopPercent": 10
+        },
+        {
+          "concurrentStudents": 50,
+          "completed": 50,
+          "durationMs": 42949,
+          "phases": {
+            "csrf": {
+              "requests": 50,
+              "failed": 0,
+              "statusCounts": {
+                "204": 50
+              },
+              "p50Ms": 3625,
+              "p95Ms": 5585,
+              "maxMs": 6095
+            },
+            "login": {
+              "requests": 50,
+              "failed": 0,
+              "statusCounts": {
+                "200": 50
+              },
+              "p50Ms": 7540,
+              "p95Ms": 11294,
+              "maxMs": 12091
+            },
+            "openExam": {
+              "requests": 50,
+              "failed": 0,
+              "statusCounts": {
+                "200": 50
+              },
+              "p50Ms": 5689,
+              "p95Ms": 8299,
+              "maxMs": 8684
+            },
+            "submitExam": {
+              "requests": 50,
+              "failed": 0,
+              "statusCounts": {
+                "201": 50
+              },
+              "p50Ms": 4891,
+              "p95Ms": 8450,
+              "maxMs": 8880
+            },
+            "results": {
+              "requests": 50,
+              "failed": 0,
+              "statusCounts": {
+                "200": 50
+              },
+              "p50Ms": 5241,
+              "p95Ms": 6667,
+              "maxMs": 6806
+            }
+          },
+          "persisted": {
+            "submissions": 88,
+            "answers": 1760,
+            "duplicates": 0,
+            "incomplete": 0
+          },
+          "acceptable": false,
+          "persistedInThisWave": 50,
+          "answersInThisWave": 1000,
+          "persistencePassed": true,
+          "loadGeneratorEventLoopPercent": 8.7
+        },
+        {
+          "concurrentStudents": 100,
+          "completed": 100,
+          "durationMs": 89263,
+          "phases": {
+            "csrf": {
+              "requests": 100,
+              "failed": 0,
+              "statusCounts": {
+                "204": 100
+              },
+              "p50Ms": 6173,
+              "p95Ms": 12204,
+              "maxMs": 12674
+            },
+            "login": {
+              "requests": 100,
+              "failed": 0,
+              "statusCounts": {
+                "200": 100
+              },
+              "p50Ms": 14068,
+              "p95Ms": 25779,
+              "maxMs": 27362
+            },
+            "openExam": {
+              "requests": 100,
+              "failed": 0,
+              "statusCounts": {
+                "200": 100
+              },
+              "p50Ms": 9966,
+              "p95Ms": 17438,
+              "maxMs": 18318
+            },
+            "submitExam": {
+              "requests": 100,
+              "failed": 0,
+              "statusCounts": {
+                "201": 100
+              },
+              "p50Ms": 9781,
+              "p95Ms": 16706,
+              "maxMs": 17506
+            },
+            "results": {
+              "requests": 100,
+              "failed": 0,
+              "statusCounts": {
+                "200": 100
+              },
+              "p50Ms": 9327,
+              "p95Ms": 12626,
+              "maxMs": 12870
+            }
+          },
+          "persisted": {
+            "submissions": 188,
+            "answers": 3760,
+            "duplicates": 0,
+            "incomplete": 0
+          },
+          "acceptable": false,
+          "persistedInThisWave": 100,
+          "answersInThisWave": 2000,
+          "persistencePassed": true,
+          "loadGeneratorEventLoopPercent": 7.9
+        },
+        {
+          "concurrentStudents": 200,
+          "completed": 0,
+          "durationMs": 115329,
+          "phases": {
+            "csrf": {
+              "requests": 200,
+              "failed": 0,
+              "statusCounts": {
+                "204": 200
+              },
+              "p50Ms": 12972,
+              "p95Ms": 22980,
+              "maxMs": 24160
+            },
+            "login": {
+              "requests": 200,
+              "failed": 88,
+              "statusCounts": {
+                "200": 112,
+                "timeout": 88
+              },
+              "p50Ms": 27418,
+              "p95Ms": 30173,
+              "maxMs": 30183
+            },
+            "openExam": {
+              "requests": 200,
+              "failed": 199,
+              "statusCounts": {
+                "200": 1,
+                "timeout": 111,
+                "skipped": 88
+              },
+              "p50Ms": 30290,
+              "p95Ms": 30311,
+              "maxMs": 30312
+            },
+            "submitExam": {
+              "requests": 200,
+              "failed": 200,
+              "statusCounts": {
+                "timeout": 1,
+                "skipped": 199
+              },
+              "p50Ms": 30003,
+              "p95Ms": 30003,
+              "maxMs": 30003
+            },
+            "results": {
+              "requests": 200,
+              "failed": 200,
+              "statusCounts": {
+                "skipped": 200
+              },
+              "p50Ms": 0,
+              "p95Ms": 0,
+              "maxMs": 0
+            }
+          },
+          "persisted": {
+            "submissions": 188,
+            "answers": 3760,
+            "duplicates": 0,
+            "incomplete": 0
+          },
+          "acceptable": false,
+          "persistedInThisWave": 0,
+          "answersInThisWave": 0,
+          "persistencePassed": false,
+          "loadGeneratorEventLoopPercent": 4.4
+        }
+      ],
+      "dataset": {
+        "users": 388,
+        "backgroundCourses": 30,
+        "questionsPerExam": 20
+      },
+      "securityChecks": {
+        "unauthenticated": {
+          "ok": true,
+          "status": 401,
+          "ms": 369
+        },
+        "csrfCookie": {
+          "ok": true,
+          "status": 204,
+          "ms": 315
+        },
+        "login": {
+          "ok": true,
+          "status": 200,
+          "ms": 763
+        },
+        "missingCsrf": {
+          "ok": true,
+          "status": 419,
+          "ms": 347
+        },
+        "anotherIdentity": {
+          "ok": true,
+          "status": 422,
+          "ms": 426
+        },
+        "validSubmission": {
+          "ok": true,
+          "status": 201,
+          "ms": 468
+        },
+        "duplicateSubmission": {
+          "ok": true,
+          "status": 422,
+          "ms": 332
+        }
+      },
+      "concurrentRetry": {
+        "ok": true,
+        "statuses": [
+          201,
+          422
+        ]
+      },
+      "completedAt": "2026-10-09T17:39:53.233Z",
+      "error": "Concurrent assessment persistence checks failed; see the per-phase results."
+    },
+    "pre": {
+      "filename": "assessment-capacity-2026-10-09T17-42-15-192Z.json",
+      "startedAt": "2026-10-09T17:40:58.558Z",
+      "commit": "f87038441461a2a0d655ba0ed9ea6a51a948bf51",
+      "source": {
+        "dirty": true,
+        "assessmentServiceSha256": "c488cdf6494545811aa8d1b414f035cab86efba24f3c49dc31051b913534be59",
+        "finalExamServiceSha256": "d72fe43cd892f7528cf5911384a65f5d97f991c4b48a2e38017433400dafb3ce",
+        "studentAnswerValidatorSha256": "b474eac6ab50df0ddcacb85bba45b428cc40c6339423b32d91fb59568b8122e5"
+      },
+      "environment": {
+        "kind": "isolated-local",
+        "cpu": "Intel(R) Core(TM) i5-14400F",
+        "logicalProcessors": 16,
+        "memoryGiB": 31.8,
+        "workers": 8,
+        "database": "MySQL 8.4 disposable instance",
+        "php": "8.2.31",
+        "cache": "database",
+        "sessions": "database",
+        "bcryptRounds": 12,
+        "opcacheLoaded": true,
+        "configAndRouteCache": true,
+        "loadGeneratorSharesHost": true
+      },
+      "serverErrors": {
+        "total": 0,
+        "sqlStates": {}
+      },
+      "scenario": {
+        "backgroundCourses": 30,
+        "questionsPerExam": 20,
+        "attachments": false,
+        "assessmentType": "pre",
+        "transport": "HTTP with separate authenticated sessions and CSRF cookies",
+        "phases": [
+          "csrf",
+          "login",
+          "openExam",
+          "submitExam",
+          "results"
+        ],
+        "thinkTimeSeconds": 0,
+        "retries": 0,
+        "timeoutsMs": 30000,
+        "limits": {
+          "errors": 0,
+          "loginP95Ms": 3000,
+          "openP95Ms": 2000,
+          "submitP95Ms": 3000,
+          "resultsP95Ms": 2000
+        }
+      },
+      "waves": [
+        {
+          "concurrentStudents": 1,
+          "completed": 1,
+          "durationMs": 943,
+          "phases": {
+            "csrf": {
+              "requests": 1,
+              "failed": 0,
+              "statusCounts": {
+                "204": 1
+              },
+              "p50Ms": 26,
+              "p95Ms": 26,
+              "maxMs": 26
+            },
+            "login": {
+              "requests": 1,
+              "failed": 0,
+              "statusCounts": {
+                "200": 1
+              },
+              "p50Ms": 242,
+              "p95Ms": 242,
+              "maxMs": 242
+            },
+            "openExam": {
+              "requests": 1,
+              "failed": 0,
+              "statusCounts": {
+                "200": 1
+              },
+              "p50Ms": 107,
+              "p95Ms": 107,
+              "maxMs": 107
+            },
+            "submitExam": {
+              "requests": 1,
+              "failed": 0,
+              "statusCounts": {
+                "201": 1
+              },
+              "p50Ms": 56,
+              "p95Ms": 56,
+              "maxMs": 56
+            },
+            "results": {
+              "requests": 1,
+              "failed": 0,
+              "statusCounts": {
+                "200": 1
+              },
+              "p50Ms": 60,
+              "p95Ms": 60,
+              "maxMs": 60
+            }
+          },
+          "persisted": {
+            "submissions": 3,
+            "answers": 60,
+            "duplicates": 0,
+            "incomplete": 0
+          },
+          "acceptable": true,
+          "persistedInThisWave": 1,
+          "answersInThisWave": 20,
+          "persistencePassed": true,
+          "loadGeneratorEventLoopPercent": 50.7
+        },
+        {
+          "concurrentStudents": 10,
+          "completed": 10,
+          "durationMs": 1364,
+          "phases": {
+            "csrf": {
+              "requests": 10,
+              "failed": 0,
+              "statusCounts": {
+                "204": 10
+              },
+              "p50Ms": 37,
+              "p95Ms": 50,
+              "maxMs": 50
+            },
+            "login": {
+              "requests": 10,
+              "failed": 0,
+              "statusCounts": {
+                "200": 10
+              },
+              "p50Ms": 288,
+              "p95Ms": 546,
+              "maxMs": 546
+            },
+            "openExam": {
+              "requests": 10,
+              "failed": 0,
+              "statusCounts": {
+                "200": 10
+              },
+              "p50Ms": 92,
+              "p95Ms": 140,
+              "maxMs": 140
+            },
+            "submitExam": {
+              "requests": 10,
+              "failed": 0,
+              "statusCounts": {
+                "201": 10
+              },
+              "p50Ms": 91,
+              "p95Ms": 134,
+              "maxMs": 134
+            },
+            "results": {
+              "requests": 10,
+              "failed": 0,
+              "statusCounts": {
+                "200": 10
+              },
+              "p50Ms": 80,
+              "p95Ms": 147,
+              "maxMs": 147
+            }
+          },
+          "persisted": {
+            "submissions": 13,
+            "answers": 260,
+            "duplicates": 0,
+            "incomplete": 0
+          },
+          "acceptable": true,
+          "persistedInThisWave": 10,
+          "answersInThisWave": 200,
+          "persistencePassed": true,
+          "loadGeneratorEventLoopPercent": 41.6
+        },
+        {
+          "concurrentStudents": 25,
+          "completed": 25,
+          "durationMs": 2379,
+          "phases": {
+            "csrf": {
+              "requests": 25,
+              "failed": 0,
+              "statusCounts": {
+                "204": 25
+              },
+              "p50Ms": 64,
+              "p95Ms": 108,
+              "maxMs": 124
+            },
+            "login": {
+              "requests": 25,
+              "failed": 0,
+              "statusCounts": {
+                "200": 25
+              },
+              "p50Ms": 577,
+              "p95Ms": 864,
+              "maxMs": 1050
+            },
+            "openExam": {
+              "requests": 25,
+              "failed": 0,
+              "statusCounts": {
+                "200": 25
+              },
+              "p50Ms": 155,
+              "p95Ms": 225,
+              "maxMs": 272
+            },
+            "submitExam": {
+              "requests": 25,
+              "failed": 0,
+              "statusCounts": {
+                "201": 25
+              },
+              "p50Ms": 188,
+              "p95Ms": 275,
+              "maxMs": 318
+            },
+            "results": {
+              "requests": 25,
+              "failed": 0,
+              "statusCounts": {
+                "200": 25
+              },
+              "p50Ms": 147,
+              "p95Ms": 230,
+              "maxMs": 236
+            }
+          },
+          "persisted": {
+            "submissions": 38,
+            "answers": 760,
+            "duplicates": 0,
+            "incomplete": 0
+          },
+          "acceptable": true,
+          "persistedInThisWave": 25,
+          "answersInThisWave": 500,
+          "persistencePassed": true,
+          "loadGeneratorEventLoopPercent": 35.6
+        },
+        {
+          "concurrentStudents": 50,
+          "completed": 50,
+          "durationMs": 4623,
+          "phases": {
+            "csrf": {
+              "requests": 50,
+              "failed": 0,
+              "statusCounts": {
+                "204": 50
+              },
+              "p50Ms": 96,
+              "p95Ms": 166,
+              "maxMs": 180
+            },
+            "login": {
+              "requests": 50,
+              "failed": 0,
+              "statusCounts": {
+                "200": 50
+              },
+              "p50Ms": 1131,
+              "p95Ms": 1731,
+              "maxMs": 1980
+            },
+            "openExam": {
+              "requests": 50,
+              "failed": 0,
+              "statusCounts": {
+                "200": 50
+              },
+              "p50Ms": 904,
+              "p95Ms": 1053,
+              "maxMs": 1106
+            },
+            "submitExam": {
+              "requests": 50,
+              "failed": 0,
+              "statusCounts": {
+                "201": 50
+              },
+              "p50Ms": 302,
+              "p95Ms": 457,
+              "maxMs": 500
+            },
+            "results": {
+              "requests": 50,
+              "failed": 0,
+              "statusCounts": {
+                "200": 50
+              },
+              "p50Ms": 246,
+              "p95Ms": 442,
+              "maxMs": 502
+            }
+          },
+          "persisted": {
+            "submissions": 88,
+            "answers": 1760,
+            "duplicates": 0,
+            "incomplete": 0
+          },
+          "acceptable": true,
+          "persistedInThisWave": 50,
+          "answersInThisWave": 1000,
+          "persistencePassed": true,
+          "loadGeneratorEventLoopPercent": 25.8
+        },
+        {
+          "concurrentStudents": 100,
+          "completed": 100,
+          "durationMs": 7566,
+          "phases": {
+            "csrf": {
+              "requests": 100,
+              "failed": 0,
+              "statusCounts": {
+                "204": 100
+              },
+              "p50Ms": 202,
+              "p95Ms": 339,
+              "maxMs": 382
+            },
+            "login": {
+              "requests": 100,
+              "failed": 0,
+              "statusCounts": {
+                "200": 100
+              },
+              "p50Ms": 2197,
+              "p95Ms": 3544,
+              "maxMs": 3776
+            },
+            "openExam": {
+              "requests": 100,
+              "failed": 0,
+              "statusCounts": {
+                "200": 100
+              },
+              "p50Ms": 489,
+              "p95Ms": 858,
+              "maxMs": 934
+            },
+            "submitExam": {
+              "requests": 100,
+              "failed": 0,
+              "statusCounts": {
+                "201": 100
+              },
+              "p50Ms": 580,
+              "p95Ms": 891,
+              "maxMs": 955
+            },
+            "results": {
+              "requests": 100,
+              "failed": 0,
+              "statusCounts": {
+                "200": 100
+              },
+              "p50Ms": 537,
+              "p95Ms": 990,
+              "maxMs": 1061
+            }
+          },
+          "persisted": {
+            "submissions": 188,
+            "answers": 3760,
+            "duplicates": 0,
+            "incomplete": 0
+          },
+          "acceptable": false,
+          "persistedInThisWave": 100,
+          "answersInThisWave": 2000,
+          "persistencePassed": true,
+          "loadGeneratorEventLoopPercent": 28.1
+        },
+        {
+          "concurrentStudents": 200,
+          "completed": 200,
+          "durationMs": 34340,
+          "phases": {
+            "csrf": {
+              "requests": 200,
+              "failed": 0,
+              "statusCounts": {
+                "204": 200
+              },
+              "p50Ms": 370,
+              "p95Ms": 637,
+              "maxMs": 696
+            },
+            "login": {
+              "requests": 200,
+              "failed": 0,
+              "statusCounts": {
+                "200": 200
+              },
+              "p50Ms": 9622,
+              "p95Ms": 22336,
+              "maxMs": 23575
+            },
+            "openExam": {
+              "requests": 200,
+              "failed": 0,
+              "statusCounts": {
+                "200": 200
+              },
+              "p50Ms": 5124,
+              "p95Ms": 5814,
+              "maxMs": 5907
+            },
+            "submitExam": {
+              "requests": 200,
+              "failed": 0,
+              "statusCounts": {
+                "201": 200
+              },
+              "p50Ms": 1021,
+              "p95Ms": 1777,
+              "maxMs": 1927
+            },
+            "results": {
+              "requests": 200,
+              "failed": 0,
+              "statusCounts": {
+                "200": 200
+              },
+              "p50Ms": 855,
+              "p95Ms": 1540,
+              "maxMs": 1628
+            }
+          },
+          "persisted": {
+            "submissions": 388,
+            "answers": 7760,
+            "duplicates": 0,
+            "incomplete": 0
+          },
+          "acceptable": false,
+          "persistedInThisWave": 200,
+          "answersInThisWave": 4000,
+          "persistencePassed": true,
+          "loadGeneratorEventLoopPercent": 24.4
+        }
+      ],
+      "dataset": {
+        "users": 388,
+        "backgroundCourses": 30,
+        "questionsPerExam": 20
+      },
+      "securityChecks": {
+        "unauthenticated": {
+          "ok": true,
+          "status": 401,
+          "ms": 60
+        },
+        "csrfCookie": {
+          "ok": true,
+          "status": 204,
+          "ms": 32
+        },
+        "login": {
+          "ok": true,
+          "status": 200,
+          "ms": 266
+        },
+        "missingCsrf": {
+          "ok": true,
+          "status": 419,
+          "ms": 23
+        },
+        "anotherIdentity": {
+          "ok": true,
+          "status": 422,
+          "ms": 60
+        },
+        "validSubmission": {
+          "ok": true,
+          "status": 201,
+          "ms": 310
+        },
+        "duplicateSubmission": {
+          "ok": true,
+          "status": 422,
+          "ms": 35
+        }
+      },
+      "concurrentRetry": {
+        "ok": true,
+        "statuses": [
+          201,
+          422
+        ]
+      },
+      "completedAt": "2026-10-09T17:42:15.131Z"
+    },
+    "post": {
+      "filename": "assessment-capacity-2026-10-09T17-43-13-350Z.json",
+      "startedAt": "2026-10-09T17:42:15.549Z",
+      "commit": "f87038441461a2a0d655ba0ed9ea6a51a948bf51",
+      "source": {
+        "dirty": true,
+        "assessmentServiceSha256": "c488cdf6494545811aa8d1b414f035cab86efba24f3c49dc31051b913534be59",
+        "finalExamServiceSha256": "d72fe43cd892f7528cf5911384a65f5d97f991c4b48a2e38017433400dafb3ce",
+        "studentAnswerValidatorSha256": "b474eac6ab50df0ddcacb85bba45b428cc40c6339423b32d91fb59568b8122e5"
+      },
+      "environment": {
+        "kind": "isolated-local",
+        "cpu": "Intel(R) Core(TM) i5-14400F",
+        "logicalProcessors": 16,
+        "memoryGiB": 31.8,
+        "workers": 8,
+        "database": "MySQL 8.4 disposable instance",
+        "php": "8.2.31",
+        "cache": "database",
+        "sessions": "database",
+        "bcryptRounds": 12,
+        "opcacheLoaded": true,
+        "configAndRouteCache": true,
+        "loadGeneratorSharesHost": true
+      },
+      "serverErrors": {
+        "total": 0,
+        "sqlStates": {}
+      },
+      "scenario": {
+        "backgroundCourses": 30,
+        "questionsPerExam": 20,
+        "attachments": false,
+        "assessmentType": "post",
+        "transport": "HTTP with separate authenticated sessions and CSRF cookies",
+        "phases": [
+          "csrf",
+          "login",
+          "openExam",
+          "submitExam",
+          "results"
+        ],
+        "thinkTimeSeconds": 0,
+        "retries": 0,
+        "timeoutsMs": 30000,
+        "limits": {
+          "errors": 0,
+          "loginP95Ms": 3000,
+          "openP95Ms": 2000,
+          "submitP95Ms": 3000,
+          "resultsP95Ms": 2000
+        }
+      },
+      "waves": [
+        {
+          "concurrentStudents": 1,
+          "completed": 1,
+          "durationMs": 1275,
+          "phases": {
+            "csrf": {
+              "requests": 1,
+              "failed": 0,
+              "statusCounts": {
+                "204": 1
+              },
+              "p50Ms": 48,
+              "p95Ms": 48,
+              "maxMs": 48
+            },
+            "login": {
+              "requests": 1,
+              "failed": 0,
+              "statusCounts": {
+                "200": 1
+              },
+              "p50Ms": 406,
+              "p95Ms": 406,
+              "maxMs": 406
+            },
+            "openExam": {
+              "requests": 1,
+              "failed": 0,
+              "statusCounts": {
+                "200": 1
+              },
+              "p50Ms": 176,
+              "p95Ms": 176,
+              "maxMs": 176
+            },
+            "submitExam": {
+              "requests": 1,
+              "failed": 0,
+              "statusCounts": {
+                "201": 1
+              },
+              "p50Ms": 78,
+              "p95Ms": 78,
+              "maxMs": 78
+            },
+            "results": {
+              "requests": 1,
+              "failed": 0,
+              "statusCounts": {
+                "200": 1
+              },
+              "p50Ms": 140,
+              "p95Ms": 140,
+              "maxMs": 140
+            }
+          },
+          "persisted": {
+            "submissions": 3,
+            "answers": 60,
+            "duplicates": 0,
+            "incomplete": 0
+          },
+          "acceptable": true,
+          "persistedInThisWave": 1,
+          "answersInThisWave": 20,
+          "persistencePassed": true,
+          "loadGeneratorEventLoopPercent": 36.3
+        },
+        {
+          "concurrentStudents": 10,
+          "completed": 10,
+          "durationMs": 1328,
+          "phases": {
+            "csrf": {
+              "requests": 10,
+              "failed": 0,
+              "statusCounts": {
+                "204": 10
+              },
+              "p50Ms": 35,
+              "p95Ms": 75,
+              "maxMs": 75
+            },
+            "login": {
+              "requests": 10,
+              "failed": 0,
+              "statusCounts": {
+                "200": 10
+              },
+              "p50Ms": 281,
+              "p95Ms": 534,
+              "maxMs": 534
+            },
+            "openExam": {
+              "requests": 10,
+              "failed": 0,
+              "statusCounts": {
+                "200": 10
+              },
+              "p50Ms": 78,
+              "p95Ms": 146,
+              "maxMs": 146
+            },
+            "submitExam": {
+              "requests": 10,
+              "failed": 0,
+              "statusCounts": {
+                "201": 10
+              },
+              "p50Ms": 76,
+              "p95Ms": 133,
+              "maxMs": 133
+            },
+            "results": {
+              "requests": 10,
+              "failed": 0,
+              "statusCounts": {
+                "200": 10
+              },
+              "p50Ms": 60,
+              "p95Ms": 110,
+              "maxMs": 110
+            }
+          },
+          "persisted": {
+            "submissions": 13,
+            "answers": 260,
+            "duplicates": 0,
+            "incomplete": 0
+          },
+          "acceptable": true,
+          "persistedInThisWave": 10,
+          "answersInThisWave": 200,
+          "persistencePassed": true,
+          "loadGeneratorEventLoopPercent": 38.3
+        },
+        {
+          "concurrentStudents": 25,
+          "completed": 25,
+          "durationMs": 3028,
+          "phases": {
+            "csrf": {
+              "requests": 25,
+              "failed": 0,
+              "statusCounts": {
+                "204": 25
+              },
+              "p50Ms": 55,
+              "p95Ms": 97,
+              "maxMs": 112
+            },
+            "login": {
+              "requests": 25,
+              "failed": 0,
+              "statusCounts": {
+                "200": 25
+              },
+              "p50Ms": 514,
+              "p95Ms": 1536,
+              "maxMs": 1763
+            },
+            "openExam": {
+              "requests": 25,
+              "failed": 0,
+              "statusCounts": {
+                "200": 25
+              },
+              "p50Ms": 134,
+              "p95Ms": 219,
+              "maxMs": 262
+            },
+            "submitExam": {
+              "requests": 25,
+              "failed": 0,
+              "statusCounts": {
+                "201": 25
+              },
+              "p50Ms": 153,
+              "p95Ms": 235,
+              "maxMs": 294
+            },
+            "results": {
+              "requests": 25,
+              "failed": 0,
+              "statusCounts": {
+                "200": 25
+              },
+              "p50Ms": 162,
+              "p95Ms": 254,
+              "maxMs": 271
+            }
+          },
+          "persisted": {
+            "submissions": 38,
+            "answers": 760,
+            "duplicates": 0,
+            "incomplete": 0
+          },
+          "acceptable": true,
+          "persistedInThisWave": 25,
+          "answersInThisWave": 500,
+          "persistencePassed": true,
+          "loadGeneratorEventLoopPercent": 23.6
+        },
+        {
+          "concurrentStudents": 50,
+          "completed": 50,
+          "durationMs": 3649,
+          "phases": {
+            "csrf": {
+              "requests": 50,
+              "failed": 0,
+              "statusCounts": {
+                "204": 50
+              },
+              "p50Ms": 92,
+              "p95Ms": 149,
+              "maxMs": 179
+            },
+            "login": {
+              "requests": 50,
+              "failed": 0,
+              "statusCounts": {
+                "200": 50
+              },
+              "p50Ms": 1010,
+              "p95Ms": 1576,
+              "maxMs": 1782
+            },
+            "openExam": {
+              "requests": 50,
+              "failed": 0,
+              "statusCounts": {
+                "200": 50
+              },
+              "p50Ms": 239,
+              "p95Ms": 399,
+              "maxMs": 428
+            },
+            "submitExam": {
+              "requests": 50,
+              "failed": 0,
+              "statusCounts": {
+                "201": 50
+              },
+              "p50Ms": 273,
+              "p95Ms": 433,
+              "maxMs": 470
+            },
+            "results": {
+              "requests": 50,
+              "failed": 0,
+              "statusCounts": {
+                "200": 50
+              },
+              "p50Ms": 251,
+              "p95Ms": 407,
+              "maxMs": 446
+            }
+          },
+          "persisted": {
+            "submissions": 88,
+            "answers": 1760,
+            "duplicates": 0,
+            "incomplete": 0
+          },
+          "acceptable": true,
+          "persistedInThisWave": 50,
+          "answersInThisWave": 1000,
+          "persistencePassed": true,
+          "loadGeneratorEventLoopPercent": 32
+        },
+        {
+          "concurrentStudents": 100,
+          "completed": 100,
+          "durationMs": 7148,
+          "phases": {
+            "csrf": {
+              "requests": 100,
+              "failed": 0,
+              "statusCounts": {
+                "204": 100
+              },
+              "p50Ms": 159,
+              "p95Ms": 287,
+              "maxMs": 347
+            },
+            "login": {
+              "requests": 100,
+              "failed": 0,
+              "statusCounts": {
+                "200": 100
+              },
+              "p50Ms": 1747,
+              "p95Ms": 3188,
+              "maxMs": 3647
+            },
+            "openExam": {
+              "requests": 100,
+              "failed": 0,
+              "statusCounts": {
+                "200": 100
+              },
+              "p50Ms": 454,
+              "p95Ms": 787,
+              "maxMs": 840
+            },
+            "submitExam": {
+              "requests": 100,
+              "failed": 0,
+              "statusCounts": {
+                "201": 100
+              },
+              "p50Ms": 553,
+              "p95Ms": 869,
+              "maxMs": 947
+            },
+            "results": {
+              "requests": 100,
+              "failed": 0,
+              "statusCounts": {
+                "200": 100
+              },
+              "p50Ms": 485,
+              "p95Ms": 843,
+              "maxMs": 933
+            }
+          },
+          "persisted": {
+            "submissions": 188,
+            "answers": 3760,
+            "duplicates": 0,
+            "incomplete": 0
+          },
+          "acceptable": false,
+          "persistedInThisWave": 100,
+          "answersInThisWave": 2000,
+          "persistencePassed": true,
+          "loadGeneratorEventLoopPercent": 30.9
+        },
+        {
+          "concurrentStudents": 200,
+          "completed": 200,
+          "durationMs": 14557,
+          "phases": {
+            "csrf": {
+              "requests": 200,
+              "failed": 0,
+              "statusCounts": {
+                "204": 200
+              },
+              "p50Ms": 322,
+              "p95Ms": 549,
+              "maxMs": 606
+            },
+            "login": {
+              "requests": 200,
+              "failed": 0,
+              "statusCounts": {
+                "200": 200
+              },
+              "p50Ms": 3699,
+              "p95Ms": 6939,
+              "maxMs": 7286
+            },
+            "openExam": {
+              "requests": 200,
+              "failed": 0,
+              "statusCounts": {
+                "200": 200
+              },
+              "p50Ms": 1077,
+              "p95Ms": 2001,
+              "maxMs": 2090
+            },
+            "submitExam": {
+              "requests": 200,
+              "failed": 0,
+              "statusCounts": {
+                "201": 200
+              },
+              "p50Ms": 1164,
+              "p95Ms": 1870,
+              "maxMs": 1977
+            },
+            "results": {
+              "requests": 200,
+              "failed": 0,
+              "statusCounts": {
+                "200": 200
+              },
+              "p50Ms": 1047,
+              "p95Ms": 1856,
+              "maxMs": 1960
+            }
+          },
+          "persisted": {
+            "submissions": 388,
+            "answers": 7760,
+            "duplicates": 0,
+            "incomplete": 0
+          },
+          "acceptable": false,
+          "persistedInThisWave": 200,
+          "answersInThisWave": 4000,
+          "persistencePassed": true,
+          "loadGeneratorEventLoopPercent": 31.5
+        }
+      ],
+      "dataset": {
+        "users": 388,
+        "backgroundCourses": 30,
+        "questionsPerExam": 20
+      },
+      "securityChecks": {
+        "unauthenticated": {
+          "ok": true,
+          "status": 401,
+          "ms": 133
+        },
+        "csrfCookie": {
+          "ok": true,
+          "status": 204,
+          "ms": 109
+        },
+        "login": {
+          "ok": true,
+          "status": 200,
+          "ms": 374
+        },
+        "missingCsrf": {
+          "ok": true,
+          "status": 419,
+          "ms": 42
+        },
+        "anotherIdentity": {
+          "ok": true,
+          "status": 422,
+          "ms": 97
+        },
+        "validSubmission": {
+          "ok": true,
+          "status": 201,
+          "ms": 99
+        },
+        "duplicateSubmission": {
+          "ok": true,
+          "status": 422,
+          "ms": 63
+        }
+      },
+      "concurrentRetry": {
+        "ok": true,
+        "statuses": [
+          201,
+          422
+        ]
+      },
+      "completedAt": "2026-10-09T17:43:13.263Z"
+    },
+    "tasks": {
+      "filename": "assessment-capacity-2026-10-09T17-50-46-167Z.json",
+      "startedAt": "2026-10-09T17:48:26.471Z",
+      "commit": "f87038441461a2a0d655ba0ed9ea6a51a948bf51",
+      "source": {
+        "dirty": true,
+        "assessmentServiceSha256": "c488cdf6494545811aa8d1b414f035cab86efba24f3c49dc31051b913534be59",
+        "finalExamServiceSha256": "d72fe43cd892f7528cf5911384a65f5d97f991c4b48a2e38017433400dafb3ce",
+        "studentAnswerValidatorSha256": "b474eac6ab50df0ddcacb85bba45b428cc40c6339423b32d91fb59568b8122e5"
+      },
+      "environment": {
+        "kind": "isolated-local",
+        "cpu": "Intel(R) Core(TM) i5-14400F",
+        "logicalProcessors": 16,
+        "memoryGiB": 31.8,
+        "workers": 8,
+        "database": "MySQL 8.4 disposable instance",
+        "php": "8.2.31",
+        "cache": "database",
+        "sessions": "database",
+        "bcryptRounds": 12,
+        "opcacheLoaded": true,
+        "configAndRouteCache": true,
+        "loadGeneratorSharesHost": true
+      },
+      "serverErrors": {
+        "total": 0,
+        "sqlStates": {}
+      },
+      "scenario": {
+        "backgroundCourses": 30,
+        "questionsPerExam": 20,
+        "attachments": false,
+        "assessmentType": "tasks",
+        "entityType": "task",
+        "transport": "HTTP with separate authenticated sessions and CSRF cookies",
+        "phases": [
+          "csrf",
+          "login",
+          "openExam",
+          "submitExam",
+          "results"
+        ],
+        "thinkTimeSeconds": 0,
+        "retries": 0,
+        "timeoutsMs": 30000,
+        "limits": {
+          "errors": 0,
+          "loginP95Ms": 3000,
+          "openP95Ms": 2000,
+          "submitP95Ms": 3000,
+          "resultsP95Ms": 2000
+        }
+      },
+      "waves": [
+        {
+          "concurrentStudents": 1,
+          "completed": 1,
+          "durationMs": 981,
+          "phases": {
+            "csrf": {
+              "requests": 1,
+              "failed": 0,
+              "statusCounts": {
+                "204": 1
+              },
+              "p50Ms": 26,
+              "p95Ms": 26,
+              "maxMs": 26
+            },
+            "login": {
+              "requests": 1,
+              "failed": 0,
+              "statusCounts": {
+                "200": 1
+              },
+              "p50Ms": 371,
+              "p95Ms": 371,
+              "maxMs": 371
+            },
+            "openExam": {
+              "requests": 1,
+              "failed": 0,
+              "statusCounts": {
+                "200": 1
+              },
+              "p50Ms": 122,
+              "p95Ms": 122,
+              "maxMs": 122
+            },
+            "submitExam": {
+              "requests": 1,
+              "failed": 0,
+              "statusCounts": {
+                "201": 1
+              },
+              "p50Ms": 73,
+              "p95Ms": 73,
+              "maxMs": 73
+            },
+            "results": {
+              "requests": 1,
+              "failed": 0,
+              "statusCounts": {
+                "200": 1
+              },
+              "p50Ms": 80,
+              "p95Ms": 80,
+              "maxMs": 80
+            }
+          },
+          "persisted": {
+            "submissions": 3,
+            "answers": 60,
+            "duplicates": 0,
+            "incomplete": 0
+          },
+          "acceptable": true,
+          "persistedInThisWave": 1,
+          "answersInThisWave": 20,
+          "persistencePassed": true,
+          "loadGeneratorEventLoopPercent": 35.5
+        },
+        {
+          "concurrentStudents": 5,
+          "completed": 5,
+          "durationMs": 1380,
+          "phases": {
+            "csrf": {
+              "requests": 5,
+              "failed": 0,
+              "statusCounts": {
+                "204": 5
+              },
+              "p50Ms": 46,
+              "p95Ms": 50,
+              "maxMs": 50
+            },
+            "login": {
+              "requests": 5,
+              "failed": 0,
+              "statusCounts": {
+                "200": 5
+              },
+              "p50Ms": 429,
+              "p95Ms": 448,
+              "maxMs": 448
+            },
+            "openExam": {
+              "requests": 5,
+              "failed": 0,
+              "statusCounts": {
+                "200": 5
+              },
+              "p50Ms": 136,
+              "p95Ms": 148,
+              "maxMs": 148
+            },
+            "submitExam": {
+              "requests": 5,
+              "failed": 0,
+              "statusCounts": {
+                "201": 5
+              },
+              "p50Ms": 128,
+              "p95Ms": 137,
+              "maxMs": 137
+            },
+            "results": {
+              "requests": 5,
+              "failed": 0,
+              "statusCounts": {
+                "200": 5
+              },
+              "p50Ms": 205,
+              "p95Ms": 238,
+              "maxMs": 238
+            }
+          },
+          "persisted": {
+            "submissions": 8,
+            "answers": 160,
+            "duplicates": 0,
+            "incomplete": 0
+          },
+          "acceptable": true,
+          "persistedInThisWave": 5,
+          "answersInThisWave": 100,
+          "persistencePassed": true,
+          "loadGeneratorEventLoopPercent": 44.9
+        },
+        {
+          "concurrentStudents": 10,
+          "completed": 10,
+          "durationMs": 3401,
+          "phases": {
+            "csrf": {
+              "requests": 10,
+              "failed": 0,
+              "statusCounts": {
+                "204": 10
+              },
+              "p50Ms": 77,
+              "p95Ms": 102,
+              "maxMs": 102
+            },
+            "login": {
+              "requests": 10,
+              "failed": 0,
+              "statusCounts": {
+                "200": 10
+              },
+              "p50Ms": 1267,
+              "p95Ms": 1685,
+              "maxMs": 1685
+            },
+            "openExam": {
+              "requests": 10,
+              "failed": 0,
+              "statusCounts": {
+                "200": 10
+              },
+              "p50Ms": 412,
+              "p95Ms": 607,
+              "maxMs": 607
+            },
+            "submitExam": {
+              "requests": 10,
+              "failed": 0,
+              "statusCounts": {
+                "201": 10
+              },
+              "p50Ms": 202,
+              "p95Ms": 293,
+              "maxMs": 293
+            },
+            "results": {
+              "requests": 10,
+              "failed": 0,
+              "statusCounts": {
+                "200": 10
+              },
+              "p50Ms": 216,
+              "p95Ms": 348,
+              "maxMs": 348
+            }
+          },
+          "persisted": {
+            "submissions": 18,
+            "answers": 360,
+            "duplicates": 0,
+            "incomplete": 0
+          },
+          "acceptable": true,
+          "persistedInThisWave": 10,
+          "answersInThisWave": 200,
+          "persistencePassed": true,
+          "loadGeneratorEventLoopPercent": 30.4
+        },
+        {
+          "concurrentStudents": 25,
+          "completed": 25,
+          "durationMs": 6697,
+          "phases": {
+            "csrf": {
+              "requests": 25,
+              "failed": 0,
+              "statusCounts": {
+                "204": 25
+              },
+              "p50Ms": 173,
+              "p95Ms": 246,
+              "maxMs": 247
+            },
+            "login": {
+              "requests": 25,
+              "failed": 0,
+              "statusCounts": {
+                "200": 25
+              },
+              "p50Ms": 2080,
+              "p95Ms": 3200,
+              "maxMs": 3560
+            },
+            "openExam": {
+              "requests": 25,
+              "failed": 0,
+              "statusCounts": {
+                "200": 25
+              },
+              "p50Ms": 459,
+              "p95Ms": 642,
+              "maxMs": 718
+            },
+            "submitExam": {
+              "requests": 25,
+              "failed": 0,
+              "statusCounts": {
+                "201": 25
+              },
+              "p50Ms": 670,
+              "p95Ms": 938,
+              "maxMs": 940
+            },
+            "results": {
+              "requests": 25,
+              "failed": 0,
+              "statusCounts": {
+                "200": 25
+              },
+              "p50Ms": 533,
+              "p95Ms": 767,
+              "maxMs": 813
+            }
+          },
+          "persisted": {
+            "submissions": 43,
+            "answers": 860,
+            "duplicates": 0,
+            "incomplete": 0
+          },
+          "acceptable": false,
+          "persistedInThisWave": 25,
+          "answersInThisWave": 500,
+          "persistencePassed": true,
+          "loadGeneratorEventLoopPercent": 32.9
+        },
+        {
+          "concurrentStudents": 50,
+          "completed": 50,
+          "durationMs": 13759,
+          "phases": {
+            "csrf": {
+              "requests": 50,
+              "failed": 0,
+              "statusCounts": {
+                "204": 50
+              },
+              "p50Ms": 267,
+              "p95Ms": 703,
+              "maxMs": 727
+            },
+            "login": {
+              "requests": 50,
+              "failed": 0,
+              "statusCounts": {
+                "200": 50
+              },
+              "p50Ms": 3421,
+              "p95Ms": 5271,
+              "maxMs": 6104
+            },
+            "openExam": {
+              "requests": 50,
+              "failed": 0,
+              "statusCounts": {
+                "200": 50
+              },
+              "p50Ms": 1290,
+              "p95Ms": 1911,
+              "maxMs": 2024
+            },
+            "submitExam": {
+              "requests": 50,
+              "failed": 0,
+              "statusCounts": {
+                "201": 50
+              },
+              "p50Ms": 1488,
+              "p95Ms": 2246,
+              "maxMs": 2341
+            },
+            "results": {
+              "requests": 50,
+              "failed": 0,
+              "statusCounts": {
+                "200": 50
+              },
+              "p50Ms": 1009,
+              "p95Ms": 1932,
+              "maxMs": 1988
+            }
+          },
+          "persisted": {
+            "submissions": 93,
+            "answers": 1860,
+            "duplicates": 0,
+            "incomplete": 0
+          },
+          "acceptable": false,
+          "persistedInThisWave": 50,
+          "answersInThisWave": 1000,
+          "persistencePassed": true,
+          "loadGeneratorEventLoopPercent": 38.5
+        },
+        {
+          "concurrentStudents": 100,
+          "completed": 100,
+          "durationMs": 28681,
+          "phases": {
+            "csrf": {
+              "requests": 100,
+              "failed": 0,
+              "statusCounts": {
+                "204": 100
+              },
+              "p50Ms": 944,
+              "p95Ms": 1423,
+              "maxMs": 1504
+            },
+            "login": {
+              "requests": 100,
+              "failed": 0,
+              "statusCounts": {
+                "200": 100
+              },
+              "p50Ms": 7944,
+              "p95Ms": 13603,
+              "maxMs": 14553
+            },
+            "openExam": {
+              "requests": 100,
+              "failed": 0,
+              "statusCounts": {
+                "200": 100
+              },
+              "p50Ms": 2382,
+              "p95Ms": 4030,
+              "maxMs": 4212
+            },
+            "submitExam": {
+              "requests": 100,
+              "failed": 0,
+              "statusCounts": {
+                "201": 100
+              },
+              "p50Ms": 2160,
+              "p95Ms": 3556,
+              "maxMs": 3666
+            },
+            "results": {
+              "requests": 100,
+              "failed": 0,
+              "statusCounts": {
+                "200": 100
+              },
+              "p50Ms": 2076,
+              "p95Ms": 3682,
+              "maxMs": 3813
+            }
+          },
+          "persisted": {
+            "submissions": 193,
+            "answers": 3860,
+            "duplicates": 0,
+            "incomplete": 0
+          },
+          "acceptable": false,
+          "persistedInThisWave": 100,
+          "answersInThisWave": 2000,
+          "persistencePassed": true,
+          "loadGeneratorEventLoopPercent": 38.7
+        },
+        {
+          "concurrentStudents": 200,
+          "completed": 200,
+          "durationMs": 54759,
+          "phases": {
+            "csrf": {
+              "requests": 200,
+              "failed": 0,
+              "statusCounts": {
+                "204": 200
+              },
+              "p50Ms": 1270,
+              "p95Ms": 2294,
+              "maxMs": 2379
+            },
+            "login": {
+              "requests": 200,
+              "failed": 0,
+              "statusCounts": {
+                "200": 200
+              },
+              "p50Ms": 15124,
+              "p95Ms": 27853,
+              "maxMs": 28873
+            },
+            "openExam": {
+              "requests": 200,
+              "failed": 0,
+              "statusCounts": {
+                "200": 200
+              },
+              "p50Ms": 3994,
+              "p95Ms": 7152,
+              "maxMs": 7484
+            },
+            "submitExam": {
+              "requests": 200,
+              "failed": 0,
+              "statusCounts": {
+                "201": 200
+              },
+              "p50Ms": 4110,
+              "p95Ms": 6450,
+              "maxMs": 7193
+            },
+            "results": {
+              "requests": 200,
+              "failed": 0,
+              "statusCounts": {
+                "200": 200
+              },
+              "p50Ms": 3756,
+              "p95Ms": 7071,
+              "maxMs": 7625
+            }
+          },
+          "persisted": {
+            "submissions": 393,
+            "answers": 7860,
+            "duplicates": 0,
+            "incomplete": 0
+          },
+          "acceptable": false,
+          "persistedInThisWave": 200,
+          "answersInThisWave": 4000,
+          "persistencePassed": true,
+          "loadGeneratorEventLoopPercent": 35.1
+        }
+      ],
+      "dataset": {
+        "users": 393,
+        "backgroundCourses": 30,
+        "questionsPerExam": 20
+      },
+      "securityChecks": {
+        "unauthenticated": {
+          "ok": true,
+          "status": 401,
+          "ms": 70
+        },
+        "csrfCookie": {
+          "ok": true,
+          "status": 204,
+          "ms": 22
+        },
+        "login": {
+          "ok": true,
+          "status": 200,
+          "ms": 396
+        },
+        "missingCsrf": {
+          "ok": true,
+          "status": 419,
+          "ms": 63
+        },
+        "anotherIdentity": {
+          "ok": true,
+          "status": 422,
+          "ms": 258
+        },
+        "validSubmission": {
+          "ok": true,
+          "status": 201,
+          "ms": 288
+        },
+        "duplicateSubmission": {
+          "ok": true,
+          "status": 422,
+          "ms": 74
+        }
+      },
+      "concurrentRetry": {
+        "ok": true,
+        "statuses": [
+          201,
+          422
+        ]
+      },
+      "completedAt": "2026-10-09T17:50:45.843Z"
+    },
+    "final": {
+      "filename": "assessment-capacity-2026-10-09T17-46-42-005Z.json",
+      "startedAt": "2026-10-09T17:45:21.149Z",
+      "commit": "f87038441461a2a0d655ba0ed9ea6a51a948bf51",
+      "source": {
+        "dirty": true,
+        "assessmentServiceSha256": "c488cdf6494545811aa8d1b414f035cab86efba24f3c49dc31051b913534be59",
+        "finalExamServiceSha256": "d72fe43cd892f7528cf5911384a65f5d97f991c4b48a2e38017433400dafb3ce",
+        "studentAnswerValidatorSha256": "b474eac6ab50df0ddcacb85bba45b428cc40c6339423b32d91fb59568b8122e5"
+      },
+      "environment": {
+        "kind": "isolated-local",
+        "cpu": "Intel(R) Core(TM) i5-14400F",
+        "logicalProcessors": 16,
+        "memoryGiB": 31.8,
+        "workers": 8,
+        "database": "MySQL 8.4 disposable instance",
+        "php": "8.2.31",
+        "cache": "database",
+        "sessions": "database",
+        "bcryptRounds": 12,
+        "opcacheLoaded": true,
+        "configAndRouteCache": true,
+        "loadGeneratorSharesHost": true
+      },
+      "serverErrors": {
+        "total": 0,
+        "sqlStates": {}
+      },
+      "scenario": {
+        "backgroundCourses": 30,
+        "questionsPerExam": 20,
+        "attachments": false,
+        "assessmentType": "final",
+        "transport": "HTTP with separate authenticated sessions and CSRF cookies",
+        "phases": [
+          "csrf",
+          "login",
+          "openExam",
+          "submitExam",
+          "results"
+        ],
+        "thinkTimeSeconds": 0,
+        "retries": 0,
+        "timeoutsMs": 30000,
+        "limits": {
+          "errors": 0,
+          "loginP95Ms": 3000,
+          "openP95Ms": 2000,
+          "submitP95Ms": 3000,
+          "resultsP95Ms": 2000
+        }
+      },
+      "waves": [
+        {
+          "concurrentStudents": 200,
+          "completed": 200,
+          "durationMs": 51105,
+          "phases": {
+            "csrf": {
+              "requests": 200,
+              "failed": 0,
+              "statusCounts": {
+                "204": 200
+              },
+              "p50Ms": 1600,
+              "p95Ms": 2207,
+              "maxMs": 2293
+            },
+            "login": {
+              "requests": 200,
+              "failed": 0,
+              "statusCounts": {
+                "200": 200
+              },
+              "p50Ms": 14349,
+              "p95Ms": 26674,
+              "maxMs": 27555
+            },
+            "openExam": {
+              "requests": 200,
+              "failed": 0,
+              "statusCounts": {
+                "200": 200
+              },
+              "p50Ms": 3569,
+              "p95Ms": 7395,
+              "maxMs": 7675
+            },
+            "submitExam": {
+              "requests": 200,
+              "failed": 0,
+              "statusCounts": {
+                "201": 200
+              },
+              "p50Ms": 3185,
+              "p95Ms": 5560,
+              "maxMs": 5758
+            },
+            "results": {
+              "requests": 200,
+              "failed": 0,
+              "statusCounts": {
+                "200": 200
+              },
+              "p50Ms": 3561,
+              "p95Ms": 6556,
+              "maxMs": 6759
+            }
+          },
+          "persisted": {
+            "submissions": 202,
+            "answers": 4040,
+            "duplicates": 0,
+            "incomplete": 0
+          },
+          "acceptable": false,
+          "persistedInThisWave": 200,
+          "answersInThisWave": 4000,
+          "persistencePassed": true,
+          "loadGeneratorEventLoopPercent": 37.9
+        }
+      ],
+      "dataset": {
+        "users": 202,
+        "backgroundCourses": 30,
+        "questionsPerExam": 20
+      },
+      "securityChecks": {
+        "unauthenticated": {
+          "ok": true,
+          "status": 401,
+          "ms": 282
+        },
+        "csrfCookie": {
+          "ok": true,
+          "status": 204,
+          "ms": 31
+        },
+        "login": {
+          "ok": true,
+          "status": 200,
+          "ms": 387
+        },
+        "missingCsrf": {
+          "ok": true,
+          "status": 419,
+          "ms": 59
+        },
+        "anotherIdentity": {
+          "ok": true,
+          "status": 422,
+          "ms": 207
+        },
+        "validSubmission": {
+          "ok": true,
+          "status": 201,
+          "ms": 221
+        },
+        "duplicateSubmission": {
+          "ok": true,
+          "status": 422,
+          "ms": 65
+        }
+      },
+      "concurrentRetry": {
+        "ok": true,
+        "statuses": [
+          201,
+          422
+        ]
+      },
+      "completedAt": "2026-10-09T17:46:41.902Z"
+    },
+    "legacyTasks": {
+      "filename": "assessment-capacity-2026-10-09T17-45-20-704Z.json",
+      "startedAt": "2026-10-09T17:43:13.695Z",
+      "commit": "f87038441461a2a0d655ba0ed9ea6a51a948bf51",
+      "source": {
+        "dirty": true,
+        "assessmentServiceSha256": "c488cdf6494545811aa8d1b414f035cab86efba24f3c49dc31051b913534be59",
+        "finalExamServiceSha256": "d72fe43cd892f7528cf5911384a65f5d97f991c4b48a2e38017433400dafb3ce",
+        "studentAnswerValidatorSha256": "b474eac6ab50df0ddcacb85bba45b428cc40c6339423b32d91fb59568b8122e5"
+      },
+      "environment": {
+        "kind": "isolated-local",
+        "cpu": "Intel(R) Core(TM) i5-14400F",
+        "logicalProcessors": 16,
+        "memoryGiB": 31.8,
+        "workers": 8,
+        "database": "MySQL 8.4 disposable instance",
+        "php": "8.2.31",
+        "cache": "database",
+        "sessions": "database",
+        "bcryptRounds": 12,
+        "opcacheLoaded": true,
+        "configAndRouteCache": true,
+        "loadGeneratorSharesHost": true
+      },
+      "serverErrors": {
+        "total": 0,
+        "sqlStates": {}
+      },
+      "scenario": {
+        "backgroundCourses": 30,
+        "questionsPerExam": 20,
+        "attachments": false,
+        "assessmentType": "tasks",
+        "transport": "HTTP with separate authenticated sessions and CSRF cookies",
+        "phases": [
+          "csrf",
+          "login",
+          "openExam",
+          "submitExam",
+          "results"
+        ],
+        "thinkTimeSeconds": 0,
+        "retries": 0,
+        "timeoutsMs": 30000,
+        "limits": {
+          "errors": 0,
+          "loginP95Ms": 3000,
+          "openP95Ms": 2000,
+          "submitP95Ms": 3000,
+          "resultsP95Ms": 2000
+        }
+      },
+      "waves": [
+        {
+          "concurrentStudents": 1,
+          "completed": 1,
+          "durationMs": 1133,
+          "phases": {
+            "csrf": {
+              "requests": 1,
+              "failed": 0,
+              "statusCounts": {
+                "204": 1
+              },
+              "p50Ms": 38,
+              "p95Ms": 38,
+              "maxMs": 38
+            },
+            "login": {
+              "requests": 1,
+              "failed": 0,
+              "statusCounts": {
+                "200": 1
+              },
+              "p50Ms": 421,
+              "p95Ms": 421,
+              "maxMs": 421
+            },
+            "openExam": {
+              "requests": 1,
+              "failed": 0,
+              "statusCounts": {
+                "200": 1
+              },
+              "p50Ms": 162,
+              "p95Ms": 162,
+              "maxMs": 162
+            },
+            "submitExam": {
+              "requests": 1,
+              "failed": 0,
+              "statusCounts": {
+                "201": 1
+              },
+              "p50Ms": 98,
+              "p95Ms": 98,
+              "maxMs": 98
+            },
+            "results": {
+              "requests": 1,
+              "failed": 0,
+              "statusCounts": {
+                "200": 1
+              },
+              "p50Ms": 100,
+              "p95Ms": 100,
+              "maxMs": 100
+            }
+          },
+          "persisted": {
+            "submissions": 3,
+            "answers": 60,
+            "duplicates": 0,
+            "incomplete": 0
+          },
+          "acceptable": true,
+          "persistedInThisWave": 1,
+          "answersInThisWave": 20,
+          "persistencePassed": true,
+          "loadGeneratorEventLoopPercent": 36.3
+        },
+        {
+          "concurrentStudents": 10,
+          "completed": 10,
+          "durationMs": 3512,
+          "phases": {
+            "csrf": {
+              "requests": 10,
+              "failed": 0,
+              "statusCounts": {
+                "204": 10
+              },
+              "p50Ms": 106,
+              "p95Ms": 168,
+              "maxMs": 168
+            },
+            "login": {
+              "requests": 10,
+              "failed": 0,
+              "statusCounts": {
+                "200": 10
+              },
+              "p50Ms": 1212,
+              "p95Ms": 1684,
+              "maxMs": 1684
+            },
+            "openExam": {
+              "requests": 10,
+              "failed": 0,
+              "statusCounts": {
+                "200": 10
+              },
+              "p50Ms": 229,
+              "p95Ms": 383,
+              "maxMs": 383
+            },
+            "submitExam": {
+              "requests": 10,
+              "failed": 0,
+              "statusCounts": {
+                "201": 10
+              },
+              "p50Ms": 441,
+              "p95Ms": 557,
+              "maxMs": 557
+            },
+            "results": {
+              "requests": 10,
+              "failed": 0,
+              "statusCounts": {
+                "200": 10
+              },
+              "p50Ms": 204,
+              "p95Ms": 340,
+              "maxMs": 340
+            }
+          },
+          "persisted": {
+            "submissions": 13,
+            "answers": 260,
+            "duplicates": 0,
+            "incomplete": 0
+          },
+          "acceptable": true,
+          "persistedInThisWave": 10,
+          "answersInThisWave": 200,
+          "persistencePassed": true,
+          "loadGeneratorEventLoopPercent": 31.6
+        },
+        {
+          "concurrentStudents": 25,
+          "completed": 25,
+          "durationMs": 7552,
+          "phases": {
+            "csrf": {
+              "requests": 25,
+              "failed": 0,
+              "statusCounts": {
+                "204": 25
+              },
+              "p50Ms": 133,
+              "p95Ms": 200,
+              "maxMs": 230
+            },
+            "login": {
+              "requests": 25,
+              "failed": 0,
+              "statusCounts": {
+                "200": 25
+              },
+              "p50Ms": 1905,
+              "p95Ms": 3255,
+              "maxMs": 3661
+            },
+            "openExam": {
+              "requests": 25,
+              "failed": 0,
+              "statusCounts": {
+                "200": 25
+              },
+              "p50Ms": 744,
+              "p95Ms": 913,
+              "maxMs": 982
+            },
+            "submitExam": {
+              "requests": 25,
+              "failed": 0,
+              "statusCounts": {
+                "201": 25
+              },
+              "p50Ms": 488,
+              "p95Ms": 899,
+              "maxMs": 969
+            },
+            "results": {
+              "requests": 25,
+              "failed": 0,
+              "statusCounts": {
+                "200": 25
+              },
+              "p50Ms": 709,
+              "p95Ms": 1015,
+              "maxMs": 1124
+            }
+          },
+          "persisted": {
+            "submissions": 38,
+            "answers": 760,
+            "duplicates": 0,
+            "incomplete": 0
+          },
+          "acceptable": false,
+          "persistedInThisWave": 25,
+          "answersInThisWave": 500,
+          "persistencePassed": true,
+          "loadGeneratorEventLoopPercent": 35.8
+        },
+        {
+          "concurrentStudents": 50,
+          "completed": 50,
+          "durationMs": 13798,
+          "phases": {
+            "csrf": {
+              "requests": 50,
+              "failed": 0,
+              "statusCounts": {
+                "204": 50
+              },
+              "p50Ms": 553,
+              "p95Ms": 732,
+              "maxMs": 734
+            },
+            "login": {
+              "requests": 50,
+              "failed": 0,
+              "statusCounts": {
+                "200": 50
+              },
+              "p50Ms": 3737,
+              "p95Ms": 6724,
+              "maxMs": 7310
+            },
+            "openExam": {
+              "requests": 50,
+              "failed": 0,
+              "statusCounts": {
+                "200": 50
+              },
+              "p50Ms": 926,
+              "p95Ms": 1758,
+              "maxMs": 1813
+            },
+            "submitExam": {
+              "requests": 50,
+              "failed": 0,
+              "statusCounts": {
+                "201": 50
+              },
+              "p50Ms": 1157,
+              "p95Ms": 1550,
+              "maxMs": 1615
+            },
+            "results": {
+              "requests": 50,
+              "failed": 0,
+              "statusCounts": {
+                "200": 50
+              },
+              "p50Ms": 1065,
+              "p95Ms": 1715,
+              "maxMs": 1835
+            }
+          },
+          "persisted": {
+            "submissions": 88,
+            "answers": 1760,
+            "duplicates": 0,
+            "incomplete": 0
+          },
+          "acceptable": false,
+          "persistedInThisWave": 50,
+          "answersInThisWave": 1000,
+          "persistencePassed": true,
+          "loadGeneratorEventLoopPercent": 36.9
+        },
+        {
+          "concurrentStudents": 100,
+          "completed": 100,
+          "durationMs": 27823,
+          "phases": {
+            "csrf": {
+              "requests": 100,
+              "failed": 0,
+              "statusCounts": {
+                "204": 100
+              },
+              "p50Ms": 981,
+              "p95Ms": 1357,
+              "maxMs": 1410
+            },
+            "login": {
+              "requests": 100,
+              "failed": 0,
+              "statusCounts": {
+                "200": 100
+              },
+              "p50Ms": 7364,
+              "p95Ms": 13541,
+              "maxMs": 14375
+            },
+            "openExam": {
+              "requests": 100,
+              "failed": 0,
+              "statusCounts": {
+                "200": 100
+              },
+              "p50Ms": 2129,
+              "p95Ms": 3550,
+              "maxMs": 3654
+            },
+            "submitExam": {
+              "requests": 100,
+              "failed": 0,
+              "statusCounts": {
+                "201": 100
+              },
+              "p50Ms": 2013,
+              "p95Ms": 3479,
+              "maxMs": 3641
+            },
+            "results": {
+              "requests": 100,
+              "failed": 0,
+              "statusCounts": {
+                "200": 100
+              },
+              "p50Ms": 2220,
+              "p95Ms": 3909,
+              "maxMs": 4051
+            }
+          },
+          "persisted": {
+            "submissions": 188,
+            "answers": 3760,
+            "duplicates": 0,
+            "incomplete": 0
+          },
+          "acceptable": false,
+          "persistedInThisWave": 100,
+          "answersInThisWave": 2000,
+          "persistencePassed": true,
+          "loadGeneratorEventLoopPercent": 39.1
+        },
+        {
+          "concurrentStudents": 200,
+          "completed": 200,
+          "durationMs": 43620,
+          "phases": {
+            "csrf": {
+              "requests": 200,
+              "failed": 0,
+              "statusCounts": {
+                "204": 200
+              },
+              "p50Ms": 1178,
+              "p95Ms": 1874,
+              "maxMs": 1958
+            },
+            "login": {
+              "requests": 200,
+              "failed": 0,
+              "statusCounts": {
+                "200": 200
+              },
+              "p50Ms": 13981,
+              "p95Ms": 21587,
+              "maxMs": 21854
+            },
+            "openExam": {
+              "requests": 200,
+              "failed": 0,
+              "statusCounts": {
+                "200": 200
+              },
+              "p50Ms": 2917,
+              "p95Ms": 5357,
+              "maxMs": 5732
+            },
+            "submitExam": {
+              "requests": 200,
+              "failed": 0,
+              "statusCounts": {
+                "201": 200
+              },
+              "p50Ms": 3345,
+              "p95Ms": 6000,
+              "maxMs": 6264
+            },
+            "results": {
+              "requests": 200,
+              "failed": 0,
+              "statusCounts": {
+                "200": 200
+              },
+              "p50Ms": 3449,
+              "p95Ms": 6772,
+              "maxMs": 7048
+            }
+          },
+          "persisted": {
+            "submissions": 388,
+            "answers": 7760,
+            "duplicates": 0,
+            "incomplete": 0
+          },
+          "acceptable": false,
+          "persistedInThisWave": 200,
+          "answersInThisWave": 4000,
+          "persistencePassed": true,
+          "loadGeneratorEventLoopPercent": 36
+        }
+      ],
+      "dataset": {
+        "users": 388,
+        "backgroundCourses": 30,
+        "questionsPerExam": 20
+      },
+      "securityChecks": {
+        "unauthenticated": {
+          "ok": true,
+          "status": 401,
+          "ms": 138
+        },
+        "csrfCookie": {
+          "ok": true,
+          "status": 204,
+          "ms": 61
+        },
+        "login": {
+          "ok": true,
+          "status": 200,
+          "ms": 881
+        },
+        "missingCsrf": {
+          "ok": true,
+          "status": 419,
+          "ms": 49
+        },
+        "anotherIdentity": {
+          "ok": true,
+          "status": 422,
+          "ms": 121
+        },
+        "validSubmission": {
+          "ok": true,
+          "status": 201,
+          "ms": 197
+        },
+        "duplicateSubmission": {
+          "ok": true,
+          "status": 422,
+          "ms": 68
+        }
+      },
+      "concurrentRetry": {
+        "ok": true,
+        "statuses": [
+          201,
+          422
+        ]
+      },
+      "completedAt": "2026-10-09T17:45:20.594Z"
+    }
+  },
+  "completedAt": "2026-10-09T18:55:09.438Z",
+  "branch": "main",
+  "currentCommit": "f87038441461a2a0d655ba0ed9ea6a51a948bf51",
+  "gitStatus": [
+    " M backend/app/Services/AssessmentAccessService.php",
+    " M backend/app/Services/Concerns/ProcessesFinalExamSubmissions.php",
+    " M backend/app/Services/Concerns/SubmitsCourseAssessments.php",
+    " M backend/tests/bootstrap.php",
+    " M frontend/e2e/accessibility.spec.mjs",
+    " M frontend/e2e/assessment-admin.spec.mjs",
+    " M frontend/e2e/auth.spec.mjs",
+    " M frontend/e2e/critical-workflows.spec.mjs",
+    " M frontend/e2e/management-panels.spec.mjs",
+    " M frontend/e2e/mobile-interaction-regressions.spec.mjs",
+    " M frontend/e2e/password-csrf.spec.mjs",
+    " M frontend/e2e/people-branch.spec.mjs",
+    " M frontend/e2e/people-directory.spec.mjs",
+    " M frontend/e2e/question-deletion.spec.mjs",
+    " M frontend/e2e/question-save.spec.mjs",
+    " M frontend/e2e/registration.spec.mjs",
+    " M frontend/e2e/remaining-panels.spec.mjs",
+    " M frontend/e2e/responsive.spec.mjs",
+    " M frontend/e2e/results-directory.spec.mjs",
+    " M frontend/e2e/rich-text-security.spec.mjs",
+    " M frontend/e2e/role-journeys.spec.mjs",
+    " M frontend/e2e/satisfaction-courses.spec.mjs",
+    " M frontend/e2e/student-dashboard.spec.mjs",
+    " M frontend/e2e/student-question-types.spec.mjs",
+    " M frontend/playwright.config.mjs",
+    " M frontend/scripts/run-e2e.mjs",
+    " M frontend/src/features/controllers/AdminRegistrationView.js",
+    " M frontend/src/features/controllers/SatisfactionView.js",
+    " M frontend/src/features/course/courseSubmissionMethods.js",
+    " M frontend/src/features/finalExam/finalExamQuestionMethods.js",
+    " M frontend/src/features/finalExam/publicFinalExamSubmissionMethods.js",
+    " M frontend/src/features/tasks/tasksAnswerMethods.js",
+    " M frontend/src/views/CourseView.vue",
+    " M frontend/src/views/SatisfactionView.vue",
+    " M scripts/capacity/fixture.php",
+    " M scripts/capacity/run-local.mjs",
+    " M scripts/capacity/workload.mjs",
+    "?? backend/app/Services/StudentAssessmentAnswerValidator.php",
+    "?? backend/app/Services/StudentSatisfactionResponseValidator.php",
+    "?? backend/tests/Feature/AssessmentAttachmentRollbackTest.php",
+    "?? backend/tests/Feature/FinalExamSubmissionConcurrencyTest.php",
+    "?? backend/tests/Feature/StudentAssessmentAnswerValidationTest.php",
+    "?? backend/tests/Feature/StudentSatisfactionValidationTest.php",
+    "?? frontend/e2e/assessment-recovery.spec.mjs",
+    "?? frontend/e2e/student-satisfaction.spec.mjs",
+    "?? frontend/e2e/support/assessmentAttemptFixture.mjs",
+    "?? frontend/e2e/support/backend-router.php",
+    "?? frontend/e2e/support/isolatedTest.mjs",
+    "?? frontend/node-tests/assessment-recovery.test.mjs",
+    "?? frontend/src/features/assessmentQuestions/submissionState.mjs",
+    "?? reports/assessment-capacity-2026-10-09T17-39-53-493Z.json",
+    "?? reports/assessment-capacity-2026-10-09T17-42-15-192Z.json",
+    "?? reports/assessment-capacity-2026-10-09T17-43-13-350Z.json",
+    "?? reports/assessment-capacity-2026-10-09T17-45-20-704Z.json",
+    "?? reports/assessment-capacity-2026-10-09T17-46-42-005Z.json",
+    "?? reports/assessment-capacity-2026-10-09T17-50-46-167Z.json",
+    "?? reports/system-audit-2026-10-09.html",
+    "?? reports/system-audit-2026-10-09.json"
+  ],
+  "publication": {
+    "changesAreLocal": true,
+    "committedByAudit": false,
+    "pushedByAudit": false,
+    "deployedByAudit": false,
+    "productionSql": false
+  },
+  "quality": {
+    "quick": true,
+    "quickSecretScanFiles": 949,
+    "secretScanFiles": 951,
+    "codeSizeSources": 589,
+    "lint": true,
+    "productionDependencyVulnerabilities": {
+      "critical": 0,
+      "high": 0,
+      "moderate": 0,
+      "low": 0
+    },
+    "fullDependencyTree": {
+      "critical": 0,
+      "high": 0
+    },
+    "phpPintChangedFiles": true,
+    "operationsTests": 3
+  },
+  "verification": {
+    "commands": [
+      [
+        "npm run verify:quick",
+        "فحص الأسرار والحجم والاعتماديات وLint واختبارات الواجهة والتغطية"
+      ],
+      [
+        "npm test",
+        "اختبارات Laravel: النجاح والرفض والصلاحيات وحفظ البيانات"
+      ],
+      [
+        "npm run test:operations",
+        "3 اختبارات تشغيلية؛ لم تتغير ملفات التشغيل ضمن هذا الطلب"
+      ],
+      [
+        "node frontend/scripts/run-e2e.mjs --reporter=line,json",
+        "الفحص الشامل على خمسة مقاسات، بلا إعادة محاولات تلقائية"
+      ],
+      [
+        "node scripts/run-php.mjs backend/vendor/bin/pint --test ...",
+        "تنسيق ملفات PHP المعدلة والمضافة"
+      ],
+      [
+        "node scripts/capacity/run-local.mjs",
+        "حسابات مستقلة وCSRF وقواعد MySQL مؤقتة؛ مستويات التحمل مسجلة في ملفات JSON"
+      ],
+      [
+        "npm run build",
+        "إعادة بناء التوزيعة بالإعدادات المعتادة بعد انتهاء المتصفح"
+      ],
+      [
+        "npm --prefix frontend run check:bundle",
+        "حدود حجم الحزمة الأولية وفصل الحزم الثقيلة"
+      ],
+      [
+        "git diff --check",
+        "سلامة الفرق دون أخطاء مسافات"
+      ],
+      [
+        "npm run check:secrets",
+        "فحص نهائي ناجح لـ951 ملفًا بعد إضافة التقارير"
+      ]
+    ],
+    "reportPreview": {
+      "viewports": [
+        320,
+        1440
+      ],
+      "horizontalOverflow": false,
+      "pageErrors": 0,
+      "passed": true
+    }
+  },
+  "notes": [
+    "أُجري الفحص في المجلد المحدد، وبدأت شجرة Git نظيفة عند f87038441461a2a0d655ba0ed9ea6a51a948bf51. التعديلات السابقة في هذه النسخة استُخدمت أساسًا للفحص.",
+    "حذف الأسئلة وحفظ الأنواع وعرض خيارات الطالب كانت لها إصلاحات سابقة في النسخة الأساسية. أُعيد التحقق منها في المتصفح، مع حذف جميع الأسئلة النشطة وإبقاء إجابات المحاولات السابقة ودرجاتها.",
+    "أضيفت اختبارات كانت تفشل قبل الإصلاح لإثبات الأعطال، ثم أُعيدت بعد إصلاحها. الاختبارات القديمة وحدها نجحت في البداية: 171 للخادم و113 للواجهة.",
+    "توقفت جولات استكشافية قبل إكمالها عند اكتشاف تداخل بيانات الاختبارات أو خلل التسجيل. لا تُحتسب تلك الجولات نجاحًا شاملًا. نتيجة الفحص النهائي معروضة منفصلة.",
+    "جرى عزل ملفات Laravel واختبارات SQLite في مجلدات مؤقتة. يبدأ كل اختبار متصفح بنسخة مستقلة من قاعدة مهاجرة ومزروعة، مع التحقق من ملكية مسارات الملفات المؤقتة.",
+    "شُغلت 6 قواعد MySQL مؤقتة مستقلة لقياس الحمل. ظلت خدمات وقاعدة MySQL التشغيلية خارج هذه الاختبارات؛ لا توجد تغييرات إنتاجية أو ترحيلات جديدة لهذا الإصلاح.",
+    "تم تعطيل لقطات الشاشة والفيديو افتراضيًا، بما فيها صور trace؛ تبقى سجلات وتشخيصات DOM في مجلد الأدلة المؤقت.",
+    "تغطية الواجهة تخص ملفات المنطق المحددة في إعداد الاختبارات، ولا تعني تغطية كامل الموقع بهذه النسبة.",
+    "أُنشئ تقرير HTML وJSON، وفُحصت بياناته وعرض جميع الجداول على عرضي 320 و1440. صُحح التفاف أسماء الاختبارات الطويلة في التقرير، وأُعيد التحقق من عدم تجاوز عرض الصفحة ومن عدم وجود أخطاء JavaScript."
+  ],
+  "limits": [
+    "هذا إثبات محلي على Windows وChrome. لا يثبت نشر الإصلاحات أو عملها على السيرفر المنشور أو جهاز جوال فعلي.",
+    "قياس الحمل يستخدم طلبات HTTP فعلية وجلسات مستقلة، وليس 200 متصفح مفتوح. تشغيل مولد الحمل والخادم على الجهاز نفسه يؤثر في الأرقام.",
+    "اختبار الحمل يستخدم 20 سؤال خيارات لكل محاولة و30 دورة خلفية، بدون مرفقات في الحمل المتزامن. المرفقات وأنواع الأسئلة الأخرى اختُبرت سلوكيًا وفي المتصفح.",
+    "200 هو أعلى عدد اختُبر في هذه الجولة، وليس حدًا أقصى معتمدًا للسيرفر. نجح الحفظ بهذا العدد، وتجاوزت أزمنة بعض المراحل الشروط المحددة.",
+    "النهائي قيس عند 200 في قاعدة منفصلة. لم تُحدد في هذه الجولة عتبة زمن مقبولة له عند مستويات أقل.",
+    "قاعدة البيانات التشغيلية والبيانات القديمة للموقع المنشور لم تُفحص أو تُصحح بهذا الفحص؛ التحقق وحفظ البيانات تمّا في قواعد اختبار معزولة.",
+    "لا يوجد حفظ تلقائي جديد للمسودات غير المرسلة عند إغلاق الصفحة أو إعادة تحميلها. تبقى مدخلات الطلب الفاشل في الصفحة خلال إعادة المحاولة.",
+    "تكاملات الخدمات الخارجية والإشعارات الفعلية والبريد ونسخ الإنتاج الاحتياطية لم تُختبر بإرسال حقيقي.",
+    "الفحص يثبت الرحلات والحالات الموثقة أدناه، ولا يثبت خلو كل احتمال أو إدخال غير مختبر من عيب."
+  ],
+  "bundle": {
+    "summary": "نجح البناء وفحص الحزمة: JavaScript أولي 62.37 KiB gzip من حد 100، وCSS أولي 11.4 KiB من حد 12؛ الحزم الثقيلة مؤجلة",
+    "log": "bundle-final.log",
+    "jsGzipKiB": 62.37,
+    "jsLimitKiB": 100,
+    "cssGzipKiB": 11.4,
+    "cssLimitKiB": 12
+  }
+}

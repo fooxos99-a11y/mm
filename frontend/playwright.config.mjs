@@ -8,6 +8,7 @@ const backendOrigin = `http://127.0.0.1:${backendPort}`;
 const frontendOrigin = `http://127.0.0.1:${frontendPort}`;
 const browserChannel = process.env.PLAYWRIGHT_CHANNEL
   || (process.env.CI ? undefined : 'chrome');
+const captureScreenshots = process.env.E2E_CAPTURE_SCREENSHOTS === '1';
 const viewportProjects = [
   { name: 'mobile-320', viewport: { width: 320, height: 568 }, hasTouch: true, isMobile: true },
   { name: 'mobile-390', viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true },
@@ -34,8 +35,8 @@ export default defineConfig({
     browserName: 'chromium',
     ...(browserChannel ? { channel: browserChannel } : {}),
     locale: 'ar-SA',
-    trace: 'retain-on-failure',
-    screenshot: 'only-on-failure',
+    trace: { mode: 'retain-on-failure', screenshots: captureScreenshots },
+    screenshot: captureScreenshots ? 'only-on-failure' : 'off',
     video: 'off',
   },
   projects: viewportProjects.map((project) => ({
@@ -49,7 +50,7 @@ export default defineConfig({
   })),
   webServer: [
     {
-      command: `node ../scripts/run-php.mjs -d max_execution_time=300 -d opcache.enable_cli=1 -S 127.0.0.1:${backendPort} -t public server.php`,
+      command: `node ../scripts/run-php.mjs -d max_execution_time=300 -d opcache.enable_cli=1 -S 127.0.0.1:${backendPort} -t public ../frontend/e2e/support/backend-router.php`,
       cwd: backendRoot,
       // Browser tests must exercise CSRF; Laravel bypasses it in the testing environment.
       env: { APP_ENV: 'local' },

@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './support/isolatedTest.mjs';
 
 test('people directory searches and pages real server results with usable touch controls', async ({ page, request }, testInfo) => {
   const api = `http://127.0.0.1:${process.env.E2E_BACKEND_PORT}/api`;
@@ -33,7 +33,9 @@ test('people directory searches and pages real server results with usable touch 
   await search.fill(prefix);
   await expect(page.locator('.people-directory-status')).toHaveText('عدد النتائج: 21');
   await expect(page.locator('.people-card')).toHaveCount(20);
-  await page.screenshot({ path: testInfo.outputPath('users-populated.png'), fullPage: false });
+  if (process.env.E2E_CAPTURE_SCREENSHOTS === '1') {
+    await page.screenshot({ path: testInfo.outputPath('users-populated.png'), fullPage: false });
+  }
   const next = page.getByRole('button', { name: 'الصفحة التالية', exact: true });
   expect((await next.boundingBox())?.height).toBeGreaterThanOrEqual(44);
   await next.click();
@@ -42,7 +44,9 @@ test('people directory searches and pages real server results with usable touch 
   await search.fill('doesnotexist');
   await expect(page.locator('.people-directory-status')).toHaveText('عدد النتائج: 0');
   await expect(page.locator('.people-card')).toHaveCount(0);
-  await page.screenshot({ path: testInfo.outputPath('users-empty.png'), fullPage: false });
+  if (process.env.E2E_CAPTURE_SCREENSHOTS === '1') {
+    await page.screenshot({ path: testInfo.outputPath('users-empty.png'), fullPage: false });
+  }
   await search.fill(prefix);
   await expect(page.locator('.people-card')).toHaveCount(20);
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);

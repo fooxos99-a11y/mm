@@ -1,5 +1,5 @@
 import AxeBuilder from '@axe-core/playwright';
-import { expect, test } from '@playwright/test';
+import { expect, test } from './support/isolatedTest.mjs';
 import { adminLogin, adminPassword } from './support/credentials.mjs';
 
 const criticalViolations = (results) => results.violations.filter(

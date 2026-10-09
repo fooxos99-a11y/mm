@@ -3,6 +3,7 @@ import {
   submitPublicSatisfactionResponses,
 } from '../../services/api';
 import { MAX_STUDENT_ATTACHMENT_SIZE } from './courseViewConfig';
+import { acknowledgeSubmission, hasQuestionAnswer, recoverSavedSubmission } from '../assessmentQuestions/submissionState.mjs';
 
 export default {
   setAnswer(questionId, value) {
@@ -79,7 +80,7 @@ export default {
     if (this.existingSubmission && !this.hasPendingPostSatisfaction) {
       return 'تم إرسال النتيجة مسبقًا، ولا يمكن إعادة الإرسال مرة أخرى.';
     }
-    if (!this.existingSubmission && this.questions.some((question) => !(this.answers[question.id] || '').trim())) {
+    if (!this.existingSubmission && this.questions.some((question) => !hasQuestionAnswer(question, this.answers, this.files))) {
       return 'الرجاء إكمال جميع الأسئلة';
     }
     return '';
@@ -121,10 +122,30 @@ export default {
     }
     if (this.needsSatisfactionSubmission() && !this.validateSatisfactionAnswers()) return;
 
+    const courseId = this.activeCourse.id;
+    const loginId = this.student.loginId;
+    const assessmentType = this.resolvedAssessmentType;
     this.submitting = true;
     try {
-      if (!this.existingSubmission) await this.submitAssessmentAnswers();
-      if (this.needsSatisfactionSubmission()) await this.submitSatisfactionAnswers();
+      if (!this.existingSubmission) {
+        const result = await this.submitAssessmentAnswers();
+        this.publicSnapshot = acknowledgeSubmission(this.publicSnapshot, 'submissions', result, {
+          courseId: this.activeCourse.id, assessmentType: this.resolvedAssessmentType,
+          loginId: this.student.loginId, studentName: this.student.name,
+          answers: this.questions.map(question => ({ questionId: question.id, value: this.answers[question.id] || '' })),
+        });
+      }
+      if (this.needsSatisfactionSubmission()) {
+        const savedResponses = await this.submitSatisfactionAnswers();
+        const ids = new Set(savedResponses.map(response => response.id));
+        this.publicSnapshot = {
+          ...this.publicSnapshot,
+          satisfactionResponses: [
+            ...(this.publicSnapshot.satisfactionResponses || []).filter(response => !ids.has(response.id)),
+            ...savedResponses,
+          ],
+        };
+      }
 
       this.pageError = '';
       this.satisfactionError = '';
@@ -132,9 +153,21 @@ export default {
       this.files = {};
       this.satisfactionAnswers = {};
       this.resetKey += 1;
-      this.publicSnapshot = await this.fetchPublicSnapshotWithTimeout();
+      try {
+        this.publicSnapshot = await this.fetchPublicSnapshotWithTimeout();
+      } catch {
+        // The accepted submission is already visible; a refresh failure does not undo saving.
+      }
     } catch (error) {
-      this.pageError = error?.response?.data?.message || error?.message || 'تعذر إرسال الاختبار.';
+      const saved = await recoverSavedSubmission(() => this.fetchPublicSnapshotWithTimeout(), snapshot => snapshot?.submissions?.some(
+        item => item.courseId === courseId && item.assessmentType === assessmentType && item.loginId === loginId,
+      ));
+      if (saved) {
+        this.publicSnapshot = saved;
+        this.pageError = this.needsSatisfactionSubmission() ? 'تم حفظ الاختبار. أعد الإرسال لاستكمال استبيان الرضا.' : '';
+      } else {
+        this.pageError = error?.response?.data?.message || error?.message || 'تعذر إرسال الاختبار.';
+      }
     } finally {
       this.submitting = false;
     }

@@ -20,6 +20,7 @@ class StudentSession {
     this.base = base;
     this.login = `capacity-${String(index).padStart(5, '0')}`;
     this.name = `Capacity student ${index}`;
+    this.branchCode = index % 2 ? 'female' : 'male';
     this.password = password;
     this.cookies = new Map();
   }
@@ -52,17 +53,26 @@ class StudentSession {
   }
 }
 
+const submissionEndpoint = course => course.assessmentType === 'final'
+  ? '/api/public/final-exam/submissions' : '/api/public/assessment-submissions';
+const submissionPayload = (session, course, login = session.login) => {
+  const final = course.assessmentType === 'final';
+  const questionIds = final ? course.branchQuestionIds[session.branchCode] : course.questionIds;
+  return buildAssessmentSubmissionFormData({
+    ...(final ? { branchCode: session.branchCode, loginCode: login }
+      : { courseId: course.courseId, assessmentType: course.assessmentType || 'pre', loginId: login }),
+    studentName: session.name, answers: questionIds.map(questionId => ({ questionId, value: 'أ' })),
+  }, final ? ['branchCode', 'loginCode', 'studentName'] : ['courseId', 'assessmentType', 'loginId', 'studentName']);
+};
+
 export async function validateGuards({ base, index, password, course }) {
   const session = new StudentSession(base, index, password);
   const checks = {};
   checks.unauthenticated = await session.request('/api/dashboard/snapshot', { expected: 401 });
   checks.csrfCookie = await session.request('/sanctum/csrf-cookie', { expected: 204 });
   checks.login = await session.request('/api/auth/login', { method: 'POST', data: { login_code: session.login, password } });
-  const payload = loginId => buildAssessmentSubmissionFormData({ courseId: course.courseId,
-    assessmentType: course.assessmentType || 'pre', loginId, studentName: session.name,
-    answers: course.questionIds.map(questionId => ({ questionId, value: 'أ' })),
-  }, ['courseId', 'assessmentType', 'loginId', 'studentName']);
-  const endpoint = '/api/public/assessment-submissions';
+  const payload = loginId => submissionPayload(session, course, loginId);
+  const endpoint = submissionEndpoint(course);
   checks.missingCsrf = await session.request(endpoint, { method: 'POST', data: payload(session.login), csrf: false, expected: 419 });
   checks.anotherIdentity = await session.request(endpoint, { method: 'POST', data: payload('capacity-00000'), expected: 422 });
   checks.validSubmission = await session.request(endpoint, { method: 'POST', data: payload(session.login), expected: 201 });
@@ -79,12 +89,8 @@ export async function validateConcurrentRetry({ base, index, password, course })
     const login = await session.request('/api/auth/login', { method: 'POST', data: { login_code: session.login, password } });
     if (!csrf.ok || !login.ok) throw new Error('Concurrent-retry login failed.');
   }
-  const attempts = await Promise.all(sessions.map(session => session.request('/api/public/assessment-submissions', {
-    method: 'POST', expected: 201, data: buildAssessmentSubmissionFormData({
-      courseId: course.courseId, assessmentType: course.assessmentType || 'pre',
-      loginId: session.login, studentName: session.name,
-      answers: course.questionIds.map(questionId => ({ questionId, value: 'أ' })),
-    }, ['courseId', 'assessmentType', 'loginId', 'studentName']),
+  const attempts = await Promise.all(sessions.map(session => session.request(submissionEndpoint(course), {
+    method: 'POST', expected: 201, data: submissionPayload(session, course),
   })));
   const statuses = attempts.map(attempt => attempt.status).sort();
   return { ok: statuses[0] === 201 && statuses[1] === 422, statuses };
@@ -105,19 +111,20 @@ export async function runWave({ base, count, offset, password, course, verify })
     ? session.request('/api/dashboard/snapshot') : Promise.resolve({ ok: false, status: 'skipped', ms: 0 })));
   for (const sample of open) {
     const field = { pre: 'preQuestions', post: 'postQuestions', tasks: 'taskQuestions' }[course.assessmentType || 'pre'];
-    if (sample.ok && sample.body?.courses?.find(item => item.id === course.courseId)?.[field]?.length !== 20) sample.ok = false;
+    const questionCount = course.assessmentType === 'final' ? sample.body?.finalExamQuestions?.length
+      : sample.body?.courses?.find(item => item.id === course.courseId)?.[field]?.length;
+    if (sample.ok && questionCount !== 20) sample.ok = false;
   }
   phases.openExam = summarize(open);
   const submit = await Promise.all(sessions.map((session, index) => open[index].ok
-    ? session.request('/api/public/assessment-submissions', { method: 'POST', expected: 201, data: buildAssessmentSubmissionFormData({
-      courseId: course.courseId, assessmentType: course.assessmentType || 'pre', loginId: session.login, studentName: session.name,
-      answers: course.questionIds.map(questionId => ({ questionId, value: 'أ' })),
-    }, ['courseId', 'assessmentType', 'loginId', 'studentName']) }) : Promise.resolve({ ok: false, status: 'skipped', ms: 0 })));
+    ? session.request(submissionEndpoint(course), { method: 'POST', expected: 201, data: submissionPayload(session, course) })
+    : Promise.resolve({ ok: false, status: 'skipped', ms: 0 })));
   phases.submitExam = summarize(submit);
   const after = await Promise.all(sessions.map((session, index) => submit[index].ok
     ? session.request('/api/dashboard/snapshot') : Promise.resolve({ ok: false, status: 'skipped', ms: 0 })));
   for (let index = 0; index < after.length; index++) {
-    const saved = after[index].body?.submissions?.find(item => item.id === submit[index].body?.id);
+    const collection = course.assessmentType === 'final' ? 'finalExamSubmissions' : 'submissions';
+    const saved = after[index].body?.[collection]?.find(item => item.id === submit[index].body?.id);
     if (after[index].ok && saved?.answers?.length !== 20) after[index].ok = false;
   }
   phases.results = summarize(after);

@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './support/isolatedTest.mjs';
 
 const assertNoPageOverflow = async (page) => {
   const dimensions = await page.evaluate(() => ({

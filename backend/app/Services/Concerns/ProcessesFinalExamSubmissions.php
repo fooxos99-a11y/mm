@@ -3,8 +3,10 @@
 namespace App\Services\Concerns;
 
 use App\Models\Student;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use Throwable;
 
 trait ProcessesFinalExamSubmissions
 {
@@ -21,44 +23,61 @@ trait ProcessesFinalExamSubmissions
 
         $submissionId = (string) str()->uuid();
         $submittedAt = now();
+        $storedPaths = [];
 
-        DB::transaction(function () use (
-            $submissionId,
-            $submittedAt,
-            $branchCode,
-            $studentName,
-            $submission,
-            $loginCode,
-            $questionSnapshots
-        ): void {
-            DB::table('final_exam_submissions')->insert([
-                'id' => $submissionId,
-                'branch_code' => $branchCode,
-                'student_name' => $studentName,
-                'login_code' => $loginCode,
-                'submitted_at' => $submittedAt,
-            ]);
+        try {
+            DB::transaction(function () use (
+                $submissionId,
+                $submittedAt,
+                $branchCode,
+                $studentName,
+                $submission,
+                $loginCode,
+                $questionSnapshots,
+                &$storedPaths
+            ): void {
+                DB::table('final_exam_submissions')->insert([
+                    'id' => $submissionId,
+                    'branch_code' => $branchCode,
+                    'student_name' => $studentName,
+                    'login_code' => $loginCode,
+                    'submitted_at' => $submittedAt,
+                ]);
 
-            $answers = collect($submission['answers'] ?? [])
-                ->filter(fn (array $answer) => ($answer['questionId'] ?? '') !== '__score_override__')
-                ->map(function (array $answer) use ($submissionId, $questionSnapshots): array {
-                    $question = $questionSnapshots->get(trim((string) $answer['questionId']));
+                $answers = collect($submission['answers'] ?? [])
+                    ->filter(fn (array $answer) => ($answer['questionId'] ?? '') !== '__score_override__')
+                    ->map(function (array $answer) use ($submissionId, $questionSnapshots, &$storedPaths): array {
+                        $question = $questionSnapshots->get(trim((string) $answer['questionId']));
+                        $attachment = $this->assessmentAttachmentService->storeAnswer($answer);
+                        if ($attachment['file_path']) {
+                            $storedPaths[] = $attachment['file_path'];
+                        }
 
-                    return [
-                        'id' => (string) str()->uuid(),
-                        'submission_id' => $submissionId,
-                        'question_id' => $answer['questionId'],
-                        'answer_text' => $answer['value'] ?? null,
-                        ...$this->assessmentAttachmentService->storeAnswer($answer),
-                        ...$this->submissionValidator->snapshotColumns($question),
-                    ];
-                })
-                ->all();
+                        return [
+                            'id' => (string) str()->uuid(),
+                            'submission_id' => $submissionId,
+                            'question_id' => $answer['questionId'],
+                            'answer_text' => $answer['value'] ?? null,
+                            ...$attachment,
+                            ...$this->submissionValidator->snapshotColumns($question),
+                        ];
+                    })
+                    ->all();
 
-            if ($answers !== []) {
-                DB::table('final_exam_submission_answers')->insert($answers);
+                if ($answers !== []) {
+                    DB::table('final_exam_submission_answers')->insert($answers);
+                }
+            });
+        } catch (Throwable $exception) {
+            foreach ($storedPaths as $path) {
+                $this->assessmentAttachmentService->delete($path);
             }
-        });
+            if (! $exception instanceof UniqueConstraintViolationException
+                || ! DB::table('final_exam_submissions')->where('login_code', $loginCode)->exists()) {
+                throw $exception;
+            }
+            throw ValidationException::withMessages(['loginCode' => 'تم إرسال الاختبار النهائي مسبقًا.']);
+        }
 
         return ['id' => $submissionId, 'submittedAt' => $submittedAt->toISOString()];
     }

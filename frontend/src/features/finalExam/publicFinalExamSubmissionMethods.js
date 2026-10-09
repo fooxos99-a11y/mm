@@ -1,4 +1,5 @@
 import { submitPublicFinalExam } from '../../services/api';
+import { acknowledgeSubmission, hasQuestionAnswer, recoverSavedSubmission } from '../assessmentQuestions/submissionState.mjs';
 import {
   MAX_FINAL_EXAM_ATTACHMENT_SIZE,
   finalExamAnswersMatch,
@@ -62,14 +63,15 @@ export default {
       this.pageError = 'تم إرسال الاختبار النهائي مسبقًا.';
       return;
     }
-    if (this.questions.some((question) => !String(this.answers[question.id] || '').trim())) {
+    if (this.questions.some((question) => !hasQuestionAnswer(question, this.answers, this.files))) {
       this.pageError = 'الرجاء إكمال جميع الأسئلة';
       return;
     }
 
+    const loginCode = this.student.loginId;
     this.submitting = true;
     try {
-      await submitPublicFinalExam({
+      const payload = {
         branchCode: this.branchCode,
         studentName: this.student.name,
         loginCode: this.student.loginId,
@@ -81,14 +83,28 @@ export default {
           file: this.files[question.id]?.file || null,
           fileDataUrl: null,
         })),
-      });
+      };
+      const result = await submitPublicFinalExam(payload);
+      this.publicSnapshot = acknowledgeSubmission(this.publicSnapshot, 'finalExamSubmissions', result, payload);
       this.pageError = '';
       this.answers = {};
       this.files = {};
       this.resetKey += 1;
-      this.publicSnapshot = await this.fetchPublicSnapshotWithTimeout();
+      try {
+        this.publicSnapshot = await this.fetchPublicSnapshotWithTimeout();
+      } catch {
+        // Keep the accepted result when the subsequent read is unavailable.
+      }
     } catch (error) {
-      this.pageError = error?.response?.data?.message || error?.message || 'تعذر إرسال الاختبار النهائي.';
+      const saved = await recoverSavedSubmission(() => this.fetchPublicSnapshotWithTimeout(), snapshot => snapshot?.finalExamSubmissions?.some(
+        item => item.loginCode === loginCode,
+      ));
+      if (saved) {
+        this.publicSnapshot = saved;
+        this.pageError = '';
+      } else {
+        this.pageError = error?.response?.data?.message || error?.message || 'تعذر إرسال الاختبار النهائي.';
+      }
     } finally {
       this.submitting = false;
     }

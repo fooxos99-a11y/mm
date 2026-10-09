@@ -1,4 +1,4 @@
-import { existsSync, rmSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { randomBytes } from 'node:crypto';
 import os from 'node:os';
@@ -13,6 +13,11 @@ const artisan = path.join(workspaceRoot, 'backend', 'artisan');
 const playwrightCli = path.join(frontendRoot, 'node_modules', '@playwright', 'test', 'cli.js');
 const viteCli = path.join(frontendRoot, 'node_modules', 'vite', 'bin', 'vite.js');
 const databasePath = path.join(os.tmpdir(), `momars-e2e-${process.pid}.sqlite`);
+const databaseTemplate = path.join(os.tmpdir(), `momars-e2e-template-${process.pid}.sqlite`);
+const storagePath = path.join(os.tmpdir(), `momars-e2e-storage-${process.pid}`);
+for (const directory of ['app/private', 'app/public', 'framework/cache/data', 'framework/sessions', 'framework/views', 'framework/testing', 'logs']) {
+  mkdirSync(path.join(storagePath, directory), { recursive: true });
+}
 const adminLogin = 'e2e-admin';
 // Throw-away accounts for the temporary SQLite database, regenerated on every run.
 const createTestSecret = () => `E2e-${randomBytes(12).toString('base64url')}-9`;
@@ -48,6 +53,9 @@ const e2eEnv = {
   FRONTEND_URL: frontendOrigin,
   DB_CONNECTION: 'sqlite',
   DB_DATABASE: databasePath,
+  E2E_DATABASE_TEMPLATE: databaseTemplate,
+  DB_URL: '',
+  LARAVEL_STORAGE_PATH: storagePath,
   CACHE_STORE: 'array',
   SESSION_DRIVER: 'database',
   SESSION_SECURE_COOKIE: 'false',
@@ -117,6 +125,7 @@ try {
     if (migration.status !== 0) {
       process.exitCode = migration.status ?? 1;
     } else {
+      copyFileSync(databasePath, databaseTemplate);
       const result = spawnSync(
         process.execPath,
         [playwrightCli, 'test', ...process.argv.slice(2)],
@@ -133,4 +142,5 @@ try {
   }
 } finally {
   removeDatabaseFiles();
+  rmSync(databaseTemplate, { force: true });
 }
