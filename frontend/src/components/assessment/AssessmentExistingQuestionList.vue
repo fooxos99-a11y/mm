@@ -22,6 +22,7 @@
               type="button"
               class="assessment-form-card__trash"
               :aria-label="`حذف السؤال ${index + 1}`"
+              :disabled="saving"
               @click="$emit('remove', question.id)"
             >
               <v-icon

@@ -186,7 +186,8 @@ class FinalExamTest extends CoreDataApiTestCase
 
         $this->assertDatabaseHas('final_exam_questions', ['branch_code' => 'female']);
 
-        $this->deleteJson('/api/dashboard/final-exam/questions/'.$questionId)->assertUnprocessable();
+        $this->deleteJson('/api/dashboard/final-exam/questions/'.$questionId)->assertNoContent();
+        $this->assertNotNull(DB::table('final_exam_questions')->where('id', $questionId)->value('deleted_at'));
 
         $this->assertDatabaseHas('final_exam_questions', ['id' => $questionId]);
     }

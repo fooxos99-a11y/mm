@@ -89,7 +89,8 @@ class AssessmentHistoryProtectionTest extends TestCase
         $this->putJson('/api/dashboard/questions/'.$questionId, $questionPayload)
             ->assertUnprocessable();
         $this->deleteJson('/api/dashboard/questions/'.$questionId)
-            ->assertUnprocessable();
+            ->assertNoContent();
+        $this->assertNotNull(DB::table('course_questions')->where('id', $questionId)->value('deleted_at'));
         $this->postJson('/api/dashboard/courses/'.$courseId.'/questions', [
             'assessmentType' => 'pre',
             ...$this->questionPayload('New historical question', ['A', 'B'], 'A', 1),
@@ -198,7 +199,8 @@ class AssessmentHistoryProtectionTest extends TestCase
         $this->putJson('/api/dashboard/final-exam/questions/'.$maleQuestionId, $questionPayload)
             ->assertUnprocessable();
         $this->deleteJson('/api/dashboard/final-exam/questions/'.$maleQuestionId)
-            ->assertUnprocessable();
+            ->assertNoContent();
+        $this->assertNotNull(DB::table('final_exam_questions')->where('id', $maleQuestionId)->value('deleted_at'));
         $this->postJson('/api/dashboard/final-exam/questions', [
             'branchCode' => 'male',
             ...$this->questionPayload('New final question', ['One', 'Two'], 'One', 1),

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class SatisfactionTemplateService
 {
@@ -34,6 +35,7 @@ class SatisfactionTemplateService
         // The old "all courses" operation inserted its copies with one timestamp.
         // Single-course questions cannot be identified as global and stay local.
         $groups = DB::table('satisfaction_questions')->whereNull('archive_id')
+            ->when(Schema::hasColumn('satisfaction_questions', 'deleted_at'), fn ($query) => $query->whereNull('deleted_at'))
             ->whereNull('global_template_id')->get()
             ->groupBy(fn ($question) => json_encode([
                 $question->prompt, $question->type, (bool) $question->is_required, $question->created_at,
@@ -49,7 +51,8 @@ class SatisfactionTemplateService
 
     private function attach(object $template, string $courseId): object
     {
-        $query = DB::table('satisfaction_questions')->whereNull('archive_id')->where('course_id', $courseId);
+        $query = DB::table('satisfaction_questions')->whereNull('archive_id')->where('course_id', $courseId)
+            ->when(Schema::hasColumn('satisfaction_questions', 'deleted_at'), fn ($query) => $query->whereNull('deleted_at'));
         $existing = (clone $query)->where('prompt', $template->prompt)->where('type', $template->type)
             ->orderBy('sort_order')->first();
         if ($existing) {

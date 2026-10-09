@@ -66,7 +66,8 @@ class SatisfactionTest extends CoreDataApiTestCase
 
         $this->deleteJson('/api/dashboard/satisfaction-questions/'.$questionId)->assertNoContent();
 
-        $this->assertDatabaseMissing('satisfaction_questions', ['id' => $questionId]);
+        $this->assertNotNull(DB::table('satisfaction_questions')->where('id', $questionId)->value('deleted_at'));
+        $this->assertDatabaseHas('satisfaction_responses', ['question_id' => $questionId, 'rating_value' => 5]);
     }
 
     public function test_public_student_assessment_submission_flows_work_for_pre_post_and_tasks(): void

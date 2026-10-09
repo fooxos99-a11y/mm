@@ -1,5 +1,5 @@
 import {
-  applyPastedQuestionOptions, isCorrectQuestionOption, updateQuestionOption, validateQuestionDraft,
+  applyPastedQuestionOptions, hasQuestionDraftChanges, isCorrectQuestionOption, updateQuestionOption, validateQuestionDraft,
 } from '../assessmentQuestions/questionModel.mjs';
 import { parseImportedQuestionsFromText, splitPastedQuestionOptions } from '../../utils/questionImportParser';
 import { emptyFinalExamQuestionForm as emptyQuestionForm } from './finalExamViewModel.mjs';
@@ -25,8 +25,8 @@ export const finalExamQuestionMethods = {
       this.questionDialogOpen = open;
 
       if (!open) {
-        this.questionForms = [emptyQuestionForm()];
-        this.questionErrors = [''];
+        this.questionForms = [];
+        this.questionErrors = [];
         this.pasteText = '';
       }
     },
@@ -143,10 +143,6 @@ export const finalExamQuestionMethods = {
       this.questionErrors = [...this.questionErrors, ''];
     },
     handleRemoveQuestionSlot(index) {
-      if (this.questionForms.length <= 1) {
-        return;
-      }
-
       this.questionForms = this.questionForms.filter((_, currentIndex) => currentIndex !== index);
       this.questionErrors = this.questionErrors.filter((_, currentIndex) => currentIndex !== index);
     },
@@ -200,8 +196,10 @@ export const finalExamQuestionMethods = {
 
       let hasError = false;
       const nextDraftErrors = {};
+      const changedQuestions = this.visibleBranchQuestions
+        .filter((question) => hasQuestionDraftChanges(question, this.questionDrafts[question.id]));
 
-      this.visibleBranchQuestions.forEach((question) => {
+      changedQuestions.forEach((question) => {
         const validationError = this.validateQuestionDraft(this.questionDrafts[question.id]);
         nextDraftErrors[question.id] = validationError;
 
@@ -233,7 +231,7 @@ export const finalExamQuestionMethods = {
       this.isSaving = true;
 
       try {
-        for (const question of this.visibleBranchQuestions) {
+        for (const question of changedQuestions) {
           const draft = this.questionDrafts[question.id];
           const options = draft.type === 'multiple'
             ? draft.options.map((option) => option.trim()).filter(Boolean)
@@ -252,8 +250,9 @@ export const finalExamQuestionMethods = {
           });
         }
 
-        for (const questionId of this.pendingDeletedQuestionIds) {
+        for (const questionId of [...this.pendingDeletedQuestionIds]) {
           await this.deleteFinalExamQuestion(questionId);
+          this.pendingDeletedQuestionIds = this.pendingDeletedQuestionIds.filter((id) => id !== questionId);
         }
 
         for (const form of this.questionForms) {
@@ -273,8 +272,8 @@ export const finalExamQuestionMethods = {
         }
 
         this.$toast.success('تم حفظ الأسئلة بنجاح');
-        this.questionForms = [emptyQuestionForm()];
-        this.questionErrors = [''];
+        this.questionForms = [];
+        this.questionErrors = [];
         this.pendingDeletedQuestionIds = [];
       } catch (error) {
         this.$toast.error(error?.response?.data?.message || 'تعذر حفظ الأسئلة');

@@ -1,3 +1,5 @@
+import { hasQuestionDraftChanges } from '../assessmentQuestions/questionModel.mjs';
+
 export default {
   async handleSaveAllQuestions() {
     if (!this.selectedCourse || this.isSaving) {
@@ -6,7 +8,9 @@ export default {
 
     let hasError = false;
     const nextDraftErrors = {};
-    const visibleQuestionIds = this.visibleSelectedQuestions.map((question) => question.id);
+    const changedQuestions = this.visibleSelectedQuestions
+      .filter((question) => hasQuestionDraftChanges(question, this.questionDrafts[question.id]));
+    const visibleQuestionIds = changedQuestions.map((question) => question.id);
 
     visibleQuestionIds.forEach((questionId) => {
       const validationError = this.validateQuestionDraft(this.questionDrafts[questionId]);
@@ -61,7 +65,7 @@ export default {
     this.isSaving = true;
 
     try {
-      const questions = this.visibleSelectedQuestions.map((question) => {
+      const questions = changedQuestions.map((question) => {
         const draft = this.questionDrafts[question.id];
 
         return {

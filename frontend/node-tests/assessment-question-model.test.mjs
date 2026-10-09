@@ -5,6 +5,7 @@ import {
   applyPastedQuestionOptions,
   createEmptyQuestionForm,
   createQuestionDraft,
+  hasQuestionDraftChanges,
   isCorrectQuestionOption,
   mapImportedQuestionToForm,
   normalizeAssessmentAnswer,
@@ -30,6 +31,19 @@ test('question factories isolate mutable option arrays and normalize persisted d
 test('answer normalization handles Arabic variants labels and punctuation', () => {
   assert.equal(normalizeAssessmentAnswer('أ) مَدْرَسَة؟'), 'مدرسه')
   assert.equal(normalizeAssessmentAnswer('  إجابة.  '), 'اجابه')
+})
+
+test('saving deletion skips unchanged questions but detects meaningful draft edits', () => {
+  const question = { type: 'multiple', prompt: 'اختر', options: ['أ', 'ب'], points: 2, correctAnswer: 'أ' }
+  const draft = createQuestionDraft(question)
+  assert.equal(hasQuestionDraftChanges(question, draft), false)
+  assert.equal(hasQuestionDraftChanges(question, { ...draft, prompt: ' اختر ', options: ['أ', 'ب', ''], points: '2' }), false)
+  for (const patch of [{ prompt: 'سؤال آخر' }, { options: ['أ', 'ج'] }, { points: 0 }, { correctAnswer: 'ب' }, { type: 'text' }]) {
+    assert.equal(hasQuestionDraftChanges(question, { ...draft, ...patch }), true)
+  }
+  const text = { type: 'text', prompt: 'اشرح', points: 0 }
+  assert.equal(hasQuestionDraftChanges(text, { ...createQuestionDraft(text), correctAnswer: 'ignored' }), false)
+  assert.equal(hasQuestionDraftChanges({}, { prompt: '', type: 'multiple', points: undefined }), false)
 })
 
 test('question validation covers prompt options answer and non-negative points', () => {

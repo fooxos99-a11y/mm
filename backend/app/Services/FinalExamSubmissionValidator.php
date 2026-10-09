@@ -49,6 +49,7 @@ class FinalExamSubmissionValidator
         $questions = DB::table('final_exam_questions')
             ->where('branch_code', $branchCode)
             ->whereNull('archive_id')
+            ->whereNull('deleted_at')
             ->whereIn('id', $questionIds->all())
             ->get([
                 'id',

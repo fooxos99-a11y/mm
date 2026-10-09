@@ -7,8 +7,10 @@ use Illuminate\Validation\ValidationException;
 
 class CourseQuestionService
 {
-    public function __construct(private readonly AssessmentAttachmentService $assessmentAttachmentService)
-    {
+    public function __construct(
+        private readonly AssessmentAttachmentService $assessmentAttachmentService,
+        private readonly QuestionDeletionService $questionDeletionService,
+    ) {
     }
 
     public function create(string $courseId, string $assessmentType, array $question): string
@@ -50,7 +52,7 @@ class CourseQuestionService
 
     public function update(string $questionId, array $question): void
     {
-        $existing = DB::table('course_questions')->where('id', $questionId)->first();
+        $existing = DB::table('course_questions')->where('id', $questionId)->whereNull('deleted_at')->first();
         if (! $existing) {
             throw ValidationException::withMessages(['questionId' => ['السؤال المحدد غير موجود.']]);
         }
@@ -71,18 +73,12 @@ class CourseQuestionService
 
     public function delete(string $questionId): void
     {
-        $question = DB::table('course_questions')->where('id', $questionId)->first();
+        $question = DB::table('course_questions')->where('id', $questionId)->whereNull('archive_id')->first();
         if (! $question) {
             throw ValidationException::withMessages(['questionId' => ['السؤال المحدد غير موجود.']]);
         }
 
-        $this->assertMutable(
-            (string) $question->course_id,
-            (string) $question->assessment_type,
-            $question->archive_id ?? null,
-        );
-
-        DB::table('course_questions')->where('id', $questionId)->delete();
+        $this->questionDeletionService->delete('course_questions', [$questionId]);
     }
 
     private function attributes(array $question, string $type, array $options): array

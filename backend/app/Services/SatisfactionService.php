@@ -8,8 +8,10 @@ use Illuminate\Validation\ValidationException;
 
 class SatisfactionService
 {
-    public function __construct(private readonly SatisfactionTemplateService $templates)
-    {
+    public function __construct(
+        private readonly SatisfactionTemplateService $templates,
+        private readonly QuestionDeletionService $questionDeletionService,
+    ) {
     }
 
     public function addSatisfactionQuestion(
@@ -84,17 +86,32 @@ class SatisfactionService
     public function deleteSatisfactionQuestion(string $questionId): void
     {
         DB::transaction(function () use ($questionId): void {
-            $templateId = DB::table('satisfaction_questions')->where('id', $questionId)->value('global_template_id');
-            DB::table('satisfaction_questions')->where('id', $questionId)->delete();
-            if ($templateId && ! DB::table('satisfaction_questions')->whereNull('archive_id')
-                ->where('global_template_id', $templateId)->exists()) {
-                DB::table('satisfaction_templates')->where('id', $templateId)->delete();
+            $question = DB::table('satisfaction_questions')->where('id', $questionId)->whereNull('archive_id')->first();
+            if (! $question) {
+                return;
             }
+            $templateId = $question->global_template_id;
+            if ($templateId) {
+                DB::table('satisfaction_templates')->where('id', $templateId)->lockForUpdate()->first();
+                $ids = DB::table('satisfaction_questions')->whereNull('archive_id')
+                    ->where('global_template_id', $templateId)->pluck('id')->all();
+                $this->questionDeletionService->delete('satisfaction_questions', $ids);
+                DB::table('satisfaction_templates')->where('id', $templateId)->delete();
+
+                return;
+            }
+            $this->questionDeletionService->delete('satisfaction_questions', [$questionId]);
         });
     }
 
     public function submitSatisfactionResponses(array $responses): array
     {
+        foreach ($responses as $response) {
+            if (! DB::table('satisfaction_questions')->where('id', $response['questionId'])
+                ->where('course_id', $response['courseId'])->whereNull('archive_id')->whereNull('deleted_at')->exists()) {
+                throw ValidationException::withMessages(['responses' => 'السؤال المحدد غير متاح لهذه الدورة.']);
+            }
+        }
         $rows = array_map(
             fn (array $response) => [
                 'id' => (string) str()->uuid(),

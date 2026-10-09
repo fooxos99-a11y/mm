@@ -21,6 +21,7 @@ class DashboardSnapshotFeedbackLoader
             ->orderByDesc('submitted_at')->orderByDesc('id');
         $finalExamQuestionsQuery = DB::table('final_exam_questions')
             ->whereNull('archive_id')
+            ->whereNull('deleted_at')
             ->orderBy('sort_order')->orderBy('id');
         $finalExamSubmissionsQuery = DB::table('final_exam_submissions')
             ->whereNull('archive_id')
@@ -45,6 +46,7 @@ class DashboardSnapshotFeedbackLoader
         return [
             'satisfactionQuestions' => DB::table('satisfaction_questions')
                 ->whereNull('archive_id')
+                ->whereNull('deleted_at')
                 ->orderBy('sort_order')
                 ->get(),
             'satisfactionResponses' => $satisfactionResponsesQuery->when(

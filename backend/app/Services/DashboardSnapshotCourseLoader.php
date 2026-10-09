@@ -45,6 +45,7 @@ class DashboardSnapshotCourseLoader
                 ->get(),
             'questions' => DB::table('course_questions')
                 ->whereNull('archive_id')
+                ->whereNull('deleted_at')
                 ->orderBy('sort_order')
                 ->get()
                 ->groupBy('course_id'),

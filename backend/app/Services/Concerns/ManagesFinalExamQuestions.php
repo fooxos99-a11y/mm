@@ -44,7 +44,8 @@ trait ManagesFinalExamQuestions
 
     public function deleteFinalExamQuestion(string $questionId): void
     {
-        $question = DB::table('final_exam_questions')->where('id', $questionId)->first(['branch_code', 'archive_id']);
+        $question = DB::table('final_exam_questions')->where('id', $questionId)->whereNull('archive_id')
+            ->first(['branch_code', 'archive_id']);
 
         if (! $question) {
             throw ValidationException::withMessages(
@@ -53,13 +54,12 @@ trait ManagesFinalExamQuestions
         }
 
         $this->assertCanManageBranch((string) $question->branch_code);
-        $this->assertFinalExamQuestionSetIsMutable((string) $question->branch_code, $question->archive_id ?? null);
-        DB::table('final_exam_questions')->where('id', $questionId)->delete();
+        $this->questionDeletionService->delete('final_exam_questions', [$questionId]);
     }
 
     public function updateFinalExamQuestion(string $questionId, array $question): void
     {
-        $existingQuestion = DB::table('final_exam_questions')->where('id', $questionId)->first();
+        $existingQuestion = DB::table('final_exam_questions')->where('id', $questionId)->whereNull('deleted_at')->first();
 
         if (! $existingQuestion) {
             throw ValidationException::withMessages(['questionId' => 'السؤال المحدد غير موجود.']);
@@ -102,6 +102,7 @@ trait ManagesFinalExamQuestions
         $sourceQuestions = DB::table('final_exam_questions')
             ->where('branch_code', $from)
             ->whereNull('archive_id')
+            ->whereNull('deleted_at')
             ->orderBy('sort_order')
             ->get();
 

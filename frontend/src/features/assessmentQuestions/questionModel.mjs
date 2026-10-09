@@ -41,6 +41,17 @@ export const createQuestionDraft = question => ({
   correctAnswerTouched: Boolean(String(question?.correctAnswer || '').trim()),
 })
 
+export const hasQuestionDraftChanges = (question, draft) => {
+  const normalize = value => ({
+    prompt: String(value.prompt || '').trim(),
+    type: value.type,
+    options: value.type === 'multiple' ? (value.options || []).map(option => option.trim()).filter(Boolean) : [],
+    points: Number(value.points ?? 1),
+    correctAnswer: value.type === 'multiple' ? String(value.correctAnswer || '').trim() : '',
+  })
+  return JSON.stringify(normalize(createQuestionDraft(question))) !== JSON.stringify(normalize(draft))
+}
+
 export const validateQuestionDraft = (draft, { requireCorrectForTypes = ['multiple'] } = {}) => {
   const prompt = String(draft?.prompt || '').trim()
   const options = draft?.type === 'multiple'

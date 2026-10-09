@@ -139,7 +139,7 @@
 
             <AssessmentExistingQuestionList
               v-if="selectedCourse"
-              :questions="selectedQuestions"
+              :questions="visibleSelectedQuestions"
               :drafts="questionDrafts"
               :errors="questionDraftErrors"
               :empty-text="isTasksPage ? 'لا توجد أسئلة بعد. استخدم + لإضافة خيارات أو نصي أو صح وخطأ، أو اختر وورد.' : 'لا توجد أسئلة بعد.'"

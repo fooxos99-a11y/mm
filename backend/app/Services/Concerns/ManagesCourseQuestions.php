@@ -28,6 +28,7 @@ trait ManagesCourseQuestions
                 $ownedIds = DB::table('course_questions')
                     ->where('course_id', $courseId)
                     ->where('assessment_type', $assessmentType)
+                    ->whereNull('archive_id')
                     ->whereIn('id', $referencedIds->all())
                     ->pluck('id');
 

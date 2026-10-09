@@ -43,6 +43,7 @@ class CourseAssessmentQuestionService
             ->where('course_id', $courseId)
             ->where('assessment_type', $assessmentType)
             ->whereNull('archive_id')
+            ->whereNull('deleted_at')
             ->whereIn('id', $questionIds)
             ->get([
                 'id',
