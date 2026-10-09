@@ -1,5 +1,6 @@
 import AttachmentPreviewDialog from '../../components/tasks/AttachmentPreviewDialog.vue';
-import { AppButton, AppChoiceButton } from '../../components/ui';
+import { AppButton } from '../../components/ui';
+import AssessmentQuestionAnswer from '../../components/assessment/AssessmentQuestionAnswer.vue';
 import { ASSESSMENT_LABELS } from './courseViewConfig';
 import courseMethods from './courseViewMethods';
 
@@ -19,7 +20,7 @@ export default /** @type {Record<string, any>} */ ({
   components: {
     AttachmentPreviewDialog,
     AppButton,
-    AppChoiceButton,
+    AssessmentQuestionAnswer,
   },
   props: {
     assessmentType: {

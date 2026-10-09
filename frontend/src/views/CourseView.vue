@@ -154,31 +154,9 @@
                   </div>
                 </div>
 
-                <div
-                  v-if="question.type === 'multiple'"
-                  class="assessment-options-grid"
-                >
-                  <AppChoiceButton
-                    v-for="option in question.options"
-                    :key="option"
-                    block
-                    class="assessment-option"
-                    :class="{ 'assessment-option--active': answers[question.id] === option }"
-                    :active="answers[question.id] === option"
-                    @click="setAnswer(question.id, option)"
-                  >
-                    {{ option }}
-                  </AppChoiceButton>
-                </div>
-
-                <v-textarea
-                  v-else
+                <AssessmentQuestionAnswer
+                  :question="question"
                   :model-value="answers[question.id] || ''"
-                  outlined
-                  rows="5"
-                  hide-details
-                  class="assessment-textarea"
-                  placeholder="اكتب إجابتك هنا"
                   @update:model-value="setAnswer(question.id, $event)"
                 />
 

@@ -1,0 +1,33 @@
+.assessment-question-answer {
+  width: 100%;
+  min-width: 0;
+}
+
+.assessment-options-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+}
+
+.assessment-option {
+  min-height: 56px;
+  padding: 12px 20px;
+  border-radius: 20px;
+  font-size: 0.95rem;
+}
+
+.assessment-option :deep(.app-choice-button__content) {
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.assessment-question-answer :deep(textarea) {
+  line-height: 1.9;
+}
+
+@media (min-width: 961px) {
+  .assessment-options-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

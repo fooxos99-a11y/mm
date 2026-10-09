@@ -50,30 +50,9 @@
         </div>
       </template>
 
-      <div
-        v-if="question.type === 'multiple' || question.type === 'truefalse'"
-        class="assessment-options-grid"
-      >
-        <AppChoiceButton
-          v-for="option in question.options"
-          :key="option"
-          block
-          class="assessment-option"
-          :class="{ 'assessment-option--active': answers[question.id] === option }"
-          :active="answers[question.id] === option"
-          @click="$emit('answer', question.id, option)"
-        >
-          {{ option }}
-        </AppChoiceButton>
-      </div>
-      <v-textarea
-        v-else
+      <AssessmentQuestionAnswer
+        :question="question"
         :model-value="answers[question.id] || ''"
-        outlined
-        rows="5"
-        hide-details
-        class="assessment-textarea"
-        placeholder="اكتب إجابتك هنا"
         @update:model-value="$emit('answer', question.id, $event)"
       />
       <div
@@ -99,12 +78,13 @@
 </template>
 
 <script>
-import { AppButton, AppChoiceButton } from '../ui';
+import { AppButton } from '../ui';
+import AssessmentQuestionAnswer from '../assessment/AssessmentQuestionAnswer.vue';
 import FinalExamQuestionCard from './FinalExamQuestionCard.vue';
 
 export default {
   name: 'FinalExamAttemptPanel',
-  components: { AppButton, AppChoiceButton, FinalExamQuestionCard },
+  components: { AppButton, AssessmentQuestionAnswer, FinalExamQuestionCard },
   props: {
     questions: { type: Array, default: () => [] },
     answers: { type: Object, default: () => ({}) },

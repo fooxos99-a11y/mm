@@ -1,6 +1,7 @@
 import { defineAsyncComponent } from 'vue';
 import AttachmentPreviewDialog from '../../components/tasks/AttachmentPreviewDialog.vue';
-import { AppButton, AppChoiceButton } from '../../components/ui';
+import { AppButton } from '../../components/ui';
+import AssessmentQuestionAnswer from '../../components/assessment/AssessmentQuestionAnswer.vue';
 import taskMethods from './tasksViewMethods';
 const RichTextEditor = defineAsyncComponent(() => import(
   /* webpackChunkName: "rich-text-editor" */ '@/components/RichTextEditor.vue'
@@ -11,7 +12,7 @@ export default {
   components: {
     AttachmentPreviewDialog,
     AppButton,
-    AppChoiceButton,
+    AssessmentQuestionAnswer,
     RichTextEditor,
   },
   data() {
