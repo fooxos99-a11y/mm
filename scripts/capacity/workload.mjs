@@ -92,7 +92,8 @@ export async function validateConcurrentRetry({ base, index, password, course })
   const attempts = await Promise.all(sessions.map(session => session.request(submissionEndpoint(course), {
     method: 'POST', expected: 201, data: submissionPayload(session, course),
   })));
-  const statuses = attempts.map(attempt => attempt.status).sort();
+  const statuses = attempts.map(attempt => attempt.status)
+    .sort((left, right) => String(left).localeCompare(String(right), undefined, { numeric: true }));
   return { ok: statuses[0] === 201 && statuses[1] === 422, statuses };
 }
 

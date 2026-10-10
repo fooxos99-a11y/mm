@@ -16,7 +16,7 @@
     "report:health": "powershell -ExecutionPolicy Bypass -File scripts/project-health-report.ps1",
     "verify:staging": "node scripts/verify-staging.mjs",
     "monitor:production": "node scripts/monitor-production.mjs",
-    "test:operations": "node --test scripts/monitor-production.test.mjs",
+    "test:operations": "node --test scripts/monitor-production.test.mjs scripts/wait-for-commit-checks.test.mjs",
     "serve:backend:8001": "powershell -ExecutionPolicy Bypass -File scripts/start-backend.ps1",
     "serve:backend": "node scripts/run-php.mjs backend/artisan serve --host=127.0.0.1 --port=8000",
     "migrate:backend": "node scripts/run-php.mjs backend/artisan migrate --force",
@@ -24,8 +24,8 @@
     "test:frontend": "npm --prefix frontend run test:coverage",
     "test:e2e": "npm --prefix frontend run test:e2e",
     "verify:quick": "npm run check:secrets && npm run check:code-size && npm --prefix frontend run audit:policy && npm run lint && npm run test:frontend",
-    "verify:full": "npm run verify:quick && npm test && npm run build && npm --prefix frontend run check:bundle && npm run test:e2e",
-    "verify:release": "node scripts/verify-clean-release.mjs && npm run verify:full && npm run test:operations && npm --prefix frontend run check:mobile-performance"
+    "verify:full": "npm run verify:quick && npm test && npm run test:e2e && npm run build && npm --prefix frontend run check:bundle && npm --prefix frontend run check:mobile-performance",
+    "verify:release": "node scripts/verify-clean-release.mjs && npm run verify:full && npm run test:operations"
   },
   "dependencies": {},
   "devDependencies": {}

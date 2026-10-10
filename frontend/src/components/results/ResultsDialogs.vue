@@ -224,6 +224,9 @@
           هل أنت متأكد من حذف {{ deleteEntityLabel }}
           <strong>{{ deleteTitle || 'المحددة' }}</strong>؟
         </p>
+        <p class="results-delete-dialog__text">
+          ستُحذف الأسئلة والإجابات والنتائج والمرفقات المرتبطة نهائيًا. لا يمكن التراجع.
+        </p>
         <div class="results-delete-dialog__actions">
           <AppButton
             variant="secondary"

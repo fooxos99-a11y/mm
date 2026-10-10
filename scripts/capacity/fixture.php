@@ -1,5 +1,11 @@
 <?php
 
+use App\Models\Branch;
+use App\Services\CourseManagementService;
+use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+
 // Only the disposable database started by run-local.mjs is allowed.
 if (getenv('DB_DATABASE') !== 'momars_capacity' || getenv('DB_HOST') !== '127.0.0.1'
     || getenv('DB_PORT') !== getenv('CAPACITY_DB_PORT') || ! getenv('CAPACITY_RUN_DIR')) {
@@ -16,12 +22,6 @@ set_exception_handler(function (Throwable $error): void {
     fwrite(STDERR, get_class($error).': '.$message.PHP_EOL);
     exit(1);
 });
-
-use App\Models\Branch;
-use App\Services\CourseManagementService;
-use Illuminate\Contracts\Console\Kernel;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 
 $action = $argv[1] ?? 'seed';
 if ($action === 'verify') {
@@ -40,7 +40,8 @@ if ($action === 'verify') {
     $submissions = DB::table('course_submissions')->whereIn('course_id', $courses)->get();
     echo json_encode([
         'submissions' => $submissions->count(),
-        'answers' => DB::table('course_submission_answers')->whereIn('submission_id', $submissions->pluck('id'))->count(),
+        'answers' => DB::table('course_submission_answers')
+            ->whereIn('submission_id', $submissions->pluck('id'))->count(),
         'duplicates' => $submissions->groupBy(fn ($row) => $row->course_id.'|'.$row->login_code)
             ->filter(fn ($group) => $group->count() > 1)->count(),
         'incomplete' => $submissions->filter(fn ($row) => DB::table('course_submission_answers')
@@ -55,7 +56,8 @@ if ($action === 'wave') {
     if ($type === 'final') {
         $questions = [];
         foreach (['male', 'female'] as $branch) {
-            $ids = DB::table('final_exam_questions')->where('branch_code', $branch)->orderBy('sort_order')->pluck('id')->all();
+            $ids = DB::table('final_exam_questions')->where('branch_code', $branch)
+                ->orderBy('sort_order')->pluck('id')->all();
             if ($ids === []) {
                 for ($index = 0; $index < 20; $index++) {
                     $id = (string) str()->uuid();
@@ -79,8 +81,11 @@ if ($action === 'wave') {
     if (! in_array($type, ['pre', 'post', 'tasks'], true)) {
         throw new RuntimeException('Invalid capacity assessment type.');
     }
-    $course = $manager->createCourse('Capacity wave '.getenv('CAPACITY_WAVE'), false,
-        $type === 'tasks' ? ['entityType' => 'task', 'taskMode' => 'questions'] : []);
+    $course = $manager->createCourse(
+        'Capacity wave '.getenv('CAPACITY_WAVE'),
+        false,
+        $type === 'tasks' ? ['entityType' => 'task', 'taskMode' => 'questions'] : []
+    );
     if ($type === 'tasks') {
         DB::table('courses')->where('id', $course['id'])->update(['is_tasks_enabled' => true]);
     }

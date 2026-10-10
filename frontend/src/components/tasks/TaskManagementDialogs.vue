@@ -64,6 +64,7 @@
     >
       <DialogShell title="تأكيد حذف المهمة">
         <p>هل أنت متأكد من حذف المهمة <strong>{{ deleteTitle || 'المحددة' }}</strong>؟</p>
+        <p>ستُحذف الأسئلة والإجابات والنتائج والمرفقات المرتبطة نهائيًا. لا يمكن التراجع.</p>
         <template #actions>
           <AppButton
             variant="secondary"

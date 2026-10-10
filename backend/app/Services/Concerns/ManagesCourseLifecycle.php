@@ -9,15 +9,28 @@ trait ManagesCourseLifecycle
 {
     public function deleteCourse(string $courseId): void
     {
-        $course = DB::table('courses')->where('id', $courseId)->first();
+        DB::transaction(function () use ($courseId): void {
+            if (! DB::table('courses')->where('id', $courseId)->lockForUpdate()->first()) {
+                return;
+            }
 
-        if ($course && $this->hasCourseSubmissions($course)) {
-            throw ValidationException::withMessages([
-                'courseId' => 'لا يمكن حذف دورة أو مهمة توجد لها إجابات محفوظة.',
-            ]);
-        }
+            $submissionIds = DB::table('course_submissions')->where('course_id', $courseId)->select('id');
+            $answers = DB::table('course_submission_answers')->whereIn('submission_id', $submissionIds);
+            $attachmentPaths = DB::table('course_questions')->where('course_id', $courseId)
+                ->pluck('attachment_path')->merge((clone $answers)->pluck('file_path'))
+                ->filter()->unique()->all();
 
-        DB::table('courses')->where('id', $courseId)->delete();
+            // Referenced questions restrict deletion, so remove their answers before the course cascades.
+            $answers->delete();
+            DB::table('course_submissions')->where('course_id', $courseId)->delete();
+            DB::table('courses')->where('id', $courseId)->delete();
+
+            DB::afterCommit(function () use ($attachmentPaths): void {
+                foreach ($attachmentPaths as $path) {
+                    $this->assessmentAttachmentService->deleteIfUnreferenced($path);
+                }
+            });
+        });
     }
 
     public function updateCoursesSortOrder(array $orderedIds): void

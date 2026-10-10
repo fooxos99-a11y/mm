@@ -1,5 +1,5 @@
 import { spawn, spawnSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { resolveTrustedExecutable } from '../../scripts/trustedExecutable.mjs';
 import { request } from 'node:http';
 import { createServer } from 'node:net';
@@ -104,6 +104,10 @@ try {
 
   const score = Math.round((result?.lhr?.categories?.performance?.score || 0) * 100);
   const lcp = Math.round(result?.lhr?.audits?.['largest-contentful-paint']?.numericValue || Infinity);
+
+  if (process.env.MOBILE_PERFORMANCE_REPORT && result?.lhr) {
+    writeFileSync(process.env.MOBILE_PERFORMANCE_REPORT, JSON.stringify(result.lhr, null, 2));
+  }
 
   if (result?.lhr?.runtimeError) {
     console.error(`Lighthouse runtime error: ${result.lhr.runtimeError.code} ${result.lhr.runtimeError.message}`);

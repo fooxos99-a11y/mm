@@ -9,11 +9,14 @@ import os from 'node:os';
 import path from 'node:path';
 import { performance } from 'node:perf_hooks';
 import { runWave, validateConcurrentRetry, validateGuards } from './workload.mjs';
+import { resolveTrustedExecutable } from '../trustedExecutable.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const backend = path.join(root, 'backend');
 const runDir = mkdtempSync(path.join(os.tmpdir(), 'momars-capacity-'));
 const php = process.env.PHP_BIN || 'php';
+const git = resolveTrustedExecutable('git');
+if (!git) throw new Error('Git is unavailable in the trusted install locations.');
 const mysqlBin = process.env.CAPACITY_MYSQL_BIN || 'C:/Program Files/MySQL/MySQL Server 8.4/bin';
 if (!existsSync(path.join(mysqlBin, 'mysqld.exe'))) throw new Error('Set CAPACITY_MYSQL_BIN to the installed MySQL bin directory.');
 const levels = (process.env.CAPACITY_LEVELS || '1,10,25,50,100,200').split(',').map(Number);
@@ -82,8 +85,8 @@ const waitFor = async (probe, label) => {
   }
   throw new Error(`${label} was not ready within 45 seconds.`);
 };
-const report = { startedAt: new Date().toISOString(), commit: spawnSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).stdout.trim(),
-  source: { dirty: spawnSync('git', ['diff', '--quiet'], { cwd: root }).status !== 0,
+const report = { startedAt: new Date().toISOString(), commit: spawnSync(git, ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).stdout.trim(),
+  source: { dirty: spawnSync(git, ['diff', '--quiet'], { cwd: root }).status !== 0,
     assessmentServiceSha256: createHash('sha256').update(readFileSync(path.join(backend, 'app/Services/Concerns/SubmitsCourseAssessments.php'))).digest('hex'),
     finalExamServiceSha256: createHash('sha256').update(readFileSync(path.join(backend, 'app/Services/Concerns/ProcessesFinalExamSubmissions.php'))).digest('hex'),
     studentAnswerValidatorSha256: createHash('sha256').update(readFileSync(path.join(backend, 'app/Services/StudentAssessmentAnswerValidator.php'))).digest('hex') },
@@ -130,7 +133,7 @@ try {
     targets.push({ port: workerPort, pending: 0, agent: new Agent({ keepAlive: true, maxSockets: 1 }) });
   }
   proxy = createServer((incoming, outgoing) => {
-    const target = targets.reduce((best, candidate) => candidate.pending < best.pending ? candidate : best);
+    const target = targets.reduce((best, candidate) => candidate.pending < best.pending ? candidate : best, targets[0]);
     target.pending++;
     const upstream = request({ host: '127.0.0.1', port: target.port, path: incoming.url,
       method: incoming.method, agent: target.agent, headers: incoming.headers }, response => {
@@ -140,7 +143,11 @@ try {
     let finished = false;
     const finish = () => { if (!finished) { finished = true; target.pending--; } };
     upstream.on('close', finish);
-    upstream.on('error', () => { finish(); if (!outgoing.headersSent) outgoing.writeHead(502); outgoing.end(); });
+    upstream.on('error', () => {
+      finish();
+      if (!outgoing.headersSent) outgoing.writeHead(502);
+      outgoing.end();
+    });
     incoming.pipe(upstream);
   });
   proxy.listen(proxyPort, '127.0.0.1');

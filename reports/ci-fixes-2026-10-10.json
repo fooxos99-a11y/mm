@@ -1,0 +1,303 @@
+{
+  "title": "ممارس — إصلاح فحوص GitHub وأداء الجوال",
+  "generatedAt": "2026-10-10T03:07:53.148Z",
+  "baselineHead": "a6ed38498a8a6bacb4d431a81f9f740837d47ce6",
+  "status": "local_verification_complete_after_request_timeout_rechecks_remote_sonar_and_new_deployment_pending_user_upload",
+  "verifiedSource": [
+    {
+      "path": ".github/workflows/deploy.yml",
+      "sha256": "CB2C3DB72642BE2EDD6A7083CDEB65A633D8A9F7127DC5DACA7FC45BD24F43C4"
+    },
+    {
+      "path": "frontend/index.html",
+      "sha256": "F7727AA7F5C3AD44959EEA2A5F480BA24BBA509E3E5EE947BDEE798F60F18615"
+    },
+    {
+      "path": "frontend/scripts/check-mobile-performance.mjs",
+      "sha256": "1B1959DEC1DDB292E2AFC33EC0D74A152EAA2EEE1BF478B1696A23EADA478CA8"
+    },
+    {
+      "path": "frontend/src/main.js",
+      "sha256": "3B06F09F187CF368E329E3B997A5FDEBB0120F87C6CE02B9924BED6736CA58D2"
+    },
+    {
+      "path": "frontend/e2e/lazy-vuetify.spec.mjs",
+      "sha256": "DDC907C4F673B994F152DCFA8A0A019F9A60CBDAC4E42B6BAEEF91A79DA0229F"
+    },
+    {
+      "path": "scripts/capacity/run-local.mjs",
+      "sha256": "4A9C45ED77A3E2BCCE71F89DD1CE6C9857E5EF8014B19022FEF4F4C0BCCF1518"
+    },
+    {
+      "path": "scripts/capacity/workload.mjs",
+      "sha256": "DA6D4C6F3ED0B3D4BC367FAE61DAFB7B70A81FA9D915BE4519D7865B8FF8211E"
+    },
+    {
+      "path": "scripts/capacity/fixture.php",
+      "sha256": "C01D7C9271FD20B1BF502D4D96E8DDF5C966F7775027077D802CD40B95CD8F76"
+    },
+    {
+      "path": "scripts/wait-for-commit-checks.mjs",
+      "sha256": "1B298FDC3F2C7FFCBC38828D82DA4D29FC80FFF882CD9280AE33C6B0E49EC9E3"
+    },
+    {
+      "path": "scripts/wait-for-commit-checks.test.mjs",
+      "sha256": "921F9AB8760EAE909C4EDD378260AAE4C08784F9D9E1F0EF4A85DF3D3FE3E45A"
+    },
+    {
+      "path": "package.json",
+      "sha256": "E3C68B8BD311030D9F869BCBF5D790EDD4036364A0595B78D9DD2C0DBD9BDA0B"
+    },
+    {
+      "path": "sonar-project.properties",
+      "sha256": "40C341C64816B9E669514DE57E3AF6747592A8CF82AEE1012729745CC9A7FBFA"
+    },
+    {
+      "path": ".sonarcloud.properties",
+      "sha256": "2CC35F54AE28D4D950274531903444BB7221798609B1B6D876E5D0907A1865F2"
+    },
+    {
+      "path": ".github/workflows/monitor-production.yml",
+      "sha256": "42FE68E0E5BFF7804A38747E9032336E0E0668AB53C8B9324F42A67664E551CB"
+    }
+  ],
+  "baseline": {
+    "frontend": {
+      "failure": "check:mobile-performance",
+      "score": 85,
+      "requiredScore": 90,
+      "lcpMs": 2412,
+      "maxLcpMs": 2500
+    },
+    "sonar": {
+      "duplicationOnNewCode": 5.9,
+      "maxDuplication": 3,
+      "reliability": "D",
+      "security": "B",
+      "requiredRating": "A"
+    },
+    "previousDeployment": {
+      "success": true,
+      "run": "https://github.com/fooxos99-a11y/mm/actions/runs/38011374036"
+    }
+  },
+  "fixes": [
+    {
+      "id": "CI01",
+      "action": "تحميل Vuetify عند دخول الصفحات التي تحتاجه، قبل عرضها؛ الصفحة الرئيسية تبدأ بمكوناتها الخفيفة.",
+      "files": [
+        "frontend/src/main.js"
+      ]
+    },
+    {
+      "id": "CI02",
+      "action": "تحميل خط عنوان الصفحة مبكرًا، مع تحويل مساره الصحيح تلقائيًا عند البناء.",
+      "files": [
+        "frontend/index.html"
+      ]
+    },
+    {
+      "id": "CI03",
+      "action": "إصلاح ترتيب حالات HTTP وتحديد قيمة البداية عند اختيار العامل الأقل انشغالًا.",
+      "files": [
+        "scripts/capacity/workload.mjs",
+        "scripts/capacity/run-local.mjs"
+      ]
+    },
+    {
+      "id": "CI04",
+      "action": "تشغيل Git من المسار المعتمد عوض البحث عنه في PATH؛ توضيح حدود شرط معالجة خطأ الوكيل.",
+      "files": [
+        "scripts/capacity/run-local.mjs"
+      ]
+    },
+    {
+      "id": "CI05",
+      "action": "توحيد إعداد التحليل التلقائي وCI: تصنيف تقارير الفحص كأدلة مولدة، وتصنيف ملفات الاختبار كاختبارات. يبقى تحليل كود التطبيق فعالًا والحد 3% كما هو.",
+      "files": [
+        ".sonarcloud.properties",
+        "sonar-project.properties"
+      ]
+    },
+    {
+      "id": "CI06",
+      "action": "اشتراط نجاح Verify وSonarCloud لنفس رقم النسخة قبل الرفع والتفعيل؛ غياب النتيجة أو رفض الوصول أو الفشل يمنع النشر.",
+      "files": [
+        ".github/workflows/deploy.yml",
+        "scripts/wait-for-commit-checks.mjs"
+      ]
+    },
+    {
+      "id": "CI07",
+      "action": "إدراج أداء الجوال ضمن الفحص الكامل وفحص النشر التلقائي، وتشغيل اختبارات بوابة النشر. ينتهي الفحص الكامل بإعادة بناء الإنتاج وفحصه بعد اختبارات المتصفح، لتجنب رفع بناء التجربة الذي يستخدم مسارًا وAPI محليين.",
+      "files": [
+        "package.json",
+        ".github/workflows/deploy.yml"
+      ]
+    },
+    {
+      "id": "CI08",
+      "action": "إصلاح ترتيب استيرادات PHP في تجهيز بيانات قياس التحمل؛ كان يمنع تشغيل الأداة بخطأ Kernel.",
+      "files": [
+        "scripts/capacity/fixture.php"
+      ]
+    },
+    {
+      "id": "CI09",
+      "action": "إتاحة حفظ نتيجة Lighthouse الكاملة في ملف عند طلب التشخيص، مع إبقاء درجات النجاح دون تخفيف.",
+      "files": [
+        "frontend/scripts/check-mobile-performance.mjs"
+      ]
+    },
+    {
+      "id": "CI10",
+      "action": "إصلاح إعداد مراقبة الإنتاج الذي فشل لأن MONITOR_URL فارغ: استخدام بيئة production المعتمدة، ثم رابط المراقبة المخصص أو رابط DEPLOY_URL المعتمد دون تغيير الأسرار.",
+      "files": [
+        ".github/workflows/monitor-production.yml"
+      ]
+    }
+  ],
+  "verification": {
+    "fullCommand": "npm run verify:full",
+    "initialFullCommandExitCode": 1,
+    "finalStageOrder": "اكتمل تشغيل الفحص الكامل ثم إعادة بناء الإنتاج وفحص الحزمة وأداء الجوال. عُدّل ترتيب الأمر أثناء تشغيل اختبارات المتصفح ليضمن هذه الخطوات النهائية في التشغيلات التالية؛ لم تتغير ملفات التطبيق أثناء التشغيل.",
+    "backendTests": 211,
+    "frontendUnitTests": 131,
+    "browser": {
+      "total": 360,
+      "passed": 354,
+      "initiallyFailed": 2,
+      "skipped": 4,
+      "duration": "1.1h",
+      "viewports": [
+        320,
+        390,
+        768,
+        1024,
+        1440
+      ],
+      "method": "Chrome headless، بيانات SQLite مؤقتة معزولة؛ أربعة استثناءات لمس على سطح المكتب كما في الاختبارات الأصلية.",
+      "rechecks": [
+        {
+          "scenario": "student pre displays saved question types and submits the exact selected answers",
+          "viewport": 1024,
+          "passedRuns": 3,
+          "applicationChanged": false,
+          "cause": "auth/session request exceeded the existing 12000 ms HTTP deadline, so the protected route showed login before questions",
+          "rootCause": "لم يُحسم سبب التأخر الداخلي لخادم الاختبار؛ أُعيدت الحالة نفسها دون تغيير التطبيق أو زيادة المهلة أو تخفيف التحقق."
+        },
+        {
+          "scenario": "remaining dashboard panels expose usable controls and dialogs",
+          "viewport": 1440,
+          "passedRuns": 3,
+          "applicationChanged": false,
+          "cause": "dashboard request exceeded the existing 12000 ms HTTP deadline; the UI reported timeout of 12000ms exceeded before the notifications list rendered",
+          "rootCause": "لم يُحسم سبب التأخر الداخلي لخادم الاختبار؛ أُعيدت الحالة نفسها دون تغيير التطبيق أو زيادة المهلة أو تخفيف التحقق."
+        }
+      ]
+    },
+    "operationsTests": 8,
+    "lazyVuetifyRegression": "نجح على المقاسات الخمسة؛ يشمل نافذة الدخول ثم الإدارة وإعادة التحميل.",
+    "releaseGate": "اختبارات النجاح والفشل والانتظار، النسخة الدقيقة، المحاولة الأحدث، مصدر Sonar الصحيح، البيانات الناقصة ورفض API؛ وأعيد تطبيقها على ردود GitHub الحقيقية للنسخة القديمة فحُظر نشرها.",
+    "mobile": {
+      "score": 99,
+      "lcpMs": 2156,
+      "requiredScore": 90,
+      "maxLcpMs": 2500,
+      "localBefore": {
+        "score": 97,
+        "lcpMs": 2483
+      },
+      "initialJsGzipKiB": {
+        "before": 62.37,
+        "after": 44.39
+      }
+    },
+    "other": [
+      "البناء الإنتاجي النهائي",
+      "حجم الحزمة",
+      "ESLint",
+      "فحص الأسرار وحجم الملفات والاعتماديات",
+      "Laravel Pint",
+      "صيغة PHP وJavaScript",
+      "صيغة YAML وترتيب بوابة الفحص قبل الرفع",
+      "git diff --check",
+      "مطابقة بصمات ملفات التطبيق المفحوصة"
+    ],
+    "capacity": {
+      "source": "assessment-capacity-2026-10-10T01-58-33-328Z.json",
+      "kind": "smoke_check_not_production_capacity_measurement",
+      "workers": 2,
+      "participantsInWave": 1,
+      "completeAnswers": 20,
+      "duplicateRetry": {
+        "ok": true,
+        "statuses": [
+          201,
+          422
+        ]
+      },
+      "guards": {
+        "unauthenticated": {
+          "ok": true,
+          "status": 401,
+          "ms": 290
+        },
+        "csrfCookie": {
+          "ok": true,
+          "status": 204,
+          "ms": 228
+        },
+        "login": {
+          "ok": true,
+          "status": 200,
+          "ms": 471
+        },
+        "missingCsrf": {
+          "ok": true,
+          "status": 419,
+          "ms": 232
+        },
+        "anotherIdentity": {
+          "ok": true,
+          "status": 422,
+          "ms": 278
+        },
+        "validSubmission": {
+          "ok": true,
+          "status": 201,
+          "ms": 229
+        },
+        "duplicateSubmission": {
+          "ok": true,
+          "status": 422,
+          "ms": 244
+        }
+      },
+      "persistedIntegrity": {
+        "submissions": 3,
+        "answers": 60,
+        "duplicates": 0,
+        "incomplete": 0
+      }
+    }
+  },
+  "limitations": [
+    "هذه التعديلات الجديدة محلية ولم أنشرها أو أنشئ لها commit؛ الرفع بواسطة المستخدم كما اتُّفق.",
+    "حكم SonarCloud النهائي للنسخة الجديدة ينتظر رفعها وإعادة التحليل. النتائج القديمة الفاشلة لا تتغير بمجرد تعديل الملفات محليًا.",
+    "اختبارات بوابة النشر محلية ومن ردود GitHub الفعلية، وتشغيلها داخل GitHub Actions للنسخة الجديدة ينتظر الرفع.",
+    "لم يُنفذ SQL إنتاجي ولم تُغيّر أسئلة أو إجابات المستخدمين الفعليين. اختبار MySQL استخدم قاعدة جديدة مؤقتة فقط.",
+    "تجربة التحمل هنا تثبت عمل الأداة وسلامة الحفظ والطلبات المتزامنة؛ لا تثبت عدد الطلاب الذي يتحمله موقع الإنتاج.",
+    "الفشل الأول لتجهيز بيانات أداة التحمل حُفظ كدليل مؤقت؛ أصلحت السبب وأعدت التجربة بنجاح.",
+    "ملاحظات Sonar الأخرى التي لا تسبب فشل شروط الجودة ليست ادعاء أنها حُلّت كلها؛ عولجت أسباب الفشل المحددة في هذه الجولة.",
+    "سجل الفحص الكامل إخفاقين بسبب انتهاء مهلة طلب الخادم: التحقق من الجلسة في القبلي على 1024، وتحميل بيانات لوحة الإشعارات على 1440. أُعيدت كل حالة ثلاث مرات ونجحت دون تغيير التطبيق أو المهلة أو تخفيف التحقق. السبب الداخلي للتأخر لم يُحسم، وبوابة النشر ستشترط نجاح تشغيل GitHub الجديد.",
+    "ظهرت مراقبة الإنتاج بفشل إضافي بسبب الرابط الفارغ. أصلحت إعداد workflow محليًا؛ نجاح تشغيل المراقبة في GitHub ينتظر الرفع ولم أرسل تنبيهًا خارجيًا."
+  ],
+  "sources": [
+    "https://github.com/fooxos99-a11y/mm/actions/runs/38011373999/job/114091926603",
+    "https://sonarcloud.io/dashboard?id=fooxos99-a11y_mm&branch=main",
+    "https://developer.chrome.com/docs/performance/insights/render-blocking",
+    "https://docs.github.com/en/rest/actions/workflow-runs",
+    "https://docs.github.com/en/rest/checks/runs"
+  ]
+}

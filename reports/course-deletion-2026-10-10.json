@@ -1,0 +1,120 @@
+{
+  "title": "ممارس — حذف الدورات والمهام مع الإجابات المحفوظة",
+  "generatedAt": "2026-10-10T03:26:00.725Z",
+  "status": "local_verification_passed_pending_user_upload",
+  "cause": "كانت خدمة الحذف ترفض أي دورة أو مهمة لها تسليمات. العلاقات المرجعية تمنع حذف أسئلة لها إجابات؛ لذلك لا تكفي إزالة رسالة المنع وحدها.",
+  "behavior": [
+    "يُسمح بحذف الدورة أو المهمة المحددة حتى مع وجود إجابات ونتائج محفوظة.",
+    "تُحذف الإجابات والتسليمات أولًا، ثم الدورة وأسئلتها والتحضير والاستبيانات والردود المرتبطة بها، داخل معاملة واحدة.",
+    "يشمل الحذف بيانات القبلي والبعدي والمهام المرتبطة بالدورة، بما فيها السجلات المؤرشفة والأسئلة المحذوفة سابقًا.",
+    "تُحذف المرفقات المملوكة بعد نجاح المعاملة، ويُحفظ المرفق المشترك إذا بقي مستخدمًا في سجل آخر.",
+    "يتضمن تأكيد الحذف توضيحًا بأن الأسئلة والإجابات والنتائج والمرفقات ستُحذف نهائيًا."
+  ],
+  "preserved": [
+    "الدورات والمهام الأخرى وبياناتها",
+    "الحسابات",
+    "قوالب المهام العامة",
+    "أسئلة الاستبيان العامة",
+    "الاختبار النهائي المستقل",
+    "حاويات الأرشيف غير المملوكة للدورة"
+  ],
+  "verification": {
+    "backend": {
+      "passed": 228,
+      "assertions": 1950,
+      "newDeletionCases": 17,
+      "command": "npm test"
+    },
+    "frontend": {
+      "passed": 131,
+      "failed": 0,
+      "command": "npm run test:frontend"
+    },
+    "browser": {
+      "passed": 8,
+      "browser": "Chrome",
+      "viewports": [
+        "390 × 844",
+        "1440 × 900"
+      ],
+      "flows": [
+        "حذف من القبلي",
+        "حذف من البعدي",
+        "حذف مهمة بأسئلة",
+        "حذف مهمة بمستند"
+      ],
+      "assertions": [
+        "وجود إجابة محفوظة قبل الحذف",
+        "إلغاء الحذف يبقي البيانات",
+        "الحذف يرجع 204",
+        "اختفاء الدورة وإجاباتها بعد إعادة التحميل",
+        "بقاء دورة أخرى",
+        "وضوح التأكيد وعدم تجاوز العرض"
+      ],
+      "command": "node frontend/scripts/run-e2e.mjs course-deletion.spec.mjs --project=mobile-390 --project=desktop-1440"
+    },
+    "securityAndIntegrity": [
+      "رفض الزائر والطالب والمشرف دون صلاحية",
+      "رفض صلاحية القبلي وحدها عند حذف دورة لها بعدي",
+      "نجاح المدير والمشرف بالصلاحيات المطلوبة",
+      "استعادة البيانات والمرفقات عند فشل المعاملة",
+      "حماية المرفقات المشتركة في أنواع المراجع الأربعة"
+    ],
+    "quality": [
+      "Frontend lint: passed",
+      "Code-size gate: passed",
+      "Secret scan: passed",
+      "Production build: passed",
+      "Bundle budget: passed",
+      "git diff --check: passed"
+    ],
+    "initialBundle": {
+      "jsGzipKiB": 44.4,
+      "cssGzipKiB": 10.93
+    }
+  },
+  "limits": [
+    "الفحص محلي بقاعدة بيانات ومرفقات تجربة معزولة.",
+    "تجارب المتصفح الحالية تخص الحذف؛ لم يُعد تشغيل الفحص الكامل لكل الشاشات في هذا التعديل.",
+    "لم تُحذف بيانات من الموقع الفعلي ولم تُنشر أو تُدفع التعديلات إلى GitHub.",
+    "تطبيق الإصلاح يتطلب رفع الخلفية والواجهة معًا. لا يتطلب ترحيلًا جديدًا لقاعدة البيانات."
+  ],
+  "verifiedSource": [
+    {
+      "path": "backend/app/Services/Concerns/ManagesCourseLifecycle.php",
+      "sha256": "6680d0eab8b642c3c915c7115d0652ff081ce936579969df2d9d740fec23a2f6"
+    },
+    {
+      "path": "backend/app/Services/AssessmentAttachmentService.php",
+      "sha256": "eb5f0c085a9cdc23bf256f9a84f36e78ce3b67053d14eba8ea0865c36284a19f"
+    },
+    {
+      "path": "backend/tests/Feature/AssessmentHistoryProtectionTest.php",
+      "sha256": "efe46889d3c449348a4d015b356befd8eeabcbf91507a692b1308cfd038f1705"
+    },
+    {
+      "path": "backend/tests/Feature/CourseDeletionTest.php",
+      "sha256": "17a7d9f7381ff20b72e6b3407a0cbb6a8f860fa8c0b81bd72009cdc123bb3bda"
+    },
+    {
+      "path": "frontend/src/components/assessment/AssessmentCourseDialogs.vue",
+      "sha256": "9b862454501b26c6e63dca163df4e0d1899f3f458879d15fc4427a3639344066"
+    },
+    {
+      "path": "frontend/src/components/tasks/TaskManagementDialogs.vue",
+      "sha256": "e0243504fc2b94dd925f5ebe5207ca3e5cd6e092584daac341fac03365ee5bd6"
+    },
+    {
+      "path": "frontend/src/components/results/ResultsDialogs.vue",
+      "sha256": "b33697a3663bed2ae9ba3ce3b1c5c7fc1051f35c8fc8fd285358b3915667526a"
+    },
+    {
+      "path": "frontend/e2e/course-deletion.spec.mjs",
+      "sha256": "f1d8d0599a58b0f423dad760cfddfcbf7fc63072fc78c4bdc61b3898e126892f"
+    }
+  ],
+  "previousReports": [
+    "combined-audit-2026-10-09.html",
+    "ci-fixes-2026-10-10.html"
+  ]
+}

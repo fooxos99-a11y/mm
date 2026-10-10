@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Throwable;
@@ -71,6 +72,22 @@ class AssessmentAttachmentService
                 // Cleanup must not invalidate an otherwise successful transaction.
             }
         }
+    }
+
+    public function deleteIfUnreferenced(string $path): void
+    {
+        foreach ([
+            'course_questions' => 'attachment_path',
+            'final_exam_questions' => 'attachment_path',
+            'course_submission_answers' => 'file_path',
+            'final_exam_submission_answers' => 'file_path',
+        ] as $table => $column) {
+            if (DB::table($table)->where($column, $path)->exists()) {
+                return;
+            }
+        }
+
+        $this->delete($path);
     }
 
     private function storeUploadedFile(UploadedFile $file): string

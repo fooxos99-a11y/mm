@@ -17,6 +17,8 @@ on:
 
 permissions:
   contents: read
+  actions: read
+  checks: read
 
 concurrency:
   group: deploy-${{ inputs.environment || 'production' }}
@@ -44,12 +46,16 @@ jobs:
       - run: npm ci --prefix frontend --no-audit --no-fund --ignore-scripts
       - run: composer install --working-dir=backend --no-interaction --prefer-dist --no-progress --no-ansi
       - run: cp backend/.env.example backend/.env && php backend/artisan key:generate
-      # Pushes to main deploy after the fast gate (secrets, size, lint, unit, backend tests, build).
-      # Manual runs keep the full release gate, including browser tests.
+      # Pushes also wait for Verify (including browser/MySQL tests) and SonarCloud below.
+      # Manual runs keep the full local release gate.
       - if: github.event_name == 'push'
-        run: npm run verify:quick && npm test && npm run build && npm --prefix frontend run check:bundle
+        run: npm run verify:quick && npm test && npm run build && npm --prefix frontend run check:bundle && npm --prefix frontend run check:mobile-performance && npm run test:operations
       - if: github.event_name != 'push'
         run: npm run verify:release
+      - name: Require successful Verify and SonarCloud for this commit
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/wait-for-commit-checks.mjs
       - name: Package immutable release
         run: tar --exclude=release.tgz --exclude=.git --exclude='.*-logs' --exclude=frontend/node_modules --exclude=backend/vendor --exclude=backend/storage --exclude=backend/.env -czf "$RUNNER_TEMP/release.tgz" .
       - name: Configure SSH host verification

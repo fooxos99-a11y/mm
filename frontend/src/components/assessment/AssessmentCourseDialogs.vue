@@ -160,6 +160,9 @@
             هل أنت متأكد من حذف {{ isTasksPage ? 'المهمة' : 'الدورة' }}
             <strong>{{ deleteTitle || 'المحددة' }}</strong>؟
           </p>
+          <p class="assessment-dialog__text">
+            ستُحذف الأسئلة والإجابات والنتائج والمرفقات المرتبطة نهائيًا. لا يمكن التراجع.
+          </p>
         </AppDialogBody>
         <AppDialogFooter class="assessment-dialog__footer">
           <AppButton

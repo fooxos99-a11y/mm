@@ -16,6 +16,7 @@ jobs:
   monitor:
     runs-on: ubuntu-24.04
     timeout-minutes: 3
+    environment: production
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
@@ -23,7 +24,7 @@ jobs:
           node-version: '22'
       - name: Check availability, latency, errors and queue health
         env:
-          MONITOR_URL: ${{ secrets.PRODUCTION_MONITOR_URL }}
+          MONITOR_URL: ${{ secrets.PRODUCTION_MONITOR_URL || secrets.DEPLOY_URL }}
           ALERT_WEBHOOK_URL: ${{ secrets.OPERATIONS_ALERT_WEBHOOK_URL }}
           MONITOR_MAX_LATENCY_MS: '2000'
         run: node scripts/monitor-production.mjs

@@ -100,10 +100,12 @@ class AssessmentHistoryProtectionTest extends TestCase
         $this->putJson('/api/dashboard/courses/'.$courseId, ['isActive' => false])
             ->assertNoContent();
         $this->deleteJson('/api/dashboard/courses/'.$courseId)
-            ->assertUnprocessable();
+            ->assertNoContent();
 
-        $this->assertDatabaseHas('courses', ['id' => $courseId, 'title' => 'History course']);
-        $this->assertDatabaseHas('course_questions', ['id' => $questionId]);
+        $this->assertDatabaseMissing('courses', ['id' => $courseId]);
+        $this->assertDatabaseMissing('course_questions', ['id' => $questionId]);
+        $this->assertDatabaseMissing('course_submissions', ['id' => $submission->json('id')]);
+        $this->assertDatabaseMissing('course_submission_answers', ['submission_id' => $submission->json('id')]);
     }
 
     public function test_bulk_import_validates_question_scope_and_stores_snapshots(): void
