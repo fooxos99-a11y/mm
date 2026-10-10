@@ -27,7 +27,10 @@ return new class extends Migration
     public function down(): void
     {
         // MySQL may replace the implicit course foreign-key index with the composite unique index.
-        if (! Schema::hasIndex('satisfaction_questions', ['course_id'])) {
+        if (
+            in_array(Schema::getConnection()->getDriverName(), ['mysql', 'mariadb'], true)
+            && ! Schema::hasIndex('satisfaction_questions', ['course_id'])
+        ) {
             Schema::table('satisfaction_questions', function (Blueprint $table) {
                 $table->index('course_id', 'satisfaction_questions_course_id_index');
             });

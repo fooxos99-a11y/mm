@@ -207,7 +207,10 @@ return new class extends Migration
         }
 
         // Keep the submission foreign key indexed when MySQL removes the composite index.
-        if (! Schema::hasIndex($tableName, ['submission_id'])) {
+        if (
+            in_array(Schema::getConnection()->getDriverName(), ['mysql', 'mariadb'], true)
+            && ! Schema::hasIndex($tableName, ['submission_id'])
+        ) {
             Schema::table($tableName, function (Blueprint $table) use ($tableName): void {
                 $table->index('submission_id', $tableName.'_submission_id_index');
             });

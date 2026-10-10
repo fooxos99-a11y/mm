@@ -68,7 +68,10 @@ return new class extends Migration
 
     public function down(): void
     {
-        if (! Schema::hasIndex('course_submissions', ['course_id'])) {
+        if (
+            in_array(Schema::getConnection()->getDriverName(), ['mysql', 'mariadb'], true)
+            && ! Schema::hasIndex('course_submissions', ['course_id'])
+        ) {
             Schema::table('course_submissions', function (Blueprint $table) {
                 $table->index('course_id', 'course_submissions_course_id_index');
             });

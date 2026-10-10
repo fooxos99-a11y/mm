@@ -52,7 +52,10 @@ return new class extends Migration
             'students', 'course_attendance', 'course_submissions', 'course_submission_answers',
             'final_exam_questions', 'final_exam_submissions', 'final_exam_submission_answers',
         ] as $tableName) {
-            if (! Schema::hasIndex($tableName, ['archive_id'])) {
+            if (
+                in_array(Schema::getConnection()->getDriverName(), ['mysql', 'mariadb'], true)
+                && ! Schema::hasIndex($tableName, ['archive_id'])
+            ) {
                 Schema::table($tableName, function (Blueprint $table) use ($tableName): void {
                     $table->index('archive_id', $tableName.'_archive_id_index');
                 });
