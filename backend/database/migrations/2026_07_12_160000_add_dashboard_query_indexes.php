@@ -47,6 +47,18 @@ return new class extends Migration
 
     public function down(): void
     {
+        // Composite lookup indexes may have replaced MySQL's implicit archive foreign-key indexes.
+        foreach ([
+            'students', 'course_attendance', 'course_submissions', 'course_submission_answers',
+            'final_exam_questions', 'final_exam_submissions', 'final_exam_submission_answers',
+        ] as $tableName) {
+            if (! Schema::hasIndex($tableName, ['archive_id'])) {
+                Schema::table($tableName, function (Blueprint $table) use ($tableName): void {
+                    $table->index('archive_id', $tableName.'_archive_id_index');
+                });
+            }
+        }
+
         Schema::table('registration_requests', function (Blueprint $table) {
             $table->dropIndex('registration_branch_status_created_index');
             $table->dropIndex('registration_gender_status_created_index');

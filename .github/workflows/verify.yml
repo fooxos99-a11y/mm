@@ -114,6 +114,15 @@ jobs:
       - run: npm run build
       - run: npm run check:bundle
       - run: npm run check:mobile-performance
+        env:
+          MOBILE_PERFORMANCE_REPORT: ${{ runner.temp }}/mobile-performance.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: mobile-performance
+          path: ${{ runner.temp }}/mobile-performance*.json
+          if-no-files-found: warn
+          retention-days: 14
 
   e2e:
     runs-on: ubuntu-24.04
@@ -144,3 +153,4 @@ jobs:
       - run: ./node_modules/.bin/playwright install --with-deps chromium
       - run: npm run build
       - run: npm run test:e2e:dist -- --project=${{ matrix.project }}
+
