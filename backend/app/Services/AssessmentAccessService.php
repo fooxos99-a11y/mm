@@ -13,7 +13,8 @@ class AssessmentAccessService
     public function __construct(
         private readonly StudentAssessmentAnswerValidator $answerValidator,
         private readonly StudentSatisfactionResponseValidator $satisfactionValidator,
-    ) {}
+    ) {
+    }
 
     public function prepareCourseSubmission(?User $user, bool $publicRoute, array $data): array
     {

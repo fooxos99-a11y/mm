@@ -26,16 +26,7 @@ test('public pages have no serious accessibility violations', async ({ page }) =
   }
 });
 
-test('management pages have no serious accessibility violations', async ({ page }) => {
-  await page.goto('login', { waitUntil: 'domcontentloaded' });
-  await page.locator('input[autocomplete="username"]').fill(adminLogin);
-  await page.locator('input[autocomplete="current-password"]').fill(adminPassword);
-  await Promise.all([
-    page.waitForURL((url) => url.pathname === '/momars/dashboard'),
-    page.locator('form button[type="submit"]').click(),
-  ]);
-
-  const pages = [
+const managementPages = [
     ['dashboard', '.dashboard-page'],
     ['dashboard?panel=finalexam', '.final-exam-page'],
     ['dashboard?panel=satisfaction', '.satisfaction-admin'],
@@ -48,11 +39,20 @@ test('management pages have no serious accessibility violations', async ({ page 
     ['dashboard?panel=settings&settingsItem=home', '.home-page-settings'],
     ['dashboard?panel=settings&settingsItem=archive', '.admin-archive-view'],
     ['dashboard?panel=settings&settingsItem=permissions', '.permissions-admin'],
-  ];
+];
 
-  for (const [path, readySelector] of pages) {
+for (const [path, readySelector] of managementPages) {
+  test(`management page ${path} has no serious accessibility violations`, async ({ page }) => {
+    await page.goto('login', { waitUntil: 'domcontentloaded' });
+    await page.locator('input[autocomplete="username"]').fill(adminLogin);
+    await page.locator('input[autocomplete="current-password"]').fill(adminPassword);
+    await Promise.all([
+      page.waitForURL((url) => url.pathname === '/momars/dashboard'),
+      page.locator('form button[type="submit"]').click(),
+    ]);
+
     await page.goto(path);
     await expect(page.locator(readySelector)).toBeVisible();
     await expectAccessiblePage(page, path);
-  }
-});
+  });
+}

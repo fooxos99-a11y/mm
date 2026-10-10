@@ -1,0 +1,6553 @@
+{
+  "title": "ممارس — تقرير الإصلاح والتحقق والجاهزية للرفع",
+  "generatedAt": "2026-10-10T00:55:40.247Z",
+  "status": "ready_for_user_upload_with_production_retest_pending",
+  "site": "https://license-qb.us/",
+  "baselineHead": "9d22f8eeaee16a23c43fab186cd75e8184d9e512",
+  "currentHead": "8cf0c443a446e1209400680d67c934ec8a8fc861",
+  "verifiedSource": [
+    {
+      "file": "frontend/src/features/editor/richTextEditor.js",
+      "sha256": "d22ab4f833e1d62f42cc3a157f0c57d9b94261840b8b2892dfa3d06c816da8f6"
+    },
+    {
+      "file": "frontend/src/features/editor/editorCoreMethods.js",
+      "sha256": "c6f27e68b8133a5751945104d7fd423572d6faa0b11b68b54c2f5ce04ca33922"
+    },
+    {
+      "file": "frontend/src/features/tasks/tasksView.js",
+      "sha256": "ba15399a5fc810baebd9d719dbb9172c04f88ea61fa3641e648d67d7b7008269"
+    },
+    {
+      "file": "frontend/src/components/RichTextEditor.vue",
+      "sha256": "d3e803a3fe2bc7eb89d631136701d2056c91495ead53c6adf15b4a77bce21587"
+    },
+    {
+      "file": "frontend/src/components/ui/AppDialog.vue",
+      "sha256": "1e69b7b632bf05576ba2d0b6fbe1e64ed4a0d0dce2b4cd772d12474bbff79834"
+    },
+    {
+      "file": "backend/app/Services/Concerns/ProcessesRegistrationRequests.php",
+      "sha256": "94702cd404622f09f788277524daeed8774a06036204b20e923a3941a5f3f778"
+    },
+    {
+      "file": "backend/app/Services/AssessmentAccessService.php",
+      "sha256": "681c6d191efe33cb7d7c61cbc819993a731d348cd9ea8d3b92c0e5773074cb22"
+    },
+    {
+      "file": "backend/tests/Feature/QuestionDeletionTest.php",
+      "sha256": "3e7885511852a2801b4984a647b6caf1174d09299b043baf4325dff757ed34e7"
+    },
+    {
+      "file": "backend/tests/Feature/RegistrationDuplicateTest.php",
+      "sha256": "896b3d0fd62ce8738d2f7b2f4e5b49fb6ef8fbba87b44fc6ea9a111d13059889"
+    },
+    {
+      "file": "frontend/e2e/document-persistence.spec.mjs",
+      "sha256": "38fe0cecdfb6fdee3c05e968fbc75ab77f4f677208aac598c105132142a11580"
+    },
+    {
+      "file": "frontend/e2e/audit-dialog-registration.spec.mjs",
+      "sha256": "7ab14f00866e9f3588e96fdae3223b9e10a3736e2b53bed5845369ae5ae8c475"
+    },
+    {
+      "file": "frontend/e2e/accessibility.spec.mjs",
+      "sha256": "6536a78a621505338d071d3be9cd5dde70a3e9b2c860a35a5b010d4b14ba223b"
+    },
+    {
+      "file": "frontend/e2e/people-directory.spec.mjs",
+      "sha256": "61a013f77bb17ae8ef3fccf8b2fc374b0a77e5842a5b6614820f502c00189fd1"
+    }
+  ],
+  "scope": "إصلاح المشاكل الأربع الجديدة في التقرير المنشور، والتحقق المحلي الكامل. التقرير الموحد السابق محفوظ كاملًا.",
+  "changes": [
+    {
+      "finding": "PW-F02",
+      "title": "حفظ قالب Word وإجابات الطالب",
+      "status": "verified_locally",
+      "causes": [
+        "حدث input الأصلي كان يصل إلى المكوّن الأب بدل نص HTML، فيُحفظ [object InputEvent].",
+        "تمرير كائن Quill داخل Vue ككائن تفاعلي غيّر هوية كائناته وأربك مؤشر الكتابة العربية.",
+        "فحص وجود إجابة الطالب عبر Object.hasOwn لم يتتبع إضافة المفتاح الجديد، فبقيت القيمة المحسوبة على القالب القديم."
+      ],
+      "fixes": [
+        "تعريف حدث input ضمن emits ليصل المحتوى النصي الصحيح إلى المكوّن الأب.",
+        "حفظ نسخة Quill عبر markRaw للحفاظ على هوية كائناتها.",
+        "قراءة مفتاح الإجابة مباشرة لتتبع مسودة الطالب، مع إبقاء المسودة الفارغة المقصودة."
+      ],
+      "proof": [
+        "كتابة عربية فعلية في Chrome، ومقارنة النص حرفيًا، وتنسيقه بالعريض.",
+        "تعطيل أول حفظ باستجابة 500: ظهرت رسالة فشل وبقيت المسودة، ثم نجحت إعادة الحفظ.",
+        "استرجاع القالب المنسق من الخادم وإعادة فتحه بعد تحميل جديد.",
+        "حسابان جديدان من فرعي المعلمين والمعلمات: إجابة كل حساب أُرسلت بطلب multipart واسترجعت من الخادم بعد التحميل، ثم ظهرت بالقيمة نفسها في بيانات المدير.",
+        "رفض تعديل قالب المدير من كل حساب طالب باستجابة 403، وعدم ظهور أخطاء JavaScript في السيناريو."
+      ],
+      "files": [
+        "frontend/src/features/editor/richTextEditor.js",
+        "frontend/src/features/editor/editorCoreMethods.js",
+        "frontend/src/features/tasks/tasksView.js"
+      ],
+      "reference": "https://vuejs.org/api/reactivity-advanced.html#markraw",
+      "limitation": "النص الذي فُقد قبل الإصلاح لا يمكن استعادته من [object InputEvent]؛ يحتاج إلى نسخة احتياطية أو المصدر الأصلي."
+    },
+    {
+      "finding": "PW-F01",
+      "title": "منع تكرار طلب التسجيل المعلّق بالجوال نفسه",
+      "status": "verified_locally",
+      "fixes": [
+        "تنفيذ فحص التكرار والإنشاء وحفظ البيانات الإضافية داخل معاملة واحدة.",
+        "قفل صف إعداد التسجيل أثناء المعاملة، وإعادة فحص أن التسجيل مفتوح.",
+        "إظهار رسالة عربية توضح أن الطلب السابق قيد المراجعة."
+      ],
+      "proof": [
+        "إرسال طلبين من العميل: 201 للأول و422 للمكرر، وطلب معلّق واحد فقط.",
+        "إعادة الإرسال من النموذج تعرض السبب وتبقي الاسم المدخل.",
+        "رفض المكرر لا يغيّر ملف الطلب الأصلي، ويُسمح بجوال مختلف أو إعادة طلب مرفوض بعد تصحيحه، ويُمنع الطلب عند إغلاق التسجيل."
+      ],
+      "files": [
+        "backend/app/Services/Concerns/ProcessesRegistrationRequests.php",
+        "backend/tests/Feature/RegistrationDuplicateTest.php",
+        "frontend/e2e/audit-dialog-registration.spec.mjs"
+      ],
+      "limitation": "لا تنظيف للطلبات المكررة القديمة. اختبار الطلبين محلي على SQLite وخادم PHP واحد؛ ليس قياسًا لتزامن MySQL الإنتاجي."
+    },
+    {
+      "finding": "PW-F03",
+      "title": "أسماء عربية لأدوات محرر المستند والخطوط",
+      "status": "verified_locally",
+      "fixes": [
+        "تسمية أزرار التنسيق والقوائم والروابط والصور والمسافة البادئة وإزالة التنسيق ومقابض الصور.",
+        "تعريف حقل التحرير كنص متعدد الأسطر باسم محتوى المستند.",
+        "تسمية قائمة اختيار الخط وعناصرها بعد إنشائها من Quill."
+      ],
+      "proof": [
+        "فحص Axe داخل المحرر دون مخالفات، ثم اختيار الخط العربي التقليدي وفحص المحرر مجددًا دون مخالفات."
+      ],
+      "files": [
+        "frontend/src/features/editor/editorCoreMethods.js",
+        "frontend/src/components/RichTextEditor.vue",
+        "frontend/e2e/document-persistence.spec.mjs"
+      ],
+      "limitation": "فحص وصول آلي محدد؛ ليس إثباتًا لاستخدام قارئ شاشة فعلي أو معاينة بصرية شاملة."
+    },
+    {
+      "finding": "PW-F04",
+      "title": "اسم النافذة يتبع عنوانها عند إعادة الاستخدام",
+      "status": "verified_locally",
+      "fixes": [
+        "ربط aria-labelledby بعنوان النافذة الحي بدل نسخ عنوان سابق إلى aria-label."
+      ],
+      "proof": [
+        "تبديل فتح القبلي والبعدي والمهام، ثم إضافة معلم/ة وتعديله: الاسم المقروء يطابق عنوان كل نافذة."
+      ],
+      "files": [
+        "frontend/src/components/ui/AppDialog.vue",
+        "frontend/e2e/audit-dialog-registration.spec.mjs"
+      ]
+    }
+  ],
+  "formattingOnly": [
+    "backend/app/Services/AssessmentAccessService.php",
+    "backend/tests/Feature/QuestionDeletionTest.php"
+  ],
+  "checks": [
+    {
+      "name": "الخادم",
+      "command": "npm test",
+      "status": "passed",
+      "tests": 211,
+      "assertions": 1696
+    },
+    {
+      "name": "الواجهة والتغطية",
+      "command": "npm run verify:quick",
+      "status": "passed",
+      "tests": 131,
+      "coverage": {
+        "lines": 99.41,
+        "branches": 86.8,
+        "functions": 100
+      },
+      "note": "نسب التغطية للملفات المحددة في سكربت المشروع، وليست لكل سطر في Vue."
+    },
+    {
+      "name": "الأسرار وحجم الملفات وESLint وسياسة التبعيات",
+      "command": "npm run verify:quick",
+      "status": "passed",
+      "note": "لا ثغرات عالية أو حرجة حسب سياسة npm audit، وفحص أسرار أخير بعد تجهيز التقرير."
+    },
+    {
+      "name": "تنسيق PHP",
+      "command": "node ../scripts/run-php.mjs vendor/bin/pint --test (cwd: backend)",
+      "status": "passed"
+    },
+    {
+      "name": "تشغيل المراقبة",
+      "command": "npm run test:operations",
+      "status": "passed",
+      "tests": 3,
+      "note": "اختبارات محلية للسكربت؛ لم تُفعّل مراقبة دورية للموقع."
+    },
+    {
+      "name": "المتصفح الكامل",
+      "command": "node frontend/scripts/run-e2e.mjs (full + targeted people + explicit remaining test list)",
+      "status": "passed",
+      "total": 355,
+      "passed": 351,
+      "skipped": 4,
+      "failed": 0,
+      "flaky": 0,
+      "durationMs": 6646740.861,
+      "projects": [
+        "mobile-320",
+        "mobile-390",
+        "tablet-768",
+        "laptop-1024",
+        "desktop-1440"
+      ],
+      "note": "Google Chrome، بيانات SQLite وحسابات تجريبية معزولة، مسار /momars، دون صور تلقائية."
+    },
+    {
+      "name": "البناء العادي بعد فحص المتصفح",
+      "command": "npm run build",
+      "status": "passed",
+      "note": "أُعيد البناء بعد انتهاء E2E حتى لا تكون الحزمة الأخيرة مبنية بعنوان الخادم التجريبي."
+    },
+    {
+      "name": "ميزانية الحزمة",
+      "command": "npm --prefix frontend run check:bundle",
+      "status": "passed",
+      "initialJsKiB": 62.36,
+      "initialCssKiB": 11.4,
+      "limitsKiB": {
+        "js": 100,
+        "css": 12
+      }
+    },
+    {
+      "name": "سلامة diff",
+      "command": "git diff --check",
+      "status": "passed"
+    }
+  ],
+  "coverageGroups": [
+    {
+      "file": "accessibility.spec.mjs",
+      "title": "الوصول في الصفحات العامة وصفحات الإدارة",
+      "total": 65,
+      "passed": 65,
+      "skipped": 0
+    },
+    {
+      "file": "assessment-admin.spec.mjs",
+      "title": "محررات الاختبارات وأوامر الدورات والمهام",
+      "total": 25,
+      "passed": 25,
+      "skipped": 0
+    },
+    {
+      "file": "assessment-recovery.spec.mjs",
+      "title": "استرجاع الإجابات عند فشل الحفظ أو فقدان التأكيد",
+      "total": 40,
+      "passed": 40,
+      "skipped": 0
+    },
+    {
+      "file": "audit-dialog-registration.spec.mjs",
+      "title": "أسماء النوافذ ومنع التسجيل المكرر",
+      "total": 10,
+      "passed": 10,
+      "skipped": 0
+    },
+    {
+      "file": "auth.spec.mjs",
+      "title": "الدخول وواجهة الإدارة",
+      "total": 10,
+      "passed": 10,
+      "skipped": 0
+    },
+    {
+      "file": "critical-workflows.spec.mjs",
+      "title": "حفظ بيانات الإدارة الأساسية",
+      "total": 5,
+      "passed": 5,
+      "skipped": 0
+    },
+    {
+      "file": "document-persistence.spec.mjs",
+      "title": "قالب Word وإجابات الحسابين وأدوات المحرر",
+      "total": 10,
+      "passed": 10,
+      "skipped": 0
+    },
+    {
+      "file": "management-panels.spec.mjs",
+      "title": "لوحات الإدارة",
+      "total": 5,
+      "passed": 5,
+      "skipped": 0
+    },
+    {
+      "file": "mobile-interaction-regressions.spec.mjs",
+      "title": "اللمس والنوافذ على الجوال",
+      "total": 15,
+      "passed": 11,
+      "skipped": 4
+    },
+    {
+      "file": "password-csrf.spec.mjs",
+      "title": "تغيير كلمة المرور والمصادقة والتحقق",
+      "total": 5,
+      "passed": 5,
+      "skipped": 0
+    },
+    {
+      "file": "people-branch.spec.mjs",
+      "title": "تعديل فرع المستخدم وحفظه",
+      "total": 5,
+      "passed": 5,
+      "skipped": 0
+    },
+    {
+      "file": "people-directory.spec.mjs",
+      "title": "بحث المستخدمين وتقسيم النتائج إلى صفحات",
+      "total": 10,
+      "passed": 10,
+      "skipped": 0
+    },
+    {
+      "file": "question-deletion.spec.mjs",
+      "title": "حذف أسئلة القبلي والبعدي والمهام والنهائي مع حفظ الإجابات السابقة",
+      "total": 25,
+      "passed": 25,
+      "skipped": 0
+    },
+    {
+      "file": "question-save.spec.mjs",
+      "title": "حفظ الأسئلة واسترجاعها",
+      "total": 20,
+      "passed": 20,
+      "skipped": 0
+    },
+    {
+      "file": "registration.spec.mjs",
+      "title": "التسجيل وأسئلته",
+      "total": 15,
+      "passed": 15,
+      "skipped": 0
+    },
+    {
+      "file": "remaining-panels.spec.mjs",
+      "title": "بقية صفحات الإدارة ونوافذها",
+      "total": 5,
+      "passed": 5,
+      "skipped": 0
+    },
+    {
+      "file": "responsive.spec.mjs",
+      "title": "تجاوب الصفحات العامة مع المقاسات",
+      "total": 5,
+      "passed": 5,
+      "skipped": 0
+    },
+    {
+      "file": "results-directory.spec.mjs",
+      "title": "دليل النتائج والبحث",
+      "total": 5,
+      "passed": 5,
+      "skipped": 0
+    },
+    {
+      "file": "rich-text-security.spec.mjs",
+      "title": "أمان المحتوى المنسق في المحرر",
+      "total": 5,
+      "passed": 5,
+      "skipped": 0
+    },
+    {
+      "file": "role-journeys.spec.mjs",
+      "title": "الدخول وصفحات الأدوار المختلفة",
+      "total": 30,
+      "passed": 30,
+      "skipped": 0
+    },
+    {
+      "file": "satisfaction-courses.spec.mjs",
+      "title": "الرضا وربطه بالدورات والأسئلة العامة",
+      "total": 5,
+      "passed": 5,
+      "skipped": 0
+    },
+    {
+      "file": "student-dashboard.spec.mjs",
+      "title": "نتائج الطالب على المقاسات المختلفة",
+      "total": 5,
+      "passed": 5,
+      "skipped": 0
+    },
+    {
+      "file": "student-question-types.spec.mjs",
+      "title": "ظهور أنواع الأسئلة وإرسال الاختيارات الصحيحة للطالب",
+      "total": 20,
+      "passed": 20,
+      "skipped": 0
+    },
+    {
+      "file": "student-satisfaction.spec.mjs",
+      "title": "إرسال رضا الطالب واسترجاع تأكيده",
+      "total": 10,
+      "passed": 10,
+      "skipped": 0
+    }
+  ],
+  "verificationStages": [
+    {
+      "stage": "الجولة الشاملة الأولى",
+      "stats": {
+        "startTime": "2026-10-09T22:56:29.190Z",
+        "duration": 3618297.795,
+        "expected": 178,
+        "skipped": 171,
+        "unexpected": 1,
+        "flaky": 0
+      },
+      "usedPassedCases": 176,
+      "replacedPeopleCases": 2,
+      "note": "توقفت عند مهلة اختبار قائمة المستخدمين الطويل. أُعيد تقسيم هذا الاختبار دون تغيير مهلة 120 ثانية أو حذف أي فحص؛ أُبقيت نتائج بقية الحالات الناجحة."
+    },
+    {
+      "stage": "إعادة اختبار دليل المستخدمين المقسم على 768",
+      "stats": {
+        "startTime": "2026-10-10T00:00:16.042Z",
+        "duration": 132465.616,
+        "expected": 2,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "usedPassedCases": 2
+    },
+    {
+      "stage": "استكمال الحالات المتبقية والاختبار المقسم على بقية المقاسات",
+      "stats": {
+        "startTime": "2026-10-10T00:05:26.403Z",
+        "duration": 2895977.45,
+        "expected": 173,
+        "skipped": 4,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "usedPassedCases": 173,
+      "skippedCases": 4,
+      "note": "استخدمت قائمة Playwright صريحة للحالات غير المنفذة مع اختبارات دليل المستخدمين الجديدة؛ لم تُعد الحالات الناجحة غير المتغيرة."
+    },
+    {
+      "stage": "مطابقة كتالوج الحالات الحالي",
+      "declaredCases": 355,
+      "verifiedCases": 355,
+      "note": "كل حالة معلنة في المقاسات الخمسة لها نتيجة تنفيذ، ولا توجد حالة محذوفة أو معلقة مخفية."
+    }
+  ],
+  "browserCases": [
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 20,
+      "title": "accessibility.spec.mjs / public pages have no serious accessibility violations",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 20879,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard has no serious accessibility violations",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 28054,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=finalexam has no serious accessibility violations",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 12093,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=satisfaction has no serious accessibility violations",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 12489,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=users has no serious accessibility violations",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 11887,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=notifications has no serious accessibility violations",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 15107,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=materials has no serious accessibility violations",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 10752,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=results has no serious accessibility violations",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 9325,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=completion has no serious accessibility violations",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 7591,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=settings&settingsItem=registration has no serious accessibility violations",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 4688,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=settings&settingsItem=home has no serious accessibility violations",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 10080,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=settings&settingsItem=archive has no serious accessibility violations",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3384,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=settings&settingsItem=permissions has no serious accessibility violations",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3647,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 20,
+      "title": "accessibility.spec.mjs / public pages have no serious accessibility violations",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 22311,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard has no serious accessibility violations",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 7555,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=finalexam has no serious accessibility violations",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 7781,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=satisfaction has no serious accessibility violations",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 8816,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=users has no serious accessibility violations",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 7834,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=notifications has no serious accessibility violations",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 8129,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=materials has no serious accessibility violations",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 8531,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=results has no serious accessibility violations",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 7863,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=completion has no serious accessibility violations",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 9318,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=settings&settingsItem=registration has no serious accessibility violations",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 9167,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=settings&settingsItem=home has no serious accessibility violations",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 13304,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=settings&settingsItem=archive has no serious accessibility violations",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 9513,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=settings&settingsItem=permissions has no serious accessibility violations",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 10908,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 20,
+      "title": "accessibility.spec.mjs / public pages have no serious accessibility violations",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 20494,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard has no serious accessibility violations",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 7669,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=finalexam has no serious accessibility violations",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 8768,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=satisfaction has no serious accessibility violations",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 8615,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=users has no serious accessibility violations",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 8536,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=notifications has no serious accessibility violations",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 8320,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=materials has no serious accessibility violations",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 4322,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=results has no serious accessibility violations",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 7987,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=completion has no serious accessibility violations",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 9567,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=settings&settingsItem=registration has no serious accessibility violations",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 8676,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=settings&settingsItem=home has no serious accessibility violations",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 11979,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=settings&settingsItem=archive has no serious accessibility violations",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 9441,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=settings&settingsItem=permissions has no serious accessibility violations",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 8404,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-admin.spec.mjs",
+      "line": 26,
+      "title": "assessment-admin.spec.mjs / dashboard overview shows truthful indicator context",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 2994,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-admin.spec.mjs",
+      "line": 33,
+      "title": "assessment-admin.spec.mjs / manager can add and save a task question from the plus menu",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 5425,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-admin.spec.mjs",
+      "line": 86,
+      "title": "assessment-admin.spec.mjs / task start action opens its availability dialog",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 4911,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-admin.spec.mjs",
+      "line": 99,
+      "title": "assessment-admin.spec.mjs / final exam question editor keeps the same clear assessment layout",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 7047,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-admin.spec.mjs",
+      "line": 148,
+      "title": "assessment-admin.spec.mjs / course and task management actions stay inside the shared dropdown",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 31806,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-admin.spec.mjs",
+      "line": 26,
+      "title": "assessment-admin.spec.mjs / dashboard overview shows truthful indicator context",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 5533,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-admin.spec.mjs",
+      "line": 33,
+      "title": "assessment-admin.spec.mjs / manager can add and save a task question from the plus menu",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 9158,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-admin.spec.mjs",
+      "line": 86,
+      "title": "assessment-admin.spec.mjs / task start action opens its availability dialog",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 7873,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-admin.spec.mjs",
+      "line": 99,
+      "title": "assessment-admin.spec.mjs / final exam question editor keeps the same clear assessment layout",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 7859,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-admin.spec.mjs",
+      "line": 148,
+      "title": "assessment-admin.spec.mjs / course and task management actions stay inside the shared dropdown",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 7459,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-admin.spec.mjs",
+      "line": 26,
+      "title": "assessment-admin.spec.mjs / dashboard overview shows truthful indicator context",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 5445,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-admin.spec.mjs",
+      "line": 33,
+      "title": "assessment-admin.spec.mjs / manager can add and save a task question from the plus menu",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 4183,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-admin.spec.mjs",
+      "line": 86,
+      "title": "assessment-admin.spec.mjs / task start action opens its availability dialog",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3438,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-admin.spec.mjs",
+      "line": 99,
+      "title": "assessment-admin.spec.mjs / final exam question editor keeps the same clear assessment layout",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 5198,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-admin.spec.mjs",
+      "line": 148,
+      "title": "assessment-admin.spec.mjs / course and task management actions stay inside the shared dropdown",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 8238,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-recovery.spec.mjs",
+      "line": 5,
+      "title": "assessment-recovery.spec.mjs / pre retains failed answers and confirms saved file-only attempts despite a refresh outage",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 30733,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-recovery.spec.mjs",
+      "line": 62,
+      "title": "assessment-recovery.spec.mjs / pre recovers a confirmation lost after the server has saved the answers",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 26257,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-recovery.spec.mjs",
+      "line": 5,
+      "title": "assessment-recovery.spec.mjs / post retains failed answers and confirms saved file-only attempts despite a refresh outage",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 28365,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-recovery.spec.mjs",
+      "line": 62,
+      "title": "assessment-recovery.spec.mjs / post recovers a confirmation lost after the server has saved the answers",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 26187,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-recovery.spec.mjs",
+      "line": 5,
+      "title": "assessment-recovery.spec.mjs / tasks retains failed answers and confirms saved file-only attempts despite a refresh outage",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 25614,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-recovery.spec.mjs",
+      "line": 62,
+      "title": "assessment-recovery.spec.mjs / tasks recovers a confirmation lost after the server has saved the answers",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 22334,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-recovery.spec.mjs",
+      "line": 5,
+      "title": "assessment-recovery.spec.mjs / final retains failed answers and confirms saved file-only attempts despite a refresh outage",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 20789,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-recovery.spec.mjs",
+      "line": 62,
+      "title": "assessment-recovery.spec.mjs / final recovers a confirmation lost after the server has saved the answers",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 19891,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-recovery.spec.mjs",
+      "line": 5,
+      "title": "assessment-recovery.spec.mjs / pre retains failed answers and confirms saved file-only attempts despite a refresh outage",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 16698,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-recovery.spec.mjs",
+      "line": 62,
+      "title": "assessment-recovery.spec.mjs / pre recovers a confirmation lost after the server has saved the answers",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 8377,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-recovery.spec.mjs",
+      "line": 5,
+      "title": "assessment-recovery.spec.mjs / post retains failed answers and confirms saved file-only attempts despite a refresh outage",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 17024,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-recovery.spec.mjs",
+      "line": 62,
+      "title": "assessment-recovery.spec.mjs / post recovers a confirmation lost after the server has saved the answers",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 21439,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-recovery.spec.mjs",
+      "line": 5,
+      "title": "assessment-recovery.spec.mjs / tasks retains failed answers and confirms saved file-only attempts despite a refresh outage",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 19377,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-recovery.spec.mjs",
+      "line": 62,
+      "title": "assessment-recovery.spec.mjs / tasks recovers a confirmation lost after the server has saved the answers",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 19019,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-recovery.spec.mjs",
+      "line": 5,
+      "title": "assessment-recovery.spec.mjs / final retains failed answers and confirms saved file-only attempts despite a refresh outage",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 19587,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-recovery.spec.mjs",
+      "line": 62,
+      "title": "assessment-recovery.spec.mjs / final recovers a confirmation lost after the server has saved the answers",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 18421,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-recovery.spec.mjs",
+      "line": 5,
+      "title": "assessment-recovery.spec.mjs / pre retains failed answers and confirms saved file-only attempts despite a refresh outage",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 20343,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-recovery.spec.mjs",
+      "line": 62,
+      "title": "assessment-recovery.spec.mjs / pre recovers a confirmation lost after the server has saved the answers",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 18856,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-recovery.spec.mjs",
+      "line": 5,
+      "title": "assessment-recovery.spec.mjs / post retains failed answers and confirms saved file-only attempts despite a refresh outage",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 22517,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-recovery.spec.mjs",
+      "line": 62,
+      "title": "assessment-recovery.spec.mjs / post recovers a confirmation lost after the server has saved the answers",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 21394,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-recovery.spec.mjs",
+      "line": 5,
+      "title": "assessment-recovery.spec.mjs / tasks retains failed answers and confirms saved file-only attempts despite a refresh outage",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 19681,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-recovery.spec.mjs",
+      "line": 62,
+      "title": "assessment-recovery.spec.mjs / tasks recovers a confirmation lost after the server has saved the answers",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 19847,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-recovery.spec.mjs",
+      "line": 5,
+      "title": "assessment-recovery.spec.mjs / final retains failed answers and confirms saved file-only attempts despite a refresh outage",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 20602,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-recovery.spec.mjs",
+      "line": 62,
+      "title": "assessment-recovery.spec.mjs / final recovers a confirmation lost after the server has saved the answers",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 22714,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "audit-dialog-registration.spec.mjs",
+      "line": 6,
+      "title": "audit-dialog-registration.spec.mjs / shared dialog names follow pre, post, tasks and edit titles after reuse",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 20119,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "audit-dialog-registration.spec.mjs",
+      "line": 36,
+      "title": "audit-dialog-registration.spec.mjs / public duplicate submissions keep one pending request and show a recoverable error",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 15189,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "audit-dialog-registration.spec.mjs",
+      "line": 6,
+      "title": "audit-dialog-registration.spec.mjs / shared dialog names follow pre, post, tasks and edit titles after reuse",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 17983,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "audit-dialog-registration.spec.mjs",
+      "line": 36,
+      "title": "audit-dialog-registration.spec.mjs / public duplicate submissions keep one pending request and show a recoverable error",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 15960,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "audit-dialog-registration.spec.mjs",
+      "line": 6,
+      "title": "audit-dialog-registration.spec.mjs / shared dialog names follow pre, post, tasks and edit titles after reuse",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 19034,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "audit-dialog-registration.spec.mjs",
+      "line": 36,
+      "title": "audit-dialog-registration.spec.mjs / public duplicate submissions keep one pending request and show a recoverable error",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 14271,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "auth.spec.mjs",
+      "line": 14,
+      "title": "auth.spec.mjs / protected dashboard redirects guests to login",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 1334,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "auth.spec.mjs",
+      "line": 22,
+      "title": "auth.spec.mjs / admin can sign in and use the responsive dashboard shell",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 10907,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "auth.spec.mjs",
+      "line": 14,
+      "title": "auth.spec.mjs / protected dashboard redirects guests to login",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 1340,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "auth.spec.mjs",
+      "line": 22,
+      "title": "auth.spec.mjs / admin can sign in and use the responsive dashboard shell",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 9075,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "auth.spec.mjs",
+      "line": 14,
+      "title": "auth.spec.mjs / protected dashboard redirects guests to login",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 1328,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "auth.spec.mjs",
+      "line": 22,
+      "title": "auth.spec.mjs / admin can sign in and use the responsive dashboard shell",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 8029,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "critical-workflows.spec.mjs",
+      "line": 5,
+      "title": "critical-workflows.spec.mjs / admin critical data workflows persist through the browser API session",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 18986,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "critical-workflows.spec.mjs",
+      "line": 5,
+      "title": "critical-workflows.spec.mjs / admin critical data workflows persist through the browser API session",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 16330,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "critical-workflows.spec.mjs",
+      "line": 5,
+      "title": "critical-workflows.spec.mjs / admin critical data workflows persist through the browser API session",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 25772,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "document-persistence.spec.mjs",
+      "line": 8,
+      "title": "document-persistence.spec.mjs / document template and both student answers survive real typing, failed save, submission and reload",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 56072,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "document-persistence.spec.mjs",
+      "line": 118,
+      "title": "document-persistence.spec.mjs / document toolbar exposes Arabic names for formatting and font choices",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 5440,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "document-persistence.spec.mjs",
+      "line": 8,
+      "title": "document-persistence.spec.mjs / document template and both student answers survive real typing, failed save, submission and reload",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 46897,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "document-persistence.spec.mjs",
+      "line": 118,
+      "title": "document-persistence.spec.mjs / document toolbar exposes Arabic names for formatting and font choices",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 11355,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "document-persistence.spec.mjs",
+      "line": 8,
+      "title": "document-persistence.spec.mjs / document template and both student answers survive real typing, failed save, submission and reload",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 76229,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "document-persistence.spec.mjs",
+      "line": 118,
+      "title": "document-persistence.spec.mjs / document toolbar exposes Arabic names for formatting and font choices",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 26507,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "management-panels.spec.mjs",
+      "line": 28,
+      "title": "management-panels.spec.mjs / management panels remain usable across the viewport matrix",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 9796,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "management-panels.spec.mjs",
+      "line": 28,
+      "title": "management-panels.spec.mjs / management panels remain usable across the viewport matrix",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 23122,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "management-panels.spec.mjs",
+      "line": 28,
+      "title": "management-panels.spec.mjs / management panels remain usable across the viewport matrix",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 25045,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "mobile-interaction-regressions.spec.mjs",
+      "line": 5,
+      "title": "mobile-interaction-regressions.spec.mjs / mobile sidebar scrolls, contains focus and cleans up on resize",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 4518,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "mobile-interaction-regressions.spec.mjs",
+      "line": 29,
+      "title": "mobile-interaction-regressions.spec.mjs / short mobile dialogs expose save and cancel after a touch swipe",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 34202,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "mobile-interaction-regressions.spec.mjs",
+      "line": 50,
+      "title": "mobile-interaction-regressions.spec.mjs / user and satisfaction dialogs have accessible field names and contrast",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 15989,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "mobile-interaction-regressions.spec.mjs",
+      "line": 5,
+      "title": "mobile-interaction-regressions.spec.mjs / mobile sidebar scrolls, contains focus and cleans up on resize",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 7280,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "mobile-interaction-regressions.spec.mjs",
+      "line": 29,
+      "title": "mobile-interaction-regressions.spec.mjs / short mobile dialogs expose save and cancel after a touch swipe",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 45013,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "mobile-interaction-regressions.spec.mjs",
+      "line": 50,
+      "title": "mobile-interaction-regressions.spec.mjs / user and satisfaction dialogs have accessible field names and contrast",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 15994,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "mobile-interaction-regressions.spec.mjs",
+      "line": 5,
+      "title": "mobile-interaction-regressions.spec.mjs / mobile sidebar scrolls, contains focus and cleans up on resize",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 7378,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "mobile-interaction-regressions.spec.mjs",
+      "line": 29,
+      "title": "mobile-interaction-regressions.spec.mjs / short mobile dialogs expose save and cancel after a touch swipe",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 44357,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "mobile-interaction-regressions.spec.mjs",
+      "line": 50,
+      "title": "mobile-interaction-regressions.spec.mjs / user and satisfaction dialogs have accessible field names and contrast",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 13998,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "password-csrf.spec.mjs",
+      "line": 6,
+      "title": "password-csrf.spec.mjs / password change refreshes stale CSRF while preserving authentication and validation",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 32997,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "password-csrf.spec.mjs",
+      "line": 6,
+      "title": "password-csrf.spec.mjs / password change refreshes stale CSRF while preserving authentication and validation",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 24547,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "people-branch.spec.mjs",
+      "line": 3,
+      "title": "people-branch.spec.mjs / people editor changes branch and saves female users",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 20008,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "people-branch.spec.mjs",
+      "line": 3,
+      "title": "people-branch.spec.mjs / people editor changes branch and saves female users",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 23482,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "people-branch.spec.mjs",
+      "line": 3,
+      "title": "people-branch.spec.mjs / people editor changes branch and saves female users",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 24504,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "question-deletion.spec.mjs",
+      "line": 32,
+      "title": "question-deletion.spec.mjs / delete every pre question through the UI while keeping previous answers",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 20793,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "question-deletion.spec.mjs",
+      "line": 32,
+      "title": "question-deletion.spec.mjs / delete every post question through the UI while keeping previous answers",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 25006,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "question-deletion.spec.mjs",
+      "line": 32,
+      "title": "question-deletion.spec.mjs / delete every tasks question through the UI while keeping previous answers",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 24640,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "question-deletion.spec.mjs",
+      "line": 76,
+      "title": "question-deletion.spec.mjs / final exam supports successive delete-only saves without forcing a new question",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 17818,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "question-deletion.spec.mjs",
+      "line": 100,
+      "title": "question-deletion.spec.mjs / deleting a global satisfaction indicator keeps answers and stops future inheritance",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 20321,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "question-deletion.spec.mjs",
+      "line": 32,
+      "title": "question-deletion.spec.mjs / delete every pre question through the UI while keeping previous answers",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 15825,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "question-deletion.spec.mjs",
+      "line": 32,
+      "title": "question-deletion.spec.mjs / delete every post question through the UI while keeping previous answers",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 19363,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "question-deletion.spec.mjs",
+      "line": 32,
+      "title": "question-deletion.spec.mjs / delete every tasks question through the UI while keeping previous answers",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 21283,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "question-deletion.spec.mjs",
+      "line": 76,
+      "title": "question-deletion.spec.mjs / final exam supports successive delete-only saves without forcing a new question",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 21070,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "question-deletion.spec.mjs",
+      "line": 100,
+      "title": "question-deletion.spec.mjs / deleting a global satisfaction indicator keeps answers and stops future inheritance",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 18309,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "question-save.spec.mjs",
+      "line": 7,
+      "title": "question-save.spec.mjs / saved pre questions remain visible and editable for every question type",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 19439,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "question-save.spec.mjs",
+      "line": 7,
+      "title": "question-save.spec.mjs / saved post questions remain visible and editable for every question type",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 19697,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "question-save.spec.mjs",
+      "line": 7,
+      "title": "question-save.spec.mjs / saved tasks questions remain visible and editable for every question type",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 17640,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "question-save.spec.mjs",
+      "line": 71,
+      "title": "question-save.spec.mjs / final exam saves and edits all question types without losing true/false options",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 20724,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "question-save.spec.mjs",
+      "line": 7,
+      "title": "question-save.spec.mjs / saved pre questions remain visible and editable for every question type",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 21321,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "question-save.spec.mjs",
+      "line": 7,
+      "title": "question-save.spec.mjs / saved post questions remain visible and editable for every question type",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 21468,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "question-save.spec.mjs",
+      "line": 7,
+      "title": "question-save.spec.mjs / saved tasks questions remain visible and editable for every question type",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 23086,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "question-save.spec.mjs",
+      "line": 71,
+      "title": "question-save.spec.mjs / final exam saves and edits all question types without losing true/false options",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 38395,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "registration.spec.mjs",
+      "line": 19,
+      "title": "registration.spec.mjs / public registration persists a complete request",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 16729,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "registration.spec.mjs",
+      "line": 111,
+      "title": "registration.spec.mjs / admin renames fixed registration questions without changing their types",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 18875,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "registration.spec.mjs",
+      "line": 157,
+      "title": "registration.spec.mjs / registration question toggles show a visible checkbox state",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 8882,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "registration.spec.mjs",
+      "line": 19,
+      "title": "registration.spec.mjs / public registration persists a complete request",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 21452,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "registration.spec.mjs",
+      "line": 111,
+      "title": "registration.spec.mjs / admin renames fixed registration questions without changing their types",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 16196,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "registration.spec.mjs",
+      "line": 157,
+      "title": "registration.spec.mjs / registration question toggles show a visible checkbox state",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 8344,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "remaining-panels.spec.mjs",
+      "line": 30,
+      "title": "remaining-panels.spec.mjs / remaining dashboard panels expose usable controls and dialogs",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 48306,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "remaining-panels.spec.mjs",
+      "line": 30,
+      "title": "remaining-panels.spec.mjs / remaining dashboard panels expose usable controls and dialogs",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 43855,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "responsive.spec.mjs",
+      "line": 29,
+      "title": "responsive.spec.mjs / public pages fit the viewport and expose usable controls",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 4166,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "responsive.spec.mjs",
+      "line": 29,
+      "title": "responsive.spec.mjs / public pages fit the viewport and expose usable controls",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3381,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "results-directory.spec.mjs",
+      "line": 3,
+      "title": "results-directory.spec.mjs / results page searches, paginates and retains full attendance totals without a snapshot",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 39089,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "results-directory.spec.mjs",
+      "line": 3,
+      "title": "results-directory.spec.mjs / results page searches, paginates and retains full attendance totals without a snapshot",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 38765,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "rich-text-security.spec.mjs",
+      "line": 9,
+      "title": "rich-text-security.spec.mjs / client rich text sanitizer strips executable HTML before rendering",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 519,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "rich-text-security.spec.mjs",
+      "line": 9,
+      "title": "rich-text-security.spec.mjs / client rich text sanitizer strips executable HTML before rendering",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 391,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "role-journeys.spec.mjs",
+      "line": 59,
+      "title": "role-journeys.spec.mjs / e2e-male-manager can sign in and use its responsive home",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 5332,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "role-journeys.spec.mjs",
+      "line": 59,
+      "title": "role-journeys.spec.mjs / e2e-female-manager can sign in and use its responsive home",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 4913,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "role-journeys.spec.mjs",
+      "line": 59,
+      "title": "role-journeys.spec.mjs / e2e-reciter-role can sign in and use its responsive home",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 5587,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "role-journeys.spec.mjs",
+      "line": 59,
+      "title": "role-journeys.spec.mjs / e2e-student-role can sign in and use its responsive home",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 12835,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "role-journeys.spec.mjs",
+      "line": 59,
+      "title": "role-journeys.spec.mjs / e2e-trainee-role can sign in and use its responsive home",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 9432,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "role-journeys.spec.mjs",
+      "line": 113,
+      "title": "role-journeys.spec.mjs / manager panels load without browser or server errors",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 39707,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "role-journeys.spec.mjs",
+      "line": 59,
+      "title": "role-journeys.spec.mjs / e2e-male-manager can sign in and use its responsive home",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 5299,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "role-journeys.spec.mjs",
+      "line": 59,
+      "title": "role-journeys.spec.mjs / e2e-female-manager can sign in and use its responsive home",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 5006,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "role-journeys.spec.mjs",
+      "line": 59,
+      "title": "role-journeys.spec.mjs / e2e-reciter-role can sign in and use its responsive home",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 5775,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "role-journeys.spec.mjs",
+      "line": 59,
+      "title": "role-journeys.spec.mjs / e2e-student-role can sign in and use its responsive home",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 13307,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "role-journeys.spec.mjs",
+      "line": 59,
+      "title": "role-journeys.spec.mjs / e2e-trainee-role can sign in and use its responsive home",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 8706,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "role-journeys.spec.mjs",
+      "line": 113,
+      "title": "role-journeys.spec.mjs / manager panels load without browser or server errors",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 42778,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "satisfaction-courses.spec.mjs",
+      "line": 6,
+      "title": "satisfaction-courses.spec.mjs / satisfaction includes courses with closed post tests and inherits general questions",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 15425,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "satisfaction-courses.spec.mjs",
+      "line": 6,
+      "title": "satisfaction-courses.spec.mjs / satisfaction includes courses with closed post tests and inherits general questions",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 14992,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "student-dashboard.spec.mjs",
+      "line": 5,
+      "title": "student-dashboard.spec.mjs / student results remain usable across the responsive viewport matrix",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 16108,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "student-dashboard.spec.mjs",
+      "line": 5,
+      "title": "student-dashboard.spec.mjs / student results remain usable across the responsive viewport matrix",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 15318,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "student-question-types.spec.mjs",
+      "line": 8,
+      "title": "student-question-types.spec.mjs / student pre displays saved question types and submits the exact selected answers",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 17976,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "student-question-types.spec.mjs",
+      "line": 8,
+      "title": "student-question-types.spec.mjs / student post displays saved question types and submits the exact selected answers",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 26663,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "student-question-types.spec.mjs",
+      "line": 8,
+      "title": "student-question-types.spec.mjs / student tasks displays saved question types and submits the exact selected answers",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 23686,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "student-question-types.spec.mjs",
+      "line": 8,
+      "title": "student-question-types.spec.mjs / student final displays saved question types and submits the exact selected answers",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 28923,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "student-question-types.spec.mjs",
+      "line": 8,
+      "title": "student-question-types.spec.mjs / student pre displays saved question types and submits the exact selected answers",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 19065,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "student-question-types.spec.mjs",
+      "line": 8,
+      "title": "student-question-types.spec.mjs / student post displays saved question types and submits the exact selected answers",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 18437,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "student-question-types.spec.mjs",
+      "line": 8,
+      "title": "student-question-types.spec.mjs / student tasks displays saved question types and submits the exact selected answers",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 30458,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "student-question-types.spec.mjs",
+      "line": 8,
+      "title": "student-question-types.spec.mjs / student final displays saved question types and submits the exact selected answers",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 28341,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "student-satisfaction.spec.mjs",
+      "line": 17,
+      "title": "student-satisfaction.spec.mjs / student can save the separate satisfaction page and select the lowest rating",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 38895,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "student-satisfaction.spec.mjs",
+      "line": 40,
+      "title": "student-satisfaction.spec.mjs / separate survey recovers when its saved confirmation is lost",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 27435,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "student-satisfaction.spec.mjs",
+      "line": 17,
+      "title": "student-satisfaction.spec.mjs / student can save the separate satisfaction page and select the lowest rating",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 21129,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "student-satisfaction.spec.mjs",
+      "line": 40,
+      "title": "student-satisfaction.spec.mjs / separate survey recovers when its saved confirmation is lost",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 19725,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "people-directory.spec.mjs",
+      "line": 36,
+      "title": "people-directory.spec.mjs / people directory searches, pages and edits real server results with usable touch controls",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 50204,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "people-directory.spec.mjs",
+      "line": 95,
+      "title": "people-directory.spec.mjs / people directory pages reciter choices and preserves other links after assigning and unlinking a student",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 52613,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "people-directory.spec.mjs",
+      "line": 36,
+      "title": "people-directory.spec.mjs / people directory searches, pages and edits real server results with usable touch controls",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 43590,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "people-directory.spec.mjs",
+      "line": 95,
+      "title": "people-directory.spec.mjs / people directory pages reciter choices and preserves other links after assigning and unlinking a student",
+      "project": "mobile-320",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 53426,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "people-directory.spec.mjs",
+      "line": 36,
+      "title": "people-directory.spec.mjs / people directory searches, pages and edits real server results with usable touch controls",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 44043,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "people-directory.spec.mjs",
+      "line": 95,
+      "title": "people-directory.spec.mjs / people directory pages reciter choices and preserves other links after assigning and unlinking a student",
+      "project": "mobile-390",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 55001,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "people-directory.spec.mjs",
+      "line": 36,
+      "title": "people-directory.spec.mjs / people directory searches, pages and edits real server results with usable touch controls",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 42649,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "people-directory.spec.mjs",
+      "line": 95,
+      "title": "people-directory.spec.mjs / people directory pages reciter choices and preserves other links after assigning and unlinking a student",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 50340,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "people-directory.spec.mjs",
+      "line": 36,
+      "title": "people-directory.spec.mjs / people directory searches, pages and edits real server results with usable touch controls",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 42453,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "people-directory.spec.mjs",
+      "line": 95,
+      "title": "people-directory.spec.mjs / people directory pages reciter choices and preserves other links after assigning and unlinking a student",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 51393,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "password-csrf.spec.mjs",
+      "line": 6,
+      "title": "password-csrf.spec.mjs / password change refreshes stale CSRF while preserving authentication and validation",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 25835,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "password-csrf.spec.mjs",
+      "line": 6,
+      "title": "password-csrf.spec.mjs / password change refreshes stale CSRF while preserving authentication and validation",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 26054,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "password-csrf.spec.mjs",
+      "line": 6,
+      "title": "password-csrf.spec.mjs / password change refreshes stale CSRF while preserving authentication and validation",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 23888,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "question-deletion.spec.mjs",
+      "line": 32,
+      "title": "question-deletion.spec.mjs / delete every pre question through the UI while keeping previous answers",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 16771,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "question-deletion.spec.mjs",
+      "line": 32,
+      "title": "question-deletion.spec.mjs / delete every post question through the UI while keeping previous answers",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 15079,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "question-deletion.spec.mjs",
+      "line": 32,
+      "title": "question-deletion.spec.mjs / delete every tasks question through the UI while keeping previous answers",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 17592,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "question-deletion.spec.mjs",
+      "line": 76,
+      "title": "question-deletion.spec.mjs / final exam supports successive delete-only saves without forcing a new question",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 13302,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "question-deletion.spec.mjs",
+      "line": 100,
+      "title": "question-deletion.spec.mjs / deleting a global satisfaction indicator keeps answers and stops future inheritance",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 13886,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "question-deletion.spec.mjs",
+      "line": 32,
+      "title": "question-deletion.spec.mjs / delete every pre question through the UI while keeping previous answers",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 15811,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "question-deletion.spec.mjs",
+      "line": 32,
+      "title": "question-deletion.spec.mjs / delete every post question through the UI while keeping previous answers",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 16013,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "question-deletion.spec.mjs",
+      "line": 32,
+      "title": "question-deletion.spec.mjs / delete every tasks question through the UI while keeping previous answers",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 16790,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "question-deletion.spec.mjs",
+      "line": 76,
+      "title": "question-deletion.spec.mjs / final exam supports successive delete-only saves without forcing a new question",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 13290,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "question-deletion.spec.mjs",
+      "line": 100,
+      "title": "question-deletion.spec.mjs / deleting a global satisfaction indicator keeps answers and stops future inheritance",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 14580,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "question-deletion.spec.mjs",
+      "line": 32,
+      "title": "question-deletion.spec.mjs / delete every pre question through the UI while keeping previous answers",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 16071,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "question-deletion.spec.mjs",
+      "line": 32,
+      "title": "question-deletion.spec.mjs / delete every post question through the UI while keeping previous answers",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 9849,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "question-deletion.spec.mjs",
+      "line": 32,
+      "title": "question-deletion.spec.mjs / delete every tasks question through the UI while keeping previous answers",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 15295,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "question-deletion.spec.mjs",
+      "line": 76,
+      "title": "question-deletion.spec.mjs / final exam supports successive delete-only saves without forcing a new question",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 9914,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "question-deletion.spec.mjs",
+      "line": 100,
+      "title": "question-deletion.spec.mjs / deleting a global satisfaction indicator keeps answers and stops future inheritance",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 6812,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "question-save.spec.mjs",
+      "line": 7,
+      "title": "question-save.spec.mjs / saved pre questions remain visible and editable for every question type",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 16915,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "question-save.spec.mjs",
+      "line": 7,
+      "title": "question-save.spec.mjs / saved post questions remain visible and editable for every question type",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 17011,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "question-save.spec.mjs",
+      "line": 7,
+      "title": "question-save.spec.mjs / saved tasks questions remain visible and editable for every question type",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 18027,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "question-save.spec.mjs",
+      "line": 71,
+      "title": "question-save.spec.mjs / final exam saves and edits all question types without losing true/false options",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 25221,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "question-save.spec.mjs",
+      "line": 7,
+      "title": "question-save.spec.mjs / saved pre questions remain visible and editable for every question type",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 17587,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "question-save.spec.mjs",
+      "line": 7,
+      "title": "question-save.spec.mjs / saved post questions remain visible and editable for every question type",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 18115,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "question-save.spec.mjs",
+      "line": 7,
+      "title": "question-save.spec.mjs / saved tasks questions remain visible and editable for every question type",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 17246,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "question-save.spec.mjs",
+      "line": 71,
+      "title": "question-save.spec.mjs / final exam saves and edits all question types without losing true/false options",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 18248,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "question-save.spec.mjs",
+      "line": 7,
+      "title": "question-save.spec.mjs / saved pre questions remain visible and editable for every question type",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 8901,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "question-save.spec.mjs",
+      "line": 7,
+      "title": "question-save.spec.mjs / saved post questions remain visible and editable for every question type",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 12913,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "question-save.spec.mjs",
+      "line": 7,
+      "title": "question-save.spec.mjs / saved tasks questions remain visible and editable for every question type",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 19129,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "question-save.spec.mjs",
+      "line": 71,
+      "title": "question-save.spec.mjs / final exam saves and edits all question types without losing true/false options",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 19665,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "registration.spec.mjs",
+      "line": 19,
+      "title": "registration.spec.mjs / public registration persists a complete request",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 22201,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "registration.spec.mjs",
+      "line": 111,
+      "title": "registration.spec.mjs / admin renames fixed registration questions without changing their types",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 16650,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "registration.spec.mjs",
+      "line": 157,
+      "title": "registration.spec.mjs / registration question toggles show a visible checkbox state",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 9019,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "registration.spec.mjs",
+      "line": 19,
+      "title": "registration.spec.mjs / public registration persists a complete request",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 19595,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "registration.spec.mjs",
+      "line": 111,
+      "title": "registration.spec.mjs / admin renames fixed registration questions without changing their types",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 15936,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "registration.spec.mjs",
+      "line": 157,
+      "title": "registration.spec.mjs / registration question toggles show a visible checkbox state",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 8171,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "registration.spec.mjs",
+      "line": 19,
+      "title": "registration.spec.mjs / public registration persists a complete request",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 19877,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "registration.spec.mjs",
+      "line": 111,
+      "title": "registration.spec.mjs / admin renames fixed registration questions without changing their types",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 14285,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "registration.spec.mjs",
+      "line": 157,
+      "title": "registration.spec.mjs / registration question toggles show a visible checkbox state",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 7773,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "remaining-panels.spec.mjs",
+      "line": 30,
+      "title": "remaining-panels.spec.mjs / remaining dashboard panels expose usable controls and dialogs",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 45603,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "remaining-panels.spec.mjs",
+      "line": 30,
+      "title": "remaining-panels.spec.mjs / remaining dashboard panels expose usable controls and dialogs",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 40027,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "remaining-panels.spec.mjs",
+      "line": 30,
+      "title": "remaining-panels.spec.mjs / remaining dashboard panels expose usable controls and dialogs",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 42137,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "responsive.spec.mjs",
+      "line": 29,
+      "title": "responsive.spec.mjs / public pages fit the viewport and expose usable controls",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 4303,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "responsive.spec.mjs",
+      "line": 29,
+      "title": "responsive.spec.mjs / public pages fit the viewport and expose usable controls",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3252,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "responsive.spec.mjs",
+      "line": 29,
+      "title": "responsive.spec.mjs / public pages fit the viewport and expose usable controls",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3203,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "results-directory.spec.mjs",
+      "line": 3,
+      "title": "results-directory.spec.mjs / results page searches, paginates and retains full attendance totals without a snapshot",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 24939,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "results-directory.spec.mjs",
+      "line": 3,
+      "title": "results-directory.spec.mjs / results page searches, paginates and retains full attendance totals without a snapshot",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 34701,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "results-directory.spec.mjs",
+      "line": 3,
+      "title": "results-directory.spec.mjs / results page searches, paginates and retains full attendance totals without a snapshot",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 36962,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "rich-text-security.spec.mjs",
+      "line": 9,
+      "title": "rich-text-security.spec.mjs / client rich text sanitizer strips executable HTML before rendering",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 358,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "rich-text-security.spec.mjs",
+      "line": 9,
+      "title": "rich-text-security.spec.mjs / client rich text sanitizer strips executable HTML before rendering",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 411,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "rich-text-security.spec.mjs",
+      "line": 9,
+      "title": "rich-text-security.spec.mjs / client rich text sanitizer strips executable HTML before rendering",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 431,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "role-journeys.spec.mjs",
+      "line": 59,
+      "title": "role-journeys.spec.mjs / e2e-male-manager can sign in and use its responsive home",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 5176,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "role-journeys.spec.mjs",
+      "line": 59,
+      "title": "role-journeys.spec.mjs / e2e-female-manager can sign in and use its responsive home",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 5458,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "role-journeys.spec.mjs",
+      "line": 59,
+      "title": "role-journeys.spec.mjs / e2e-reciter-role can sign in and use its responsive home",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 6193,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "role-journeys.spec.mjs",
+      "line": 59,
+      "title": "role-journeys.spec.mjs / e2e-student-role can sign in and use its responsive home",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 11803,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "role-journeys.spec.mjs",
+      "line": 59,
+      "title": "role-journeys.spec.mjs / e2e-trainee-role can sign in and use its responsive home",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 8627,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "role-journeys.spec.mjs",
+      "line": 113,
+      "title": "role-journeys.spec.mjs / manager panels load without browser or server errors",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 34988,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "role-journeys.spec.mjs",
+      "line": 59,
+      "title": "role-journeys.spec.mjs / e2e-male-manager can sign in and use its responsive home",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 5442,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "role-journeys.spec.mjs",
+      "line": 59,
+      "title": "role-journeys.spec.mjs / e2e-female-manager can sign in and use its responsive home",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 4632,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "role-journeys.spec.mjs",
+      "line": 59,
+      "title": "role-journeys.spec.mjs / e2e-reciter-role can sign in and use its responsive home",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 4644,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "role-journeys.spec.mjs",
+      "line": 59,
+      "title": "role-journeys.spec.mjs / e2e-student-role can sign in and use its responsive home",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 11334,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "role-journeys.spec.mjs",
+      "line": 59,
+      "title": "role-journeys.spec.mjs / e2e-trainee-role can sign in and use its responsive home",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 9152,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "role-journeys.spec.mjs",
+      "line": 113,
+      "title": "role-journeys.spec.mjs / manager panels load without browser or server errors",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 39292,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "role-journeys.spec.mjs",
+      "line": 59,
+      "title": "role-journeys.spec.mjs / e2e-male-manager can sign in and use its responsive home",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 3762,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "role-journeys.spec.mjs",
+      "line": 59,
+      "title": "role-journeys.spec.mjs / e2e-female-manager can sign in and use its responsive home",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 6045,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "role-journeys.spec.mjs",
+      "line": 59,
+      "title": "role-journeys.spec.mjs / e2e-reciter-role can sign in and use its responsive home",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 5277,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "role-journeys.spec.mjs",
+      "line": 59,
+      "title": "role-journeys.spec.mjs / e2e-student-role can sign in and use its responsive home",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 12829,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "role-journeys.spec.mjs",
+      "line": 59,
+      "title": "role-journeys.spec.mjs / e2e-trainee-role can sign in and use its responsive home",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 12626,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "role-journeys.spec.mjs",
+      "line": 113,
+      "title": "role-journeys.spec.mjs / manager panels load without browser or server errors",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 35534,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "satisfaction-courses.spec.mjs",
+      "line": 6,
+      "title": "satisfaction-courses.spec.mjs / satisfaction includes courses with closed post tests and inherits general questions",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 11629,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "satisfaction-courses.spec.mjs",
+      "line": 6,
+      "title": "satisfaction-courses.spec.mjs / satisfaction includes courses with closed post tests and inherits general questions",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 12140,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "satisfaction-courses.spec.mjs",
+      "line": 6,
+      "title": "satisfaction-courses.spec.mjs / satisfaction includes courses with closed post tests and inherits general questions",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 11773,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "student-dashboard.spec.mjs",
+      "line": 5,
+      "title": "student-dashboard.spec.mjs / student results remain usable across the responsive viewport matrix",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 15198,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "student-dashboard.spec.mjs",
+      "line": 5,
+      "title": "student-dashboard.spec.mjs / student results remain usable across the responsive viewport matrix",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 15579,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "student-dashboard.spec.mjs",
+      "line": 5,
+      "title": "student-dashboard.spec.mjs / student results remain usable across the responsive viewport matrix",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 10442,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "student-question-types.spec.mjs",
+      "line": 8,
+      "title": "student-question-types.spec.mjs / student pre displays saved question types and submits the exact selected answers",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 23519,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "student-question-types.spec.mjs",
+      "line": 8,
+      "title": "student-question-types.spec.mjs / student post displays saved question types and submits the exact selected answers",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 16904,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "student-question-types.spec.mjs",
+      "line": 8,
+      "title": "student-question-types.spec.mjs / student tasks displays saved question types and submits the exact selected answers",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 17065,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "student-question-types.spec.mjs",
+      "line": 8,
+      "title": "student-question-types.spec.mjs / student final displays saved question types and submits the exact selected answers",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 17374,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "student-question-types.spec.mjs",
+      "line": 8,
+      "title": "student-question-types.spec.mjs / student pre displays saved question types and submits the exact selected answers",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 17213,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "student-question-types.spec.mjs",
+      "line": 8,
+      "title": "student-question-types.spec.mjs / student post displays saved question types and submits the exact selected answers",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 16640,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "student-question-types.spec.mjs",
+      "line": 8,
+      "title": "student-question-types.spec.mjs / student tasks displays saved question types and submits the exact selected answers",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 17727,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "student-question-types.spec.mjs",
+      "line": 8,
+      "title": "student-question-types.spec.mjs / student final displays saved question types and submits the exact selected answers",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 18345,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "student-question-types.spec.mjs",
+      "line": 8,
+      "title": "student-question-types.spec.mjs / student pre displays saved question types and submits the exact selected answers",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 17481,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "student-question-types.spec.mjs",
+      "line": 8,
+      "title": "student-question-types.spec.mjs / student post displays saved question types and submits the exact selected answers",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 12644,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "student-question-types.spec.mjs",
+      "line": 8,
+      "title": "student-question-types.spec.mjs / student tasks displays saved question types and submits the exact selected answers",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 7504,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "student-question-types.spec.mjs",
+      "line": 8,
+      "title": "student-question-types.spec.mjs / student final displays saved question types and submits the exact selected answers",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 6838,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "student-satisfaction.spec.mjs",
+      "line": 17,
+      "title": "student-satisfaction.spec.mjs / student can save the separate satisfaction page and select the lowest rating",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 19604,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "student-satisfaction.spec.mjs",
+      "line": 40,
+      "title": "student-satisfaction.spec.mjs / separate survey recovers when its saved confirmation is lost",
+      "project": "tablet-768",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 21103,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "student-satisfaction.spec.mjs",
+      "line": 17,
+      "title": "student-satisfaction.spec.mjs / student can save the separate satisfaction page and select the lowest rating",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 20871,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "student-satisfaction.spec.mjs",
+      "line": 40,
+      "title": "student-satisfaction.spec.mjs / separate survey recovers when its saved confirmation is lost",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 20669,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "student-satisfaction.spec.mjs",
+      "line": 17,
+      "title": "student-satisfaction.spec.mjs / student can save the separate satisfaction page and select the lowest rating",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 12277,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "student-satisfaction.spec.mjs",
+      "line": 40,
+      "title": "student-satisfaction.spec.mjs / separate survey recovers when its saved confirmation is lost",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 20042,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 20,
+      "title": "accessibility.spec.mjs / public pages have no serious accessibility violations",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 6852,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard has no serious accessibility violations",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 7551,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=finalexam has no serious accessibility violations",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 8967,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=satisfaction has no serious accessibility violations",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 9874,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=users has no serious accessibility violations",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 10792,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=notifications has no serious accessibility violations",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 8010,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=materials has no serious accessibility violations",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 7944,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=results has no serious accessibility violations",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 8912,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=completion has no serious accessibility violations",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 9286,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=settings&settingsItem=registration has no serious accessibility violations",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 8475,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=settings&settingsItem=home has no serious accessibility violations",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 11668,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=settings&settingsItem=archive has no serious accessibility violations",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 8236,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=settings&settingsItem=permissions has no serious accessibility violations",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 8239,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 20,
+      "title": "accessibility.spec.mjs / public pages have no serious accessibility violations",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 7612,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard has no serious accessibility violations",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 7741,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=finalexam has no serious accessibility violations",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 8999,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=satisfaction has no serious accessibility violations",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 8253,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=users has no serious accessibility violations",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 8668,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=notifications has no serious accessibility violations",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 7931,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=materials has no serious accessibility violations",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 9565,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=results has no serious accessibility violations",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 7787,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=completion has no serious accessibility violations",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 8565,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=settings&settingsItem=registration has no serious accessibility violations",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 9134,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=settings&settingsItem=home has no serious accessibility violations",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 11584,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=settings&settingsItem=archive has no serious accessibility violations",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 8613,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "accessibility.spec.mjs",
+      "line": 45,
+      "title": "accessibility.spec.mjs / management page dashboard?panel=settings&settingsItem=permissions has no serious accessibility violations",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 8930,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-admin.spec.mjs",
+      "line": 26,
+      "title": "assessment-admin.spec.mjs / dashboard overview shows truthful indicator context",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 6201,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-admin.spec.mjs",
+      "line": 33,
+      "title": "assessment-admin.spec.mjs / manager can add and save a task question from the plus menu",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 9738,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-admin.spec.mjs",
+      "line": 86,
+      "title": "assessment-admin.spec.mjs / task start action opens its availability dialog",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 7382,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-admin.spec.mjs",
+      "line": 99,
+      "title": "assessment-admin.spec.mjs / final exam question editor keeps the same clear assessment layout",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 7796,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-admin.spec.mjs",
+      "line": 148,
+      "title": "assessment-admin.spec.mjs / course and task management actions stay inside the shared dropdown",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 7636,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-admin.spec.mjs",
+      "line": 26,
+      "title": "assessment-admin.spec.mjs / dashboard overview shows truthful indicator context",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 6241,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-admin.spec.mjs",
+      "line": 33,
+      "title": "assessment-admin.spec.mjs / manager can add and save a task question from the plus menu",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 8557,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-admin.spec.mjs",
+      "line": 86,
+      "title": "assessment-admin.spec.mjs / task start action opens its availability dialog",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 7967,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-admin.spec.mjs",
+      "line": 99,
+      "title": "assessment-admin.spec.mjs / final exam question editor keeps the same clear assessment layout",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 7204,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-admin.spec.mjs",
+      "line": 148,
+      "title": "assessment-admin.spec.mjs / course and task management actions stay inside the shared dropdown",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 7568,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-recovery.spec.mjs",
+      "line": 5,
+      "title": "assessment-recovery.spec.mjs / pre retains failed answers and confirms saved file-only attempts despite a refresh outage",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 20006,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-recovery.spec.mjs",
+      "line": 62,
+      "title": "assessment-recovery.spec.mjs / pre recovers a confirmation lost after the server has saved the answers",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 18734,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-recovery.spec.mjs",
+      "line": 5,
+      "title": "assessment-recovery.spec.mjs / post retains failed answers and confirms saved file-only attempts despite a refresh outage",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 22264,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-recovery.spec.mjs",
+      "line": 62,
+      "title": "assessment-recovery.spec.mjs / post recovers a confirmation lost after the server has saved the answers",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 21089,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-recovery.spec.mjs",
+      "line": 5,
+      "title": "assessment-recovery.spec.mjs / tasks retains failed answers and confirms saved file-only attempts despite a refresh outage",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 21552,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-recovery.spec.mjs",
+      "line": 62,
+      "title": "assessment-recovery.spec.mjs / tasks recovers a confirmation lost after the server has saved the answers",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 20135,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-recovery.spec.mjs",
+      "line": 5,
+      "title": "assessment-recovery.spec.mjs / final retains failed answers and confirms saved file-only attempts despite a refresh outage",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 18090,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-recovery.spec.mjs",
+      "line": 62,
+      "title": "assessment-recovery.spec.mjs / final recovers a confirmation lost after the server has saved the answers",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 18292,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-recovery.spec.mjs",
+      "line": 5,
+      "title": "assessment-recovery.spec.mjs / pre retains failed answers and confirms saved file-only attempts despite a refresh outage",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 19111,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-recovery.spec.mjs",
+      "line": 62,
+      "title": "assessment-recovery.spec.mjs / pre recovers a confirmation lost after the server has saved the answers",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 20094,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-recovery.spec.mjs",
+      "line": 5,
+      "title": "assessment-recovery.spec.mjs / post retains failed answers and confirms saved file-only attempts despite a refresh outage",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 23077,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-recovery.spec.mjs",
+      "line": 62,
+      "title": "assessment-recovery.spec.mjs / post recovers a confirmation lost after the server has saved the answers",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 21812,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-recovery.spec.mjs",
+      "line": 5,
+      "title": "assessment-recovery.spec.mjs / tasks retains failed answers and confirms saved file-only attempts despite a refresh outage",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 19944,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-recovery.spec.mjs",
+      "line": 62,
+      "title": "assessment-recovery.spec.mjs / tasks recovers a confirmation lost after the server has saved the answers",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 21232,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-recovery.spec.mjs",
+      "line": 5,
+      "title": "assessment-recovery.spec.mjs / final retains failed answers and confirms saved file-only attempts despite a refresh outage",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 19290,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "assessment-recovery.spec.mjs",
+      "line": 62,
+      "title": "assessment-recovery.spec.mjs / final recovers a confirmation lost after the server has saved the answers",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 23181,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "audit-dialog-registration.spec.mjs",
+      "line": 6,
+      "title": "audit-dialog-registration.spec.mjs / shared dialog names follow pre, post, tasks and edit titles after reuse",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 16837,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "audit-dialog-registration.spec.mjs",
+      "line": 36,
+      "title": "audit-dialog-registration.spec.mjs / public duplicate submissions keep one pending request and show a recoverable error",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 13613,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "audit-dialog-registration.spec.mjs",
+      "line": 6,
+      "title": "audit-dialog-registration.spec.mjs / shared dialog names follow pre, post, tasks and edit titles after reuse",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 19205,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "audit-dialog-registration.spec.mjs",
+      "line": 36,
+      "title": "audit-dialog-registration.spec.mjs / public duplicate submissions keep one pending request and show a recoverable error",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 17742,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "auth.spec.mjs",
+      "line": 14,
+      "title": "auth.spec.mjs / protected dashboard redirects guests to login",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 2277,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "auth.spec.mjs",
+      "line": 22,
+      "title": "auth.spec.mjs / admin can sign in and use the responsive dashboard shell",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 8488,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "auth.spec.mjs",
+      "line": 14,
+      "title": "auth.spec.mjs / protected dashboard redirects guests to login",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 2379,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "auth.spec.mjs",
+      "line": 22,
+      "title": "auth.spec.mjs / admin can sign in and use the responsive dashboard shell",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 8358,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "critical-workflows.spec.mjs",
+      "line": 5,
+      "title": "critical-workflows.spec.mjs / admin critical data workflows persist through the browser API session",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 15953,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "critical-workflows.spec.mjs",
+      "line": 5,
+      "title": "critical-workflows.spec.mjs / admin critical data workflows persist through the browser API session",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 17766,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "document-persistence.spec.mjs",
+      "line": 8,
+      "title": "document-persistence.spec.mjs / document template and both student answers survive real typing, failed save, submission and reload",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 46097,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "document-persistence.spec.mjs",
+      "line": 118,
+      "title": "document-persistence.spec.mjs / document toolbar exposes Arabic names for formatting and font choices",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 11313,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "document-persistence.spec.mjs",
+      "line": 8,
+      "title": "document-persistence.spec.mjs / document template and both student answers survive real typing, failed save, submission and reload",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 48767,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "document-persistence.spec.mjs",
+      "line": 118,
+      "title": "document-persistence.spec.mjs / document toolbar exposes Arabic names for formatting and font choices",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 11069,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "management-panels.spec.mjs",
+      "line": 28,
+      "title": "management-panels.spec.mjs / management panels remain usable across the viewport matrix",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 23741,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "management-panels.spec.mjs",
+      "line": 28,
+      "title": "management-panels.spec.mjs / management panels remain usable across the viewport matrix",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 23948,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "mobile-interaction-regressions.spec.mjs",
+      "line": 5,
+      "title": "mobile-interaction-regressions.spec.mjs / mobile sidebar scrolls, contains focus and cleans up on resize",
+      "project": "laptop-1024",
+      "status": "skipped",
+      "expectedStatus": "skipped",
+      "annotations": [
+        {
+          "type": "skip",
+          "description": "Touch input requires a touch-enabled project",
+          "location": {
+            "file": "C:\\Users\\RAIQ\\Desktop\\المواقع\\ممارس\\frontend\\e2e\\mobile-interaction-regressions.spec.mjs",
+            "line": 6,
+            "column": 8
+          }
+        }
+      ],
+      "results": [
+        {
+          "status": "skipped",
+          "durationMs": 221,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "mobile-interaction-regressions.spec.mjs",
+      "line": 29,
+      "title": "mobile-interaction-regressions.spec.mjs / short mobile dialogs expose save and cancel after a touch swipe",
+      "project": "laptop-1024",
+      "status": "skipped",
+      "expectedStatus": "skipped",
+      "annotations": [
+        {
+          "type": "skip",
+          "description": "Touch input requires a touch-enabled project",
+          "location": {
+            "file": "C:\\Users\\RAIQ\\Desktop\\المواقع\\ممارس\\frontend\\e2e\\mobile-interaction-regressions.spec.mjs",
+            "line": 30,
+            "column": 8
+          }
+        }
+      ],
+      "results": [
+        {
+          "status": "skipped",
+          "durationMs": 281,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "mobile-interaction-regressions.spec.mjs",
+      "line": 50,
+      "title": "mobile-interaction-regressions.spec.mjs / user and satisfaction dialogs have accessible field names and contrast",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 11901,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "mobile-interaction-regressions.spec.mjs",
+      "line": 5,
+      "title": "mobile-interaction-regressions.spec.mjs / mobile sidebar scrolls, contains focus and cleans up on resize",
+      "project": "desktop-1440",
+      "status": "skipped",
+      "expectedStatus": "skipped",
+      "annotations": [
+        {
+          "type": "skip",
+          "description": "Touch input requires a touch-enabled project",
+          "location": {
+            "file": "C:\\Users\\RAIQ\\Desktop\\المواقع\\ممارس\\frontend\\e2e\\mobile-interaction-regressions.spec.mjs",
+            "line": 6,
+            "column": 8
+          }
+        }
+      ],
+      "results": [
+        {
+          "status": "skipped",
+          "durationMs": 155,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "mobile-interaction-regressions.spec.mjs",
+      "line": 29,
+      "title": "mobile-interaction-regressions.spec.mjs / short mobile dialogs expose save and cancel after a touch swipe",
+      "project": "desktop-1440",
+      "status": "skipped",
+      "expectedStatus": "skipped",
+      "annotations": [
+        {
+          "type": "skip",
+          "description": "Touch input requires a touch-enabled project",
+          "location": {
+            "file": "C:\\Users\\RAIQ\\Desktop\\المواقع\\ممارس\\frontend\\e2e\\mobile-interaction-regressions.spec.mjs",
+            "line": 30,
+            "column": 8
+          }
+        }
+      ],
+      "results": [
+        {
+          "status": "skipped",
+          "durationMs": 159,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "mobile-interaction-regressions.spec.mjs",
+      "line": 50,
+      "title": "mobile-interaction-regressions.spec.mjs / user and satisfaction dialogs have accessible field names and contrast",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 12266,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "people-branch.spec.mjs",
+      "line": 3,
+      "title": "people-branch.spec.mjs / people editor changes branch and saves female users",
+      "project": "laptop-1024",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 20864,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "people-branch.spec.mjs",
+      "line": 3,
+      "title": "people-branch.spec.mjs / people editor changes branch and saves female users",
+      "project": "desktop-1440",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "annotations": [],
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 21286,
+          "retry": 0,
+          "errors": []
+        }
+      ]
+    }
+  ],
+  "limits": [
+    "الرفع سيكون بواسطة المستخدم؛ لم أنفذ commit أو push أو نشرًا في هذه الجولة. دخل جزء من العمل في commit للمستخدم أثناء الفحص، وبقيت ملفات إصلاح واختبارات وتقرير يجب تضمينها.",
+    "لا SQL إنتاجي ولا تعديل لنتائج أو دورات حقيقية في هذه الجولة، ولا مخطط قاعدة بيانات أو migration جديد مطلوب لهذه الإصلاحات.",
+    "التحقق الحالي محلي. لم يُعد اختبار الموقع المنشور بعد هذه الإصلاحات؛ ذلك يبدأ بعد تأكيد المستخدم أن الرفع اكتمل.",
+    "البيانات الفاسدة القديمة تحتاج مصدرًا للاستعادة، والطلبات المكررة القديمة لم تُحذف.",
+    "لا قياس جديد لسعة الموقع المنشور. أرقام الضغط السابقة قياسات محلية وتبقى كما هي في التقرير الموحد.",
+    "الاختبار النهائي الشامل للفرع واعتماد النتائج والأرشفة على الإنتاج بقيت مستثناة لعدم وجود بيئة مستقلة؛ لا يدعي هذا التقرير اكتمالها.",
+    "لم تُوثق حالة الدورة الحقيقية النشطة قبل الفحص السابق. لم أخمّن اسمها أو أغيّر حالة أي دورة في هذه الجولة.",
+    "هذا يغلق المشاكل الأربع الجديدة محليًا، ولا يعني خلو كامل النظام من أي مشكلة أو إغلاق كل ملاحظات الجولات القديمة.",
+    "فحص ملف التقرير وبنيته آلي؛ لا ادعاء لمعاينة بصرية للتقرير داخل المتصفح."
+  ],
+  "next": [
+    "ارفع آخر ملفات المشروع مع بناء الواجهة العادي وملفات الخادم المعدلة.",
+    "بعد اكتمال الرفع، أعد تجربة الكتابة والحفظ والاسترجاع بحسابات التجربة على الموقع قبل تعميم الاستخدام.",
+    "استعد أي محتوى قديم مفقود من نسخة احتياطية أو أصل محفوظ، وراجع اسم الدورة الحقيقية المطلوبة دون تخمين."
+  ],
+  "workNotes": [
+    "لم تطابق أول قائمة استكمال مسارات جذر الاختبارات، فاختارت صفر حالات؛ لم تُحسب نجاحًا. صُححت المسارات وتأكدت قائمة جمع مستقلة من اختيار 177 حالة قبل تنفيذها فعليًا.",
+    "توقفت الجولة الشاملة التالية بعد 178 حالة ناجحة بسبب انتهاء مهلة اختبار طويل يجمع البحث والتعديل وربط المقرئ وفك الارتباط. قُسم إلى حالتين دون تغيير المهلة أو حذف فحوصه. استُبدلت نتيجتاه القديمتان الناجحتان بنتائج الحالتين الجديدتين على كل المقاسات، واحتُفظ بـ176 نتيجة ناجحة غير متغيرة. جرى استكمال الحالات غير المنفذة بقائمة صريحة، ومطابقة كل النتائج مع كتالوج الاختبارات الحالي كاملًا.",
+    "توقف أول فحص شامل عند مهلة 120 ثانية لاختبار يجمع 12 صفحة إدارة؛ أظهر trace أنه وصل إلى الأرشيف بعد تراكم زمن الفحص. قسمت الصفحات إلى حالات مستقلة دون تغيير المهلة أو قواعد Axe أو إسقاط أي صفحة؛ لذلك ارتفع عدد حالات المتصفح من 295 إلى 350.",
+    "جرى تصحيح أدوات الفحص: ترويسة Accept لاستجابات التحقق، اختيار عناصر القوائم المخصصة، اعتراض API على المسار المركّب، وفك multipart، والتحقق من الخادم بعد استبدال نموذج الطالب برسالة تم الإرسال.",
+    "اختبار الكتابة كشف تغيير موضع الحرف الأول ثم حفظ القالب بدل جواب الطالب؛ أصلحت السببين الإضافيين وأزلت أدوات التشخيص المؤقتة.",
+    "صححت خطأين تنسيقيين قديمين فقط لإتمام Pint: أقواس منشئ AssessmentAccessService وترتيب استيرادات QuestionDeletionTest؛ دون تغيير سلوك.",
+    "لم أغيّر التبعيات أو ملفات النشر أو ملف data1.yml، ولم أستخدم بيانات الاتصال المحلية المرفوضة لإنجاز الاختبارات."
+  ]
+}

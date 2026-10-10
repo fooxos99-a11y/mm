@@ -1,3 +1,4 @@
+import { markRaw } from 'vue';
 import { Quill, createTableKeyboardBindings, replaceNodeWithText } from './editorRuntime';
 import { sanitizeRichTextHtml } from '../../utils/documentContent';
 
@@ -7,7 +8,8 @@ export default {
         ? this.placeholder
         : ' ';
 
-      this.editor = new Quill(this.$refs.editor, {
+      // Quill's document and selection objects must retain their identity outside Vue proxies.
+      this.editor = markRaw(new Quill(this.$refs.editor, {
         theme: 'snow',
         placeholder: resolvedPlaceholder,
         modules: {
@@ -27,7 +29,7 @@ export default {
             bindings: createTableKeyboardBindings(),
           },
         },
-      });
+      }));
 
       this.editor.root.setAttribute('dir', 'rtl');
       this.editor.root.setAttribute('lang', 'ar');

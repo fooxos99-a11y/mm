@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
 use App\Models\Student;
+use App\Models\User;
 use App\Services\CourseManagementService;
 use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;

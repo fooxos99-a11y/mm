@@ -1,6 +1,6 @@
 import { expect, test } from './support/isolatedTest.mjs';
 
-test('people directory searches and pages real server results with usable touch controls', async ({ page, request }, testInfo) => {
+const prepareDirectory = async ({ page, request }, testInfo) => {
   const api = `http://127.0.0.1:${process.env.E2E_BACKEND_PORT}/api`;
   const loginCode = process.env.E2E_ADMIN_LOGIN;
   const password = process.env.E2E_ADMIN_PASSWORD;
@@ -30,6 +30,11 @@ test('people directory searches and pages real server results with usable touch 
   await page.waitForURL((url) => url.pathname === '/momars/dashboard');
   await page.goto('dashboard?panel=users');
   const search = page.getByRole('searchbox', { name: 'البحث بالاسم أو رقم الدخول' });
+  return { api, token, prefix, search, fullSnapshots: () => fullSnapshots };
+};
+
+test('people directory searches, pages and edits real server results with usable touch controls', async ({ page, request }, testInfo) => {
+  const { prefix, search, fullSnapshots } = await prepareDirectory({ page, request }, testInfo);
   await search.fill(prefix);
   await expect(page.locator('.people-directory-status')).toHaveText('عدد النتائج: 21');
   await expect(page.locator('.people-card')).toHaveCount(20);
@@ -51,7 +56,7 @@ test('people directory searches and pages real server results with usable touch 
   await expect(page.locator('.people-card')).toHaveCount(20);
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
   expect(overflow).toBe(false);
-  expect(fullSnapshots).toBe(0);
+  expect(fullSnapshots()).toBe(0);
   await page.route('**/dashboard/people/student/*', (route) => route.fulfill({
     status: 503, contentType: 'application/json', body: JSON.stringify({ message: 'تعذر تحميل بيانات النافذة' }),
   }));
@@ -73,7 +78,25 @@ test('people directory searches and pages real server results with usable touch 
   await expect(part).toHaveAttribute('aria-pressed', 'true');
   await expect(part).toBeEnabled();
   await page.keyboard.press('Escape');
-  expect(fullSnapshots).toBe(0);
+  expect(fullSnapshots()).toBe(0);
+  const selectPanel = async (label) => {
+    const menu = page.getByRole('button', { name: 'فتح القائمة', exact: true });
+    if (await menu.isVisible()) await menu.click();
+    await page.locator('.dashboard-nav').getByRole('button', { name: label, exact: true }).click();
+  };
+  await selectPanel('الدورات');
+  await expect(page.locator('.assessment-page')).toBeVisible();
+  await selectPanel('الرئيسية');
+  await expect(page.locator('.dashboard-indicator-card')).toHaveCount(6);
+  await selectPanel('المستخدمين');
+  await expect(search).toBeVisible();
+});
+
+test('people directory pages reciter choices and preserves other links after assigning and unlinking a student', async ({ page, request }, testInfo) => {
+  const { api, token, prefix, search, fullSnapshots } = await prepareDirectory({ page, request }, testInfo);
+  await search.fill(prefix);
+  await expect(page.locator('.people-card')).toHaveCount(20);
+  const dialog = page.getByRole('dialog');
   await page.locator('.dashboard-topbar').getByRole('button', { name: 'إضافة', exact: true }).click();
   await dialog.locator('.app-select').first().click();
   await page.getByRole('option', { name: 'مقرئ', exact: true }).click();
@@ -113,16 +136,5 @@ test('people directory searches and pages real server results with usable touch 
     headers: { Authorization: 'Bearer ' + token },
   });
   expect((await afterUnlink.json()).data[0].studentIds).toHaveLength(2);
-  expect(fullSnapshots).toBe(0);
-  const selectPanel = async (label) => {
-    const menu = page.getByRole('button', { name: 'فتح القائمة', exact: true });
-    if (await menu.isVisible()) await menu.click();
-    await page.locator('.dashboard-nav').getByRole('button', { name: label, exact: true }).click();
-  };
-  await selectPanel('الدورات');
-  await expect(page.locator('.assessment-page')).toBeVisible();
-  await selectPanel('الرئيسية');
-  await expect(page.locator('.dashboard-indicator-card')).toHaveCount(6);
-  await selectPanel('المستخدمين');
-  await expect(search).toBeVisible();
+  expect(fullSnapshots()).toBe(0);
 });

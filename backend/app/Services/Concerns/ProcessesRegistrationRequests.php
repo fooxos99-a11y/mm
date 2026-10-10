@@ -16,6 +16,10 @@ trait ProcessesRegistrationRequests
         array $answers = [],
         ?int $legacyAge = null
     ): array {
+        if (! $this->isRegistrationOpen()) {
+            throw ValidationException::withMessages(['registration' => 'التسجيل مغلق حاليًا.']);
+        }
+
         $name = trim($name);
         $phone = trim($phone);
 
@@ -33,6 +37,7 @@ trait ProcessesRegistrationRequests
         }
 
         $answers = $this->registrationFormService->normalizeAnswers($answers);
+
         return DB::transaction(function () use ($name, $phone, $gender, $answers, $legacyAge): array {
             // Lock the existing settings row so simultaneous first requests cannot both pass the check.
             $isOpen = DB::table('registration_settings')->where('key', 'is_open')->lockForUpdate()->value('value');
@@ -46,16 +51,16 @@ trait ProcessesRegistrationRequests
             }
 
             $request = RegistrationRequest::query()->create([
-            'full_name' => $name,
-            'login_code' => null,
-            'initial_password' => null,
-            'phone' => $phone,
-            'gender' => $gender,
-            'answers' => $answers,
-            'branch_code' => null,
-            'note' => null,
-            'status' => 'pending',
-        ]);
+                'full_name' => $name,
+                'login_code' => null,
+                'initial_password' => null,
+                'phone' => $phone,
+                'gender' => $gender,
+                'answers' => $answers,
+                'branch_code' => null,
+                'note' => null,
+                'status' => 'pending',
+            ]);
 
             $this->registrationMetadataService->store($request->id, $phone, $gender, $answers, $legacyAge);
 

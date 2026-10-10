@@ -90,9 +90,9 @@ export default {
         return '';
       }
 
-      return Object.hasOwn(this.answers, this.documentQuestion.id)
-        ? this.answers[this.documentQuestion.id]
-        : this.documentInitialContent;
+      // Reading the key tracks new drafts in Vue; Object.hasOwn alone does not.
+      const draft = this.answers[this.documentQuestion.id];
+      return draft === undefined ? this.documentInitialContent : draft;
     },
     currentTaskVideo() {
       return this.resolveTaskVideo(this.selectedTask?.youtubeUrl || '');
