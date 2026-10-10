@@ -5,7 +5,8 @@ import { request } from 'node:http';
 import { createServer } from 'node:net';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { launch } from 'chrome-launcher';
+import { killAll, launch } from 'chrome-launcher';
+import { runAuditWithRuntimeRetry } from './mobile-performance-retry.mjs';
 import lighthouse from 'lighthouse';
 
 const frontendRoot = path.resolve(fileURLToPath(new URL('..', import.meta.url)));
@@ -65,6 +66,7 @@ const runAudit = async (url) => {
   try {
     chrome = await launch({
       chromePath: process.env.CHROME_PATH,
+      logLevel: 'error',
       chromeFlags: ['--headless=new', '--no-sandbox', '--disable-dev-shm-usage'],
     });
     return await lighthouse(url, {
@@ -75,7 +77,19 @@ const runAudit = async (url) => {
       formFactor: 'mobile',
     });
   } finally {
-    await terminateChrome(chrome);
+    if (chrome) {
+      await terminateChrome(chrome);
+    } else {
+      // launch() can reject after spawning Chrome but before returning its handle.
+      // killAll only owns instances launched by this Node process.
+      for (const error of await killAll()) console.warn(`Chrome cleanup warning: ${error.message}`);
+    }
+  }
+};
+
+const saveAuditEvidence = (value, suffix = '') => {
+  if (process.env.MOBILE_PERFORMANCE_REPORT) {
+    writeFileSync(`${process.env.MOBILE_PERFORMANCE_REPORT}${suffix}`, JSON.stringify(value, null, 2));
   }
 };
 
@@ -95,19 +109,23 @@ const staticServer = spawn(process.execPath, ['e2e/support/serve-dist.mjs'], {
 
 try {
   await waitForUrl(url);
-  let result;
-  for (let attempt = 1; attempt <= 2; attempt += 1) {
-    result = await runAudit(url);
-    if (!result?.lhr?.runtimeError || attempt === 2) break;
-    console.warn(`Lighthouse attempt ${attempt} returned ${result.lhr.runtimeError.code}; retrying once.`);
-  }
+  console.log(`Mobile audit URL: ${url}`);
+  const result = await runAuditWithRuntimeRetry(() => runAudit(url), {
+    onResult: (audit, attempt) => {
+      if (audit?.lhr) saveAuditEvidence(audit.lhr, `.attempt-${attempt}.json`);
+    },
+    onError: (error, attempt) => saveAuditEvidence({
+      kind: 'harness-error', attempt,
+      name: error?.name, code: error?.code, message: error?.message,
+      syscall: error?.syscall, address: error?.address, port: error?.port,
+      stack: error?.stack,
+    }, `.attempt-${attempt}.error.json`),
+  });
 
   const score = Math.round((result?.lhr?.categories?.performance?.score || 0) * 100);
   const lcp = Math.round(result?.lhr?.audits?.['largest-contentful-paint']?.numericValue || Infinity);
 
-  if (process.env.MOBILE_PERFORMANCE_REPORT && result?.lhr) {
-    writeFileSync(process.env.MOBILE_PERFORMANCE_REPORT, JSON.stringify(result.lhr, null, 2));
-  }
+  if (result?.lhr) saveAuditEvidence(result.lhr);
 
   if (result?.lhr?.runtimeError) {
     console.error(`Lighthouse runtime error: ${result.lhr.runtimeError.code} ${result.lhr.runtimeError.message}`);
@@ -137,7 +155,7 @@ try {
     if (traceCandidates.length) console.log(`LCP trace candidates: ${JSON.stringify(traceCandidates)}`);
   }
 
-  if (score < 90 || lcp > 2500) {
+  if (result?.lhr?.runtimeError || score < 90 || lcp > 2500) {
     const lcpDetails = result?.lhr?.audits?.['lcp-breakdown-insight']?.details
       || result?.lhr?.audits?.['largest-contentful-paint-element']?.details;
     if (lcpDetails) console.error(`LCP details: ${JSON.stringify(lcpDetails)}`);
@@ -156,3 +174,4 @@ try {
 } finally {
   staticServer.kill('SIGTERM');
 }
+
