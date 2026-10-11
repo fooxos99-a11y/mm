@@ -207,7 +207,8 @@ return new class extends Migration
         }
 
         // Preserve the index required by the submission foreign key on MySQL.
-        if (! Schema::hasIndex($tableName, ['submission_id'])) {
+        if (Schema::getConnection()->getDriverName() === 'mysql'
+            && ! Schema::hasIndex($tableName, ['submission_id'])) {
             Schema::table($tableName, function (Blueprint $table): void {
                 $table->index('submission_id');
             });

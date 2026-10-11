@@ -148,7 +148,8 @@ class CourseDeletionTest extends TestCase
     {
         $target = $this->createHistory('course');
         DB::listen(function (QueryExecuted $query): void {
-            if (str_starts_with($query->sql, 'delete from "courses"')) {
+            $deletePrefix = 'delete from '.$query->connection->getQueryGrammar()->wrapTable('courses');
+            if (str_starts_with($query->sql, $deletePrefix)) {
                 throw new RuntimeException('Simulated deletion failure');
             }
         });
