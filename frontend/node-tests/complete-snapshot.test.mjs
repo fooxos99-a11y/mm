@@ -31,3 +31,17 @@ test('small snapshots finish without extra requests', async () => {
   assert.deepEqual(await loadCompleteSnapshot(async () => { calls++; return {}; }), {});
   assert.equal(calls, 1);
 });
+
+test('manual score pages are collected even when there are no submitted answers', async () => {
+  const pages = [];
+  const snapshot = await loadCompleteSnapshot(async page => {
+    pages.push(page);
+    return { submissions: [{ id: `score-${page}`, scoreOnly: true }],
+      snapshotMeta: { submissions: { total: 0, nextPage: null },
+        manualScores: { total: 2, nextPage: page === 1 ? 2 : null } } };
+  });
+  assert.deepEqual(pages, [1, 2]);
+  assert.equal(snapshot.submissions.length, 2);
+  assert.equal(snapshot.snapshotMeta.manualScores.returned, 2);
+  assert.equal(snapshot.snapshotMeta.manualScores.truncated, false);
+});

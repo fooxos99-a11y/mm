@@ -1,17 +1,22 @@
 import { mapActions, mapState } from 'vuex';
 import ResultsDialogs from '../../components/results/ResultsDialogs.vue';
+import ResultsGradeDialog from '../../components/results/ResultsGradeDialog.vue';
 import ResultsAttendancePanel from '../../components/results/ResultsAttendancePanel.vue';
-import { AppRawButton, AppSelect } from '../../components/ui';
+import { AppButton, AppRawButton, AppSelect } from '../../components/ui';
 import computed from './adminResultsComputed';
 import dataMethods from './adminResultsDataMethods';
 import dialogMethods from './adminResultsDialogMethods';
 import directoryMethods from './resultsDirectoryMethods';
 import AppPagination from '../../components/ui/AppPagination.vue';
+import gradeMethods from './gradeEntryMethods';
+import { gradeChanges } from './gradeEntryModel.mjs';
 
 export default {
   name: 'AdminResultsView',
   components: {
     AppPagination,
+    AppButton,
+    ResultsGradeDialog,
     AppRawButton,
     AppSelect,
     ResultsAttendancePanel,
@@ -26,6 +31,9 @@ export default {
       resultsCatalog: [], resultsCatalogReady: false, resultSnapshot: null,
       resultsSearch: '', resultsLoading: false, resultsError: '', resultsPage: 1,
       resultsGeneration: 0, resultsController: null, resultsSearchTimer: null,
+      gradeDialogOpen: false, gradeRows: [], gradeScope: {}, gradeSearch: '', gradeTotal: '',
+      gradeLoading: false, gradeSaving: false, gradeTotalLocked: false, gradeErrors: {}, gradeError: '',
+      gradeConflict: false, gradeLoadFailed: false, gradeGeneration: 0, gradeController: null,
       attendanceCourseId: '',
       attendanceBranchId: 'male',
       attendanceChecked: [],
@@ -53,7 +61,14 @@ export default {
       ],
     };
   },
-  computed: { ...mapState(['dashboardSnapshot', 'currentUser']), ...computed },
+  computed: {
+    ...mapState(['dashboardSnapshot', 'currentUser']), ...computed,
+    canEnterGrades() {
+      return !this.isAttendanceMode && this.isCourseResultsSection && ['pre', 'post'].includes(this.resultsType)
+        && ['admin', 'male_manager', 'female_manager'].includes(this.currentUser?.role);
+    },
+    gradeChangedCount() { return gradeChanges(this.gradeRows).length; },
+  },
   watch: {
     courseOptions: {
       immediate: true,
@@ -133,6 +148,8 @@ export default {
   beforeUnmount() {
     this.resultsGeneration++;
     this.resultsController?.abort();
+    this.gradeController?.abort();
+    this.gradeGeneration++;
     clearTimeout(this.resultsSearchTimer);
     if (this.attendanceSaveTimer) clearTimeout(this.attendanceSaveTimer);
   },
@@ -141,5 +158,6 @@ export default {
     ...dataMethods,
     ...dialogMethods,
     ...directoryMethods,
+    ...gradeMethods,
   },
 };

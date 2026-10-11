@@ -13,7 +13,7 @@
               {{ sectionLabel }}
             </div>
             <div class="results-detail-dialog__title">
-              {{ resultTypeLabel }}: الإجابة
+              {{ resultTypeLabel }}: {{ selectedRow?.submission?.scoreOnly ? 'النتيجة' : 'الإجابة' }}
             </div>
           </div>
           <div class="results-detail-dialog__actions">
@@ -109,6 +109,12 @@
           class="results-detail-dialog__body"
           :class="{ 'results-detail-dialog__body--tasks': taskSection }"
         >
+          <p
+            v-if="selectedRow.submission?.scoreOnly"
+            class="results-empty-state"
+          >
+            الدرجة: {{ selectedRow.scoreLabel }}. أُدخلت يدويًا دون إجابات.
+          </p>
           <article
             v-for="detail in detailCards"
             :key="detail.key"

@@ -26,6 +26,7 @@ export const requiresManualReview = (question, answer = null) => (
 
 export const hasPendingManualReview = (questions, submission) => {
   if (!submission) return false
+  if (submission.manualScore !== null && submission.manualScore !== undefined) return false
   const answerMap = new Map((submission.answers || []).map(answer => [answer.questionId, answer]))
   if ((questions || []).length) {
     return questions.some(question => {
@@ -85,7 +86,7 @@ export const buildResultDetailCards = (questions, submission, {
   richTextAnswers = false,
   attachmentResolver = null,
 } = {}) => {
-  if (!submission) return []
+  if (!submission || submission.scoreOnly) return []
   const answerMap = new Map((submission.answers || []).map(answer => [answer.questionId, answer]))
   const buildRichText = answer => richTextAnswers && !answer?.fileName && String(answer?.value || '').trim()
     ? String(answer.value)
@@ -144,4 +145,15 @@ export const buildResultDetailCards = (questions, submission, {
       statusText: manualReview ? buildManualReviewStatus(manualPoints, answer.points) : '',
     }
   })
+}
+
+export const formatResultScore = (questions, submission, score = calculateSubmissionScore(questions, submission)) => {
+  if (!submission) return 'غير مرسل'
+  if (hasPendingManualReview(questions, submission)) return 'بانتظار التصحيح اليدوي'
+  const total = submission.scoreTotal ?? questions.reduce((sum, question) => sum + Number(question.points || 0), 0)
+  if (score !== null && (total > 0 || submission.manualScore !== null && submission.manualScore !== undefined)) {
+    if (submission.scoreTotal > 0) return `${Number(score)} / ${Number(total)}`
+    return total > 0 ? `${formatScoreValue(score)} / ${formatScoreValue(total)}` : formatScoreValue(score)
+  }
+  return `${(submission.answers || []).length} إجابة`
 }

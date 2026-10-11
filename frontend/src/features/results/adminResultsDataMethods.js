@@ -1,7 +1,7 @@
 import {
   calculateSubmissionScore,
   formatScoreValue,
-  hasPendingManualReview,
+  formatResultScore,
   resolveCorrectAnswer as resolveCorrectAnswerValue,
   resolveStudentAnswer as resolveStudentAnswerValue,
 } from './resultModel.mjs';
@@ -106,12 +106,7 @@ export default {
   },
   formatScore(value) { return formatScoreValue(value); },
   formatRowScore(score, submission) {
-    if (!submission) return 'غير مرسل';
-    if (hasPendingManualReview(this.resolveSubmissionQuestions(submission), submission)) {
-      return 'بانتظار التصحيح اليدوي';
-    }
-    if (!this.selectedResultsTotalPoints) return `${(submission.answers || []).length} إجابة`;
-    return `${this.formatScore(score)} / ${this.formatScore(this.selectedResultsTotalPoints)}`;
+    return formatResultScore(this.resolveSubmissionQuestions(submission), submission, score);
   },
   taskReviewStatusLabel(status) {
     return { approved: 'معتمد', rejected: 'مرفوض', pending: 'بانتظار المراجعة' }[status]

@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ClientErrorController;
 use App\Http\Controllers\Api\CourseAssessmentController;
 use App\Http\Controllers\Api\CourseController;
+use App\Http\Controllers\Api\CourseScoreController;
 use App\Http\Controllers\Api\DashboardAccountController;
 use App\Http\Controllers\Api\DashboardDatasetController;
 use App\Http\Controllers\Api\EditorAssetController;
@@ -66,6 +67,7 @@ Route::middleware(['auth:sanctum', 'password.changed'])->group(function () {
             Route::get('results/catalog', [ResultsDirectoryController::class, 'catalog'])
                 ->middleware('dashboard.access:results');
             Route::get('results', [ResultsDirectoryController::class, 'index'])->middleware('dashboard.access:results');
+            Route::put('results/grades', [CourseScoreController::class, 'update'])->middleware('dashboard.access:results');
             Route::get('people', PeopleDirectoryController::class)->middleware('dashboard.access:people');
             Route::get('people/options', [PeopleDirectoryController::class, 'options'])
                 ->middleware('dashboard.access:people');

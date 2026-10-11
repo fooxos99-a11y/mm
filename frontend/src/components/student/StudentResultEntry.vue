@@ -34,6 +34,12 @@
           v-if="expanded && submission"
           class="student-detail-stack"
         >
+          <p
+            v-if="submission.scoreOnly"
+            class="results-empty-state"
+          >
+            أُدخلت النتيجة يدويًا دون إجابات.
+          </p>
           <article
             v-for="detail in details"
             :key="detail.key"

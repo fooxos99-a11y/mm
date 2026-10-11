@@ -1,0 +1,24 @@
+.grade-dialog { display: flex; flex-direction: column; max-height: calc(var(--overlay-height, 100dvh) - 32px); min-height: 0; color: #183638; }
+.grade-dialog__body { display: block; overflow-y: auto; min-height: 0; overscroll-behavior: contain; }
+.grade-dialog .app-dialog-header { flex-direction: row; }
+.grade-dialog .app-field { min-width: 0; grid-template-columns: minmax(0, 1fr); }
+.grade-dialog .app-field__control { min-width: 0; }
+.grade-dialog__controls { display: grid; grid-template-columns: 90px minmax(0, 1fr); gap: 8px; margin-bottom: 14px; }
+.grade-dialog__controls .app-field__label { font-size: 13px; }
+.grade-dialog__error { padding: 12px; border: 1px solid #e7b4b4; border-radius: 8px; background: #fff3f3; color: #9c2222; margin-bottom: 12px; }
+.grade-dialog__error .app-button { margin-top: 8px; }
+.grade-dialog__hint { margin: 0 0 12px; font-size: 13px; color: #51656b; }
+.grade-dialog__columns, .grade-dialog__row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(100px, 140px); gap: 12px; }
+.grade-dialog__columns { padding: 8px 0; border-bottom: 1px solid #c9dada; font-weight: 700; }
+.grade-dialog__row { padding: 12px 0; border-bottom: 1px solid #e2ebeb; align-items: start; }
+.grade-dialog__identity { display: flex; flex-direction: column; gap: 5px; min-width: 0; overflow-wrap: anywhere; }
+.grade-dialog__identity span, .grade-dialog__identity small { font-size: 12px; color: #556b6e; }
+.grade-dialog__identity span { text-align: right; }
+.grade-dialog__field { min-width: 0; }
+.grade-dialog__field input { min-height: 44px; text-align: center; direction: ltr; }
+.grade-dialog__field .app-button { padding: 6px 2px; min-height: 44px; width: 100%; font-size: 11px; }
+.grade-dialog .app-dialog-footer { flex-shrink: 0; gap: 8px; flex-direction: row; flex-wrap: wrap; }
+.grade-dialog .app-dialog-footer > .app-button { min-width: 0; }
+.grade-dialog .app-dialog-footer output { flex: 1; font-size: 12px; }
+@media (min-width: 560px) { .grade-dialog__controls { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); } }
+@media (max-width: 420px) { .grade-dialog__columns, .grade-dialog__row { grid-template-columns: minmax(0, 1fr) 100px; } .grade-dialog .app-dialog-footer output { flex-basis: 100%; } .grade-dialog .app-dialog-footer .app-button { flex: 1; } }

@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 class ResultsDirectoryService
 {
-    public function __construct(private readonly CoreDataService $core)
+    public function __construct(private readonly CoreDataService $core, private readonly CourseScoreReadService $scores)
     {
     }
 
@@ -101,6 +101,11 @@ class ResultsDirectoryService
             ->orderByDesc('id')
             ->get() : collect();
         $permissions = $this->core->loadRolePermissions()[$user->role] ?? [];
+        $manualScores = in_array($type, ['pre', 'post'], true) ? $this->scores->query()
+            ->where('settings.course_id', $courseId)->where('settings.assessment_type', $type)
+            ->where('settings.branch_code', $branch)->whereIn('scores.student_id', $page->getCollection()->pluck('id'))
+            ->get() : collect();
+        $submissions = $this->scores->merge($submissions, $manualScores);
         $courseKeys = $user->role === 'admin' || collect(['edit_pre_questions', 'edit_post_questions', 'edit_tasks'])
             ->contains(fn ($key) => (bool) ($permissions[$key] ?? false));
         $data = $this->core->serializeResultsPage(
@@ -122,7 +127,11 @@ class ResultsDirectoryService
             $user->role === 'admin' || ($permissions['page_final_exam'] ?? false),
         );
 
-        return [...$data, 'students' => $page->getCollection()->map(fn ($student) => [
+        return [...$data,
+            'gradeSettings' => in_array($type, ['pre', 'post'], true) ? $this->scores->settings($courseId, $type, $branch) : null,
+            'scoreEntries' => $manualScores->map(fn ($score) => ['studentId' => $score->student_id,
+                'score' => $score->score === null ? null : (float) $score->score, 'version' => $score->version])->all(),
+            'students' => $page->getCollection()->map(fn ($student) => [
             'id' => $student->id, 'name' => $student->full_name, 'loginId' => $student->login_code,
             'branchId' => $branch, 'absenceCount' => $courseCount - (int) $student->attended_count,
         ])->all(), 'summary' => $summary,

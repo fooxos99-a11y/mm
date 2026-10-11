@@ -9,6 +9,10 @@ class DashboardSnapshotCourseLoader
 {
     private const MAX_SNAPSHOT_RECORDS = 1000;
 
+    public function __construct(private readonly CourseScoreReadService $scores)
+    {
+    }
+
     public function load(
         bool $restrictStudentData,
         Collection $allowedStudentLogins,
@@ -36,6 +40,16 @@ class DashboardSnapshotCourseLoader
         $submissionAnswersQuery = DB::table('course_submission_answers')->whereNull('archive_id');
 
         $submissionAnswersQuery->whereIn('submission_id', $submissions->pluck('id')->all());
+        $scoresQuery = $this->scores->query()->orderByDesc('scores.updated_at')->orderBy('scores.id');
+        if ($restrictStudentData) {
+            $scoresQuery->whereIn('students.login_code', $allowedStudentLogins->all());
+        }
+        $scoreCount = (clone $scoresQuery)->count();
+        $manualScores = $scoresQuery->when(! $includeAll,
+            fn ($query) => $query->forPage($page, self::MAX_SNAPSHOT_RECORDS))->get();
+        $submissionScores = $this->scores->query()->whereIn('actual.id', $submissions->pluck('id'))->get();
+        $manualScores = $manualScores->concat($submissionScores)->unique('id')->values();
+        $submissions = $this->scores->merge($submissions, $manualScores);
 
         return [
             'courses' => DB::table('courses')
@@ -60,6 +74,7 @@ class DashboardSnapshotCourseLoader
             'meta' => [
                 'submissions' => $this->datasetMeta($submissionCount, $includeAll, $page),
                 'attendance' => $this->datasetMeta($attendanceCount, $includeAll, $page),
+                'manualScores' => $this->datasetMeta($scoreCount, $includeAll, $page),
             ],
         ];
     }

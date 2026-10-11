@@ -9,7 +9,7 @@ import {
   buildResultDetailCards,
   calculateSubmissionScore,
   formatScoreValue,
-  hasPendingManualReview,
+  formatResultScore,
   resolveCorrectAnswer as resolveCorrectAnswerValue,
   resolveStudentAnswer as resolveStudentAnswerValue,
 } from '../results/resultModel.mjs';
@@ -206,11 +206,7 @@ export default {
     resolveSubmissionScore(questions, submission) { return calculateSubmissionScore(questions, submission); },
     formatScore(value) { return formatScoreValue(value); },
     formatResultScore(score, submission, questions) {
-      if (!submission) return 'غير مرسل';
-      const total = questions.reduce((sum, question) => sum + Number(question.points || 0), 0);
-      if (!total) return `${(submission.answers || []).length} إجابة`;
-      if (hasPendingManualReview(questions, submission)) return 'بانتظار التصحيح اليدوي';
-      return `${this.formatScore(score)} / ${this.formatScore(total)}`;
+      return formatResultScore(questions, submission, score);
     },
     resolveStudentAnswer(answer) { return resolveStudentAnswerValue(answer); },
     resolveCorrectAnswer(question) { return resolveCorrectAnswerValue(question); },

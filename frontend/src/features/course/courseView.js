@@ -130,6 +130,7 @@ export default /** @type {Record<string, any>} */ ({
       return [...(this.dashboardSnapshot?.submissions || [])]
         .filter((submission) => (
           submission.courseId === this.activeCourse.id
+          && !submission.scoreOnly
           && submission.assessmentType === this.resolvedAssessmentType
           && submission.loginId === this.student.loginId
         ))

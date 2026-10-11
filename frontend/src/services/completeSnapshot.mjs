@@ -4,7 +4,7 @@ export const loadCompleteSnapshot = async (fetchPage) => {
   const keys = ['submissions', 'attendance', 'satisfactionResponses', 'finalExamSubmissions'];
   let page = 1;
   let latest = snapshot;
-  while (keys.some((key) => latest.snapshotMeta?.[key]?.nextPage)) {
+  while ([...keys, 'manualScores'].some((key) => latest.snapshotMeta?.[key]?.nextPage)) {
     latest = await fetchPage(++page);
     for (const key of keys) {
       const rows = new Map((snapshot[key] || []).map((row) => [row.id, row]));
@@ -18,6 +18,10 @@ export const loadCompleteSnapshot = async (fetchPage) => {
         ...latest.snapshotMeta[key], returned: (snapshot[key] || []).length, truncated: false, nextPage: null,
       };
     }
+  }
+  if (snapshot.snapshotMeta?.manualScores) {
+    snapshot.snapshotMeta.manualScores = { ...latest.snapshotMeta.manualScores,
+      returned: latest.snapshotMeta.manualScores.total, truncated: false, nextPage: null };
   }
   return snapshot;
 };

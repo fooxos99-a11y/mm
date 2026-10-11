@@ -125,6 +125,12 @@ trait SerializesDashboardSnapshots
                         'studentName' => $submission->student_name,
                         'loginId' => $submission->login_code,
                         'manualScore' => $submission->manual_score !== null ? (float) $submission->manual_score : null,
+                        ...(isset($submission->score_recorded_at) ? [
+                            'scoreTotal' => isset($submission->score_total) ? (float) $submission->score_total : null,
+                            'scoreOnly' => (bool) ($submission->score_only ?? false),
+                            'scoreSource' => $submission->score_source,
+                            'scoreRecordedAt' => (string) $submission->score_recorded_at,
+                        ] : []),
                         'taskReviewStatus' => $submission->assessment_type === 'tasks'
                             ? ($submission->task_review_status ?: 'pending')
                             : null,

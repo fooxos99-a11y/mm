@@ -43,6 +43,13 @@
           <h1 class="results-shell__title">
             لوحة النتائج
           </h1>
+          <AppButton
+            v-if="canEnterGrades"
+            :disabled="resultsLoading"
+            @click="openGradeDialog"
+          >
+            إدخال الدرجات
+          </AppButton>
         </div>
 
         <div class="results-filters">
@@ -265,6 +272,29 @@
         </div>
       </section>
 
+      <ResultsGradeDialog
+        :open="gradeDialogOpen"
+        :course-title="gradeScope.courseTitle"
+        :type-label="gradeScope.typeLabel"
+        :rows="gradeRows"
+        :total="gradeTotal"
+        :total-locked="gradeTotalLocked"
+        :search="gradeSearch"
+        :loading="gradeLoading"
+        :saving="gradeSaving"
+        :errors="gradeErrors"
+        :error="gradeError"
+        :conflict="gradeConflict"
+        :load-failed="gradeLoadFailed"
+        :changed-count="gradeChangedCount"
+        @update:total="gradeTotal = $event"
+        @update:search="gradeSearch = $event"
+        @update-grade="updateGradeDraft"
+        @clear-grade="toggleGradeClear"
+        @reload="loadGradeRoster(true)"
+        @close="closeGradeDialog"
+        @save="saveGradeDrafts"
+      />
       <ResultsDialogs
         :result-open="resultDialogOpen"
         :delete-open="courseDeleteDialogOpen"
@@ -309,4 +339,5 @@
 .results-search { width: 100%; min-height: 44px; border: 1px solid #bdced1; border-radius: 8px; padding: 10px; margin-bottom: 12px; }
 .results-pagination { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-top: 16px; }
 .results-retry { min-height: 44px; padding: 8px 16px; }
+.results-shell__header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
 </style>
