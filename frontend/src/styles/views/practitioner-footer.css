@@ -243,52 +243,7 @@
   }
 }
 
-@media (min-width: 1101px) {
-  .practitioner-page .landing-header__inner {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-    align-items: center;
-    padding-inline: 56px;
-  }
-
-  .practitioner-page .brand-mark {
-    justify-self: end;
-  }
-
-  .practitioner-page .landing-nav {
-    display: flex;
-    position: static;
-    justify-self: center;
-    transform: none;
-    max-width: 100%;
-  }
-
-  .practitioner-page .landing-header__actions {
-    position: absolute;
-    top: 50%;
-    left: 8px;
-    transform: translateY(-50%);
-    justify-self: auto;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .practitioner-page .mobile-menu-toggle,
-  .practitioner-page .mobile-nav-panel {
-    display: none;
-  }
-}
-
 @media (max-width: 860px) {
-  .practitioner-page .landing-header__inner {
-    align-items: flex-start;
-    gap: 14px;
-  }
-
-  .practitioner-page .landing-header__actions {
-    gap: 8px;
-  }
 
   .practitioner-page .goals-grid,
   .practitioner-page .domains-grid,
@@ -309,7 +264,6 @@
     border-top: 1px solid rgba(26, 106, 133, 0.13);
   }
 
-  .practitioner-page .landing-header__inner,
   .practitioner-page .landing-footer__bottom {
     flex-direction: column;
   }

@@ -1,6 +1,9 @@
 import { mapActions, mapState } from 'vuex';
 import {
   AppButton,
+  AppCard,
+  AppFilterField,
+  AppFilterToolbar,
   AppDialog,
   AppDialogBody,
   AppDialogFooter,
@@ -22,6 +25,9 @@ export default {
   name: 'AdminTrainingMaterialsView',
   components: {
     AppButton,
+    AppCard,
+    AppFilterField,
+    AppFilterToolbar,
     AppDialog,
     AppDialogBody,
     AppDialogFooter,

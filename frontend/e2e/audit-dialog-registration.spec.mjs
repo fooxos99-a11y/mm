@@ -8,7 +8,7 @@ test('shared dialog names follow pre, post, tasks and edit titles after reuse', 
   await page.goto('dashboard?panel=courses');
   const courses = page.locator('.assessment-select:visible').first();
   await courses.locator('.v-field').click();
-  await page.getByText('دورة اختبار الواجهة', { exact: true }).click();
+  await page.getByRole('option').filter({ hasText: 'دورة اختبار الواجهة' }).click();
   for (const [mode, title] of [['الاختبار القبلي', 'فتح الاختبار القبلي'], ['الاختبار البعدي', 'فتح الاختبار البعدي']]) {
     const type = page.getByRole('combobox', { name: 'النوع', exact: true });
     await type.locator('xpath=ancestor::div[contains(@class,"v-field")][1]').click();
@@ -20,7 +20,7 @@ test('shared dialog names follow pre, post, tasks and edit titles after reuse', 
   }
   await page.goto('dashboard?panel=tasks');
   await page.locator('.assessment-select:visible').first().locator('.v-field').click();
-  await page.getByText('مهمة اختبار الواجهة', { exact: true }).click();
+  await page.getByRole('option').filter({ hasText: 'مهمة اختبار الواجهة' }).click();
   await page.getByRole('button', { name: 'بدء المهمة الأدائية', exact: true }).click();
   const taskDialog = page.getByRole('dialog', { name: 'فتح المهام الأدائية', exact: true });
   await expect(taskDialog).toBeVisible();

@@ -13,25 +13,6 @@
     padding: 72px 0;
   }
 
-  .home-page .landing-header__inner {
-    min-height: 84px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-  }
-
-  .home-page .brand-mark {
-    gap: 10px;
-    margin-inline-end: 0;
-  }
-
-  .home-page .brand-mark__text {
-    display: none;
-  }
-
-  .home-page .site-logo {
-    height: 52px;
-  }
-
   .home-page .hero-section {
     min-height: max(100svh, 760px);
     box-sizing: border-box;
@@ -68,13 +49,6 @@
   .home-page .hero-actions {
     width: 100%;
     flex-direction: column;
-  }
-
-  .home-page .licenses-menu {
-    right: 16px !important;
-    left: auto !important;
-    width: min(330px, calc(100vw - 32px)) !important;
-    max-width: calc(100vw - 32px) !important;
   }
 
   .home-page .hero-primary-btn,

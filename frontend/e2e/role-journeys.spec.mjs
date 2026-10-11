@@ -144,14 +144,14 @@ test('manager panels load without browser or server errors', async ({ page }) =>
     if (panel === 'courses') {
       const courseSelect = page.locator('.assessment-select:visible').first();
       await courseSelect.locator('.v-field').click();
-      await page.getByText('دورة اختبار الواجهة', { exact: true }).click();
+      await page.getByRole('option').filter({ hasText: 'دورة اختبار الواجهة' }).click();
       await expect(courseSelect).toContainText('دورة اختبار الواجهة');
     }
 
     if (panel === 'tasks') {
       const taskSelect = page.locator('.assessment-select:visible');
       await taskSelect.locator('.v-field').click();
-      await page.getByText('مهمة اختبار الواجهة', { exact: true }).click();
+      await page.getByRole('option').filter({ hasText: 'مهمة اختبار الواجهة' }).click();
       await expect(taskSelect).toContainText('مهمة اختبار الواجهة');
     }
 

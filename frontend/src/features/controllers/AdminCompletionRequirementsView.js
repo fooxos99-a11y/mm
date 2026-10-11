@@ -1,6 +1,6 @@
 import { mapState } from 'vuex';
 import {
-  AppButton, AppDialog, AppDialogBody, AppDialogFooter, AppDialogHeader, AppSelect, AppTextField,
+  AppButton, AppCard, AppFilterField, AppFilterToolbar, AppDialog, AppDialogBody, AppDialogFooter, AppDialogHeader, AppSelect, AppTextField,
 } from '../../components/ui';
 import {
   closeCompletionResults,
@@ -28,7 +28,7 @@ const emptyPayload = () => ({
 export default {
   name: 'AdminCompletionRequirementsView',
   components: {
-    AppButton, AppDialog, AppDialogBody, AppDialogFooter, AppDialogHeader, AppSelect, AppTextField,
+    AppButton, AppCard, AppFilterField, AppFilterToolbar, AppDialog, AppDialogBody, AppDialogFooter, AppDialogHeader, AppSelect, AppTextField,
     CompletionRequirementsPanel,
   },
   data() {

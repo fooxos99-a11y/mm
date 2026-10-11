@@ -1,13 +1,10 @@
 <template>
   <div>
-    <div class="permissions-admin__role-switcher">
-      <div class="permissions-admin__role-field">
-        <label
-          for="permissions-manager-role"
-          class="permissions-admin__role-label"
-        >
-          نوع المسؤول
-        </label>
+    <AppFilterToolbar :columns="1">
+      <AppFilterField
+        for-id="permissions-manager-role"
+        label="نوع المسؤول"
+      >
         <AppNativeSelect
           id="permissions-manager-role"
           :value="role"
@@ -22,8 +19,8 @@
             {{ option.label }}
           </option>
         </AppNativeSelect>
-      </div>
-    </div>
+      </AppFilterField>
+    </AppFilterToolbar>
 
     <div class="permissions-admin__groups">
       <section
@@ -62,11 +59,11 @@
 </template>
 
 <script>
-import { AppNativeSelect } from '../ui';
+import { AppFilterField, AppFilterToolbar, AppNativeSelect } from '../ui';
 
 export default {
   name: 'PermissionsMatrixPanel',
-  components: { AppNativeSelect },
+  components: { AppFilterField, AppFilterToolbar, AppNativeSelect },
   props: {
     role: { type: String, required: true },
     roles: { type: Array, required: true },

@@ -3,7 +3,10 @@
     class="permissions-admin"
     :class="{ 'permissions-admin--embedded': embedded }"
   >
-    <v-container class="permissions-admin__container py-8 py-md-10">
+    <v-container
+      class="permissions-admin__container"
+      :class="{ 'py-8 py-md-10': !embedded }"
+    >
       <div
         v-if="dashboardError"
         class="permissions-admin__alert permissions-admin__alert--error"
@@ -12,7 +15,10 @@
       </div>
 
       <section class="permissions-admin__panel">
-        <article class="permissions-admin__card">
+        <AppCard
+          tag="article"
+          class="permissions-admin__card admin-workspace-card"
+        >
           <div
             v-if="currentUser && currentUser.role === 'admin'"
             class="permissions-admin__section-switcher"
@@ -49,7 +55,7 @@
             v-else
             embedded
           />
-        </article>
+        </AppCard>
       </section>
     </v-container>
   </div>

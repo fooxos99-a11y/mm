@@ -21,7 +21,7 @@ for (const assessmentType of ['pre', 'post', 'tasks']) {
       await page.locator('.assessment-select:visible').first().locator('.v-field').click();
       await page.getByText(title, { exact: true }).click();
     } else {
-      await page.locator('.assessment-select:visible').last().locator('.v-field').click();
+      await page.locator('#assessment-toolbar-mode').locator('xpath=ancestor::div[contains(@class,"v-input")]').locator('.v-field').click();
       await page.getByRole('option').filter({ hasText: assessmentType === 'pre' ? 'الاختبار القبلي' : 'الاختبار البعدي' }).click();
     }
     for (const [index, type] of ['خيارات', 'صح أو خطأ', 'نصي'].entries()) {
@@ -56,7 +56,7 @@ for (const assessmentType of ['pre', 'post', 'tasks']) {
       await page.locator('.assessment-select:visible').first().locator('.v-field').click();
       await page.getByText(title, { exact: true }).click();
     } else {
-      await page.locator('.assessment-select:visible').last().locator('.v-field').click();
+      await page.locator('#assessment-toolbar-mode').locator('xpath=ancestor::div[contains(@class,"v-input")]').locator('.v-field').click();
       await page.getByRole('option').filter({ hasText: assessmentType === 'pre' ? 'الاختبار القبلي' : 'الاختبار البعدي' }).click();
     }
     await expect(saved).toHaveCount(3);

@@ -85,6 +85,7 @@
           'dashboard-workspace-panel--assessment': isAssessmentWorkspace,
           'dashboard-workspace-panel--communications': isCommunicationsWorkspace,
           'dashboard-workspace-panel--registration': isRegistrationWorkspace,
+          'dashboard-workspace-panel--standard': ['courses', 'tasks', 'finalexam', 'satisfaction', 'completion', 'results', 'materials', 'users', 'notifications'].includes(activeMenu) || (activeMenu === 'settings' && ['archive', 'permissions'].includes(selectedSettingsItemId)),
         }"
       >
         <component
@@ -147,3 +148,4 @@
 <style src="../styles/views/dashboard-satisfaction.css"></style>
 <style src="../styles/views/dashboard-management.css"></style>
 <style src="../styles/views/dashboard-responsive.css"></style>
+<style src="../styles/views/admin-workspace.css"></style>

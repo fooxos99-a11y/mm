@@ -3,13 +3,12 @@
     class="admin-training-materials"
     :class="{ 'admin-training-materials--embedded': embedded }"
   >
-    <section class="admin-training-materials__controls">
-      <div class="admin-training-materials__toolbar">
-        <div class="prep-field admin-training-materials__filter-field">
-          <label
-            class="prep-field__label"
-            for="training-materials-select"
-          >المادة التدريبية</label>
+    <AppCard class="admin-training-materials__controls admin-workspace-card">
+      <AppFilterToolbar :columns="1">
+        <AppFilterField
+          for-id="training-materials-select"
+          label="المادة التدريبية"
+        >
           <AppSelect
             id="training-materials-select"
             :key="materialSelectResetKey"
@@ -25,8 +24,8 @@
             outlined
             class="prep-select admin-training-materials__select"
           />
-        </div>
-      </div>
+        </AppFilterField>
+      </AppFilterToolbar>
 
       <div
         v-if="!hasMaterials"
@@ -34,7 +33,7 @@
       >
         لا توجد مواد تدريبية بعد. اختر إضافة مادة من القائمة لإنشاء أول مادة.
       </div>
-    </section>
+    </AppCard>
 
     <TrainingMaterialsList
       v-if="hasMaterials"

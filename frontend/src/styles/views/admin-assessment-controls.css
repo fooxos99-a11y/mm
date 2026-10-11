@@ -129,6 +129,73 @@
   color: #b42318;
 }
 
+.assessment-page .assessment-card:has(> .assessment-task-toolbar) {
+  min-width: 0;
+}
+
+.assessment-page .assessment-task-toolbar .assessment-toolbar--embedded {
+  grid-template-columns: minmax(0, 1fr) clamp(88px, 22%, 140px);
+  align-items: start;
+  gap: 12px;
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.assessment-page .assessment-task-toolbar .assessment-toolbar__field:only-child {
+  grid-column: 1 / -1;
+}
+
+.assessment-page .assessment-task-toolbar .assessment-select .v-field__input {
+  min-height: 58px;
+}
+
+.assessment-page .assessment-task-toolbar .assessment-toolbar__label {
+  margin-bottom: 8px;
+  color: #0f172a;
+  font-size: 0.92rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.assessment-page .assessment-task-toolbar .assessment-form-card__field-group {
+  row-gap: 8px;
+}
+
+.assessment-page .assessment-task-toolbar .assessment-form-card__field-group .assessment-toolbar__label {
+  margin-bottom: 0;
+}
+
+.assessment-page .assessment-task-toolbar .assessment-toolbar__aux-fields {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+  margin-bottom: 24px;
+}
+
+.assessment-page .assessment-task-toolbar .assessment-input--multiline {
+  min-height: 58px;
+  height: 58px;
+}
+
+.assessment-page .assessment-task-toolbar input[type="url"] {
+  direction: ltr;
+  text-align: right;
+}
+
+@media (min-width: 600px) {
+  .assessment-page .assessment-task-toolbar .assessment-toolbar--embedded,
+  .assessment-page .assessment-task-toolbar .assessment-toolbar__aux-fields {
+    gap: 20px;
+  }
+}
+
+@media (max-width: 599px) {
+  .assessment-page .assessment-card:has(> .assessment-task-toolbar) {
+    padding: 12px;
+  }
+}
+
 .assessment-course-menu .assessment-select-option__actions {
   display: inline-flex;
   align-items: center;

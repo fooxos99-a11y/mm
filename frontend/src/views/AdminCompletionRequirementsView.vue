@@ -1,45 +1,48 @@
 <template>
   <div class="completion-page">
-    <div class="completion-filter-bar">
-      <div class="completion-field">
-        <label for="completion-status-filter">الحالة</label>
-        <AppSelect
-          id="completion-status-filter"
-          v-model="statusFilter"
-          aria-label="الحالة"
-          :items="statusOptions"
-          item-text="label"
-          item-value="value"
-          dense
-          outlined
-          hide-details
-        />
-      </div>
-      <div class="completion-field">
-        <label for="completion-student">{{ selectedBranch === 'female' ? 'المعلمة' : 'المعلم' }}</label>
-        <AppSelect
-          id="completion-student"
-          v-model="selectedStudentId"
-          :aria-label="selectedBranch === 'female' ? 'المعلمة' : 'المعلم'"
-          :items="studentOptions"
-          item-text="label"
-          item-value="value"
-          placeholder="اختر الاسم"
-          dense
-          outlined
-          hide-details
-          clearable
-        />
-      </div>
-    </div>
-
-    <section class="completion-students">
+    <AppCard class="completion-students admin-workspace-card">
+      <AppFilterToolbar>
+        <AppFilterField
+          for-id="completion-student"
+          :label="selectedBranch === 'female' ? 'المعلمة' : 'المعلم'"
+        >
+          <AppSelect
+            id="completion-student"
+            v-model="selectedStudentId"
+            :aria-label="selectedBranch === 'female' ? 'المعلمة' : 'المعلم'"
+            :items="studentOptions"
+            item-text="label"
+            item-value="value"
+            placeholder="اختر الاسم"
+            dense
+            outlined
+            hide-details
+            clearable
+          />
+        </AppFilterField>
+        <AppFilterField
+          for-id="completion-status-filter"
+          label="الحالة"
+        >
+          <AppSelect
+            id="completion-status-filter"
+            v-model="statusFilter"
+            aria-label="الحالة"
+            :items="statusOptions"
+            item-text="label"
+            item-value="value"
+            dense
+            outlined
+            hide-details
+          />
+        </AppFilterField>
+      </AppFilterToolbar>
       <CompletionRequirementsPanel
         :student="selectedStudent"
         :loading="loading"
         :empty-message="studentOptions.length ? 'اختر اسمًا لعرض تفاصيل الاجتياز.' : 'لا توجد أسماء مطابقة لهذا الفلتر.'"
       />
-    </section>
+    </AppCard>
 
     <AppDialog
       v-model="settingsDialogOpen"

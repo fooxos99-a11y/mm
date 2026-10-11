@@ -1,6 +1,6 @@
 import { defineAsyncComponent } from 'vue';
 import { mapActions, mapGetters, mapState } from 'vuex';
-import LicenseProgramsMenu from '../../components/public/LicenseProgramsMenu.vue';
+import PublicLandingHeader from '../../components/public/PublicLandingHeader.vue';
 import AppButton from '../../components/ui/AppButton.vue';
 import computed from './homeComputed';
 import methods from './homeMethods';
@@ -25,7 +25,7 @@ export default {
     AppButton,
     HomeProgramsSection,
     HomeSupportingSections,
-    LicenseProgramsMenu,
+    PublicLandingHeader,
     PublicAccountDialogs,
   },
   data() {

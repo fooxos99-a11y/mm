@@ -1,4 +1,6 @@
 import { normalizePractitionerPageContent } from '../../utils/practitionerPageContent';
+import { normalizeHomePageContent } from '../../utils/homePageContent';
+import { buildLicensePrograms } from '../home/homeProgramMeta';
 import { resolveUserHomeLabel, resolveUserHomeRoute } from '../../utils/authRoutes';
 import { PRACTITIONER_NAV_LINKS, PRACTITIONER_PROGRAM_INDICATORS } from './practitionerMeta';
 
@@ -14,6 +16,9 @@ export default {
         href: PRACTITIONER_NAV_LINKS[index] || '#about',
         label: item.label,
       }));
+    },
+    licensePrograms() {
+      return buildLicensePrograms(normalizeHomePageContent(this.publicSnapshot?.homePageContent));
     },
     pageGoals() {
       return this.pageContent.goals;

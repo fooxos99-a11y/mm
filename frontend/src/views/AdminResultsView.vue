@@ -38,7 +38,7 @@
       v-else
       class="results-board"
     >
-      <section class="results-shell">
+      <AppCard class="results-shell admin-workspace-card">
         <div class="results-shell__header">
           <h1 class="results-shell__title">
             لوحة النتائج
@@ -52,12 +52,11 @@
           </AppButton>
         </div>
 
-        <div class="results-filters">
-          <div class="results-filter-field results-filter-field--wide">
-            <label
-              class="results-filter-field__label"
-              for="results-filter-course"
-            >القسم</label>
+        <AppFilterToolbar :columns="1 + Number(!managedBranchId) + Number(isCourseResultsSection) + Number(showStudentFilter)">
+          <AppFilterField
+            for-id="results-filter-course"
+            label="القسم"
+          >
             <AppSelect
               id="results-filter-course"
               v-model="resultsCourseId"
@@ -72,16 +71,13 @@
               hide-details
               class="results-select"
             />
-          </div>
+          </AppFilterField>
 
-          <div
+          <AppFilterField
             v-if="!managedBranchId"
-            class="results-filter-field"
+            for-id="results-filter-branch"
+            label="الفرع"
           >
-            <label
-              class="results-filter-field__label"
-              for="results-filter-branch"
-            >الفرع</label>
             <AppSelect
               id="results-filter-branch"
               v-model="resultsBranchId"
@@ -94,16 +90,13 @@
               hide-details
               class="results-select"
             />
-          </div>
+          </AppFilterField>
 
-          <div
+          <AppFilterField
             v-if="isCourseResultsSection"
-            class="results-filter-field"
+            for-id="results-filter-type"
+            label="نوع البيانات"
           >
-            <label
-              class="results-filter-field__label"
-              for="results-filter-type"
-            >نوع البيانات</label>
             <AppSelect
               id="results-filter-type"
               v-model="resultsType"
@@ -118,16 +111,13 @@
               hide-details
               class="results-select"
             />
-          </div>
+          </AppFilterField>
 
-          <div
+          <AppFilterField
             v-if="showStudentFilter"
-            class="results-filter-field"
+            for-id="results-filter-student"
+            :label="studentFilterLabel"
           >
-            <label
-              class="results-filter-field__label"
-              for="results-filter-student"
-            >{{ studentFilterLabel }}</label>
             <AppSelect
               id="results-filter-student"
               v-model="studentFilter"
@@ -140,11 +130,11 @@
               hide-details
               class="results-select"
             />
-          </div>
-        </div>
-      </section>
+          </AppFilterField>
+        </AppFilterToolbar>
+      </AppCard>
 
-      <section class="results-list-shell">
+      <AppCard class="results-list-shell admin-workspace-card">
         <input
           :value="resultsSearch"
           type="search"
@@ -270,7 +260,7 @@
             @change="loadResultsPage"
           />
         </div>
-      </section>
+      </AppCard>
 
       <ResultsGradeDialog
         :open="gradeDialogOpen"

@@ -20,6 +20,10 @@ export default {
     try {
       const response = await listArchives();
       this.archives = response.data;
+      if (!this.archives.some((archive) => archive.id === this.selectedArchiveId)) {
+        this.selectedArchiveId = this.archives[0]?.id || null;
+        await this.fetchArchiveData();
+      }
     } catch {
       this.notifyError('تعذر تحميل الأرشيفات.');
     }

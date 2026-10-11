@@ -21,10 +21,10 @@ export default {
         return;
       }
 
-      this.selectedCourseId = '';
+      this.selectedCourseId = this.defaultCourseSelectionId();
     },
     defaultCourseSelectionId() {
-      return '';
+      return this.filteredCourses[0]?.id || '';
     },
     navigateBack() {
       this.$router.push({ name: 'dashboard' });

@@ -122,7 +122,10 @@
           v-else
           class="assessment-layout"
         >
-          <article class="assessment-card">
+          <AppCard
+            class="assessment-card admin-workspace-card"
+            tag="article"
+          >
             <AssessmentCourseToolbar
               v-bind="courseToolbarProps"
               :show-description="isTasksPage"
@@ -175,7 +178,7 @@
               @add-question="handleAddQuestionSlot"
               @save="handleSaveAllQuestions"
             />
-          </article>
+          </AppCard>
         </section>
       </template>
 

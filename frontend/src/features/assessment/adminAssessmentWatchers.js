@@ -66,10 +66,6 @@ export default {
     },
     selectedCourseId(newValue, oldValue) {
       if ((!this.showUnifiedToolbar && !this.isTasksPage) || newValue !== CREATE_COURSE_OPTION) {
-        if (this.showUnifiedToolbar && !this.isTasksPage && newValue && newValue !== CREATE_COURSE_OPTION) {
-          this.viewMode = 'attendance';
-        }
-
         return;
       }
 

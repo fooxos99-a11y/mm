@@ -1,5 +1,8 @@
 <template>
-  <div>
+  <AppCard
+    tag="article"
+    class="admin-workspace-card"
+  >
     <div
       v-if="error"
       class="people-alert people-alert--error"
@@ -17,12 +20,14 @@
       class="people-toolbar"
       :class="{ 'people-toolbar--with-actions': canCreate }"
     >
-      <div class="people-toolbar__filters">
-        <div class="people-search-field">
-          <label
-            for="people-directory-search"
-            class="people-filter-field__label"
-          >البحث بالاسم أو رقم الدخول</label>
+      <AppFilterToolbar
+        :columns="managedBranchId ? 2 : 3"
+        class="people-toolbar__filters"
+      >
+        <AppFilterField
+          for-id="people-directory-search"
+          label="البحث بالاسم أو رقم الدخول"
+        >
           <AppTextField
             id="people-directory-search"
             :value="search"
@@ -34,17 +39,13 @@
             hide-details
             @input="$emit('search', $event)"
           />
-        </div>
-        <div
+        </AppFilterField>
+        <AppFilterField
           v-if="!managedBranchId"
+          for-id="people-branch-filter"
+          label="الفرع"
           class="people-filter-field"
         >
-          <label
-            for="people-branch-filter"
-            class="people-filter-field__label"
-          >
-            الفرع
-          </label>
           <AppSelect
             id="people-branch-filter"
             :value="branch"
@@ -57,15 +58,13 @@
             class="people-select"
             @input="handleBranchChange"
           />
-        </div>
+        </AppFilterField>
 
-        <div class="people-filter-field">
-          <label
-            for="people-entity-filter"
-            class="people-filter-field__label"
-          >
-            الفلتر
-          </label>
+        <AppFilterField
+          for-id="people-entity-filter"
+          label="الفلتر"
+          class="people-filter-field"
+        >
           <AppSelect
             id="people-entity-filter"
             :value="filter"
@@ -78,8 +77,8 @@
             class="people-select"
             @input="$emit('update:filter', $event)"
           />
-        </div>
-      </div>
+        </AppFilterField>
+      </AppFilterToolbar>
 
       <div
         v-if="canCreate"
@@ -232,15 +231,15 @@
       :page-count="pageCount"
       @change="$emit('page', $event)"
     />
-  </div>
+  </AppCard>
 </template>
 
 <script>
-import { AppRawButton, AppSelect, AppTextField, AppPagination } from '../ui';
+import { AppCard, AppFilterField, AppFilterToolbar, AppRawButton, AppSelect, AppTextField, AppPagination } from '../ui';
 
 export default {
   name: 'PeopleDirectoryPanel',
-  components: { AppRawButton, AppSelect, AppTextField, AppPagination },
+  components: { AppCard, AppFilterField, AppFilterToolbar, AppRawButton, AppSelect, AppTextField, AppPagination },
   props: {
     loading: { type: Boolean, default: false },
     search: { type: String, default: '' },

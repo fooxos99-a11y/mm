@@ -12,6 +12,8 @@ export { default as AppCard } from './AppCard.vue';
 export { default as AppEmptyState } from './AppEmptyState.vue';
 export { default as AppErrorState } from './AppErrorState.vue';
 export { default as AppFooter } from './AppFooter.vue';
+export { default as AppFilterField } from './AppFilterField.vue';
+export { default as AppFilterToolbar } from './AppFilterToolbar.vue';
 export { default as AppHeader } from './AppHeader.vue';
 export { default as AppInput } from './AppInput.vue';
 export { default as AppLoadingSpinner } from './AppLoadingSpinner.vue';

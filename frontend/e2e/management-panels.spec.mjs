@@ -38,7 +38,7 @@ test('management panels remain usable across the viewport matrix', async ({ page
   const entityFilterBox = await peopleFilters.nth(1).boundingBox();
   expect(branchFilterBox).not.toBeNull();
   expect(entityFilterBox).not.toBeNull();
-  if (page.viewportSize().width < 480) {
+  if (page.viewportSize().width < 360) {
     expect(entityFilterBox.y).toBeGreaterThanOrEqual(branchFilterBox.y + branchFilterBox.height);
   } else {
     expect(Math.abs(branchFilterBox.y - entityFilterBox.y)).toBeLessThanOrEqual(1);

@@ -2,7 +2,7 @@ import { mapActions, mapState } from 'vuex';
 import ResultsDialogs from '../../components/results/ResultsDialogs.vue';
 import ResultsGradeDialog from '../../components/results/ResultsGradeDialog.vue';
 import ResultsAttendancePanel from '../../components/results/ResultsAttendancePanel.vue';
-import { AppButton, AppRawButton, AppSelect } from '../../components/ui';
+import { AppButton, AppCard, AppFilterField, AppFilterToolbar, AppRawButton, AppSelect } from '../../components/ui';
 import computed from './adminResultsComputed';
 import dataMethods from './adminResultsDataMethods';
 import dialogMethods from './adminResultsDialogMethods';
@@ -16,6 +16,9 @@ export default {
   components: {
     AppPagination,
     AppButton,
+    AppCard,
+    AppFilterField,
+    AppFilterToolbar,
     ResultsGradeDialog,
     AppRawButton,
     AppSelect,
@@ -42,7 +45,7 @@ export default {
       saveStatusText: '',
       resultsCourseId: '',
       resultsBranchId: 'male',
-      resultsType: '',
+      resultsType: 'attendance',
       studentFilter: '',
       resultDialogOpen: false,
       selectedResultLoginId: '',
@@ -82,11 +85,16 @@ export default {
     resultsCourseOptions: {
       immediate: true,
       handler(options) {
-        if (this.resultsCourseId
+        if ((this.resultsCatalogReady || this.resultsCatalog.length)
           && !options.some((option) => option.value === this.resultsCourseId)) {
-          this.resultsCourseId = '';
+          this.resultsCourseId = options[0]?.value || '';
         }
       },
+    },
+    resultsCatalogReady(ready) {
+      if (ready && !this.resultsCourseOptions.some((option) => option.value === this.resultsCourseId)) {
+        this.resultsCourseId = this.resultsCourseOptions[0]?.value || '';
+      }
     },
     resultsType() {
       this.queueResultsPage();

@@ -7,7 +7,7 @@ import AssessmentExistingQuestionList from '../../components/assessment/Assessme
 import AssessmentOperationalPanels from '../../components/assessment/AssessmentOperationalPanels.vue';
 import AssessmentQuestionBuilder from '../../components/assessment/AssessmentQuestionBuilder.vue';
 import {
-  AppChoiceButton, AppIconButton,
+  AppCard, AppChoiceButton, AppIconButton,
 } from '../../components/ui';
 import { normalizeAssessmentAnswer } from '../assessmentQuestions/questionModel.mjs';
 import { useIndicatorAnimation } from '../../composables/useIndicatorAnimation';
@@ -31,6 +31,7 @@ export default {
     AssessmentOperationalPanels,
     AssessmentQuestionBuilder,
     AppChoiceButton,
+    AppCard,
     AppIconButton,
   },
   setup() {

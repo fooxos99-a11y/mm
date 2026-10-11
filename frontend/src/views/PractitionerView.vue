@@ -10,6 +10,7 @@
       :account-menu-items="accountMenuItems"
       :license-programs="licensePrograms"
       @account-click="handleAccountClick"
+      @close-account="accountMenuOpen = false"
       @open-profile="openProfileDialog"
       @account-menu-action="handleAccountMenuAction"
       @open-program="openProgram"

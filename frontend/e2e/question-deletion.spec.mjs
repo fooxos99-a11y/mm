@@ -51,7 +51,7 @@ for (const type of ['pre', 'post', 'tasks']) {
       await page.locator('.assessment-select:visible').first().locator('.v-field').click();
       await page.getByText(title, { exact: true }).click();
     } else {
-      await page.locator('.assessment-select:visible').last().locator('.v-field').click();
+      await page.locator('#assessment-toolbar-mode').locator('xpath=ancestor::div[contains(@class,"v-input")]').locator('.v-field').click();
       await page.getByRole('option').filter({ hasText: type === 'pre' ? 'الاختبار القبلي' : 'الاختبار البعدي' }).click();
     }
     await deleteCard(page, 'السؤال المحذوف');
@@ -85,6 +85,8 @@ test('final exam supports successive delete-only saves without forcing a new que
     questions.push({ id: question.id, prompt });
   }
   await page.goto('dashboard?panel=finalexam');
+  await page.getByRole('combobox', { name: 'الفرع', exact: true }).locator('xpath=ancestor::div[contains(@class,"v-input")]').locator('.v-field').click();
+  await page.getByRole('option', { name: 'معلمات', exact: true }).click();
   for (const question of questions) {
     await deleteCard(page, question.prompt);
     const deleted = page.waitForResponse(response => response.url().endsWith(`/final-exam/questions/${question.id}`)

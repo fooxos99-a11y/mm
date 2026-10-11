@@ -3,7 +3,10 @@
     class="tasks-page"
     :class="{ 'tasks-page--embedded': embedded }"
   >
-    <v-container class="tasks-page__container py-8 py-md-10">
+    <v-container
+      class="tasks-page__container"
+      :class="{ 'py-8 py-md-10': !embedded }"
+    >
       <v-alert
         v-if="dashboardError"
         type="error"

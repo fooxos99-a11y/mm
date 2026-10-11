@@ -1,12 +1,12 @@
 import { mapActions, mapState } from 'vuex';
 import PermissionsMatrixPanel from '../../components/permissions/PermissionsMatrixPanel.vue';
-import { AppButton } from '../../components/ui';
+import { AppButton, AppCard } from '../../components/ui';
 import AdminSupervisionView from '../../views/AdminSupervisionView.vue';
 import { PERMISSION_GROUPS, PERMISSION_ROLES } from './permissionGroups';
 
 export default {
   name: 'AdminPermissionsView',
-  components: { AdminSupervisionView, AppButton, PermissionsMatrixPanel },
+  components: { AdminSupervisionView, AppButton, AppCard, PermissionsMatrixPanel },
   props: { embedded: { type: Boolean, default: false } },
   data() {
     return {

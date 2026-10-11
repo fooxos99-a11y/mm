@@ -24,7 +24,7 @@ const expectNoOverflow = async (page) => {
 const openSelectOption = async (page, label, option) => {
   const select = page.getByLabel(label, { exact: true });
   await select.locator('xpath=ancestor::div[contains(@class,"v-input")]').locator('.v-field').click();
-  await page.getByText(option, { exact: true }).click();
+  await page.getByRole('option').filter({ hasText: option }).click();
 };
 
 test('remaining dashboard panels expose usable controls and dialogs', async ({ page }, testInfo) => {

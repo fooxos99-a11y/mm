@@ -143,26 +143,6 @@
   backdrop-filter: blur(10px);
 }
 
-.home-page .licenses-menu-header {
-  font-weight: bold;
-  font-size: 1.1rem;
-  padding: 10px 0;
-  color: #08384a;
-}
-
-.home-page .licenses-menu {
-  max-width: calc(100vw - 32px);
-}
-
-.home-page .license-item {
-  border-radius: 8px;
-  margin: 4px;
-}
-
-.home-page .license-item:hover {
-  background-color: #f7fcfb;
-}
-
 .home-page .achievements-section {
   margin-top: -18px;
 }

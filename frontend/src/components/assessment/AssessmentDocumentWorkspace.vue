@@ -1,6 +1,9 @@
 <template>
   <section class="assessment-layout">
-    <article class="assessment-card">
+    <AppCard
+      class="assessment-card admin-workspace-card"
+      tag="article"
+    >
       <AssessmentCourseToolbar
         v-bind="toolbarProps"
         show-description
@@ -37,13 +40,13 @@
           {{ templateSaving ? 'جارٍ الحفظ...' : 'حفظ' }}
         </AppButton>
       </div>
-    </article>
+    </AppCard>
   </section>
 </template>
 
 <script>
 import { defineAsyncComponent } from 'vue';
-import { AppButton } from '../ui';
+import { AppButton, AppCard } from '../ui';
 import AssessmentCourseToolbar from './AssessmentCourseToolbar.vue';
 
 const RichTextEditor = defineAsyncComponent(() => import(
@@ -52,7 +55,7 @@ const RichTextEditor = defineAsyncComponent(() => import(
 
 export default {
   name: 'AssessmentDocumentWorkspace',
-  components: { AppButton, AssessmentCourseToolbar, RichTextEditor },
+  components: { AppButton, AppCard, AssessmentCourseToolbar, RichTextEditor },
   props: {
     toolbarProps: { type: Object, required: true },
     templateDraft: { type: String, default: '' },

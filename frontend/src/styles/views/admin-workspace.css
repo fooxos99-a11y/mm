@@ -1,0 +1,69 @@
+.dashboard-page .dashboard-workspace-panel--standard {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+}
+
+.dashboard-page .dashboard-workspace-panel--standard :is(.assessment-page__container, .tasks-page__container, .final-exam-page__container, .satisfaction-admin__container, .permissions-admin__container, .settings-admin__container, .people-page) {
+  max-width: none;
+  padding: 0 !important;
+}
+
+.dashboard-page .dashboard-workspace-panel .admin-workspace-card {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 1px solid #e6edf3;
+  border-radius: 28px;
+  background: #fff;
+  box-shadow: 0 12px 34px rgba(15, 23, 42, .04);
+}
+
+.dashboard-page .admin-workspace-card > .app-card__body { min-width: 0; padding: 28px; }
+.dashboard-page .dashboard-workspace-panel .admin-workspace-card .app-filter-toolbar {
+  display: grid;
+  grid-template-columns: var(--app-filter-columns);
+  align-items: end;
+  gap: 16px;
+  margin: 0 0 24px;
+  padding: 0 0 20px;
+  border: 0;
+  border-bottom: 1px solid #e6edf3;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.dashboard-page .admin-workspace-card .app-filter-field__label { color: #123f56; font-size: .95rem; font-weight: 800; }
+.dashboard-page .admin-workspace-card .app-filter-field :is(.app-native-select, .app-filter-input) {
+  width: 100%;
+  min-width: 0;
+  min-height: 58px;
+  border: 1px solid #bbcbd5;
+  border-radius: 12px;
+  padding: 12px 16px;
+  color: #123f56;
+  background: #fff;
+  font-size: 1rem;
+}
+.dashboard-page .admin-workspace-card .people-toolbar { margin-bottom: 0; }
+.dashboard-page .admin-workspace-card .admin-archive-view__select-row { flex-wrap: wrap; }
+.dashboard-page .admin-workspace-card .admin-archive-view__select { flex: 1 1 0; }
+.dashboard-page .admin-workspace-card .results-shell__header { margin-bottom: 20px; }
+.dashboard-page .admin-workspace-card .results-shell__title { font-size: 1.1rem; }
+.dashboard-page .admin-workspace-card .prep-filters--selection { display: flex; justify-content: flex-end; padding-bottom: 12px; }
+.dashboard-page .admin-workspace-card .prep-filters--selection .prep-filters__toggle { margin-top: 0; }
+.dashboard-page .assessment-form-card__label-row { min-height: 44px; }
+
+@media (max-width: 599px) {
+  .dashboard-page .dashboard-workspace-panel .admin-workspace-card { border-radius: 20px; }
+  .dashboard-page .admin-workspace-card > .app-card__body { padding: 16px; }
+}
+
+@media (max-width: 767px) {
+  .dashboard-page .admin-archive-view__card .app-filter-toolbar { --app-filter-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 359px) {
+  .dashboard-page .admin-workspace-card .assessment-toolbar__aux-fields { grid-template-columns: minmax(0, 1fr); }
+}

@@ -143,3 +143,22 @@ export const PROGRAM_CONTENT_INDEX_BY_KEY = {
   supervisor: 2,
   secretary: 3,
 };
+
+export function buildLicensePrograms(homePageContent) {
+  const orderedPrograms = [
+    ...LICENSE_PROGRAM_META.filter((program) => program.key === 'practitioner'),
+    ...LICENSE_PROGRAM_META.filter((program) => program.key !== 'practitioner'),
+  ];
+
+  return orderedPrograms.map((program) => {
+    const content = homePageContent.programs[PROGRAM_CONTENT_INDEX_BY_KEY[program.key]];
+    return {
+      ...program,
+      title: content.title,
+      menuSubtitle: content.menuSubtitle,
+      description: content.description,
+      audience: content.audience,
+      features: content.features,
+    };
+  });
+}

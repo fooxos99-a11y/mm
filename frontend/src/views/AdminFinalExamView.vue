@@ -117,19 +117,18 @@
         </div>
       </section>
 
-      <section
+      <AppCard
         v-else
-        class="final-exam-list-shell"
+        class="final-exam-list-shell admin-workspace-card"
       >
-        <div
+        <AppFilterToolbar
           v-if="!managedBranchId"
-          class="assessment-toolbar assessment-toolbar--embedded"
+          :columns="1"
         >
-          <div class="assessment-toolbar__field">
-            <label
-              class="assessment-toolbar__label"
-              for="final-exam-question-branch"
-            >الفرع</label>
+          <AppFilterField
+            for-id="final-exam-question-branch"
+            label="الفرع"
+          >
             <AppSelect
               id="final-exam-question-branch"
               v-model="selectedBranch"
@@ -142,8 +141,8 @@
               hide-details
               class="assessment-select"
             />
-          </div>
-        </div>
+          </AppFilterField>
+        </AppFilterToolbar>
 
         <AssessmentExistingQuestionList
           :questions="visibleBranchQuestions"
@@ -176,7 +175,7 @@
           @add-question="handleAddQuestionSlot"
           @save="handleSaveAllQuestions"
         />
-      </section>
+      </AppCard>
 
       <FinalExamDialogs
         v-model:copy-open="copyDialogOpen"

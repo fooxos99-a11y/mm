@@ -1,124 +1,90 @@
 <template>
-  <header
-    class="landing-header"
-    :class="{ 'landing-header--scrolled': scrolled }"
+  <PublicLandingHeader
+    ref="header"
+    :brand-title="pageContent.brandTitle"
+    :scrolled="scrolled"
+    :programs="licensePrograms"
+    :section-links="pageNavItems"
+    current-key="practitioner"
+    program-logo
+    @open-program="$emit('open-program', $event)"
+    @menu-open="$emit('close-account')"
   >
-    <div class="landing-shell landing-header__inner">
-      <a
-        href="#home"
-        class="brand-mark"
+    <template #account>
+      <div
+        class="account-menu account-menu--header"
+        @click.stop
+        @keydown.stop
       >
-        <div class="brand-mark__logos">
-          <img
-            :src="$publicAsset('شعار-الجمعية.webp')"
-            alt="شعار الجمعية"
-            class="site-logo"
-            :class="scrolled ? 'site-logo--scrolled' : 'site-logo--top'"
-          >
-          <img
-            :src="$publicAsset('اللوقو-شفاف.webp')"
-            alt="شعار برنامج رخصة ممارس"
-            class="site-logo"
-            :class="scrolled ? 'site-logo--scrolled' : 'site-logo--top'"
-          >
-        </div>
-        <div
-          class="brand-mark__text"
-          :class="{ 'brand-mark__text--light': !scrolled }"
+        <AppIconButton
+          variant="plain"
+          class="public-header__action"
+          :aria-label="isAuthenticated ? 'الحساب' : 'التسجيل'"
+          @click="handleAccountClick"
         >
-          <div class="brand-mark__title">{{ pageContent.brandTitle }}</div>
-        </div>
-      </a>
-
-      <nav class="landing-nav">
-        <a
-          v-for="item in pageNavItems"
-          :key="item.href"
-          :href="item.href"
-        >{{ item.label }}</a>
-      </nav>
-
-      <div class="landing-header__actions">
-        <div
-          class="account-menu account-menu--header"
-          @click.stop
-          @keydown.stop
-        >
-          <AppIconButton
-            variant="plain"
-            class="header-icon-link"
-            :aria-label="isAuthenticated ? 'الحساب' : 'التسجيل'"
-            @click="$emit('account-click')"
+          <svg
+            viewBox="0 0 24 24"
+            class="public-header__action-icon"
+            aria-hidden="true"
           >
-            <svg
-              viewBox="0 0 24 24"
-              class="header-icon-svg"
-              aria-hidden="true"
-            >
-              <circle
-                cx="12"
-                cy="8"
-                r="3.25"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.9"
-              />
-              <path
-                d="M6.75 18.25c0-2.7 2.35-4.75 5.25-4.75s5.25 2.05 5.25 4.75"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.9"
-                stroke-linecap="round"
-              />
-            </svg>
-          </AppIconButton>
+            <circle
+              cx="12"
+              cy="8"
+              r="3.25"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+            />
+            <path
+              d="M6.75 18.25c0-2.7 2.35-4.75 5.25-4.75s5.25 2.05 5.25 4.75"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+            />
+          </svg>
+        </AppIconButton>
 
-          <transition name="mobile-menu-fade">
-            <div
-              v-if="accountMenuOpen && isAuthenticated"
-              class="account-menu__panel account-menu__panel--header"
+        <transition name="mobile-menu-fade">
+          <div
+            v-if="accountMenuOpen && isAuthenticated"
+            class="account-menu__panel account-menu__panel--header"
+          >
+            <AppButton
+              variant="plain"
+              class="account-menu__name"
+              @click="$emit('open-profile')"
             >
-              <AppButton
-                variant="plain"
-                class="account-menu__name"
-                @click="$emit('open-profile')"
-              >
-                {{ profileName }}
-              </AppButton>
-              <AppButton
-                v-for="item in accountMenuItems"
-                :key="item.key"
-                variant="plain"
-                class="account-menu__item"
-                :class="{
-                  'account-menu__item--danger': item.danger,
-                  'account-menu__item--disabled': item.disabled,
-                }"
-                :disabled="item.disabled"
-                @click="$emit('account-menu-action', item)"
-              >
-                {{ item.label }}
-              </AppButton>
-            </div>
-          </transition>
-        </div>
-
-        <LicenseProgramsMenu
-          :programs="licensePrograms"
-          @select="$emit('open-program', $event)"
-        />
+              {{ profileName }}
+            </AppButton>
+            <AppButton
+              v-for="item in accountMenuItems"
+              :key="item.key"
+              variant="plain"
+              class="account-menu__item"
+              :class="{
+                'account-menu__item--danger': item.danger,
+                'account-menu__item--disabled': item.disabled,
+              }"
+              :disabled="item.disabled"
+              @click="$emit('account-menu-action', item)"
+            >
+              {{ item.label }}
+            </AppButton>
+          </div>
+        </transition>
       </div>
-    </div>
-  </header>
+    </template>
+  </PublicLandingHeader>
 </template>
 
 <script>
 import { AppButton, AppIconButton } from '../ui';
-import LicenseProgramsMenu from '../public/LicenseProgramsMenu.vue';
+import PublicLandingHeader from '../public/PublicLandingHeader.vue';
 
 export default {
   name: 'PractitionerHeader',
-  components: { AppButton, AppIconButton, LicenseProgramsMenu },
+  components: { AppButton, AppIconButton, PublicLandingHeader },
   props: {
     pageContent: { type: Object, required: true },
     scrolled: { type: Boolean, default: false },
@@ -129,6 +95,31 @@ export default {
     accountMenuItems: { type: Array, default: () => [] },
     licensePrograms: { type: Array, default: () => [] },
   },
-  emits: ['account-click', 'account-menu-action', 'open-profile', 'open-program'],
+  emits: ['account-click', 'account-menu-action', 'open-profile', 'open-program', 'close-account'],
+  methods: {
+    handleAccountClick() {
+      this.$refs.header.closeMenu();
+      this.$emit('account-click');
+    },
+  },
 };
 </script>
+
+<style scoped>
+.account-menu__panel.account-menu__panel--header {
+  top: calc(100% + 12px);
+  right: auto;
+  left: 0;
+  width: min(260px, calc(100vw - 96px));
+  max-height: calc(100dvh - 96px);
+  overflow-y: auto;
+  padding: 12px 16px;
+  border: 1px solid #dce9ed;
+  border-radius: 14px;
+  background: #fff;
+}
+.account-menu__panel--header .account-menu__name,
+.account-menu__panel--header .account-menu__item { min-height: 44px; padding: 8px 0; font-size: 0.94rem; }
+.account-menu__panel--header .account-menu__name:focus-visible,
+.account-menu__panel--header .account-menu__item:focus-visible { outline: 2px solid #237a93; outline-offset: 2px; }
+</style>

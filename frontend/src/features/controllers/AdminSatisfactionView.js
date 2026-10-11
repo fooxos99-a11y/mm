@@ -1,6 +1,6 @@
 import { mapActions, mapState } from 'vuex';
 import {
-  AppButton, AppDialog, AppDialogFooter, AppDialogHeader, AppIconButton, AppSelect, AppTextField,
+  AppButton, AppCard, AppFilterField, AppFilterToolbar, AppDialog, AppDialogFooter, AppDialogHeader, AppIconButton, AppSelect, AppTextField,
 } from '../../components/ui';
 import { useIndicatorAnimation } from '../../composables/useIndicatorAnimation';
 
@@ -21,6 +21,9 @@ export default {
   components: {
     AppDialog,
     AppButton,
+    AppCard,
+    AppFilterField,
+    AppFilterToolbar,
     AppSelect,
     AppDialogHeader,
     AppDialogFooter,
@@ -206,7 +209,7 @@ export default {
         return;
       }
 
-      this.selectedCourseId = '';
+      this.selectedCourseId = this.availableCourseOptions[0]?.value || '';
     },
     openAddDialog() {
       this.questionDraft = {

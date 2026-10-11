@@ -1,13 +1,13 @@
 <template>
-  <section class="admin-archive-view__card">
-    <div class="admin-archive-view__toolbar">
-      <div class="admin-archive-view__field admin-archive-view__field--select">
-        <label
-          for="archive-record-filter"
-          class="admin-archive-view__field-label"
-        >
-          الأرشيف
-        </label>
+  <AppCard
+    tag="section"
+    class="admin-archive-view__card admin-workspace-card"
+  >
+    <AppFilterToolbar>
+      <AppFilterField
+        for-id="archive-record-filter"
+        label="الأرشيف"
+      >
         <div class="admin-archive-view__select-row">
           <AppNativeSelect
             id="archive-record-filter"
@@ -44,26 +44,25 @@
             <span>حذف الأرشيف نهائيًا</span>
           </AppButton>
         </div>
-      </div>
+      </AppFilterField>
 
-      <div class="admin-archive-view__field admin-archive-view__field--search">
-        <label
-          for="archive-records-search"
-          class="admin-archive-view__field-label"
-        >البحث باسم الطالب</label>
+      <AppFilterField
+        for-id="archive-records-search"
+        label="البحث باسم الطالب"
+      >
         <div class="admin-archive-view__search-row">
           <input
             id="archive-records-search"
             :value="searchQuery"
             type="search"
-            class="admin-archive-view__search-input"
+            class="admin-archive-view__search-input app-filter-input"
             placeholder="اكتب اسم الطالب"
             aria-label="البحث باسم الطالب"
             @input="$emit('update:search-query', $event.target.value)"
           >
         </div>
-      </div>
-    </div>
+      </AppFilterField>
+    </AppFilterToolbar>
 
     <div
       v-if="!showWorkspace"
@@ -111,15 +110,15 @@
         </v-data-table>
       </div>
     </div>
-  </section>
+  </AppCard>
 </template>
 
 <script>
-import { AppButton, AppNativeSelect, AppRawButton } from '../ui';
+import { AppButton, AppCard, AppFilterField, AppFilterToolbar, AppNativeSelect, AppRawButton } from '../ui';
 
 export default {
   name: 'ArchiveRecordsPanel',
-  components: { AppButton, AppNativeSelect, AppRawButton },
+  components: { AppButton, AppCard, AppFilterField, AppFilterToolbar, AppNativeSelect, AppRawButton },
   props: {
     archiveId: { type: String, default: null },
     archives: { type: Array, required: true },

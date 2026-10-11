@@ -9,30 +9,29 @@
         :key="`question-form-${formIndex}`"
         class="assessment-form-card assessment-form-card--inline"
       >
-        <div class="assessment-form-card__topline">
-          <div class="assessment-form-card__meta">
-            <AppRawButton
-              type="button"
-              class="assessment-form-card__trash"
-              :aria-label="`حذف السؤال ${existingCount + formIndex + 1}`"
-              @click="$emit('remove-form', formIndex)"
-            >
-              <v-icon
-                class="app-action-icon app-action-icon--delete"
-                aria-hidden="true"
-              >
-                mdi-delete-outline
-              </v-icon>
-            </AppRawButton>
-          </div>
-        </div>
-
         <div class="assessment-form-card__prompt-row">
           <div class="assessment-form-card__field-group assessment-form-card__field-group--compact assessment-form-card__field-group--prompt">
-            <label
-              class="assessment-form-card__label"
-              :for="promptId(formIndex)"
-            >{{ existingCount + formIndex + 1 }}.السؤال</label>
+            <div class="assessment-form-card__label-row">
+              <label
+                class="assessment-form-card__label"
+                :for="promptId(formIndex)"
+              >{{ existingCount + formIndex + 1 }}.السؤال</label>
+              <AppRawButton
+                v-if="canRemoveForm(form)"
+                type="button"
+                class="assessment-form-card__trash"
+                :aria-label="`حذف السؤال ${existingCount + formIndex + 1}`"
+                :disabled="saving"
+                @click="$emit('remove-form', formIndex)"
+              >
+                <v-icon
+                  class="app-action-icon app-action-icon--delete"
+                  aria-hidden="true"
+                >
+                  mdi-delete-outline
+                </v-icon>
+              </AppRawButton>
+            </div>
             <input
               :id="promptId(formIndex)"
               :value="form.prompt"
@@ -225,6 +224,12 @@ export default {
     },
   },
   methods: {
+    canRemoveForm(form) {
+      return this.existingCount > 0 || this.forms.length > 1
+        || Boolean(String(form.prompt || '').trim() || String(form.correctAnswer || '').trim())
+        || (form.options || []).some((option) => String(option).trim())
+        || Number(form.points ?? 1) !== 1;
+    },
     promptId(index) {
       return `assessment-new-question-${index}-prompt`;
     },

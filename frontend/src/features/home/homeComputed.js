@@ -1,6 +1,6 @@
 import { resolveUserHomeLabel, resolveUserHomeRoute } from '../../utils/authRoutes';
 import { normalizeHomePageContent } from '../../utils/homePageContent';
-import { LICENSE_PROGRAM_META, PROGRAM_CONTENT_INDEX_BY_KEY } from './homeProgramMeta';
+import { buildLicensePrograms } from './homeProgramMeta';
 
 export default {
     currentYear() {
@@ -10,25 +10,10 @@ export default {
       return normalizeHomePageContent(this.publicSnapshot?.homePageContent || null);
     },
     licensePrograms() {
-      const orderedPrograms = [
-        ...LICENSE_PROGRAM_META.filter((program) => program.key === 'practitioner'),
-        ...LICENSE_PROGRAM_META.filter((program) => program.key !== 'practitioner'),
-      ];
-
-      return orderedPrograms.map((program) => {
-        const content = this.homePageContent.programs[PROGRAM_CONTENT_INDEX_BY_KEY[program.key]] || {};
-        const stats = this.licenseProgramStats(program.key);
-
-        return {
-          ...program,
-          title: content.title || '',
-          menuSubtitle: content.menuSubtitle || '',
-          description: content.description || '',
-          audience: content.audience || '',
-          features: Array.isArray(content.features) ? content.features : [],
-          stats,
-        };
-      });
+      return buildLicensePrograms(this.homePageContent).map((program) => ({
+        ...program,
+        stats: this.licenseProgramStats(program.key),
+      }));
     },
     graduateDetailStats() {
       const details = this.publicStats?.graduateDetails || {};

@@ -1,11 +1,13 @@
 <template>
-  <div>
-    <div class="assessment-toolbar assessment-toolbar--embedded">
-      <div class="assessment-toolbar__field">
-        <label
-          for="assessment-toolbar-course"
-          class="assessment-toolbar__label"
-        >{{ isTasksPage ? 'المهام الأدائية' : 'الدورات' }}</label>
+  <div :class="{ 'assessment-task-toolbar': isTasksPage }">
+    <AppFilterToolbar
+      class="assessment-toolbar assessment-toolbar--embedded"
+      :columns="isTasksPage ? (selectedCourse && isDocumentMode ? 2 : 1) : columns"
+    >
+      <AppFilterField
+        for-id="assessment-toolbar-course"
+        :label="isTasksPage ? 'المهام الأدائية' : 'الدورات'"
+      >
         <AppSelect
           id="assessment-toolbar-course"
           :value="courseValue"
@@ -79,16 +81,31 @@
             </v-list-item>
           </template>
         </AppSelect>
-      </div>
+      </AppFilterField>
 
-      <div
-        v-if="!isTasksPage"
-        class="assessment-toolbar__field"
+      <AppFilterField
+        v-if="isTasksPage && selectedCourse && isDocumentMode"
+        for-id="assessment-task-points"
+        label="درجة المهمة"
       >
-        <label
-          for="assessment-toolbar-mode"
-          class="assessment-toolbar__label"
-        >النوع</label>
+        <input
+          id="assessment-task-points"
+          :value="taskPoints"
+          type="number"
+          min="0"
+          inputmode="numeric"
+          class="assessment-input assessment-input--points"
+          :disabled="!canEdit"
+          placeholder="1"
+          @input="$emit('update:task-points', $event.target.value)"
+        >
+      </AppFilterField>
+
+      <AppFilterField
+        v-if="!isTasksPage"
+        for-id="assessment-toolbar-mode"
+        label="النوع"
+      >
         <AppSelect
           id="assessment-toolbar-mode"
           :value="viewMode"
@@ -101,38 +118,36 @@
           class="assessment-select"
           @input="$emit('update:view-mode', $event)"
         />
-      </div>
-    </div>
+      </AppFilterField>
+      <slot name="branch" />
+    </AppFilterToolbar>
 
     <div
       v-if="isTasksPage && selectedCourse"
       class="assessment-toolbar__aux-fields"
     >
-      <div
-        v-if="isDocumentMode"
+      <AppFilterField
+        v-if="showDescription"
         class="assessment-toolbar__field assessment-form-card__field-group assessment-form-card__field-group--compact"
+        for-id="assessment-task-description"
+        label="الوصف"
       >
-        <label
-          class="assessment-form-card__label"
-          for="assessment-task-points"
-        >درجة المهمة</label>
-        <input
-          id="assessment-task-points"
-          :value="taskPoints"
-          type="number"
-          min="0"
-          inputmode="numeric"
-          class="assessment-input assessment-input--points"
+        <textarea
+          id="assessment-task-description"
+          :value="taskDescription"
+          rows="1"
+          wrap="off"
+          class="assessment-input assessment-input--multiline"
           :disabled="!canEdit"
-          placeholder="1"
-          @input="$emit('update:task-points', $event.target.value)"
-        >
-      </div>
-      <div class="assessment-toolbar__field assessment-form-card__field-group assessment-form-card__field-group--compact">
-        <label
-          class="assessment-form-card__label"
-          for="assessment-task-video"
-        >الرابط</label>
+          placeholder="اكتب الوصف الذي سيظهر في المهمة"
+          @input="$emit('update:task-description', $event.target.value)"
+        />
+      </AppFilterField>
+      <AppFilterField
+        class="assessment-toolbar__field assessment-form-card__field-group assessment-form-card__field-group--compact"
+        for-id="assessment-task-video"
+        label="الرابط"
+      >
         <input
           id="assessment-task-video"
           :value="taskVideoUrl"
@@ -143,25 +158,7 @@
           placeholder="ألصق رابط يوتيوب أو رابط فيديو مباشر"
           @input="$emit('update:task-video-url', $event.target.value)"
         >
-      </div>
-    </div>
-
-    <div
-      v-if="showDescription && isTasksPage && selectedCourse"
-      class="assessment-toolbar__field assessment-toolbar__field--full assessment-form-card__field-group assessment-form-card__field-group--compact"
-    >
-      <label
-        class="assessment-form-card__label"
-        for="assessment-task-description"
-      >الوصف</label>
-      <textarea
-        id="assessment-task-description"
-        :value="taskDescription"
-        class="assessment-input assessment-input--multiline"
-        :disabled="!canEdit"
-        placeholder="اكتب الوصف الذي سيظهر في المهمة"
-        @input="$emit('update:task-description', $event.target.value)"
-      />
+      </AppFilterField>
     </div>
 
     <div
@@ -174,12 +171,13 @@
 </template>
 
 <script>
-import { AppRawButton, AppSelect } from '../ui';
+import { AppFilterField, AppFilterToolbar, AppRawButton, AppSelect } from '../ui';
 
 export default {
   name: 'AssessmentCourseToolbar',
-  components: { AppRawButton, AppSelect },
+  components: { AppFilterField, AppFilterToolbar, AppRawButton, AppSelect },
   props: {
+    columns: { type: Number, default: 2 },
     isTasksPage: { type: Boolean, default: false },
     courseValue: { type: String, default: '' },
     courseOptions: { type: Array, required: true },

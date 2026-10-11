@@ -2,7 +2,7 @@ import { mapActions, mapState } from 'vuex';
 import AssessmentExistingQuestionList from '../../components/assessment/AssessmentExistingQuestionList.vue';
 import AssessmentQuestionBuilder from '../../components/assessment/AssessmentQuestionBuilder.vue';
 import FinalExamDialogs from '../../components/finalExam/FinalExamDialogs.vue';
-import { AppChoiceButton, AppSelect } from '../../components/ui';
+import { AppCard, AppFilterField, AppFilterToolbar, AppChoiceButton, AppSelect } from '../../components/ui';
 import { useIndicatorAnimation } from '../../composables/useIndicatorAnimation';
 import { finalExamBranchMethods } from './finalExamBranchMethods';
 import { finalExamIndicatorMethods } from './finalExamIndicatorMethods';
@@ -11,7 +11,7 @@ import { createFinalExamState } from './finalExamViewModel.mjs';
 
 export default {
   name: 'AdminFinalExamView',
-  components: { AssessmentExistingQuestionList, AssessmentQuestionBuilder, FinalExamDialogs, AppChoiceButton, AppSelect },
+  components: { AppCard, AppFilterField, AppFilterToolbar, AssessmentExistingQuestionList, AssessmentQuestionBuilder, FinalExamDialogs, AppChoiceButton, AppSelect },
   setup() {
     return useIndicatorAnimation();
   },

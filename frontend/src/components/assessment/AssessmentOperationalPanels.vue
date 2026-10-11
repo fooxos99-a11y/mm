@@ -4,8 +4,9 @@
       v-if="mode === 'indicators'"
       class="prep-layout"
     >
-      <section class="prep-card">
+      <AppCard class="prep-card admin-workspace-card">
         <AssessmentCourseToolbar
+          :columns="managedBranchId ? 2 : 3"
           :course-value="courseValue"
           :course-options="courseOptions"
           :course-placeholder="coursePlaceholder"
@@ -19,31 +20,28 @@
           @edit-course="$emit('edit-course', $event)"
           @move-course="$emit('move-course', $event)"
           @delete-course="$emit('delete-course', $event)"
-        />
-
-        <div class="assessment-indicators-card__controls assessment-indicators-card__controls--embedded">
-          <div
-            v-if="!managedBranchId"
-            class="assessment-indicators-card__filter-group"
-          >
-            <label
-              for="assessment-indicators-branch"
-              class="assessment-indicators-card__label"
-            >الفرع</label>
-            <AppSelect
-              id="assessment-indicators-branch"
-              :value="indicatorBranch"
-              :items="indicatorBranchOptions"
-              item-text="label"
-              item-value="value"
-              dense
-              outlined
-              hide-details
-              class="assessment-select"
-              @input="$emit('update:indicator-branch', $event)"
-            />
-          </div>
-        </div>
+        >
+          <template #branch>
+            <AppFilterField
+              v-if="!managedBranchId"
+              for-id="assessment-indicators-branch"
+              label="الفرع"
+            >
+              <AppSelect
+                id="assessment-indicators-branch"
+                :value="indicatorBranch"
+                :items="indicatorBranchOptions"
+                item-text="label"
+                item-value="value"
+                dense
+                outlined
+                hide-details
+                class="assessment-select"
+                @input="$emit('update:indicator-branch', $event)"
+              />
+            </AppFilterField>
+          </template>
+        </AssessmentCourseToolbar>
 
         <div
           v-if="selectedCourse && !totalStudents"
@@ -100,15 +98,16 @@
             </div>
           </article>
         </div>
-      </section>
+      </AppCard>
     </div>
 
     <div
       v-else-if="mode === 'attendance'"
       class="prep-layout"
     >
-      <section class="prep-card">
+      <AppCard class="prep-card admin-workspace-card">
         <AssessmentCourseToolbar
+          :columns="managedBranchId ? 2 : 3"
           :course-value="courseValue"
           :course-options="courseOptions"
           :course-placeholder="coursePlaceholder"
@@ -122,7 +121,28 @@
           @edit-course="$emit('edit-course', $event)"
           @move-course="$emit('move-course', $event)"
           @delete-course="$emit('delete-course', $event)"
-        />
+        >
+          <template #branch>
+            <AppFilterField
+              v-if="!managedBranchId"
+              for-id="assessment-attendance-branch"
+              label="الفرع"
+            >
+              <AppSelect
+                id="assessment-attendance-branch"
+                :value="attendanceBranch"
+                :items="attendanceBranchOptions"
+                item-text="label"
+                item-value="value"
+                dense
+                outlined
+                hide-details
+                class="assessment-select"
+                @input="$emit('update:attendance-branch', $event)"
+              />
+            </AppFilterField>
+          </template>
+        </AssessmentCourseToolbar>
         <div
           v-if="selectedCourse && saveStatus"
           class="prep-card__status prep-card__status--inline"
@@ -132,29 +152,8 @@
         </div>
         <div
           v-if="selectedCourse"
-          class="prep-filters prep-filters--single"
+          class="prep-filters prep-filters--selection"
         >
-          <div
-            v-if="!managedBranchId"
-            class="prep-field prep-field--wide"
-          >
-            <label
-              for="assessment-attendance-branch"
-              class="prep-field__label"
-            >الفرع</label>
-            <AppSelect
-              id="assessment-attendance-branch"
-              :value="attendanceBranch"
-              :items="attendanceBranchOptions"
-              item-text="label"
-              item-value="value"
-              dense
-              outlined
-              hide-details
-              class="prep-select"
-              @input="$emit('update:attendance-branch', $event)"
-            />
-          </div>
           <AppRawButton
             type="button"
             class="attendance-toggle prep-filters__toggle"
@@ -212,18 +211,18 @@
             </tbody>
           </table>
         </div>
-      </section>
+      </AppCard>
     </div>
   </div>
 </template>
 
 <script>
-import { AppRawButton, AppSelect } from '../ui';
+import { AppCard, AppFilterField, AppRawButton, AppSelect } from '../ui';
 import AssessmentCourseToolbar from './AssessmentCourseToolbar.vue';
 
 export default {
   name: 'AssessmentOperationalPanels',
-  components: { AppRawButton, AppSelect, AssessmentCourseToolbar },
+  components: { AppCard, AppFilterField, AppRawButton, AppSelect, AssessmentCourseToolbar },
   props: {
     mode: { type: String, default: '' },
     courseValue: { type: String, default: '' },

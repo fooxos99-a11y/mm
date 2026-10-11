@@ -14,27 +14,6 @@
     width: min(100% - 24px, 100%);
   }
 
-  .practitioner-page .landing-header__inner {
-    min-height: auto;
-    padding-top: 14px;
-    padding-bottom: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .practitioner-page .brand-mark {
-    display: none;
-  }
-
-  .practitioner-page .landing-header__actions {
-    width: 100%;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-    margin-inline-start: 0;
-  }
-
   .practitioner-page .hero-section__inner {
     padding: 112px 0 82px;
   }
@@ -139,19 +118,6 @@
   .practitioner-page .account-menu--header {
     display: flex;
     align-items: center;
-  }
-
-  .practitioner-page .header-icon-link,
-  .practitioner-page .licenses-menu-toggle {
-    width: 44px;
-    height: 44px;
-  }
-
-  .practitioner-page .licenses-menu {
-    right: 16px !important;
-    left: auto !important;
-    width: min(330px, calc(100vw - 32px)) !important;
-    max-width: calc(100vw - 32px) !important;
   }
 
   .practitioner-page .section-ribbon h2 {

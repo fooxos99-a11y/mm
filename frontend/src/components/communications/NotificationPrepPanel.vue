@@ -1,12 +1,14 @@
 <template>
   <div class="prep-layout communications-page__prep-shell">
-    <section class="prep-card communications-page__prep-card">
-      <div class="prep-filters communications-page__prep-filters">
-        <div class="prep-field communications-page__prep-field communications-page__prep-field--message">
-          <label
-            for="notification-prep-message"
-            class="prep-field__label"
-          >نص الإشعار</label>
+    <AppCard
+      tag="section"
+      class="prep-card communications-page__prep-card admin-workspace-card"
+    >
+      <AppFilterToolbar>
+        <AppFilterField
+          for-id="notification-prep-message"
+          label="نص الإشعار"
+        >
           <AppTextField
             id="notification-prep-message"
             :value="message"
@@ -17,13 +19,12 @@
             class="prep-select communications-page__prep-input"
             @input="$emit('update:message', $event.trim())"
           />
-        </div>
+        </AppFilterField>
 
-        <div class="prep-field communications-page__prep-field">
-          <label
-            for="notification-prep-branch"
-            class="prep-field__label"
-          >الفرع</label>
+        <AppFilterField
+          for-id="notification-prep-branch"
+          label="الفرع"
+        >
           <AppSelect
             id="notification-prep-branch"
             :value="branchId"
@@ -37,11 +38,13 @@
             class="prep-select communications-page__prep-input"
             @input="$emit('update:branch-id', $event)"
           />
-        </div>
+        </AppFilterField>
+      </AppFilterToolbar>
 
+      <div class="prep-filters prep-filters--selection">
         <AppRawButton
           type="button"
-          class="attendance-toggle communications-page__bulk-toggle"
+          class="attendance-toggle"
           :class="{
             'attendance-toggle--active': allSelected,
             'attendance-toggle--partial': selectedCount > 0 && !allSelected,
@@ -109,18 +112,18 @@
           {{ submitting ? 'جارٍ الإرسال...' : 'إرسال' }}
         </AppButton>
       </div>
-    </section>
+    </AppCard>
   </div>
 </template>
 
 <script>
 import {
-  AppButton, AppRawButton, AppSelect, AppTextField,
+  AppButton, AppCard, AppFilterField, AppFilterToolbar, AppRawButton, AppSelect, AppTextField,
 } from '../ui';
 
 export default {
   name: 'NotificationPrepPanel',
-  components: { AppButton, AppRawButton, AppSelect, AppTextField },
+  components: { AppButton, AppCard, AppFilterField, AppFilterToolbar, AppRawButton, AppSelect, AppTextField },
   props: {
     allSelected: { type: Boolean, default: false },
     branchId: { type: String, default: null },

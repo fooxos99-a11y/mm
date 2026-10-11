@@ -1,40 +1,12 @@
 <template>
   <div class="landing-page home-page">
-    <header
-      class="landing-header"
-      :class="{ 'landing-header--scrolled': scrolled }"
-    >
-      <div class="landing-shell landing-header__inner">
-        <a
-          href="#home"
-          class="brand-mark"
-        >
-          <div class="brand-mark__logos">
-            <img
-              :src="$publicAsset('شعار-الجمعية.webp')"
-              alt="شعار الجمعية"
-              class="site-logo"
-              :class="{ 'site-logo--light': !scrolled }"
-              width="326"
-              height="320"
-            >
-          </div>
-          <div
-            class="brand-mark__text"
-            :class="{ 'brand-mark__text--light': !scrolled }"
-          >
-            {{ homePageContent.brandTitle }}
-          </div>
-        </a>
-
-        <div class="landing-header__actions">
-          <LicenseProgramsMenu
-            :programs="licensePrograms"
-            @select="openProgram"
-          />
-        </div>
-      </div>
-    </header>
+    <PublicLandingHeader
+      :brand-title="homePageContent.brandTitle"
+      :scrolled="scrolled"
+      :programs="licensePrograms"
+      current-key="home"
+      @open-program="openProgram"
+    />
 
     <section
       id="home"

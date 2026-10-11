@@ -11,13 +11,12 @@
         {{ dashboardError }}
       </div>
 
-      <section class="satisfaction-admin__card">
-        <div class="satisfaction-admin__toolbar">
-          <div class="prep-field satisfaction-admin__filter-field">
-            <label
-              class="prep-field__label"
-              for="satisfaction-course"
-            >الدورة</label>
+      <AppCard class="satisfaction-admin__card admin-workspace-card">
+        <AppFilterToolbar :columns="1">
+          <AppFilterField
+            for-id="satisfaction-course"
+            label="الدورة"
+          >
             <AppSelect
               id="satisfaction-course"
               v-model="courseSelectValue"
@@ -32,8 +31,8 @@
               outlined
               class="prep-select satisfaction-admin__select"
             />
-          </div>
-        </div>
+          </AppFilterField>
+        </AppFilterToolbar>
 
         <div
           v-if="!selectedCourse"
@@ -88,7 +87,7 @@
             </div>
           </section>
         </template>
-      </section>
+      </AppCard>
 
       <AppDialog
         v-model="addDialogOpen"

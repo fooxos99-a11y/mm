@@ -36,7 +36,7 @@ test('manager can add and save a task question from the plus menu', async ({ pag
 
   const taskSelect = page.locator('.assessment-select:visible').first();
   await taskSelect.locator('.v-field').click();
-  await page.getByText('مهمة اختبار الواجهة', { exact: true }).click();
+  await page.getByRole('option').filter({ hasText: 'مهمة اختبار الواجهة' }).click();
 
   await page.locator('.assessment-inline-builder__add:visible').click();
   await page.getByRole('button', { name: 'صح أو خطأ', exact: true }).click();
@@ -89,7 +89,7 @@ test('task start action opens its availability dialog', async ({ page }) => {
 
   const taskSelect = page.locator('.assessment-select:visible').first();
   await taskSelect.locator('.v-field').click();
-  await page.getByText('مهمة اختبار الواجهة', { exact: true }).click();
+  await page.getByRole('option').filter({ hasText: 'مهمة اختبار الواجهة' }).click();
   await expect(page.getByRole('button', { name: 'بدء المهمة الأدائية', exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'بدء المهمة الأدائية', exact: true }).click();
   await expect(page.getByText('فتح المهام الأدائية', { exact: true })).toBeVisible();
@@ -105,6 +105,9 @@ test('final exam question editor keeps the same clear assessment layout', async 
 
   const card = page.locator('.final-exam-page .assessment-form-card--inline:visible').last();
   await expect(card.locator('input[placeholder="اكتب السؤال"]')).toBeVisible();
+  await expect(card.locator('.assessment-form-card__trash')).toHaveCount(0);
+  await card.locator('input[placeholder="اكتب السؤال"]').fill('سؤال لفحص التنسيق');
+  await expect(card.locator('.assessment-form-card__trash')).toBeVisible();
   const layout = await card.evaluate((element) => {
     const cardRect = element.getBoundingClientRect();
     const promptRect = element.querySelector('input[placeholder="اكتب السؤال"]')?.getBoundingClientRect();

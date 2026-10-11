@@ -30,7 +30,7 @@ export const finalExamIndicatorMethods = {
       this.emitTopbarState(setting, activeBranchCode);
     },
     defaultBranchCode() {
-      return this.branchOptions[this.branchOptions.length - 1]?.value || 'male';
+      return this.branchOptions[0]?.value || 'male';
     },
     emitTopbarState(setting, branchCode) {
       this.$emit('final-exam-topbar-state', {
