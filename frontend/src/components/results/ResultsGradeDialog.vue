@@ -63,9 +63,6 @@
           جارٍ تحميل جميع الطلاب...
         </p>
         <template v-else-if="!loadFailed">
-          <p class="grade-dialog__hint">
-            الخانة الفارغة تُتجاهل، والصفر درجة صحيحة.
-          </p>
           <div
             class="grade-dialog__columns"
             aria-hidden="true"

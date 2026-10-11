@@ -38,6 +38,8 @@ test('invalid values identify the student even if a search has hidden the row', 
   const rows = [{ id: 'a', value: '16' }, { id: 'b', value: '0' }, { id: 'c', value: '-1' },
     { id: 'd', value: '1.234' }, { id: 'e', value: 'not-a-score' }]
   assert.deepEqual(Object.keys(validateGradeDraft(rows, '15')), ['a', 'c', 'd', 'e'])
+  assert.equal(validateGradeDraft(rows, '15').a, 'يجب أن تساوي درجة الاختبار درجة الطالب أو تزيد عليها.')
+  assert.deepEqual(validateGradeDraft([{ id: 'equal', value: '15' }], '15'), {})
   assert.ok(validateGradeDraft([], '').totalPoints)
   assert.ok(validateGradeDraft([], '0').totalPoints)
   assert.ok(validateGradeDraft([], '1.234').totalPoints)

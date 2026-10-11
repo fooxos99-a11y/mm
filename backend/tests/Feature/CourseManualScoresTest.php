@@ -91,7 +91,8 @@ class CourseManualScoresTest extends TestCase
         $this->acting('admin');
         $first = $this->student('male', 'الأول');
         $second = $this->student('male', 'الثاني');
-        $this->save([$this->grade($first, 5), $this->grade($second, 16)])->assertUnprocessable();
+        $invalid = $this->save([$this->grade($first, 5), $this->grade($second, 16)])->assertUnprocessable();
+        $this->assertSame('يجب أن تساوي درجة الاختبار درجة الطالب أو تزيد عليها.', $invalid->json('errors')['grades.1.score'][0]);
         $this->assertDatabaseCount('course_manual_scores', 0);
         $this->assertDatabaseCount('course_score_settings', 0);
         $this->save([$this->grade($first, 5)])->assertOk();

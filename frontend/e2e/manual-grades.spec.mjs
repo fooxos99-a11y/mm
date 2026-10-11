@@ -40,9 +40,14 @@ test('manual grades save all drafts across search, recover from failure, and sup
   const lastInput = dialog.getByRole('spinbutton', { name: `درجة ${students[20].name}`, exact: true });
   await firstInput.fill('0');
   await lastInput.fill('16');
+  const rangeError = dialog.getByText('يجب أن تساوي درجة الاختبار درجة الطالب أو تزيد عليها.', { exact: true });
+  await expect(dialog.locator('.grade-dialog__hint')).toHaveCount(0);
+  await expect(rangeError).toHaveCount(0);
   await dialog.getByRole('button', { name: 'حفظ الدرجات', exact: true }).click();
   await expect(lastInput).toHaveAttribute('aria-invalid', 'true');
+  await expect(rangeError).toBeVisible();
   await lastInput.fill('13.5');
+  await expect(rangeError).toHaveCount(0);
   await dialog.getByRole('searchbox', { name: 'البحث عن طالب', exact: true }).fill(students[20].name);
   await expect(dialog.locator('.grade-dialog__row')).toHaveCount(1);
   await expect(dialog.locator('output')).toContainText('عدد التعديلات: 2');

@@ -29,13 +29,15 @@ export const validateGradeDraft = (rows, totalValue) => {
   const total = Number(totalValue)
   const errors = {}
   if (!Number.isFinite(total) || total <= 0 || total > 1000000 || !/^\d+(\.\d{1,2})?$/.test(String(totalValue))) {
-    errors.totalPoints = 'أدخل درجة كاملة أكبر من صفر، بمنزلتين عشريتين كحد أقصى.'
+    errors.totalPoints = 'أدخل درجة الاختبار.'
   }
   for (const row of rows) {
     if (row.clear || String(row.value).trim() === '') continue
     const score = Number(row.value)
-    if (!Number.isFinite(score) || score < 0 || score > total || !/^\d+(\.\d{1,2})?$/.test(String(row.value))) {
+    if (!Number.isFinite(score) || score < 0 || !/^\d+(\.\d{1,2})?$/.test(String(row.value))) {
       errors[row.id] = `أدخل درجة من 0 إلى ${Number.isFinite(total) && total > 0 ? total : 'الدرجة الكاملة'}.`
+    } else if (score > total) {
+      errors[row.id] = 'يجب أن تساوي درجة الاختبار درجة الطالب أو تزيد عليها.'
     }
   }
   return errors

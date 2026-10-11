@@ -42,7 +42,9 @@ class CourseScoreService
                 ->whereIn('student_id', $students->keys())->lockForUpdate()->get()->keyBy('student_id') : collect();
             foreach ($data['grades'] as $index => $grade) {
                 if ($grade['score'] !== null && (float) $grade['score'] > $total) {
-                    throw ValidationException::withMessages(["grades.$index.score" => "أدخل درجة من 0 إلى $total."]);
+                    throw ValidationException::withMessages([
+                        "grades.$index.score" => 'يجب أن تساوي درجة الاختبار درجة الطالب أو تزيد عليها.',
+                    ]);
                 }
                 abort_if(($existing->get($grade['studentId'])?->version) !== $grade['expectedVersion'], 409,
                     'تغيّرت بعض الدرجات أثناء التعديل. حدّث الدرجات الحالية ثم راجع تعديلاتك.');

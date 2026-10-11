@@ -7,7 +7,6 @@
 .grade-dialog__controls .app-field__label { font-size: 13px; }
 .grade-dialog__error { padding: 12px; border: 1px solid #e7b4b4; border-radius: 8px; background: #fff3f3; color: #9c2222; margin-bottom: 12px; }
 .grade-dialog__error .app-button { margin-top: 8px; }
-.grade-dialog__hint { margin: 0 0 12px; font-size: 13px; color: #51656b; }
 .grade-dialog__columns, .grade-dialog__row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(100px, 140px); gap: 12px; }
 .grade-dialog__columns { padding: 8px 0; border-bottom: 1px solid #c9dada; font-weight: 700; }
 .grade-dialog__row { padding: 12px 0; border-bottom: 1px solid #e2ebeb; align-items: start; }

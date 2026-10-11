@@ -23,7 +23,7 @@ class SaveCourseScoresRequest extends DashboardFormRequest
     public function messages(): array
     {
         return [
-            'totalPoints.*' => 'أدخل درجة كاملة أكبر من صفر، بمنزلتين عشريتين كحد أقصى.',
+            'totalPoints.*' => 'أدخل درجة الاختبار.',
             'grades.*.score.numeric' => 'أدخل درجة رقمية.',
             'grades.*.score.decimal' => 'استخدم منزلتين عشريتين كحد أقصى.',
             'grades.*.score.min' => 'لا يمكن أن تكون الدرجة أقل من صفر.',
