@@ -7,6 +7,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { launch } from 'chrome-launcher';
 import lighthouse from 'lighthouse';
+import { summarizeMobilePerformance } from './mobile-performance-summary.mjs';
 
 const frontendRoot = path.resolve(fileURLToPath(new URL('..', import.meta.url)));
 const getAvailablePort = () => new Promise((resolve, reject) => {
@@ -95,24 +96,29 @@ const staticServer = spawn(process.execPath, ['e2e/support/serve-dist.mjs'], {
 
 try {
   await waitForUrl(url);
-  let result;
-  for (let attempt = 1; attempt <= 2; attempt += 1) {
-    result = await runAudit(url);
-    if (!result?.lhr?.runtimeError || attempt === 2) break;
-    console.warn(`Lighthouse attempt ${attempt} returned ${result.lhr.runtimeError.code}; retrying once.`);
+  const results = [];
+  for (let sample = 1; sample <= 3; sample += 1) {
+    let result;
+    for (let attempt = 1; attempt <= 2; attempt += 1) {
+      result = await runAudit(url);
+      if (!result?.lhr?.runtimeError || attempt === 2) break;
+      console.warn(`Lighthouse sample ${sample} returned ${result.lhr.runtimeError.code}; retrying once.`);
+    }
+    if (result?.lhr?.runtimeError) {
+      throw new Error(`Lighthouse runtime error: ${result.lhr.runtimeError.code} ${result.lhr.runtimeError.message}`);
+    }
+    results.push(result);
   }
-
-  const score = Math.round((result?.lhr?.categories?.performance?.score || 0) * 100);
-  const lcp = Math.round(result?.lhr?.audits?.['largest-contentful-paint']?.numericValue || Infinity);
+  // A median keeps one runner timing outlier from deciding the release gate.
+  const { score, lcp, samples, result } = summarizeMobilePerformance(results);
 
   if (process.env.MOBILE_PERFORMANCE_REPORT && result?.lhr) {
-    writeFileSync(process.env.MOBILE_PERFORMANCE_REPORT, JSON.stringify(result.lhr, null, 2));
+    writeFileSync(process.env.MOBILE_PERFORMANCE_REPORT, JSON.stringify({ ...result.lhr,
+      measurementSummary: { score, lcp, samples } }, null, 2));
   }
 
-  if (result?.lhr?.runtimeError) {
-    console.error(`Lighthouse runtime error: ${result.lhr.runtimeError.code} ${result.lhr.runtimeError.message}`);
-  }
-
+  console.log(`Mobile Lighthouse samples: ${JSON.stringify(samples)}`);
+  console.log('Mobile performance uses the median of three audits.');
   console.log(`Mobile Lighthouse performance: ${score}/100`);
   console.log(`Mobile Lighthouse LCP: ${lcp} ms`);
 

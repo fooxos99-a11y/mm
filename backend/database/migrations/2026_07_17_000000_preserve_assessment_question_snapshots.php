@@ -206,6 +206,13 @@ return new class extends Migration
             return;
         }
 
+        // Preserve the index required by the submission foreign key on MySQL.
+        if (! Schema::hasIndex($tableName, ['submission_id'])) {
+            Schema::table($tableName, function (Blueprint $table): void {
+                $table->index('submission_id');
+            });
+        }
+
         Schema::table($tableName, function (Blueprint $table) use ($indexName): void {
             $table->dropUnique($indexName);
         });

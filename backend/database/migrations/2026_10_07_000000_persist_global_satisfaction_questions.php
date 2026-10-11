@@ -26,6 +26,12 @@ return new class extends Migration
 
     public function down(): void
     {
+        // MySQL may use the compound unique index for the course foreign key.
+        if (! Schema::hasIndex('satisfaction_questions', ['course_id'])) {
+            Schema::table('satisfaction_questions', function (Blueprint $table) {
+                $table->index('course_id');
+            });
+        }
         Schema::table('satisfaction_questions', function (Blueprint $table) {
             $table->dropUnique('satisfaction_course_template_unique');
             $table->dropConstrainedForeignId('global_template_id');

@@ -132,9 +132,9 @@ class ResultsDirectoryService
             'scoreEntries' => $manualScores->map(fn ($score) => ['studentId' => $score->student_id,
                 'score' => $score->score === null ? null : (float) $score->score, 'version' => $score->version])->all(),
             'students' => $page->getCollection()->map(fn ($student) => [
-            'id' => $student->id, 'name' => $student->full_name, 'loginId' => $student->login_code,
-            'branchId' => $branch, 'absenceCount' => $courseCount - (int) $student->attended_count,
-        ])->all(), 'summary' => $summary,
+                'id' => $student->id, 'name' => $student->full_name, 'loginId' => $student->login_code,
+                'branchId' => $branch, 'absenceCount' => $courseCount - (int) $student->attended_count,
+            ])->all(), 'summary' => $summary,
             'pagination' => ['page' => $page->currentPage(), 'pages' => $page->lastPage(), 'total' => $page->total()]];
     }
 }
