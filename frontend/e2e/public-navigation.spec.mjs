@@ -93,7 +93,11 @@ test('public navigation supports keyboard, outside dismissal, page links and mob
 });
 
 test('account access remains usable and opening a program menu dismisses the account menu', async ({ page }) => {
-  await page.goto('practitioner', { waitUntil: 'domcontentloaded' });
+  const [session] = await Promise.all([
+    page.waitForResponse(response => new URL(response.url()).pathname.endsWith('/auth/session')),
+    page.goto('practitioner', { waitUntil: 'domcontentloaded' }),
+  ]);
+  await session.finished();
   await page.getByRole('button', { name: 'البرامج والرخص', exact: true }).click();
   await page.getByRole('button', { name: 'التسجيل', exact: true }).click();
   const loginDialog = page.getByRole('dialog', { name: 'تسجيل الدخول', exact: true });
@@ -101,7 +105,11 @@ test('account access remains usable and opening a program menu dismisses the acc
   await expect(page.getByRole('menu')).toHaveCount(0);
   await loginDialog.locator('input[autocomplete="username"]').fill(adminLogin);
   await loginDialog.locator('input[autocomplete="current-password"]').fill(adminPassword);
-  await loginDialog.locator('button[type="submit"]').click();
+  const [signedIn] = await Promise.all([
+    page.waitForResponse(response => new URL(response.url()).pathname.endsWith('/auth/login') && response.request().method() === 'POST'),
+    loginDialog.locator('button[type="submit"]').click(),
+  ]);
+  expect(signedIn.status()).toBe(200);
   await expect(loginDialog).toHaveCount(0);
   const account = page.getByRole('button', { name: 'الحساب', exact: true });
   await account.click();
