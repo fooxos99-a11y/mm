@@ -30,6 +30,7 @@
 }
 
 .assessment-form-card--inline {
+  position: relative;
   padding: 0;
   border: 0;
   border-radius: 0;
@@ -73,6 +74,11 @@
 }
 
 .assessment-form-card__trash {
+  position: absolute;
+  inset-block-start: 14px;
+  inset-inline-end: 14px;
+  width: 44px;
+  height: 44px;
   min-width: 44px;
   min-height: 44px;
   padding: 0;
@@ -88,6 +94,16 @@
 
 .assessment-form-card__field-group--compact {
   margin-top: 0;
+}
+
+.assessment-form-card__label-row { min-height: 44px; }
+
+@media (min-width: 961px) {
+  .assessment-form-card__field-group--points-inline > .assessment-form-card__label {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+  }
 }
 
 .assessment-form-card__prompt-row {

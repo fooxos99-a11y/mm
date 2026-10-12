@@ -104,12 +104,18 @@ test('delayed catalogs choose the first course and switching courses keeps the c
   const deletion = draft.getByRole('button', { name: 'حذف السؤال 1', exact: true });
   await expect(deletion).toBeVisible();
   const bounds = await draft.evaluate(card => {
+    const cardRect = card.getBoundingClientRect();
     const label = card.querySelector('.assessment-form-card__label').getBoundingClientRect();
     const button = card.querySelector('.assessment-form-card__trash').getBoundingClientRect();
-    return { labelCenter: label.y + label.height / 2, buttonCenter: button.y + button.height / 2,
+    const prompt = card.querySelector('input[placeholder="اكتب السؤال"]').getBoundingClientRect();
+    return { leftGap: button.left - cardRect.left, topGap: button.top - cardRect.top, promptGap: prompt.top - button.bottom,
       labelLeft: label.left, buttonRight: button.right, width: button.width, height: button.height };
   });
-  expect(Math.abs(bounds.labelCenter - bounds.buttonCenter)).toBeLessThanOrEqual(1);
+  expect(bounds.leftGap).toBeGreaterThanOrEqual(0);
+  expect(bounds.leftGap).toBeLessThanOrEqual(18);
+  expect(bounds.topGap).toBeGreaterThanOrEqual(0);
+  expect(bounds.topGap).toBeLessThanOrEqual(18);
+  expect(bounds.promptGap).toBeGreaterThanOrEqual(0);
   expect(bounds.buttonRight).toBeLessThanOrEqual(bounds.labelLeft);
   expect(bounds.width).toBeGreaterThanOrEqual(44);
   expect(bounds.height).toBeGreaterThanOrEqual(44);

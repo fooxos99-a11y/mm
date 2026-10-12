@@ -141,6 +141,7 @@
 </template>
 
 <script>
+import '../../styles/components/assessment-question-editor.css';
 import { isCorrectQuestionOption } from '../../features/assessmentQuestions/questionModel.mjs';
 import { AppRawButton } from '../ui';
 

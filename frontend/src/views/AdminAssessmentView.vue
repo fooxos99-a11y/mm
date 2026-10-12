@@ -245,5 +245,4 @@
 <style src="../styles/views/admin-assessment-controls.css"></style>
 <style src="../styles/views/admin-assessment-cards.css"></style>
 <style src="../styles/views/admin-assessment-question-form.css"></style>
-<style src="../styles/components/assessment-question-editor.css"></style>
 <style src="../styles/components/assessment-management-dialogs.css"></style>

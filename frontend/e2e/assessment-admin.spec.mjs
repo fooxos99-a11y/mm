@@ -30,7 +30,7 @@ test('dashboard overview shows truthful indicator context', async ({ page }) => 
   await expectNoOverflow(page);
 });
 
-test('manager can add and save a task question from the plus menu', async ({ page }) => {
+test('manager can add and save a task question from the plus menu', async ({ page }, info) => {
   await login(page);
   await page.goto('dashboard?panel=tasks');
 
@@ -69,18 +69,26 @@ test('manager can add and save a task question from the plus menu', async ({ pag
   const pointsContainment = await savedQuestion.evaluate((card) => {
     const cardRect = card.getBoundingClientRect();
     const pointsRect = card.querySelector('.assessment-input--points')?.getBoundingClientRect();
+    const trashRect = card.querySelector('.assessment-form-card__trash')?.getBoundingClientRect();
 
     return {
       cardLeft: cardRect.left,
       cardRight: cardRect.right,
       pointsLeft: pointsRect?.left ?? -1,
       pointsRight: pointsRect?.right ?? Number.POSITIVE_INFINITY,
+      trashLeftGap: trashRect ? trashRect.left - cardRect.left : -1,
+      trashTopGap: trashRect ? trashRect.top - cardRect.top : -1,
     };
   });
   expect(pointsContainment.pointsLeft, JSON.stringify(pointsContainment))
     .toBeGreaterThanOrEqual(pointsContainment.cardLeft - 1);
   expect(pointsContainment.pointsRight).toBeLessThanOrEqual(pointsContainment.cardRight + 1);
+  expect(pointsContainment.trashLeftGap).toBeGreaterThanOrEqual(0);
+  expect(pointsContainment.trashLeftGap).toBeLessThanOrEqual(18);
+  expect(pointsContainment.trashTopGap).toBeGreaterThanOrEqual(0);
+  expect(pointsContainment.trashTopGap).toBeLessThanOrEqual(18);
   await expectNoOverflow(page);
+  await savedQuestion.screenshot({ path: info.outputPath('saved-question-corner.png') });
 });
 
 test('task start action opens its availability dialog', async ({ page }) => {
@@ -96,7 +104,7 @@ test('task start action opens its availability dialog', async ({ page }) => {
   await expect(page.locator('#assessment-availability-minutes')).toBeVisible();
 });
 
-test('final exam question editor keeps the same clear assessment layout', async ({ page }) => {
+test('final exam question editor keeps the same clear assessment layout', async ({ page }, info) => {
   await login(page);
   await page.goto('dashboard?panel=finalexam');
 
@@ -127,6 +135,8 @@ test('final exam question editor keeps the same clear assessment layout', async 
       pointsHeight: pointsRect?.height ?? 0,
       trashLeft: trashRect?.left ?? -1,
       trashRight: trashRect?.right ?? Number.POSITIVE_INFINITY,
+      trashTopGap: trashRect ? trashRect.top - cardRect.top : -1,
+      trashBottom: trashRect?.bottom ?? Number.POSITIVE_INFINITY,
     };
   });
 
@@ -134,6 +144,10 @@ test('final exam question editor keeps the same clear assessment layout', async 
   expect(layout.pointsRight).toBeLessThanOrEqual(layout.cardRight + 1);
   expect(layout.trashLeft).toBeGreaterThanOrEqual(layout.cardLeft - 1);
   expect(layout.trashRight).toBeLessThanOrEqual(layout.cardRight + 1);
+  expect(layout.trashLeft - layout.cardLeft).toBeLessThanOrEqual(18);
+  expect(layout.trashTopGap).toBeGreaterThanOrEqual(0);
+  expect(layout.trashTopGap).toBeLessThanOrEqual(18);
+  expect(layout.trashBottom).toBeLessThanOrEqual(layout.promptTop);
   expect(layout.promptHeight).toBeGreaterThanOrEqual(58);
   expect(layout.pointsHeight).toBeGreaterThanOrEqual(58);
 
@@ -146,6 +160,7 @@ test('final exam question editor keeps the same clear assessment layout', async 
   }
 
   await expectNoOverflow(page);
+  await card.screenshot({ path: info.outputPath('new-question-corner.png') });
 });
 
 test('course and task management actions stay inside the shared dropdown', async ({ page }) => {
