@@ -53,6 +53,9 @@ for (const [path, readySelector] of managementPages) {
 
     await page.goto(path);
     await expect(page.locator(readySelector)).toBeVisible();
+    if (path.includes('panel=results')) {
+      await expect(page.locator('.results-entry').first()).toBeVisible();
+    }
     await expectAccessiblePage(page, path);
   });
 }

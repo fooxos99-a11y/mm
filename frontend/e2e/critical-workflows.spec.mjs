@@ -141,6 +141,8 @@ test('admin critical data workflows persist through the browser API session', as
   expect(result.finalPersisted).toBe(true);
   expect(result.permissionPersisted).toBe(true);
 
+  // Stop dashboard requests before clearing cookies so late responses cannot restore the admin session.
+  await page.goto('about:blank');
   await page.context().clearCookies();
   await page.goto('login', { waitUntil: 'domcontentloaded' });
   await page.locator('input[autocomplete="username"]').fill(result.loginId);

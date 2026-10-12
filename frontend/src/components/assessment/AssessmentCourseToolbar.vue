@@ -90,6 +90,7 @@
       >
         <input
           id="assessment-task-points"
+          aria-label="درجة المهمة"
           :value="taskPoints"
           type="number"
           min="0"
@@ -134,6 +135,7 @@
       >
         <textarea
           id="assessment-task-description"
+          aria-label="الوصف"
           :value="taskDescription"
           rows="1"
           wrap="off"
@@ -150,6 +152,7 @@
       >
         <input
           id="assessment-task-video"
+          aria-label="الرابط"
           :value="taskVideoUrl"
           type="url"
           inputmode="url"
