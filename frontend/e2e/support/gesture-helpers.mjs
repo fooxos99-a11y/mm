@@ -1,4 +1,5 @@
 import { adminLogin, adminPassword } from './credentials.mjs';
+import { expect } from '@playwright/test';
 
 export async function swipe(page, x, fromY, toY) {
   const cdp = await page.context().newCDPSession(page);
@@ -17,9 +18,29 @@ export async function swipe(page, x, fromY, toY) {
 }
 
 export async function login(page, name = adminLogin, password = adminPassword) {
-  await page.goto('login');
+  const [session] = await Promise.all([
+    page.waitForResponse(response => new URL(response.url()).pathname.endsWith('/auth/session')),
+    page.goto('login'),
+  ]);
+  await session.finished();
+  expect(session.status()).toBe(200);
   await page.locator('[autocomplete=username]').fill(name);
   await page.locator('[autocomplete=current-password]').fill(password);
-  await page.locator('form button[type=submit]').click();
+  const [signedIn] = await Promise.all([
+    page.waitForResponse(response => new URL(response.url()).pathname.endsWith('/auth/login') && response.request().method() === 'POST'),
+    page.locator('form button[type=submit]').click(),
+  ]);
+  expect(signedIn.status()).toBe(200);
   await page.waitForURL((url) => !url.pathname.endsWith('/login'));
+}
+
+export async function openCourseManagement(page) {
+  const management = page.locator('.app-select-action-row__actions').filter({ visible: true }).filter({ has: page.getByRole('button') }).first();
+  await expect(management).toBeVisible();
+  await expect(management.getByRole('button').first()).toBeVisible();
+}
+
+export async function selectOption(page, label, { exact = false } = {}) {
+  const row = page.getByRole('row', { name: label, exact }).and(page.locator('.app-select-action-row'));
+  await page.getByRole('option', { name: label, exact }).or(row).click();
 }

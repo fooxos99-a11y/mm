@@ -105,15 +105,11 @@
             </option>
           </AppNativeSelect>
         </template>
-        <label for="task-availability-minutes">مدة الفتح بالدقائق</label>
-        <input
-          id="task-availability-minutes"
-          :value="availabilityMinutes"
-          type="number"
-          min="1"
-          class="assessment-input"
-          @input="updateMinutes($event.target.value)"
-        >
+        <AppDurationHoursField
+          id="task-availability-hours"
+          :minutes="availabilityMinutes"
+          @update:minutes="$emit('update:availability-minutes', $event)"
+        />
         <p
           v-if="availabilityError"
           class="task-dialog-error"
@@ -209,11 +205,11 @@
 
 <script>
 import DialogShell from '../ui/DialogShell.vue';
-import { AppButton, AppDialog, AppNativeSelect } from '../ui';
+import { AppButton, AppDialog, AppDurationHoursField, AppNativeSelect } from '../ui';
 
 export default {
   name: 'TaskManagementDialogs',
-  components: { AppButton, AppDialog, AppNativeSelect, DialogShell },
+  components: { AppButton, AppDialog, AppDurationHoursField, AppNativeSelect, DialogShell },
   props: {
     saveTemplateOpen: { type: Boolean, default: false }, createSubmitting: { type: Boolean, default: false },
     renameOpen: { type: Boolean, default: false }, renameTitle: { type: String, default: '' }, renameSubmitting: { type: Boolean, default: false },
@@ -250,7 +246,6 @@ export default {
   ],
   methods: {
     branchLabel(branch) { return { male: 'معلمين', female: 'معلمات' }[branch] || ''; },
-    updateMinutes(value) { this.$emit('update:availability-minutes', value === '' ? '' : Number(value)); },
   },
 };
 </script>

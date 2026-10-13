@@ -72,11 +72,11 @@
   min-width: 0;
   max-width: 100%;
   direction: rtl;
-  min-height: 58px;
+  min-height: var(--app-control-height);
   padding-inline: 16px;
-  border: 1.5px solid rgba(148, 163, 184, 0.68);
-  border-radius: 12px;
-  background: #fff;
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-control);
+  background: var(--app-surface);
   box-shadow: none;
   font-size: 1rem;
 }
@@ -108,8 +108,8 @@
 .assessment-page .assessment-input:focus,
 .assessment-page .assessment-dialog__paste:focus,
 .assessment-page .assessment-template-shell:focus-within {
-  border-color: #64748b;
-  box-shadow: 0 0 0 4px rgba(100, 116, 139, 0.12);
+  border-color: var(--app-primary);
+  box-shadow: var(--app-focus-shadow);
 }
 
 .assessment-page .assessment-options-grid {
@@ -189,77 +189,6 @@
   font-weight: 700;
 }
 
-.assessment-page .assessment-inline-builder {
-  display: grid;
-  gap: 18px;
-  margin-top: 18px;
-}
-
-.assessment-page .assessment-inline-builder__list {
-  display: grid;
-  gap: 14px;
-  min-width: 0;
-}
-
-.assessment-page .assessment-form-card--inline {
-  min-width: 0;
-  max-width: 100%;
-  padding: 18px;
-  border: 1px solid rgba(148, 163, 184, 0.42);
-  border-radius: 16px;
-  background: #fff;
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.035);
-}
-
-.assessment-page .assessment-inline-builder__actions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.assessment-page .assessment-inline-builder__add {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 52px;
-  height: 52px;
-  min-width: 28px;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: #156c82;
-  box-shadow: none;
-  justify-self: center;
-}
-
-.assessment-page .assessment-inline-builder__add .v-icon {
-  color: currentColor !important;
-}
-
-.assessment-page .assessment-inline-builder__menu {
-  display: grid;
-  min-width: 180px;
-  padding: 6px 0;
-  border-radius: 18px;
-  background: #fff;
-  box-shadow: 0 14px 28px rgba(17, 65, 96, 0.14);
-  overflow: hidden;
-}
-
-.assessment-page .assessment-inline-builder__menu-item {
-  min-height: 46px;
-  padding: 0 18px;
-  color: #21465f;
-  font-size: 0.96rem;
-  font-weight: 700;
-  text-align: right;
-}
-
-.assessment-page .assessment-inline-builder__menu-item:hover {
-  background: rgba(31, 111, 150, 0.08);
-}
-
 .assessment-page .assessment-dialog__add-slot {
   display: inline-flex;
   align-items: center;
@@ -303,39 +232,12 @@
     grid-template-columns: 1fr;
   }
 
-  .assessment-page .assessment-inline-builder__actions {
-    flex-direction: column;
-  }
 
-  .assessment-page .assessment-indicators-card__controls,
-  .assessment-page .assessment-indicators-panel {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  .assessment-page .assessment-indicators-panel {
-    padding: 24px;
-    align-items: center;
-  }
-
-  .assessment-page .assessment-score-diff {
-    justify-content: center;
-    padding-top: 0;
-  }
-
-  .assessment-page .assessment-indicators-card__filter-group {
-    min-width: 0;
-    width: 100%;
-  }
 
   .assessment-page .assessment-availability-branch-picker {
     grid-template-columns: 1fr;
   }
 
-  .assessment-page .prep-filters {
-    grid-template-columns: 1fr;
-  }
 }
 
 @media (max-width: 640px) {
@@ -395,55 +297,4 @@
     padding: 20px;
   }
 
-  .assessment-page .prep-table,
-  .assessment-page .prep-table thead,
-  .assessment-page .prep-table tbody,
-  .assessment-page .prep-table tr,
-  .assessment-page .prep-table th,
-  .assessment-page .prep-table td {
-    display: block;
-    width: 100%;
-  }
-
-  .assessment-page .prep-table thead {
-    display: none;
-  }
-
-  .assessment-page .prep-table tbody tr {
-    padding: 14px 0;
-    border-bottom: 1px solid #e7eef4;
-  }
-
-  .assessment-page .prep-table tbody tr:last-child {
-    border-bottom: none;
-  }
-
-  .assessment-page .prep-table tbody td {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 10px 0;
-    border-bottom: none;
-    text-align: right;
-  }
-
-  .assessment-page .prep-table tbody td::before {
-    content: '';
-    color: #5f7790;
-    font-size: 0.9rem;
-    font-weight: 700;
-  }
-
-  .assessment-page .prep-table__name::before {
-    content: 'الاسم';
-  }
-
-  .assessment-page .prep-table__login::before {
-    content: 'رقم الدخول';
-  }
-
-  .assessment-page .prep-table__status::before {
-    content: 'حاضر';
-  }
 }

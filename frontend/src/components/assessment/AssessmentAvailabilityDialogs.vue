@@ -6,7 +6,10 @@
       @input="$emit('update:availability-open', $event)"
     >
       <div class="assessment-dialog assessment-dialog--compact">
-        <AppDialogHeader :title="`فتح ${availabilityLabel}`" />
+        <AppDialogHeader
+          :title="`فتح ${availabilityLabel}`"
+          initial-focus
+        />
         <AppDialogBody
           class="assessment-dialog__body assessment-dialog__body--compact"
           compact
@@ -17,11 +20,13 @@
               class="assessment-form-card__field-group assessment-form-card__field-group--compact"
             >
               <label
+                id="assessment-availability-branch-label"
                 class="assessment-form-card__label"
                 for="assessment-availability-branch"
               >اختر الفرع</label>
               <AppSelect
                 id="assessment-availability-branch"
+                ref="availabilityBranchSelect"
                 :value="availabilityBranch"
                 :items="branchOptions"
                 item-text="label"
@@ -30,24 +35,18 @@
                 outlined
                 hide-details
                 class="results-select"
+                :menu-props="{ onKeydown: event => closeSelectMenu('availabilityBranchSelect', event) }"
+                @keydown.capture="closeSelectMenu('availabilityBranchSelect', $event)"
                 @input="$emit('update:availability-branch', $event)"
               />
             </div>
 
             <div class="assessment-form-card__field-group assessment-form-card__field-group--compact">
-              <label
-                class="assessment-form-card__label"
-                for="assessment-availability-minutes"
-              >مدة فتح الاختبار بالدقائق</label>
-              <input
-                id="assessment-availability-minutes"
-                :value="availabilityMinutes"
-                type="number"
-                min="1"
-                class="assessment-input"
-                placeholder="60"
-                @input="$emit('update:availability-minutes', $event.target.value === '' ? '' : Number($event.target.value))"
-              >
+              <AppDurationHoursField
+                id="assessment-availability-hours"
+                :minutes="availabilityMinutes"
+                @update:minutes="$emit('update:availability-minutes', $event)"
+              />
             </div>
           </div>
         </AppDialogBody>
@@ -83,11 +82,13 @@
           <div class="assessment-form-card assessment-form-card--flat">
             <div class="assessment-form-card__field-group assessment-form-card__field-group--compact">
               <label
+                id="assessment-manage-action-label"
                 class="assessment-form-card__label"
                 for="assessment-manage-action"
               >الإجراء</label>
               <AppSelect
                 id="assessment-manage-action"
+                ref="manageActionSelect"
                 :value="manageChoice"
                 :items="manageOptions"
                 item-text="label"
@@ -96,6 +97,8 @@
                 outlined
                 hide-details
                 class="assessment-select"
+                :menu-props="{ onKeydown: event => closeSelectMenu('manageActionSelect', event) }"
+                @keydown.capture="closeSelectMenu('manageActionSelect', $event)"
                 @input="$emit('update:manage-choice', $event)"
               />
             </div>
@@ -123,13 +126,13 @@
 
 <script>
 import {
-  AppButton, AppDialog, AppDialogBody, AppDialogFooter, AppDialogHeader, AppSelect,
+  AppButton, AppDialog, AppDialogBody, AppDialogFooter, AppDialogHeader, AppDurationHoursField, AppSelect,
 } from '../ui';
 
 export default {
   name: 'AssessmentAvailabilityDialogs',
   components: {
-    AppButton, AppDialog, AppDialogBody, AppDialogFooter, AppDialogHeader, AppSelect,
+    AppButton, AppDialog, AppDialogBody, AppDialogFooter, AppDialogHeader, AppDurationHoursField, AppSelect,
   },
   props: {
     availabilityOpen: { type: Boolean, default: false },
@@ -156,5 +159,10 @@ export default {
     'cancel-manage',
     'confirm-manage',
   ],
+  methods: {
+    closeSelectMenu(refName, event) {
+      if (event.key === 'Escape') this.$refs[refName]?.closeMenu(event);
+    },
+  },
 };
 </script>

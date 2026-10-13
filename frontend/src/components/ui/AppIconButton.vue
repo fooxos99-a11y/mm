@@ -25,7 +25,7 @@ export default {
     variant: {
       type: String,
       default: 'neutral',
-      validator: (value) => ['neutral', 'primary', 'danger', 'plain'].includes(value),
+      validator: (value) => ['neutral', 'primary', 'danger', 'plain', 'plain-danger'].includes(value),
     },
     size: {
       type: String,

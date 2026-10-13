@@ -39,7 +39,7 @@ export default {
     const targetBranch = this.managedBranchId || this.availabilityBranch;
     const shouldBypassBranchConflict = skipBranchConflictCheck || this.taskSkipBranchConflict;
     if (!task || !Number.isFinite(duration) || duration <= 0) {
-      this.availabilityError = 'أدخل مدة صحيحة بالدقائق.';
+      this.availabilityError = 'أدخل مدة صحيحة بالساعات.';
       return;
     }
     if (!targetBranch) {

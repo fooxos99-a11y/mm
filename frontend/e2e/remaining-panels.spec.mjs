@@ -1,3 +1,4 @@
+import { selectOption } from './support/gesture-helpers.mjs';
 import { expect, test } from './support/isolatedTest.mjs';
 import { adminLogin, adminPassword } from './support/credentials.mjs';
 
@@ -24,7 +25,7 @@ const expectNoOverflow = async (page) => {
 const openSelectOption = async (page, label, option) => {
   const select = page.getByLabel(label, { exact: true });
   await select.locator('xpath=ancestor::div[contains(@class,"v-input")]').locator('.v-field').click();
-  await page.getByRole('option').filter({ hasText: option }).click();
+  await selectOption(page, option);
 };
 
 test('remaining dashboard panels expose usable controls and dialogs', async ({ page }, testInfo) => {
@@ -50,7 +51,7 @@ test('remaining dashboard panels expose usable controls and dialogs', async ({ p
   await expect(requiredSwitch).toBeChecked();
   const activeSwitchColor = await page.locator('.satisfaction-admin__switch .v-switch__track')
     .evaluate((track) => getComputedStyle(track).backgroundColor);
-  expect(activeSwitchColor).toBe('rgb(31, 111, 150)');
+  expect(activeSwitchColor).toBe('rgb(29, 106, 133)');
   await page.getByRole('button', { name: 'إلغاء', exact: true }).click();
 
   await page.goto('dashboard?panel=users');

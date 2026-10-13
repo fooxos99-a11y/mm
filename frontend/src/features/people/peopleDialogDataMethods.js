@@ -70,9 +70,20 @@ export default {
     });
   },
   async selectReciterTarget(id) {
+    if (this.dialogDataLoading || this.reciterDialogSaving || !this.reciterDialogOpen || !this.canAssignReciter) return;
+    if (!id && !this.canEditReciter) return;
+    const studentId = this.reciterDialogStudentId;
+    const previousId = this.reciterDialogStudent?.reciterId || '';
+    this.reciterDialogReciterId = id;
     return this.withPersonData(async () => {
-      if (id) await this.loadPerson('reciter', id);
-      this.reciterDialogReciterId = id;
+      try {
+        if (id) await this.loadPerson('reciter', id);
+        if (!this.reciterDialogOpen || studentId !== this.reciterDialogStudentId) return;
+        await this.submitReciterAssignment();
+      } catch (error) {
+        this.reciterDialogReciterId = previousId;
+        throw error;
+      }
     });
   },
 };

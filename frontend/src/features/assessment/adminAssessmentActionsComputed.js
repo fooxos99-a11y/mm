@@ -143,6 +143,8 @@ export default /** @type {Record<string, any>} */ ({
 
       return {
         visible: this.canShowAssessmentStartButton,
+        workspace: this.isTasksPage ? 'tasks' : 'courses',
+        selection: { courseId: this.selectedCourse?.id || '', viewMode: this.viewMode },
         label: this.currentAssessmentActionLabel,
         type: this.currentAssessmentActionType,
         isEnabled: this.isAssessmentActive(this.selectedCourse, this.currentAssessmentActionType),

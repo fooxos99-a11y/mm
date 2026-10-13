@@ -1,5 +1,10 @@
 <template>
-  <header class="dashboard-topbar">
+  <header
+    class="dashboard-topbar"
+    :class="{
+      'dashboard-topbar--assessment': ['courses', 'tasks'].includes(activeMenu),
+    }"
+  >
     <div class="dashboard-topbar__mobile">
       <AppIconButton
         variant="primary"
@@ -118,30 +123,56 @@
     </div>
 
     <div
-      v-if="showCountdown"
-      class="dashboard-topbar__timer-list"
+      v-if="showCountdown || showAssessmentAction || activeMenu === 'finalexam'"
+      class="dashboard-topbar__assessment-controls"
     >
       <div
-        v-for="timer in countdownItems"
-        :key="`${activeMenu}-${timer.branchCode || 'all'}-${timer.closesAt || 'none'}`"
-        class="dashboard-topbar__timer"
+        v-if="showCountdown"
+        class="dashboard-topbar__timer-list"
       >
-        <span class="dashboard-topbar__timer-text">{{ timer.text }}</span>
-        <span class="dashboard-topbar__timer-label">{{ timer.label }}</span>
+        <div
+          v-for="timer in countdownItems"
+          :key="`${activeMenu}-${timer.branchCode || 'all'}-${timer.closesAt || 'none'}`"
+          class="dashboard-topbar__timer"
+          role="timer"
+          :aria-label="`${timer.text} ${timer.label}`"
+          :title="timer.text"
+        >
+          <span class="dashboard-topbar__timer-text">{{ timer.branchLabel || 'المتبقي' }}</span>
+          <span class="dashboard-topbar__timer-label">{{ timer.label }}</span>
+        </div>
       </div>
-    </div>
-
-    <div
-      v-if="showAssessmentAction"
-      class="dashboard-topbar__actions"
-    >
-      <AppButton
-        variant="primary"
-        class="dashboard-topbar__action"
-        @click="$emit('assessment-action')"
+      <div
+        v-if="showAssessmentAction"
+        class="dashboard-topbar__actions"
       >
-        {{ assessmentState.label }}
-      </AppButton>
+        <AppButton
+          variant="primary"
+          class="dashboard-topbar__action"
+          @click="$emit('assessment-action')"
+        >
+          {{ assessmentState.label }}
+        </AppButton>
+      </div>
+      <div
+        v-if="activeMenu === 'finalexam'"
+        class="dashboard-topbar__actions"
+      >
+        <AppButton
+          variant="primary"
+          class="dashboard-topbar__action"
+          @click="$emit('toggle-final-exam')"
+        >
+          {{ finalExamState.isEnabled ? 'إيقاف الاختبار' : 'بدء' }}
+        </AppButton>
+        <AppButton
+          variant="secondary"
+          class="dashboard-topbar__action dashboard-topbar__action--ghost"
+          @click="$emit('copy-final-exam')"
+        >
+          نسخ
+        </AppButton>
+      </div>
     </div>
 
     <div
@@ -161,26 +192,6 @@
           {{ action.icon }}
         </v-icon>
         <span>{{ action.label }}</span>
-      </AppButton>
-    </div>
-
-    <div
-      v-if="activeMenu === 'finalexam'"
-      class="dashboard-topbar__actions"
-    >
-      <AppButton
-        variant="secondary"
-        class="dashboard-topbar__action dashboard-topbar__action--ghost"
-        @click="$emit('copy-final-exam')"
-      >
-        نسخ
-      </AppButton>
-      <AppButton
-        variant="primary"
-        class="dashboard-topbar__action"
-        @click="$emit('toggle-final-exam')"
-      >
-        {{ finalExamState.isEnabled ? 'إيقاف الاختبار' : 'بدء' }}
       </AppButton>
     </div>
   </header>
@@ -229,3 +240,18 @@ export default {
   ],
 };
 </script>
+
+<style scoped>
+.dashboard-topbar.dashboard-topbar--assessment { flex-wrap: wrap; gap: 12px; padding: 12px 16px; border-radius: var(--app-radius-card); }
+.dashboard-topbar.dashboard-topbar--assessment { min-height: 72px; }
+.dashboard-topbar__assessment-controls { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.dashboard-topbar .dashboard-topbar__assessment-controls .dashboard-topbar__timer-list { display: grid; gap: 4px; min-width: 0; }
+.dashboard-topbar .dashboard-topbar__assessment-controls .dashboard-topbar__timer { justify-content: space-between; min-height: 32px; padding: 4px 8px; font-size: .8rem; border-radius: 8px; }
+@media (max-width: 700px) {
+  .dashboard-topbar__assessment-controls { width: 100%; gap: 8px; }
+  .dashboard-topbar .dashboard-topbar__assessment-controls .dashboard-topbar__timer-list { flex: 1; width: auto; }
+  .dashboard-topbar .dashboard-topbar__assessment-controls .dashboard-topbar__timer { flex-wrap: wrap; }
+  .dashboard-topbar .dashboard-topbar__assessment-controls .dashboard-topbar__actions { flex: 1; min-width: 0; }
+  .dashboard-topbar .dashboard-topbar__assessment-controls .dashboard-topbar__action { width: 100%; white-space: normal; }
+}
+</style>

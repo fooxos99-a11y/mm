@@ -33,7 +33,7 @@ export default {
 
     this.attendanceSaveTimer = setTimeout(() => {
       this.attendanceSaveTimer = null;
-      this.saveAttendance();
+      this.attendanceSavePromise = this.saveAttendance();
     }, 250);
   },
   async saveAttendance() {

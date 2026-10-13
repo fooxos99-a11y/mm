@@ -47,4 +47,15 @@ test('people editor changes branch and saves female users', async ({ page }, tes
     await expect(page.locator('.people-card')).toHaveCount(1);
     await expect(page.locator('.people-card')).toContainText(login);
   }
+  await page.locator('.app-select').filter({ has: page.locator('#people-branch-filter') }).click();
+  await page.getByRole('option', { name: 'معلمات', exact: true }).click();
+  await page.getByRole('searchbox', { name: 'البحث بالاسم أو رقم الدخول' }).fill('Branchstudent' + testInfo.project.name.replace(/[^a-z0-9]/gi, ''));
+  await page.locator('.people-card').getByRole('button', { name: /^المقرئ:/ }).click();
+  const picker = page.getByRole('dialog', { name: 'اختيار المقرئة', exact: true });
+  await expect(picker).toBeVisible();
+  await expect(picker.getByRole('searchbox')).toHaveCount(0);
+  await picker.getByRole('button', { name: 'تجربة الفرع reciter', exact: true }).click();
+  await expect(picker.getByRole('button', { name: 'تجربة الفرع reciter', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  await expect(picker.getByRole('button', { name: 'إغلاق', exact: true })).toBeEnabled();
+  await page.screenshot({ path: testInfo.outputPath('female-reciter.png'), fullPage: false });
 });

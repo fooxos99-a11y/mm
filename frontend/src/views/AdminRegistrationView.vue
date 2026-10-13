@@ -32,9 +32,6 @@
         <h1 class="registration-admin__title">
           التسجيل
         </h1>
-        <p class="registration-admin__description">
-          افتح أو أغلق رابط التسجيل، وراجع الطلبات وقم بقبولها أو رفضها مباشرة.
-        </p>
       </div>
 
       <div class="registration-admin__hero-actions">

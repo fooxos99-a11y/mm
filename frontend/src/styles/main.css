@@ -4,13 +4,40 @@
 @import './ui-inputs.css';
 
 :root {
-  --app-primary: #1f6f96;
-  --app-primary-dark: #275d8e;
-  --app-primary-deep: #084159;
-  --app-primary-soft: rgba(31, 111, 150, 0.12);
-  --app-primary-border: rgba(31, 111, 150, 0.24);
-  --app-primary-shadow: rgba(31, 111, 150, 0.34);
-  --app-primary-gradient: linear-gradient(135deg, var(--app-primary), var(--app-primary-dark));
+  --app-primary: #1D6A85;
+  --app-primary-dark: #17394B;
+  --app-primary-deep: var(--app-primary-dark);
+  --app-primary-soft: #EDF5F8;
+  --app-primary-border: #DDE5EB;
+  --app-primary-shadow: rgba(29, 106, 133, 0.16);
+  --app-primary-gradient: var(--app-primary);
+  --app-background: #F5F8FA;
+  --app-surface: #FFFFFF;
+  --app-border: #DDE5EB;
+  --app-success: #16805D;
+  --app-danger: #D14343;
+  --app-danger-soft: #FDF1F1;
+  --app-success-soft: #EDF8F3;
+  --app-text-muted: #526777;
+  --app-font-family: 'Tajawal', system-ui, sans-serif;
+  --app-font-sm: 0.875rem;
+  --app-font-base: 1rem;
+  --app-font-title: 1.125rem;
+  --app-weight-label: 700;
+  --app-space-1: 4px;
+  --app-space-2: 8px;
+  --app-space-3: 12px;
+  --app-space-4: 16px;
+  --app-space-5: 20px;
+  --app-space-6: 24px;
+  --app-space-8: 32px;
+  --app-control-height: 48px;
+  --app-touch-min: 44px;
+  --app-radius-control: 8px;
+  --app-radius-card: 12px;
+  --app-shadow-card: 0 2px 8px rgba(23, 57, 75, 0.04);
+  --app-shadow-overlay: 0 8px 32px rgba(23, 57, 75, 0.12);
+  --app-focus-shadow: 0 0 0 3px rgba(29, 106, 133, 0.2);
 }
 
 html,
@@ -27,9 +54,10 @@ html {
 
 body {
   margin: 0;
-  font-family: 'Tajawal', system-ui, sans-serif;
-  background: linear-gradient(180deg, #f3f7f6 0%, #ffffff 100%);
-  color: #0f172a;
+  font-family: var(--app-font-family);
+  background: var(--app-background);
+  color: var(--app-primary-dark);
+  line-height: 1.6;
   overflow-x: hidden;
 }
 
@@ -44,7 +72,7 @@ h4,
 h5,
 h6,
 .v-application {
-  font-family: 'Tajawal', system-ui, sans-serif !important;
+  font-family: var(--app-font-family) !important;
 }
 
 .app-action-icon {
@@ -55,7 +83,7 @@ h6,
 }
 
 .app-action-icon--delete {
-  color: #ff3b30;
+  color: var(--app-danger);
 }
 
 .app-action-icon--edit {

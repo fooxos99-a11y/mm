@@ -1,5 +1,5 @@
 import { expect, test } from './support/isolatedTest.mjs';
-import { login } from './support/gesture-helpers.mjs';
+import { login, selectOption } from './support/gesture-helpers.mjs';
 
 test.use({ actionTimeout: 20_000 });
 
@@ -8,11 +8,11 @@ test('shared dialog names follow pre, post, tasks and edit titles after reuse', 
   await page.goto('dashboard?panel=courses');
   const courses = page.locator('.assessment-select:visible').first();
   await courses.locator('.v-field').click();
-  await page.getByRole('option').filter({ hasText: 'دورة اختبار الواجهة' }).click();
+  await selectOption(page, 'دورة اختبار الواجهة');
   for (const [mode, title] of [['الاختبار القبلي', 'فتح الاختبار القبلي'], ['الاختبار البعدي', 'فتح الاختبار البعدي']]) {
     const type = page.getByRole('combobox', { name: 'النوع', exact: true });
     await type.locator('xpath=ancestor::div[contains(@class,"v-field")][1]').click();
-    await page.getByRole('option', { name: mode, exact: true }).click();
+    await selectOption(page, mode, { exact: true });
     await page.getByRole('button', { name: `بدء ${mode}`, exact: true }).click();
     const dialog = page.getByRole('dialog', { name: title, exact: true });
     await expect(dialog).toBeVisible();
@@ -20,7 +20,7 @@ test('shared dialog names follow pre, post, tasks and edit titles after reuse', 
   }
   await page.goto('dashboard?panel=tasks');
   await page.locator('.assessment-select:visible').first().locator('.v-field').click();
-  await page.getByRole('option').filter({ hasText: 'مهمة اختبار الواجهة' }).click();
+  await selectOption(page, 'مهمة اختبار الواجهة');
   await page.getByRole('button', { name: 'بدء المهمة الأدائية', exact: true }).click();
   const taskDialog = page.getByRole('dialog', { name: 'فتح المهام الأدائية', exact: true });
   await expect(taskDialog).toBeVisible();
@@ -50,7 +50,7 @@ test('public duplicate submissions keep one pending request and show a recoverab
   await page.locator('#registration-phone').fill(profile.phone);
   await page.locator('.registration-entry__field')
     .filter({ has: page.locator('label[for="registration-gender"]') }).locator('.v-field').click();
-  await page.getByRole('option', { name: 'ذكر', exact: true }).click();
+  await selectOption(page, 'ذكر', { exact: true });
   await page.locator('#registration-field-age').fill('22');
   const sent = page.waitForResponse(response => response.url().endsWith('/api/public/registration-requests')
     && response.request().method() === 'POST');

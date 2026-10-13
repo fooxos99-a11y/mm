@@ -26,12 +26,11 @@ test('permissions view delegates the matrix and keeps styles external', async ()
 });
 
 test('assessment view reuses its course toolbar and document workspace', async () => {
-  const [view, controller, toolbar, questionBuilder, toolbarStyles] = await Promise.all([
+  const [view, controller, toolbar, questionBuilder] = await Promise.all([
     source('../src/views/AdminAssessmentView.vue'),
     source('../src/features/assessment/adminAssessmentView.js'),
     source('../src/components/assessment/AssessmentCourseToolbar.vue'),
     source('../src/components/assessment/AssessmentQuestionBuilder.vue'),
-    source('../src/styles/views/admin-assessment.css'),
   ]);
 
   for (const component of ['AssessmentCourseToolbar', 'AssessmentDocumentWorkspace']) {
@@ -42,8 +41,12 @@ test('assessment view reuses its course toolbar and document workspace', async (
   assert.equal(view.includes('class="assessment-select-option"'), false);
   assert.equal(view.includes('<RichTextEditor'), false);
   assert.match(toolbar, /contentClass: 'assessment-course-menu'/);
-  assert.match(toolbar, /assessment-select-option--create/);
+  assert.match(toolbar, /#item-title="\{ item \}"/);
+  assert.match(toolbar, /#item-actions="\{ item, actionAttrs \}"/);
   assert.match(questionBuilder, /#activator="\{ props \}"/);
   assert.equal(questionBuilder.includes('#activator="{ on, attrs }"'), false);
-  assert.match(toolbarStyles, /\.assessment-select-option__delete[\s\S]*?width: 44px;[\s\S]*?height: 44px;/);
+  assert.match(toolbar, /import \{ AppIconButton, AppInput,/);
+  assert.match(toolbar, /\$emit\('edit-course', item.course\)/);
+  assert.match(toolbar, /\$emit\('delete-course', item.course\)/);
+  assert.equal(toolbar.includes('<AppRawButton'), false);
 });

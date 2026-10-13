@@ -61,6 +61,7 @@ export default /** @type {Record<string, any>} */ ({
         canEdit: this.canManageCourseCatalog,
         deletingCourseId: this.deletingCourseId,
         viewMode: this.viewMode,
+        changingContext: this.isChangingAssessmentContext,
         modeOptions: this.courseModeOptions,
         selectedCourse: this.selectedCourse,
         isDocumentMode: this.isDocumentMode,
@@ -95,10 +96,7 @@ export default /** @type {Record<string, any>} */ ({
         return this.selectedCourseId || null;
       },
       set(value) {
-        let nextValue = '';
-        if (value) nextValue = value;
-        if (nextValue !== this.selectedCourseId && !this.confirmDiscardChanges()) return;
-        this.selectedCourseId = nextValue;
+        this.requestCourseChange(value || '');
       },
     },
     selectedCourse() {

@@ -1,9 +1,9 @@
 :root {
-  --app-dialog-radius: 28px;
-  --app-dialog-border: 1px solid rgba(148, 163, 184, 0.18);
-  --app-dialog-divider: 1px solid rgba(148, 163, 184, 0.16);
-  --app-dialog-shadow: 0 24px 60px rgba(15, 23, 42, 0.08);
-  --app-dialog-padding: 18px;
+  --app-dialog-radius: var(--app-radius-card);
+  --app-dialog-border: 1px solid var(--app-border);
+  --app-dialog-divider: 1px solid var(--app-border);
+  --app-dialog-shadow: var(--app-shadow-overlay);
+  --app-dialog-padding: var(--app-space-4);
 }
 
 .modal {
@@ -56,7 +56,7 @@
   flex-direction: column;
   max-height: min(90dvh, calc(var(--overlay-height, 100dvh) - 32px));
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.96);
+  background: var(--app-surface);
   border: var(--app-dialog-border);
   border-radius: var(--app-dialog-radius);
   box-shadow: var(--app-dialog-shadow);
@@ -76,7 +76,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 16px 18px;
+  padding: var(--app-space-4);
 }
 
 .app-dialog__header,
@@ -92,6 +92,7 @@
 .app-dialog__title-wrap,
 .assessment-dialog__title-wrap {
   display: flex;
+  min-width: 0;
   align-items: center;
   gap: 8px;
 }
@@ -99,17 +100,18 @@
 .app-dialog__title,
 .assessment-dialog__title {
   margin: 0;
-  color: #0f172a;
-  font-size: 1.15rem;
-  font-weight: 800;
+  color: var(--app-primary-dark);
+  font-size: var(--app-font-title);
+  font-weight: var(--app-weight-label);
   line-height: 1.4;
+  overflow-wrap: anywhere;
 }
 
 .app-dialog__body,
 .assessment-dialog__body {
   min-height: 0;
   display: grid;
-  gap: 14px;
+  gap: var(--app-space-4);
   padding: var(--app-dialog-padding);
   overflow-y: auto;
 }
@@ -122,10 +124,10 @@
 .app-dialog__text,
 .assessment-dialog__text {
   margin: 0;
-  color: #4b6478;
+  color: var(--app-text-muted);
   font-size: 1rem;
   font-weight: 700;
-  line-height: 2;
+  line-height: 1.6;
   text-align: right;
 }
 
@@ -133,15 +135,15 @@
 .assessment-dialog__import-row {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
-  padding: 14px 18px;
+  gap: var(--app-space-3);
+  padding: var(--app-space-4);
   border-bottom: var(--app-dialog-divider);
 }
 
 .app-dialog__import-row--inline,
 .assessment-dialog__import-row--inline {
   padding: 0;
-  margin-bottom: 18px;
+  margin-bottom: var(--app-space-4);
   border-bottom: 0;
 }
 
@@ -150,21 +152,21 @@
   flex: 1;
   min-height: 72px;
   max-height: 140px;
-  padding: 12px 14px;
-  border: 1px solid rgba(148, 163, 184, 0.24);
-  border-radius: 18px;
+  padding: var(--app-space-3);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-control);
   outline: none;
   resize: vertical;
   background: rgba(248, 250, 252, 0.72);
-  color: #0f172a;
+  color: var(--app-primary-dark);
   font-size: 0.94rem;
   line-height: 1.8;
 }
 
 .app-dialog__paste:focus,
 .assessment-dialog__paste:focus {
-  border-color: rgba(13, 90, 115, 0.38);
-  box-shadow: 0 0 0 4px rgba(13, 90, 115, 0.08);
+  border-color: var(--app-primary);
+  box-shadow: var(--app-focus-shadow);
 }
 
 .app-dialog-header {
@@ -172,7 +174,7 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
-  padding: 20px 22px 18px;
+  padding: var(--app-space-4);
   border-bottom: var(--app-dialog-divider);
 }
 
@@ -182,17 +184,18 @@
 }
 
 .app-dialog-header__eyebrow {
-  color: #74879a;
+  color: var(--app-text-muted);
   font-size: 0.92rem;
-  font-weight: 800;
+  font-weight: var(--app-weight-label);
 }
 
 .app-dialog-header__title {
   margin: 4px 0 0;
-  color: #0f172a;
-  font-size: 1.22rem;
-  font-weight: 900;
+  color: var(--app-primary-dark);
+  font-size: var(--app-font-title);
+  font-weight: var(--app-weight-label);
   line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 
 .app-dialog-header__extra {
@@ -202,7 +205,7 @@
 .app-dialog-header__actions {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--app-space-3);
   flex: 0 0 auto;
 }
 
@@ -212,10 +215,10 @@
   justify-content: center;
   width: 44px;
   height: 44px;
-  border: 1px solid rgba(31, 111, 150, 0.14);
-  border-radius: 999px;
-  background: linear-gradient(180deg, #ffffff 0%, #f3f9fd 100%);
-  color: #35627a;
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-control);
+  background: var(--app-surface);
+  color: var(--app-primary);
   font-size: 1.4rem;
   line-height: 1;
 }
@@ -223,7 +226,7 @@
 .app-dialog-body {
   min-height: 0;
   display: grid;
-  gap: 14px;
+  gap: var(--app-space-4);
   padding: var(--app-dialog-padding);
   overflow-y: auto;
 }
@@ -234,10 +237,11 @@
 
 .app-dialog-footer {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: flex-end;
   gap: 12px;
-  padding: 16px 18px;
+  padding: var(--app-space-4);
   border-top: var(--app-dialog-divider);
 }
 
@@ -247,7 +251,7 @@
 .app-dialog-footer > a.app-button,
 .app-dialog-footer > button.app-button {
   flex: 1 1 0;
-  min-width: 136px;
+  min-width: 112px;
   max-width: 168px;
 }
 
@@ -258,14 +262,8 @@
 
 @media (max-width: 960px) {
   .modal {
-    width: calc(100% - 18px);
-    padding: 9px;
-  }
-
-  .app-dialog-header,
-  .app-dialog-footer {
-    flex-direction: column;
-    align-items: stretch;
+    width: calc(100% - 16px);
+    padding: 8px;
   }
 
   .app-dialog-footer > .app-button,
@@ -276,11 +274,8 @@
     max-width: none;
   }
 
-  .app-dialog__header,
   .app-dialog__footer,
-  .assessment-dialog__header,
   .assessment-dialog__footer {
-    flex-direction: column;
-    align-items: stretch;
+    flex-wrap: wrap;
   }
 }

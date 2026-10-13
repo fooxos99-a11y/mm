@@ -1,5 +1,5 @@
 import { expect, test } from './support/isolatedTest.mjs';
-import { login } from './support/gesture-helpers.mjs';
+import { login, selectOption } from './support/gesture-helpers.mjs';
 
 test.use({ screenshot: 'off' });
 
@@ -19,52 +19,52 @@ for (const assessmentType of ['pre', 'post', 'tasks']) {
       : `dashboard?panel=courses&courseId=${course.id}&assessmentType=${assessmentType}`);
     if (assessmentType === 'tasks') {
       await page.locator('.assessment-select:visible').first().locator('.v-field').click();
-      await page.getByText(title, { exact: true }).click();
+      await selectOption(page, title);
     } else {
       await page.locator('#assessment-toolbar-mode').locator('xpath=ancestor::div[contains(@class,"v-input")]').locator('.v-field').click();
-      await page.getByRole('option').filter({ hasText: assessmentType === 'pre' ? 'الاختبار القبلي' : 'الاختبار البعدي' }).click();
+      await selectOption(page, assessmentType === 'pre' ? 'الاختبار القبلي' : 'الاختبار البعدي');
     }
     for (const [index, type] of ['خيارات', 'صح أو خطأ', 'نصي'].entries()) {
       await page.locator('.assessment-inline-builder__add').click();
       await page.locator('.assessment-inline-builder__menu-item').getByText(type, { exact: true }).click();
-      const form = page.locator('.assessment-form-card--inline').filter({ has: page.locator(`#assessment-new-question-${index}-prompt`) });
-      await form.locator('input[placeholder="اكتب السؤال"]').fill(`سؤال ${type}`);
+      const form = page.locator('.assessment-editor-question').filter({ has: page.locator(`#assessment-new-question-${index}-prompt`) });
+      await form.locator('textarea[placeholder="اكتب السؤال"]').fill(`سؤال ${type}`);
       if (type === 'خيارات') {
-        await form.locator('input[placeholder="الخيار 1"]').fill('الأول');
-        await form.locator('input[placeholder="الخيار 2"]').fill('الثاني');
+        await form.locator('textarea[placeholder="الخيار 1"]').fill('الأول');
+        await form.locator('textarea[placeholder="الخيار 2"]').fill('الثاني');
       }
       if (type !== 'نصي') await form.getByRole('button', { name: 'تحديد الخيار 1 إجابة صحيحة', exact: true }).click();
     }
     // A successful save must publish server IDs even if dashboard refresh is unavailable.
     await page.route('**/api/dashboard/snapshot**', route => route.abort());
     const save = page.waitForResponse(item => item.url().endsWith(`/courses/${course.id}/questions/sync`));
-    await page.getByRole('button', { name: 'حفظ', exact: true }).click();
+    await page.getByRole('button', { name: 'حفظ الأسئلة', exact: true }).click();
     expect((await save).status()).toBe(200);
     const saved = page.locator('.assessment-inline-list__item');
     await expect(saved).toHaveCount(3);
     for (const [index, type] of ['خيارات', 'صح أو خطأ', 'نصي'].entries()) {
-      await expect(saved.nth(index).locator('input[placeholder="اكتب السؤال"]')).toHaveValue(`سؤال ${type}`);
-      await saved.nth(index).locator('input[placeholder="اكتب السؤال"]').fill(`تعديل ${type}`);
+      await expect(saved.nth(index).locator('textarea[placeholder="اكتب السؤال"]')).toHaveValue(`سؤال ${type}`);
+      await saved.nth(index).locator('textarea[placeholder="اكتب السؤال"]').fill(`تعديل ${type}`);
     }
     const edit = page.waitForResponse(item => item.url().endsWith(`/courses/${course.id}/questions/sync`));
-    await page.getByRole('button', { name: 'حفظ', exact: true }).click();
+    await page.getByRole('button', { name: 'حفظ الأسئلة', exact: true }).click();
     expect((await edit).status()).toBe(200);
-    await expect(saved.nth(0).locator('input[placeholder="اكتب السؤال"]')).toHaveValue('تعديل خيارات');
+    await expect(saved.nth(0).locator('textarea[placeholder="اكتب السؤال"]')).toHaveValue('تعديل خيارات');
     await page.unroute('**/api/dashboard/snapshot**');
     await page.reload();
     if (assessmentType === 'tasks') {
       await page.locator('.assessment-select:visible').first().locator('.v-field').click();
-      await page.getByText(title, { exact: true }).click();
+      await selectOption(page, title);
     } else {
       await page.locator('#assessment-toolbar-mode').locator('xpath=ancestor::div[contains(@class,"v-input")]').locator('.v-field').click();
-      await page.getByRole('option').filter({ hasText: assessmentType === 'pre' ? 'الاختبار القبلي' : 'الاختبار البعدي' }).click();
+      await selectOption(page, assessmentType === 'pre' ? 'الاختبار القبلي' : 'الاختبار البعدي');
     }
     await expect(saved).toHaveCount(3);
     for (const [index, type] of ['خيارات', 'صح أو خطأ', 'نصي'].entries()) {
-      await expect(saved.nth(index).locator('input[placeholder="اكتب السؤال"]')).toHaveValue(`تعديل ${type}`);
+      await expect(saved.nth(index).locator('textarea[placeholder="اكتب السؤال"]')).toHaveValue(`تعديل ${type}`);
     }
-    await expect(saved.nth(1).locator('input[placeholder="الخيار 1"]')).toHaveValue('صح');
-    await expect(saved.nth(1).locator('input[placeholder="الخيار 2"]')).toHaveValue('خطأ');
+    await expect(saved.nth(1).locator('textarea[placeholder="الخيار 1"]')).toHaveValue('صح');
+    await expect(saved.nth(1).locator('textarea[placeholder="الخيار 2"]')).toHaveValue('خطأ');
   });
 }
 
@@ -72,16 +72,16 @@ test('final exam saves and edits all question types without losing true/false op
   await login(page);
   await page.goto('dashboard?panel=finalexam');
   await page.locator('.assessment-select:visible .v-field').click();
-  await page.getByRole('option').filter({ hasText: 'معلمات' }).click();
+  await selectOption(page, 'معلمات');
   const prompts = ['خيارات', 'صح أو خطأ', 'نصي'].map(type => `نهائي ${type} ${info.project.name}`);
   for (const [index, type] of ['خيارات', 'صح أو خطأ', 'نصي'].entries()) {
     await page.locator('.assessment-inline-builder__add').click();
     await page.getByRole('button', { name: type, exact: true }).click();
-    const form = page.locator('.assessment-inline-builder .assessment-form-card').nth(index);
-    await form.locator('input[placeholder="اكتب السؤال"]').fill(prompts[index]);
+    const form = page.locator('.assessment-inline-builder .assessment-editor-question').nth(index);
+    await form.locator('textarea[placeholder="اكتب السؤال"]').fill(prompts[index]);
     if (type === 'خيارات') {
-      await form.locator('input[placeholder="الخيار 1"]').fill('الأول');
-      await form.locator('input[placeholder="الخيار 2"]').fill('الثاني');
+      await form.locator('textarea[placeholder="الخيار 1"]').fill('الأول');
+      await form.locator('textarea[placeholder="الخيار 2"]').fill('الثاني');
     }
     if (type !== 'نصي') await form.getByRole('button', { name: 'تحديد الخيار 1 إجابة صحيحة', exact: true }).click();
   }
@@ -93,15 +93,15 @@ test('final exam saves and edits all question types without losing true/false op
       await route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ message: 'Save interrupted' }) });
     } else await route.continue();
   });
-  await page.getByRole('button', { name: 'حفظ', exact: true }).click();
-  await expect(page.locator('.assessment-inline-builder .assessment-form-card')).toHaveCount(2);
-  await expect.poll(() => page.locator('.assessment-inline-list__item input[placeholder="اكتب السؤال"]')
+  await page.getByRole('button', { name: 'حفظ الأسئلة', exact: true }).click();
+  await expect(page.locator('.assessment-inline-builder .assessment-editor-question')).toHaveCount(2);
+  await expect.poll(() => page.locator('.assessment-inline-list__item textarea[placeholder="اكتب السؤال"]')
     .evaluateAll(inputs => inputs.map(input => input.value))).toContain(prompts[0]);
   await page.unroute('**/api/dashboard/final-exam/questions');
-  await page.getByRole('button', { name: 'حفظ', exact: true }).click();
-  await expect(page.locator('.assessment-inline-builder .assessment-form-card')).toHaveCount(0);
+  await page.getByRole('button', { name: 'حفظ الأسئلة', exact: true }).click();
+  await expect(page.locator('.assessment-inline-builder .assessment-editor-question')).toHaveCount(0);
   const cards = page.locator('.assessment-inline-list__item');
-  const values = () => cards.locator('input[placeholder="اكتب السؤال"]').evaluateAll(inputs => inputs.map(input => input.value));
+  const values = () => cards.locator('textarea[placeholder="اكتب السؤال"]').evaluateAll(inputs => inputs.map(input => input.value));
   for (const prompt of prompts) await expect.poll(values).toContain(prompt);
   const edited = [];
   page.on('response', response => {
@@ -110,23 +110,23 @@ test('final exam saves and edits all question types without losing true/false op
     }
   });
   for (let index = 0; index < await cards.count(); index += 1) {
-    const input = cards.nth(index).locator('input[placeholder="اكتب السؤال"]');
+    const input = cards.nth(index).locator('textarea[placeholder="اكتب السؤال"]');
     const prompt = await input.inputValue();
     if (prompts.includes(prompt)) await input.fill(`تعديل ${prompt}`);
   }
-  await page.getByRole('button', { name: 'حفظ', exact: true }).click();
+  await page.getByRole('button', { name: 'حفظ الأسئلة', exact: true }).click();
   await expect.poll(() => edited.length).toBe(3);
   expect(edited).toEqual([204, 204, 204]);
   await page.unroute('**/api/dashboard/snapshot**');
   await page.reload();
   await page.locator('.assessment-select:visible .v-field').click();
-  await page.getByRole('option').filter({ hasText: 'معلمات' }).click();
+  await selectOption(page, 'معلمات');
   for (const prompt of prompts) await expect.poll(values).toContain(`تعديل ${prompt}`);
   for (let index = 0; index < await cards.count(); index += 1) {
     const card = cards.nth(index);
-    if (await card.locator('input[placeholder="اكتب السؤال"]').inputValue() === `تعديل ${prompts[1]}`) {
-      await expect(card.locator('input[placeholder="الخيار 1"]')).toHaveValue('صح');
-      await expect(card.locator('input[placeholder="الخيار 2"]')).toHaveValue('خطأ');
+    if (await card.locator('textarea[placeholder="اكتب السؤال"]').inputValue() === `تعديل ${prompts[1]}`) {
+      await expect(card.locator('textarea[placeholder="الخيار 1"]')).toHaveValue('صح');
+      await expect(card.locator('textarea[placeholder="الخيار 2"]')).toHaveValue('خطأ');
       await expect(card.getByRole('button', { name: 'تحديد الخيار 1 إجابة صحيحة', exact: true })).toHaveAttribute('aria-pressed', 'true');
     }
   }

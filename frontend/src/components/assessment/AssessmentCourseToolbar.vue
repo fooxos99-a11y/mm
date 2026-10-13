@@ -15,6 +15,7 @@
           item-text="label"
           item-value="value"
           :placeholder="coursePlaceholder"
+          :disabled="changingContext"
           persistent-placeholder
           dense
           outlined
@@ -28,57 +29,50 @@
         >
           <template
             v-if="canEdit"
-            #item="{ item, on, attrs }"
+            #item-title="{ item }"
           >
-            <v-list-item
-              class="assessment-select-option"
-              :class="{ 'assessment-select-option--create': !item.course }"
-              v-bind="attrs"
-              v-on="on"
+            <v-icon
+              v-if="!item.course"
+              size="20"
+              aria-hidden="true"
             >
-              <template #title>
-                <span class="assessment-select-option__label">
-                  <v-icon
-                    v-if="!item.course"
-                    size="20"
-                    aria-hidden="true"
-                  >
-                    mdi-plus
-                  </v-icon>
-                  {{ item.label }}
-                </span>
-              </template>
-              <template #append>
-                <div
-                  v-if="item.course"
-                  class="assessment-select-option__actions"
-                >
-                  <AppRawButton
-                    type="button"
-                    class="assessment-select-option__action"
-                    :aria-label="`تعديل اسم ${item.course.entityType === 'task' ? 'المهمة' : 'الدورة'} ${item.label}`"
-                    @mousedown.stop.prevent
-                    @click.stop.prevent="$emit('edit-course', item.course)"
-                  >
-                    <v-icon aria-hidden="true">
-                      mdi-pencil-outline
-                    </v-icon>
-                  </AppRawButton>
-                  <AppRawButton
-                    type="button"
-                    class="assessment-select-option__action assessment-select-option__delete"
-                    :disabled="deletingCourseId === item.value"
-                    :aria-label="`حذف ${item.course.entityType === 'task' ? 'المهمة' : 'الدورة'} ${item.label}`"
-                    @mousedown.stop.prevent
-                    @click.stop.prevent="$emit('delete-course', item.course)"
-                  >
-                    <v-icon aria-hidden="true">
-                      mdi-delete-outline
-                    </v-icon>
-                  </AppRawButton>
-                </div>
-              </template>
-            </v-list-item>
+              mdi-plus
+            </v-icon>
+            {{ item.label }}
+          </template>
+          <template
+            v-if="canEdit"
+            #item-actions="{ item, actionAttrs }"
+          >
+            <AppIconButton
+              v-if="item.course"
+              v-bind="actionAttrs"
+              variant="plain"
+              :aria-label="`تعديل اسم ${isTasksPage ? 'المهمة' : 'الدورة'} ${item.course.title}`"
+              @click.stop="$emit('edit-course', item.course)"
+            >
+              <v-icon
+                color="inherit"
+                aria-hidden="true"
+              >
+                mdi-pencil-outline
+              </v-icon>
+            </AppIconButton>
+            <AppIconButton
+              v-if="item.course"
+              v-bind="actionAttrs"
+              variant="plain-danger"
+              :disabled="deletingCourseId === item.course.id"
+              :aria-label="`حذف ${isTasksPage ? 'المهمة' : 'الدورة'} ${item.course.title}`"
+              @click.stop="$emit('delete-course', item.course)"
+            >
+              <v-icon
+                color="inherit"
+                aria-hidden="true"
+              >
+                mdi-delete-outline
+              </v-icon>
+            </AppIconButton>
           </template>
         </AppSelect>
       </AppFilterField>
@@ -111,6 +105,7 @@
           id="assessment-toolbar-mode"
           :value="viewMode"
           :items="modeOptions"
+          :disabled="changingContext"
           item-text="label"
           item-value="value"
           dense
@@ -133,16 +128,17 @@
         for-id="assessment-task-description"
         label="الوصف"
       >
-        <textarea
+        <AppInput
           id="assessment-task-description"
           aria-label="الوصف"
           :value="taskDescription"
-          rows="1"
-          wrap="off"
-          class="assessment-input assessment-input--multiline"
+          multiline
+          auto-resize
+          :rows="4"
+          class="assessment-toolbar__description"
           :disabled="!canEdit"
           placeholder="اكتب الوصف الذي سيظهر في المهمة"
-          @input="$emit('update:task-description', $event.target.value)"
+          @input="$emit('update:task-description', $event)"
         />
       </AppFilterField>
       <AppFilterField
@@ -174,11 +170,11 @@
 </template>
 
 <script>
-import { AppFilterField, AppFilterToolbar, AppRawButton, AppSelect } from '../ui';
+import { AppIconButton, AppInput, AppFilterField, AppFilterToolbar, AppSelect } from '../ui';
 
 export default {
   name: 'AssessmentCourseToolbar',
-  components: { AppFilterField, AppFilterToolbar, AppRawButton, AppSelect },
+  components: { AppIconButton, AppInput, AppFilterField, AppFilterToolbar, AppSelect },
   props: {
     columns: { type: Number, default: 2 },
     isTasksPage: { type: Boolean, default: false },
@@ -186,6 +182,7 @@ export default {
     courseOptions: { type: Array, required: true },
     coursePlaceholder: { type: String, default: '' },
     canEdit: { type: Boolean, default: false },
+    changingContext: { type: Boolean, default: false },
     deletingCourseId: { type: String, default: '' },
     viewMode: { type: String, default: '' },
     modeOptions: { type: Array, required: true },
@@ -207,3 +204,12 @@ export default {
   ],
 };
 </script>
+
+<style scoped>
+.assessment-toolbar :deep(.v-select__selection-text) { white-space: normal; overflow-wrap: anywhere; overflow: visible; }
+@media (min-width: 360px) and (max-width: 767px) {
+  .assessment-toolbar { --app-filter-columns: repeat(2, minmax(0, 1fr)); }
+  .assessment-toolbar :deep(.app-filter-field:first-child) { grid-column: auto; }
+  .assessment-toolbar :deep(.app-filter-field:nth-child(3):last-child) { grid-column: 1 / -1; }
+}
+</style>

@@ -54,6 +54,7 @@ export default {
         clockTimestamp: this.currentTimestamp,
         assessmentTypeOverride: this.routeWorkspaceAssessmentType,
         courseIdOverride: this.routeWorkspaceCourseId,
+        initialSelection: this.assessmentSelections.courses,
       };
     }
     if (this.activeMenu === 'notifications') {
@@ -70,7 +71,7 @@ export default {
     if (simpleEmbeddedPanels.includes(this.activeMenu)) {
       return {
         embedded: true,
-        ...(this.activeMenu === 'tasks' ? { clockTimestamp: this.currentTimestamp } : {}),
+        ...(this.activeMenu === 'tasks' ? { clockTimestamp: this.currentTimestamp, initialSelection: this.assessmentSelections.tasks } : {}),
       };
     }
 

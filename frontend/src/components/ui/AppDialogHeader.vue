@@ -11,6 +11,8 @@
         :is="titleTag"
         v-if="title"
         class="app-dialog-header__title"
+        :tabindex="initialFocus ? -1 : undefined"
+        :autofocus="initialFocus || undefined"
       >
         {{ title }}
       </component>
@@ -27,23 +29,29 @@
       class="app-dialog-header__actions"
     >
       <slot name="actions" />
-      <button
+      <AppIconButton
         v-if="closable"
-        type="button"
+        size="sm"
         class="app-dialog-close"
-        aria-label="إغلاق"
+        label="إغلاق"
+        :disabled="closeDisabled"
         @click="$emit('close')"
       >
         <span aria-hidden="true">×</span>
-      </button>
+      </AppIconButton>
     </div>
   </div>
 </template>
 
 <script>
+import AppIconButton from './AppIconButton.vue';
+
 export default {
   name: 'AppDialogHeader',
+  components: { AppIconButton },
   props: {
+    closeDisabled: { type: Boolean, default: false },
+    initialFocus: { type: Boolean, default: false },
     title: {
       type: String,
       default: '',

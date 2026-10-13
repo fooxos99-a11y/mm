@@ -30,8 +30,13 @@ export default createVuetify({
       light: {
         dark: false,
         colors: {
-          primary: '#1f6f96',
-          secondary: '#164e63',
+          primary: '#1D6A85',
+          secondary: '#17394B',
+          background: '#F5F8FA',
+          surface: '#FFFFFF',
+          'on-surface': '#17394B',
+          success: '#16805D',
+          error: '#D14343',
           accent: '#ea580c',
         },
       },

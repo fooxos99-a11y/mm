@@ -60,9 +60,6 @@
           <h1 class="dashboard-card__title dashboard-card__title--overview">
             {{ title }}
           </h1>
-          <div class="student-summary-card__subtitle">
-            {{ description }}
-          </div>
         </div>
       </div>
       <div class="student-summary-grid">
@@ -92,7 +89,6 @@ export default {
     courseOptions: { type: Array, default: () => [] },
     taskOptions: { type: Array, default: () => [] },
     title: { type: String, default: '' },
-    description: { type: String, default: '' },
     login: { type: String, default: '' },
     branchLabel: { type: String, default: '' },
     reciterName: { type: String, default: '' },

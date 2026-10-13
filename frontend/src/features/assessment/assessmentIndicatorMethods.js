@@ -1,5 +1,5 @@
-import { createQuestionDraft, validateQuestionDraft } from '../assessmentQuestions/questionModel.mjs';
-import { branchLabels } from './adminAssessmentConfig';
+import { createQuestionDraft, hasQuestionDraftChanges, validateQuestionDraft } from '../assessmentQuestions/questionModel.mjs';
+import { branchLabels } from './adminAssessmentConfig.js';
 
 
 export default {
@@ -7,13 +7,17 @@ export default {
     syncQuestionDrafts(questions) {
       const nextDrafts = {};
       const nextErrors = {};
+      const context = `${this.selectedCourseId}:${this.detailAssessmentType}`;
+      const preserveDrafts = this.questionDraftContext === context && !this.isSaving && !this.templateSaving;
 
       (questions || []).forEach((question) => {
-        nextDrafts[question.id] = this.createQuestionDraft(question);
+        nextDrafts[question.id] = preserveDrafts && this.questionDrafts[question.id] && hasQuestionDraftChanges(question, this.questionDrafts[question.id])
+          ? this.questionDrafts[question.id] : this.createQuestionDraft(question);
         nextErrors[question.id] = this.questionDraftErrors[question.id] || '';
       });
 
       this.questionDrafts = nextDrafts;
+      this.questionDraftContext = context;
       this.questionDraftErrors = nextErrors;
       this.pendingDeletedQuestionIds = this.pendingDeletedQuestionIds.filter((id) => Boolean(nextDrafts[id]));
     },

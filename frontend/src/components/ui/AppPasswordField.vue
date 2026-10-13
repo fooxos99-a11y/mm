@@ -1,6 +1,7 @@
 <template>
   <v-text-field
     v-bind="forwardedAttrs"
+    class="app-text-field app-password-field"
     :model-value="currentValue"
     :type="inputType"
     @update:model-value="updateValue"
@@ -15,27 +16,28 @@
       />
     </template>
     <template #append>
-      <v-btn
+      <AppIconButton
         v-if="revealable"
-        icon
-        type="button"
+        size="sm"
         class="app-password-field__toggle"
-        :aria-label="toggleLabel"
+        :label="toggleLabel"
         :title="toggleLabel"
         @mousedown.prevent
         @click="visible = !visible"
       >
         <v-icon>{{ visible ? 'mdi-eye-off-outline' : 'mdi-eye-outline' }}</v-icon>
-      </v-btn>
+      </AppIconButton>
     </template>
   </v-text-field>
 </template>
 
 <script>
 import { normalizeVuetifyFieldAttrs } from './vuetifyFieldAttrs';
+import AppIconButton from './AppIconButton.vue';
 
 export default {
   name: 'AppPasswordField',
+  components: { AppIconButton },
   inheritAttrs: false,
   props: {
     modelValue: {
@@ -57,7 +59,7 @@ export default {
   },
   computed: {
     forwardedAttrs() {
-      return normalizeVuetifyFieldAttrs(this.$attrs);
+      return { variant: 'outlined', density: 'comfortable', color: 'primary', ...normalizeVuetifyFieldAttrs(this.$attrs) };
     },
     currentValue() {
       return this.modelValue !== undefined ? this.modelValue : this.value;
@@ -86,6 +88,13 @@ export default {
   width: 44px;
   min-width: 44px;
   height: 44px;
-  margin: -6px -8px -6px 0;
+  margin: 0;
+}
+
+.app-password-field :deep(.v-input__append) {
+  height: var(--app-control-height);
+  align-items: center;
+  padding-top: 0;
+  margin-inline-start: var(--app-space-2);
 }
 </style>

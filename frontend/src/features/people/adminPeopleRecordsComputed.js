@@ -107,17 +107,4 @@ export default {
       .map((student) => ({ label: student.name, value: student.id }))
       .sort(sortArabicLabels);
   },
-  reciterAssignmentOptions() {
-    if (!this.reciterDialogStudent) {
-      return this.canEditReciter ? [{ label: 'غير مرتبط', value: '' }] : [];
-    }
-
-    return [
-      this.canEditReciter ? { label: 'غير مرتبط', value: '' } : null,
-      ...this.reciters
-        .filter((reciter) => reciter.branchId === this.reciterDialogStudent.branchId)
-        .map((reciter) => personOption(reciter, reciter.loginCode))
-        .sort(sortArabicLabels),
-    ].filter(Boolean);
-  },
 };

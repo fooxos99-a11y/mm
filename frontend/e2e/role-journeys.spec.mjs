@@ -1,3 +1,4 @@
+import { selectOption } from './support/gesture-helpers.mjs';
 import { expect, test } from './support/isolatedTest.mjs';
 import { rolePassword } from './support/credentials.mjs';
 
@@ -144,21 +145,21 @@ test('manager panels load without browser or server errors', async ({ page }) =>
     if (panel === 'courses') {
       const courseSelect = page.locator('.assessment-select:visible').first();
       await courseSelect.locator('.v-field').click();
-      await page.getByRole('option').filter({ hasText: 'دورة اختبار الواجهة' }).click();
+      await selectOption(page, 'دورة اختبار الواجهة');
       await expect(courseSelect).toContainText('دورة اختبار الواجهة');
     }
 
     if (panel === 'tasks') {
       const taskSelect = page.locator('.assessment-select:visible');
       await taskSelect.locator('.v-field').click();
-      await page.getByRole('option').filter({ hasText: 'مهمة اختبار الواجهة' }).click();
+      await selectOption(page, 'مهمة اختبار الواجهة');
       await expect(taskSelect).toContainText('مهمة اختبار الواجهة');
     }
 
     if (panel === 'finalexam') {
       await page.locator('.assessment-inline-builder__add:visible').click();
       await page.getByRole('button', { name: 'خيارات', exact: true }).click();
-      await expect(page.locator('.assessment-form-card--inline:visible:not(.assessment-inline-list__item)')).toHaveCount(1);
+      await expect(page.locator('.assessment-editor-question:visible:not(.assessment-inline-list__item)')).toHaveCount(1);
     }
   }
 

@@ -3,16 +3,21 @@
     class="assessment-page"
     :class="{ 'assessment-page--embedded': embedded }"
   >
-    <div
-      v-if="showQuestionDetails"
-      class="assessment-page__glow assessment-page__glow--one"
-    />
-    <div
-      v-if="showQuestionDetails"
-      class="assessment-page__glow assessment-page__glow--two"
-    />
-
     <v-container class="assessment-page__container py-8 py-md-12">
+      <h1 class="d-sr-only">
+        {{ isIndicatorsMode ? 'مؤشرات الاختبارات' : isAttendanceMode ? 'تحضير المعلمين' : assessmentLabels[detailAssessmentType] }}
+      </h1>
+      <header
+        v-if="!embedded && canShowAssessmentStartButton"
+        class="assessment-standalone-header"
+      >
+        <AppButton
+          variant="primary"
+          @click="handleCurrentAssessmentAvailabilityAction"
+        >
+          {{ currentAssessmentActionLabel }}
+        </AppButton>
+      </header>
       <div
         v-if="!embedded"
         class="assessment-page__mobile-back"
@@ -70,32 +75,31 @@
         :indicator-branch-options="assessmentIndicatorsBranchOptions"
         :selected-course="selectedCourse"
         :total-students="assessmentIndicatorsTotalStudents"
-        :pre-value="animatedIndicatorDisplay(assessmentPreIndicatorValueLabel)"
-        :pre-meta="assessmentPreIndicatorMetaLabel"
-        :pre-style="preIndicatorStyle"
-        :post-value="animatedIndicatorDisplay(assessmentPostIndicatorValueLabel)"
-        :post-meta="assessmentPostIndicatorMetaLabel"
-        :post-style="postIndicatorStyle"
-        :score-diff-label="assessmentScoreDiffLabel"
-        :score-diff-class="assessmentScoreDiffClass"
+        :pre-value="assessmentPreIndicatorValueLabel"
+        :pre-indicator="assessmentPreIndicator"
+        :post-value="assessmentPostIndicatorValueLabel"
+        :post-indicator="assessmentPostIndicator"
+        :score-difference="assessmentScoreDiff"
+        :loading="dashboardLoading"
+        :changing-context="isChangingAssessmentContext"
         :save-status="saveStatusText"
         :saving-attendance="isSavingAttendance"
         :attendance-branch="attendanceBranchId"
         :attendance-branch-options="assessmentBranchOptions.filter((option) => option.value !== 'all')"
         :students="displayedAttendanceStudents"
         :checked-ids="attendanceChecked"
-        :checked-count="visibleCheckedCount"
         :all-checked="allVisibleChecked"
         @update:course-value="courseSelectValue = $event"
-        @update:view-mode="viewMode = $event"
+        @update:view-mode="requestViewModeChange($event)"
         @update:indicator-branch="assessmentIndicatorsBranch = $event"
-        @update:attendance-branch="attendanceBranchId = $event"
+        @update:attendance-branch="requestAttendanceBranchChange($event)"
         @create-course="openCourseCreateDialog"
         @edit-course="openCourseEditDialog"
         @move-course="moveManagedCourse"
         @delete-course="requestManagedCourseDelete"
         @toggle-all="toggleVisibleAttendance"
         @toggle-student="toggleAttendance"
+        @save-attendance="saveAttendanceNow"
       />
 
       <template v-else-if="hasCourseSelectionUi">
@@ -106,7 +110,7 @@
           :template-saving="templateSaving"
           :can-edit="canEditQuestions"
           @update:course-value="courseSelectValue = $event"
-          @update:view-mode="viewMode = $event"
+          @update:view-mode="requestViewModeChange($event)"
           @update:task-points="handleTaskPointsInput"
           @update:task-video-url="taskVideoUrlDraft = $event.trim()"
           @update:task-description="taskDescriptionDraft = $event"
@@ -130,7 +134,7 @@
               v-bind="courseToolbarProps"
               :show-description="isTasksPage"
               @update:course-value="courseSelectValue = $event"
-              @update:view-mode="viewMode = $event"
+              @update:view-mode="requestViewModeChange($event)"
               @update:task-points="handleTaskPointsInput"
               @update:task-video-url="taskVideoUrlDraft = $event.trim()"
               @update:task-description="taskDescriptionDraft = $event"
@@ -139,13 +143,23 @@
               @move-course="moveManagedCourse"
               @delete-course="requestManagedCourseDelete"
             />
+            <AssessmentEditorHeader
+              v-if="selectedCourse"
+              :questions="editorQuestions"
+              @navigate="scrollToEditorQuestion"
+            />
+
+            <AppLoadingSpinner
+              v-if="dashboardLoading"
+              label="جارٍ تحميل الأسئلة"
+            />
 
             <AssessmentExistingQuestionList
-              v-if="selectedCourse"
+              v-if="selectedCourse && (visibleSelectedQuestions.length || !questionForms.length)"
               :questions="visibleSelectedQuestions"
               :drafts="questionDrafts"
               :errors="questionDraftErrors"
-              :empty-text="isTasksPage ? 'لا توجد أسئلة بعد. استخدم + لإضافة خيارات أو نصي أو صح وخطأ، أو اختر وورد.' : 'لا توجد أسئلة بعد.'"
+              :allow-option-removal="true"
               :can-edit="canEditQuestions"
               :saving="isSaving"
               @remove="removeQuestion"
@@ -156,6 +170,7 @@
               @option-paste="handleExistingOptionPaste"
               @select-correct="selectExistingCorrectOption"
               @add-option="handleExistingAddOptionField"
+              @remove-option="removeExistingOption"
             />
 
             <AssessmentQuestionBuilder
@@ -167,6 +182,7 @@
               :has-existing-questions="selectedQuestions.length > 0"
               :is-document-mode="isDocumentMode"
               :saving="isSaving"
+              :allow-option-removal="true"
               @update-form="updateForm"
               @clear-error="clearFormError"
               @prompt-paste="handlePromptPaste"
@@ -174,6 +190,7 @@
               @option-paste="handleOptionPaste"
               @select-correct="selectCorrectOption"
               @add-option="handleAddOptionField"
+              @remove-option="removeNewOption"
               @remove-form="handleRemoveQuestionSlot"
               @add-question="handleAddQuestionSlot"
               @save="handleSaveAllQuestions"
@@ -186,9 +203,9 @@
         v-else
         class="assessment-empty-shell"
       >
-        <h1 class="assessment-empty-message">
+        <h2 class="assessment-empty-message">
           {{ isTasksPage ? 'لا توجد مهام أدائية متاحة' : 'لا توجد دورات متاحة' }}
-        </h1>
+        </h2>
       </section>
 
       <AssessmentCourseDialogs
@@ -215,6 +232,11 @@
         @submit-edit="saveCourseEdit"
         @cancel-delete="closeCourseDeleteDialog"
         @confirm-delete="confirmManagedCourseDelete"
+      />
+
+      <AssessmentEditorDialogs
+        :discard-open="discardChangesDialogOpen"
+        @resolve-discard="resolveDiscardChanges"
       />
 
       <AssessmentAvailabilityDialogs
@@ -246,3 +268,7 @@
 <style src="../styles/views/admin-assessment-cards.css"></style>
 <style src="../styles/views/admin-assessment-question-form.css"></style>
 <style src="../styles/components/assessment-management-dialogs.css"></style>
+<style scoped>
+.assessment-standalone-header { display: flex; justify-content: flex-end; margin-bottom: 16px; }
+.assessment-page :deep(.prep-card), .assessment-page :deep(.assessment-card) { border-radius: var(--app-radius-card); box-shadow: var(--app-shadow-card); backdrop-filter: none; }
+</style>

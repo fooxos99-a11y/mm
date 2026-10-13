@@ -69,12 +69,14 @@ export default {
         nextQuery.panel = panel;
       }
 
-      if (panel === 'courses' && this.routeWorkspaceAssessmentType === 'post') {
+      const courseSelection = this.assessmentSelections?.courses || {};
+      if (panel === 'courses' && (courseSelection.viewMode === 'post'
+        || (!courseSelection.viewMode && this.routeWorkspaceAssessmentType === 'post'))) {
         nextQuery.assessmentType = 'post';
       }
 
-      if (panel === 'courses' && this.routeWorkspaceCourseId) {
-        nextQuery.courseId = this.routeWorkspaceCourseId;
+      if (panel === 'courses' && (this.routeWorkspaceCourseId || courseSelection.courseId)) {
+        nextQuery.courseId = this.routeWorkspaceCourseId || courseSelection.courseId;
       }
 
       if (panel === 'settings' && this.selectedSettingsItemId) {
@@ -99,7 +101,7 @@ export default {
       if (['courses', 'tasks'].includes(this.activeMenu)
         && panel !== this.activeMenu
         && currentPanel?.confirmDiscardChanges
-        && !currentPanel.confirmDiscardChanges()) {
+        && !(await currentPanel.confirmDiscardChanges())) {
         return;
       }
 

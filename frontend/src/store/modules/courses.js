@@ -21,7 +21,7 @@ const reloadSnapshot = (dispatch) => dispatch('loadDashboardSnapshot');
 export const courseActions = {
   async setManualAttendance({ dispatch }, payload) {
     await saveManualAttendance(payload);
-    await reloadSnapshot(dispatch);
+    await dispatch('loadDashboardSnapshot', { background: true });
   },
   async submitAssessment({ dispatch }, payload) {
     const result = await submitAssessmentRequest(payload);

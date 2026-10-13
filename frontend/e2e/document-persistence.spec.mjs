@@ -1,6 +1,6 @@
 import { expect, test } from './support/isolatedTest.mjs';
 import AxeBuilder from '@axe-core/playwright';
-import { login } from './support/gesture-helpers.mjs';
+import { login, selectOption } from './support/gesture-helpers.mjs';
 import { studentPassword } from './support/credentials.mjs';
 
 test.use({ actionTimeout: 20_000 });
@@ -34,7 +34,7 @@ test('document template and both student answers survive real typing, failed sav
   const selectTask = async () => {
     await page.goto('dashboard?panel=tasks');
     await page.locator('.assessment-select:visible').first().locator('.v-field').click();
-    await page.getByText(title, { exact: true }).click();
+    await selectOption(page, title);
     await expect(page.locator('.ql-editor')).toBeVisible();
   };
   await selectTask();
@@ -126,7 +126,7 @@ test('document toolbar exposes Arabic names for formatting and font choices', as
   expect(response.status()).toBe(201);
   await page.goto('dashboard?panel=tasks');
   await page.locator('.assessment-select:visible').first().locator('.v-field').click();
-  await page.getByText('أدوات محرر وورد', { exact: true }).click();
+  await selectOption(page, 'أدوات محرر وورد', { exact: true });
   await expect(page.locator('.ql-editor')).toBeVisible();
   expect((await new AxeBuilder({ page }).include('.rich-text-editor').analyze()).violations).toEqual([]);
   const toolbar = page.locator('.rich-text-editor__toolbar');

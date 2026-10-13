@@ -1,6 +1,6 @@
 import { mapActions, mapState } from 'vuex';
 import {
-  AppButton, AppCard, AppFilterField, AppFilterToolbar, AppDialog, AppDialogFooter, AppDialogHeader, AppIconButton, AppSelect, AppTextField,
+  AppButton, AppCard, AppFilterField, AppFilterToolbar, AppDialog, AppDialogBody, AppDialogFooter, AppDialogHeader, AppIconButton, AppSelect, AppTextField,
 } from '../../components/ui';
 import { useIndicatorAnimation } from '../../composables/useIndicatorAnimation';
 
@@ -20,6 +20,7 @@ export default {
   name: 'AdminSatisfactionView',
   components: {
     AppDialog,
+    AppDialogBody,
     AppButton,
     AppCard,
     AppFilterField,
@@ -149,28 +150,15 @@ export default {
       ];
     },
     questionTargetOptions() {
-      return [
-        { label: 'جميع الدورات', value: 'all' },
-        { label: 'دورة محددة', value: 'course' },
-      ];
+      return [{ label: 'جميع الدورات', value: 'all' }, ...this.availableCourseOptions];
     },
-    questionTargetScopeValue: {
+    questionTargetValue: {
       get() {
-        return this.questionDraft.targetScope || null;
+        return this.questionDraft.targetScope === 'all' ? 'all' : this.questionDraft.targetCourseId || null;
       },
       set(value) {
-        this.questionDraft.targetScope = value || '';
-      },
-    },
-    targetCourseOptions() {
-      return this.availableCourseOptions;
-    },
-    targetCourseSelectValue: {
-      get() {
-        return this.questionDraft.targetCourseId || null;
-      },
-      set(value) {
-        this.questionDraft.targetCourseId = value || '';
+        this.questionDraft.targetScope = value === 'all' ? 'all' : value ? 'course' : '';
+        this.questionDraft.targetCourseId = value && value !== 'all' ? value : '';
       },
     },
   },
@@ -216,7 +204,7 @@ export default {
         prompt: '',
         type: 'rating',
         targetScope: '',
-        targetCourseId: this.selectedCourseId || '',
+        targetCourseId: '',
         isRequired: true,
       };
       this.addDialogOpen = true;
@@ -232,7 +220,7 @@ export default {
       }
 
       if (!this.questionDraft.targetScope) {
-        this.$toast.error('اختر نطاق إضافة السؤال أولًا');
+        this.$toast.error('اختر الدورة أولًا');
         return;
       }
 

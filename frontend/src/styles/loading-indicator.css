@@ -1,0 +1,35 @@
+.app-loading-indicator,
+.loader {
+  display: grid;
+  width: var(--app-loader-size, 48px);
+  aspect-ratio: 1;
+  flex: 0 0 auto;
+  color: var(--app-primary, #1D6A85);
+}
+
+.app-loading-indicator::before,
+.app-loading-indicator::after,
+.loader::before,
+.loader::after {
+  content: '';
+  grid-area: 1 / 1;
+  --app-loader-dot: no-repeat radial-gradient(farthest-side, currentColor 92%, transparent);
+  background: var(--app-loader-dot) 50% 0, var(--app-loader-dot) 50% 100%, var(--app-loader-dot) 100% 50%, var(--app-loader-dot) 0 50%;
+  background-size: 25% 25%;
+  animation: app-loader-spin 1s infinite;
+}
+
+.app-loading-indicator::before,
+.loader::before {
+  margin: 8%;
+  background-size: 19% 19%;
+  animation-timing-function: linear;
+  opacity: 0.7;
+}
+
+@keyframes app-loader-spin { to { transform: rotate(.5turn); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .app-loading-indicator::before, .app-loading-indicator::after,
+  .loader::before, .loader::after { animation: none; }
+}

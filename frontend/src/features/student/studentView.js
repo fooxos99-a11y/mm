@@ -59,14 +59,6 @@ export default {
     activeSectionTitle() {
       return this.studentMenu.find((item) => item.id === this.activeSection)?.label || 'حسابي';
     },
-    activeSectionDescription() {
-      if (this.activeSection === 'courses') return 'اختر الدورة ثم راجع التحضير أو نتائج القبلي والبعدي بنفس نمط لوحة النتائج.';
-      if (this.activeSection === 'parts') return 'عرض الأجزاء المقروءة المسجلة على حسابك فقط بدون تعديل.';
-      if (this.activeSection === 'tasks') return 'راجع المهام الأدائية ونتيجتك بنفس أسلوب لوحة التحكم.';
-      if (this.activeSection === 'materials') return 'حمّل الملفات التدريبية والحقائب المعتمدة المضافة لك من لوحة الإدارة.';
-      if (this.activeSection === 'indicators') return 'تابع مؤشرات اجتيازك الشخصية للحضور والمهام والاختبار النهائي وعرض القرآن.';
-      return 'راجع نتيجة الاختبار النهائي وتفاصيل إجاباتك.';
-    },
     trainingMaterials() {
       const branchId = this.studentAccount?.branchId || '';
       return (this.dashboardSnapshot?.trainingMaterials || [])

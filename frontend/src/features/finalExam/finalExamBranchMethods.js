@@ -157,7 +157,7 @@ export const finalExamBranchMethods = {
       const minutes = Number(this.openDurationMinutes);
 
       if (!Number.isFinite(minutes) || minutes <= 0) {
-        this.activationError = 'أدخل مدة فتح صحيحة بالدقائق';
+        this.activationError = 'أدخل مدة فتح صحيحة بالساعات';
         return;
       }
 

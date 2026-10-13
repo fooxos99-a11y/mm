@@ -1,4 +1,8 @@
 import { mapActions, mapState } from 'vuex';
+import { getCurrentInstance } from 'vue';
+import { onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router';
+import AssessmentEditorHeader from '../../components/assessment/AssessmentEditorHeader.vue';
+import AssessmentEditorDialogs from '../../components/assessment/AssessmentEditorDialogs.vue';
 import AssessmentAvailabilityDialogs from '../../components/assessment/AssessmentAvailabilityDialogs.vue';
 import AssessmentCourseDialogs from '../../components/assessment/AssessmentCourseDialogs.vue';
 import AssessmentCourseToolbar from '../../components/assessment/AssessmentCourseToolbar.vue';
@@ -7,7 +11,7 @@ import AssessmentExistingQuestionList from '../../components/assessment/Assessme
 import AssessmentOperationalPanels from '../../components/assessment/AssessmentOperationalPanels.vue';
 import AssessmentQuestionBuilder from '../../components/assessment/AssessmentQuestionBuilder.vue';
 import {
-  AppCard, AppChoiceButton, AppIconButton,
+  AppButton, AppCard, AppChoiceButton, AppIconButton, AppLoadingSpinner,
 } from '../../components/ui';
 import { normalizeAssessmentAnswer } from '../assessmentQuestions/questionModel.mjs';
 import { useIndicatorAnimation } from '../../composables/useIndicatorAnimation';
@@ -19,6 +23,7 @@ import indicatorMethods from './assessmentIndicatorMethods';
 import questionMethods from './assessmentQuestionMethods';
 import templateMethods from './assessmentTemplateMethods';
 import { assessmentLabels } from './adminAssessmentConfig';
+import workspaceUiMethods, { editorComputed } from './assessmentWorkspaceUi';
 
 export default {
   name: 'AdminAssessmentView',
@@ -30,11 +35,23 @@ export default {
     AssessmentExistingQuestionList,
     AssessmentOperationalPanels,
     AssessmentQuestionBuilder,
+    AssessmentEditorHeader,
+    AssessmentEditorDialogs,
+    AppButton,
+    AppLoadingSpinner,
     AppChoiceButton,
     AppCard,
     AppIconButton,
   },
   setup() {
+    const instance = getCurrentInstance();
+    onBeforeRouteLeave(() => instance.proxy.confirmDiscardChanges());
+    onBeforeRouteUpdate((to, from) => {
+      if (to.query.panel !== from.query.panel || to.query.courseId !== from.query.courseId || to.params.assessmentType !== from.params.assessmentType || to.query.assessmentType !== from.query.assessmentType) {
+        return instance.proxy.confirmDiscardChanges();
+      }
+      return true;
+    });
     return useIndicatorAnimation();
   },
   props: {
@@ -43,11 +60,18 @@ export default {
     courseIdOverride: { type: String, default: '' },
     skipInitialLoad: { type: Boolean, default: false },
     clockTimestamp: { type: Number, default: 0 },
+    initialSelection: { type: Object, default: () => ({}) },
   },
   data() {
     return {
       assessmentLabels,
-      selectedCourseId: '',
+      discardChangesDialogOpen: false,
+      discardChangesPromise: null,
+      discardChangesResolve: null,
+      questionDraftContext: '',
+      workspaceChangeRevisions: {},
+      pendingWorkspaceChanges: 0,
+      selectedCourseId: this.courseIdOverride || this.$route.query.courseId ? '' : (this.initialSelection.courseId || ''),
       viewMode: this.embedded ? 'attendance' : '',
       selectedDetailAssessmentType: '',
       questionForms: [],
@@ -96,6 +120,7 @@ export default {
       isSavingAttendance: false,
       saveStatusText: '',
       attendanceSaveTimer: null,
+      attendanceSavePromise: null,
       currentTimestamp: Date.now(),
       assessmentCountdownTimer: null,
     };
@@ -103,6 +128,7 @@ export default {
   computed: {
     ...mapState(['dashboardSnapshot', 'dashboardLoading', 'dashboardError', 'currentUser']),
     ...computed,
+    ...editorComputed,
   },
   watch: watchers,
   created() {
@@ -111,9 +137,19 @@ export default {
     }
     if (!this.skipInitialLoad && !this.dashboardSnapshot) this.loadDashboardSnapshot();
   },
+  mounted() {
+    this.assessmentBeforeUnload = event => {
+      if (!this.hasUnsavedAssessmentChanges && !this.isSaving && !this.templateSaving && !this.attendanceSaveTimer && !this.isSavingAttendance && this.saveStatusText !== 'تعذر حفظ التحضير') return;
+      event.preventDefault();
+      event.returnValue = '';
+    };
+    window.addEventListener('beforeunload', this.assessmentBeforeUnload);
+  },
   beforeUnmount() {
     if (this.attendanceSaveTimer) clearTimeout(this.attendanceSaveTimer);
     if (this.assessmentCountdownTimer) window.clearInterval(this.assessmentCountdownTimer);
+    window.removeEventListener('beforeunload', this.assessmentBeforeUnload);
+    this.discardChangesResolve?.(false);
   },
   methods: {
     ...mapActions([
@@ -126,5 +162,6 @@ export default {
     ...availabilityMethods,
     ...questionMethods,
     ...templateMethods,
+    ...workspaceUiMethods,
   },
 };

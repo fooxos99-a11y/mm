@@ -18,13 +18,13 @@
   max-width: 100%;
   min-height: var(--app-input-min-height);
   padding: 0 16px;
-  border: 1.5px solid var(--app-input-border);
+  border: 1px solid var(--app-input-border);
   border-radius: var(--app-input-radius);
   outline: none;
   background: var(--app-input-bg);
   box-shadow: var(--app-input-shadow);
   color: var(--app-input-text);
-  font-family: 'Tajawal', system-ui, sans-serif;
+  font-family: var(--app-font-family);
   font-size: 1rem;
   font-weight: 500;
   line-height: 1.45;

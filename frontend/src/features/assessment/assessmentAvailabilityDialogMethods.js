@@ -35,7 +35,7 @@ export default {
     }
 
     if (!Number.isFinite(durationMinutes) || durationMinutes < 1) {
-      this.$toast.error('أدخل مدة صحيحة بالدقائق');
+      this.$toast.error('أدخل مدة صحيحة بالساعات');
       return;
     }
 

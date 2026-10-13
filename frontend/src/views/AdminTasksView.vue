@@ -21,6 +21,7 @@
         embedded
         assessment-type-override="tasks"
         :clock-timestamp="clockTimestamp"
+        :initial-selection="initialSelection"
         :skip-initial-load="true"
         @assessment-topbar-state="$emit('assessment-topbar-state', $event)"
       />

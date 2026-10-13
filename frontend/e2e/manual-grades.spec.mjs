@@ -1,3 +1,4 @@
+import { selectOption } from './support/gesture-helpers.mjs';
 import { expect, test } from './support/isolatedTest.mjs';
 
 test('manual grades save all drafts across search, recover from failure, and support pre and post without questions', async ({ page, request }, info) => {
@@ -26,10 +27,10 @@ test('manual grades save all drafts across search, recover from failure, and sup
   await Promise.all([page.waitForResponse(response => response.url().endsWith('/dashboard/shell')), page.locator('form button[type="submit"]').click()]);
   await page.goto('dashboard?panel=results');
   await page.getByRole('combobox', { name: 'القسم', exact: true }).locator('..').click();
-  await page.getByRole('option', { name: prefix, exact: true }).click();
+  await selectOption(page, prefix, { exact: true });
   const selectType = async (label) => {
     await page.getByRole('combobox', { name: 'نوع البيانات', exact: true }).locator('..').click();
-    await page.getByRole('option', { name: label, exact: true }).click();
+    await selectOption(page, label, { exact: true });
   };
   await selectType('الاختبار القبلي');
   await page.getByRole('button', { name: 'إدخال الدرجات', exact: true }).click();

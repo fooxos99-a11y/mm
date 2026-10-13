@@ -59,6 +59,7 @@
               >
                 <AppIconButton
                   variant="plain"
+                  :label="`حذف سؤال ${indicatorCard.prompt}`"
                   class="satisfaction-admin__delete-indicator"
                   :disabled="deletingQuestionKey === indicatorCard.questionKey"
                   @click="deleteQuestionFromIndicator(indicatorCard)"
@@ -94,70 +95,56 @@
         max-width="640"
         @close="closeAddDialog"
       >
-        <v-card class="satisfaction-admin__dialog pa-5">
+        <div class="app-dialog satisfaction-admin__dialog">
           <AppDialogHeader
             class="satisfaction-admin__dialog-header"
             title="إضافة استبيان جديد"
           />
-          <div class="satisfaction-admin__dialog-note">
-            اختر ما إذا كان السؤال سيُضاف لكل الدورات البعدية أو لدورة محددة فقط.
-          </div>
+          <AppDialogBody>
+            <AppTextField
+              v-model.trim="questionDraft.prompt"
+              label="نص السؤال"
+              dense
+              outlined
+              hide-details
+              class="satisfaction-admin__field"
+            />
 
-          <AppTextField
-            v-model.trim="questionDraft.prompt"
-            label="نص السؤال"
-            dense
-            outlined
-            class="satisfaction-admin__field"
-          />
+            <AppSelect
+              v-model="questionDraft.type"
+              :items="questionTypeOptions"
+              item-text="label"
+              item-value="value"
+              label="نوع السؤال"
+              hide-details
+              dense
+              outlined
+              class="satisfaction-admin__field"
+            />
 
-          <AppSelect
-            v-model="questionDraft.type"
-            :items="questionTypeOptions"
-            item-text="label"
-            item-value="value"
-            label="نوع السؤال"
-            dense
-            outlined
-            class="satisfaction-admin__field"
-          />
+            <AppSelect
+              v-model="questionTargetValue"
+              :items="questionTargetOptions"
+              item-text="label"
+              item-value="value"
+              label="الدورة"
+              hide-details
+              placeholder="اختر الدورة"
+              persistent-placeholder
+              dense
+              outlined
+              class="satisfaction-admin__field"
+            />
 
-          <AppSelect
-            v-model="questionTargetScopeValue"
-            :items="questionTargetOptions"
-            item-text="label"
-            item-value="value"
-            label="الدورة"
-            placeholder="اختر الدورة"
-            persistent-placeholder
-            dense
-            outlined
-            class="satisfaction-admin__field"
-          />
-
-          <AppSelect
-            v-if="questionDraft.targetScope === 'course'"
-            v-model="targetCourseSelectValue"
-            :items="targetCourseOptions"
-            item-text="label"
-            item-value="value"
-            label="اختر الدورة"
-            placeholder="اختر الدورة"
-            persistent-placeholder
-            dense
-            outlined
-            class="satisfaction-admin__field"
-          />
-
-          <v-switch
-            v-model="questionDraft.isRequired"
-            color="primary"
-            inset
-            hide-details
-            label="سؤال إلزامي"
-            class="satisfaction-admin__switch"
-          />
-
+            <v-switch
+              v-model="questionDraft.isRequired"
+              color="primary"
+              inset
+              hide-details
+              label="سؤال إلزامي"
+              class="satisfaction-admin__switch"
+            />
+          </AppDialogBody>
           <AppDialogFooter class="satisfaction-admin__dialog-actions">
             <AppButton
               variant="secondary"
@@ -173,7 +160,7 @@
               إضافة
             </AppButton>
           </AppDialogFooter>
-        </v-card>
+        </div>
       </AppDialog>
     </v-container>
   </div>

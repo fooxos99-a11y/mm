@@ -43,15 +43,11 @@
           hide-details
           @input="$emit('update:activation-branch', $event)"
         />
-        <label for="final-exam-duration">مدة الفتح بالدقائق</label>
-        <input
+        <AppDurationHoursField
           id="final-exam-duration"
-          :value="durationMinutes"
-          type="number"
-          min="1"
-          class="final-exam-duration-field__input"
-          @input="updateDuration($event.target.value)"
-        >
+          :minutes="durationMinutes"
+          @update:minutes="$emit('update:duration-minutes', $event)"
+        />
         <p
           v-if="activationError"
           class="final-exam-dialog-error"
@@ -116,11 +112,11 @@
 </template>
 
 <script>
-import { AppButton, AppDialog, AppSelect, DialogShell } from '../ui';
+import { AppButton, AppDialog, AppDurationHoursField, AppSelect, DialogShell } from '../ui';
 
 export default {
   name: 'FinalExamDialogs',
-  components: { AppButton, AppDialog, AppSelect, DialogShell },
+  components: { AppButton, AppDialog, AppDurationHoursField, AppSelect, DialogShell },
   props: {
     copyOpen: { type: Boolean, default: false }, copySubmitting: { type: Boolean, default: false },
     currentBranchLabel: { type: String, default: '' }, targetBranchLabel: { type: String, default: '' },
@@ -144,9 +140,6 @@ export default {
     'confirm-manage',
     'update:duration-minutes',
   ],
-  methods: {
-    updateDuration(value) { this.$emit('update:duration-minutes', value === '' ? '' : Number(value)); },
-  },
 };
 </script>
 

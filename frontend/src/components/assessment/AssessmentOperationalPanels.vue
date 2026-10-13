@@ -1,275 +1,111 @@
 <template>
-  <div class="assessment-operational-panels">
-    <div
-      v-if="mode === 'indicators'"
-      class="prep-layout"
+  <AppCard class="prep-card admin-workspace-card">
+    <AssessmentCourseToolbar
+      :columns="managedBranchId ? 2 : 3"
+      :course-value="courseValue"
+      :course-options="courseOptions"
+      :course-placeholder="coursePlaceholder"
+      :view-mode="viewMode"
+      :selected-course="selectedCourse"
+      :mode-options="modeOptions"
+      :can-edit="canManageCatalog"
+      :deleting-course-id="deletingCourseId"
+      :changing-context="changingContext"
+      @update:course-value="$emit('update:course-value', $event)"
+      @update:view-mode="$emit('update:view-mode', $event)"
+      @create-course="$emit('create-course')"
+      @edit-course="$emit('edit-course', $event)"
+      @move-course="$emit('move-course', $event)"
+      @delete-course="$emit('delete-course', $event)"
     >
-      <AppCard class="prep-card admin-workspace-card">
-        <AssessmentCourseToolbar
-          :columns="managedBranchId ? 2 : 3"
-          :course-value="courseValue"
-          :course-options="courseOptions"
-          :course-placeholder="coursePlaceholder"
-          :view-mode="viewMode"
-          :mode-options="modeOptions"
-          :can-edit="canManageCatalog"
-          :deleting-course-id="deletingCourseId"
-          @update:course-value="$emit('update:course-value', $event)"
-          @update:view-mode="$emit('update:view-mode', $event)"
-          @create-course="$emit('create-course')"
-          @edit-course="$emit('edit-course', $event)"
-          @move-course="$emit('move-course', $event)"
-          @delete-course="$emit('delete-course', $event)"
+      <template #branch>
+        <AppFilterField
+          v-if="!managedBranchId"
+          :for-id="branchId"
+          label="الفرع"
         >
-          <template #branch>
-            <AppFilterField
-              v-if="!managedBranchId"
-              for-id="assessment-indicators-branch"
-              label="الفرع"
-            >
-              <AppSelect
-                id="assessment-indicators-branch"
-                :value="indicatorBranch"
-                :items="indicatorBranchOptions"
-                item-text="label"
-                item-value="value"
-                dense
-                outlined
-                hide-details
-                class="assessment-select"
-                @input="$emit('update:indicator-branch', $event)"
-              />
-            </AppFilterField>
-          </template>
-        </AssessmentCourseToolbar>
-
-        <div
-          v-if="selectedCourse && !totalStudents"
-          class="assessment-empty-state"
-        >
-          لا يوجد معلمون مطابقون للفرع المحدد.
-        </div>
-        <div
-          v-else-if="selectedCourse"
-          class="assessment-indicators-panel"
-        >
-          <article class="assessment-score-indicator">
-            <div
-              class="assessment-score-indicator__ring"
-              :style="preStyle"
-            >
-              <div class="assessment-score-indicator__ring-core">
-                {{ preValue }}
-              </div>
-            </div>
-            <div class="assessment-score-indicator__text">
-              <div class="assessment-score-indicator__subtitle">
-                الاختبار القبلي
-              </div>
-              <div class="assessment-score-indicator__sublabel">
-                {{ preMeta }}
-              </div>
-            </div>
-          </article>
-          <div
-            class="assessment-score-diff"
-            :class="scoreDiffClass"
-          >
-            <div class="assessment-score-diff__value">
-              {{ scoreDiffLabel }}
-            </div>
-          </div>
-          <article class="assessment-score-indicator">
-            <div
-              class="assessment-score-indicator__ring"
-              :style="postStyle"
-            >
-              <div class="assessment-score-indicator__ring-core">
-                {{ postValue }}
-              </div>
-            </div>
-            <div class="assessment-score-indicator__text">
-              <div class="assessment-score-indicator__subtitle">
-                الاختبار البعدي
-              </div>
-              <div class="assessment-score-indicator__sublabel">
-                {{ postMeta }}
-              </div>
-            </div>
-          </article>
-        </div>
-      </AppCard>
-    </div>
-
-    <div
-      v-else-if="mode === 'attendance'"
-      class="prep-layout"
-    >
-      <AppCard class="prep-card admin-workspace-card">
-        <AssessmentCourseToolbar
-          :columns="managedBranchId ? 2 : 3"
-          :course-value="courseValue"
-          :course-options="courseOptions"
-          :course-placeholder="coursePlaceholder"
-          :view-mode="viewMode"
-          :mode-options="modeOptions"
-          :can-edit="canManageCatalog"
-          :deleting-course-id="deletingCourseId"
-          @update:course-value="$emit('update:course-value', $event)"
-          @update:view-mode="$emit('update:view-mode', $event)"
-          @create-course="$emit('create-course')"
-          @edit-course="$emit('edit-course', $event)"
-          @move-course="$emit('move-course', $event)"
-          @delete-course="$emit('delete-course', $event)"
-        >
-          <template #branch>
-            <AppFilterField
-              v-if="!managedBranchId"
-              for-id="assessment-attendance-branch"
-              label="الفرع"
-            >
-              <AppSelect
-                id="assessment-attendance-branch"
-                :value="attendanceBranch"
-                :items="attendanceBranchOptions"
-                item-text="label"
-                item-value="value"
-                dense
-                outlined
-                hide-details
-                class="assessment-select"
-                @input="$emit('update:attendance-branch', $event)"
-              />
-            </AppFilterField>
-          </template>
-        </AssessmentCourseToolbar>
-        <div
-          v-if="selectedCourse && saveStatus"
-          class="prep-card__status prep-card__status--inline"
-          :class="{ 'prep-card__status--saving': savingAttendance }"
-        >
-          {{ saveStatus }}
-        </div>
-        <div
-          v-if="selectedCourse"
-          class="prep-filters prep-filters--selection"
-        >
-          <AppRawButton
-            type="button"
-            class="attendance-toggle prep-filters__toggle"
-            :class="{
-              'attendance-toggle--active': allChecked,
-              'attendance-toggle--partial': checkedCount > 0 && !allChecked,
-            }"
-            :disabled="!canEdit || !students.length || savingAttendance"
-            :aria-label="allChecked ? 'إلغاء تحديد حضور الجميع' : 'تحديد حضور الجميع'"
-            :aria-pressed="allChecked"
-            @click="$emit('toggle-all')"
-          >
-            <span class="attendance-toggle__dot" />
-          </AppRawButton>
-        </div>
-        <div
-          v-if="selectedCourse"
-          class="prep-table-wrap"
-        >
-          <table class="prep-table">
-            <thead><tr><th>الاسم</th><th>رقم الدخول</th><th>حاضر</th></tr></thead>
-            <tbody>
-              <tr v-if="!students.length">
-                <td
-                  colspan="3"
-                  class="prep-table__empty"
-                >
-                  لا يوجد معلمون في هذا الفرع.
-                </td>
-              </tr>
-              <tr
-                v-for="student in students"
-                :key="student.id"
-              >
-                <td class="prep-table__name">
-                  {{ student.name }}
-                </td>
-                <td class="prep-table__login">
-                  {{ student.loginId || '---' }}
-                </td>
-                <td class="prep-table__status">
-                  <AppRawButton
-                    type="button"
-                    class="attendance-toggle"
-                    :class="{ 'attendance-toggle--active': checkedIds.includes(student.id) }"
-                    :disabled="!canEdit || savingAttendance"
-                    :aria-label="`تبديل حضور ${student.name}`"
-                    :aria-pressed="checkedIds.includes(student.id)"
-                    @click="$emit('toggle-student', student.id)"
-                  >
-                    <span class="attendance-toggle__dot" />
-                  </AppRawButton>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </AppCard>
-    </div>
-  </div>
+          <AppSelect
+            :id="branchId"
+            :value="mode === 'indicators' ? indicatorBranch : attendanceBranch"
+            :items="mode === 'indicators' ? indicatorBranchOptions : attendanceBranchOptions"
+            :disabled="changingContext"
+            item-text="label"
+            item-value="value"
+            dense
+            outlined
+            hide-details
+            class="assessment-select"
+            @input="$emit(mode === 'indicators' ? 'update:indicator-branch' : 'update:attendance-branch', $event)"
+          />
+        </AppFilterField>
+      </template>
+    </AssessmentCourseToolbar>
+    <AppLoadingSpinner
+      v-if="loading"
+      label="جارٍ تحميل البيانات"
+    />
+    <AppEmptyState
+      v-else-if="!selectedCourse"
+      title-tag="h2"
+      title="اختر دورة لعرض البيانات"
+    />
+    <template v-else-if="mode === 'indicators'">
+      <AppEmptyState
+        v-if="!totalStudents"
+        title-tag="h2"
+        title="لا يوجد معلمون في الفرع المحدد"
+      />
+      <AssessmentIndicators
+        v-else
+        :pre="preIndicator"
+        :post="postIndicator"
+        :pre-value="preValue"
+        :post-value="postValue"
+        :total-students="totalStudents"
+        :difference="scoreDifference"
+      />
+    </template>
+    <AssessmentAttendanceList
+      v-else
+      :key="`${courseValue}-${attendanceBranch}`"
+      :students="students"
+      :checked-ids="checkedIds"
+      :all-checked="allChecked"
+      :can-edit="canEdit"
+      :saving="savingAttendance"
+      :save-status="saveStatus"
+      @toggle-all="$emit('toggle-all')"
+      @toggle-student="$emit('toggle-student', $event)"
+      @save="$emit('save-attendance')"
+    />
+  </AppCard>
 </template>
-
 <script>
-import { AppCard, AppFilterField, AppRawButton, AppSelect } from '../ui';
+import { AppCard, AppEmptyState, AppFilterField, AppLoadingSpinner, AppSelect } from '../ui';
 import AssessmentCourseToolbar from './AssessmentCourseToolbar.vue';
+import AssessmentIndicators from './AssessmentIndicators.vue';
+import AssessmentAttendanceList from './AssessmentAttendanceList.vue';
 
 export default {
   name: 'AssessmentOperationalPanels',
-  components: { AppCard, AppFilterField, AppRawButton, AppSelect, AssessmentCourseToolbar },
+  components: { AppCard, AppEmptyState, AppFilterField, AppLoadingSpinner, AppSelect, AssessmentCourseToolbar, AssessmentIndicators, AssessmentAttendanceList },
   props: {
-    mode: { type: String, default: '' },
-    courseValue: { type: String, default: '' },
-    courseOptions: { type: Array, default: () => [] },
-    coursePlaceholder: { type: String, default: '' },
-    viewMode: { type: String, default: '' },
-    modeOptions: { type: Array, default: () => [] },
-    canEdit: Boolean,
-    canManageCatalog: Boolean,
-    deletingCourseId: { type: String, default: '' },
-    managedBranchId: { type: String, default: '' },
-    indicatorBranch: { type: String, default: '' },
-    indicatorBranchOptions: { type: Array, default: () => [] },
-    selectedCourse: { type: Object, default: null },
-    totalStudents: { type: Number, default: 0 },
-    preValue: { type: String, default: '' },
-    preMeta: { type: String, default: '' },
-    preStyle: { type: Object, default: () => ({}) },
-    postValue: { type: String, default: '' },
-    postMeta: { type: String, default: '' },
-    postStyle: { type: Object, default: () => ({}) },
-    scoreDiffLabel: { type: String, default: '' },
-    scoreDiffClass: { type: String, default: '' },
-    saveStatus: { type: String, default: '' },
-    savingAttendance: Boolean,
-    attendanceBranch: { type: String, default: '' },
-    attendanceBranchOptions: { type: Array, default: () => [] },
-    students: { type: Array, default: () => [] },
-    checkedIds: { type: Array, default: () => [] },
-    checkedCount: { type: Number, default: 0 },
+    mode: { type: String, default: '' }, courseValue: { type: String, default: '' },
+    courseOptions: { type: Array, default: () => [] }, coursePlaceholder: { type: String, default: '' },
+    viewMode: { type: String, default: '' }, modeOptions: { type: Array, default: () => [] },
+    canEdit: Boolean, canManageCatalog: Boolean, loading: Boolean, changingContext: Boolean,
+    deletingCourseId: { type: String, default: '' }, managedBranchId: { type: String, default: '' },
+    indicatorBranch: { type: String, default: '' }, indicatorBranchOptions: { type: Array, default: () => [] },
+    selectedCourse: { type: Object, default: null }, totalStudents: { type: Number, default: 0 },
+    preValue: { type: String, default: '0' }, postValue: { type: String, default: '0' },
+    preIndicator: { type: Object, required: true }, postIndicator: { type: Object, required: true },
+    scoreDifference: { type: Number, default: 0 },
+    saveStatus: { type: String, default: '' }, savingAttendance: Boolean,
+    attendanceBranch: { type: String, default: '' }, attendanceBranchOptions: { type: Array, default: () => [] },
+    students: { type: Array, default: () => [] }, checkedIds: { type: Array, default: () => [] },
     allChecked: Boolean,
   },
-  emits: [
-    'update:course-value',
-    'update:view-mode',
-    'create-course',
-    'edit-course',
-    'move-course',
-    'delete-course',
-    'update:indicator-branch',
-    'update:attendance-branch',
-    'toggle-all',
-    'toggle-student',
-  ],
+  emits: ['update:course-value', 'update:view-mode', 'create-course', 'edit-course', 'move-course', 'delete-course', 'update:indicator-branch', 'update:attendance-branch', 'toggle-all', 'toggle-student', 'save-attendance'],
+  computed: { branchId() { return this.mode === 'indicators' ? 'assessment-indicators-branch' : 'assessment-attendance-branch'; } },
 };
 </script>
-
-<style scoped>
-.assessment-operational-panels { display: contents; }
-</style>

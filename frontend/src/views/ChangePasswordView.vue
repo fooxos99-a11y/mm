@@ -1,8 +1,7 @@
 <template>
-  <main class="change-password-page">
+  <div class="change-password-page">
     <section class="change-password-panel">
       <h1>تحديث كلمة المرور</h1>
-      <p>أدخل كلمة المرور الحالية، ثم اختر كلمة مرور جديدة قوية.</p>
 
       <form @submit.prevent="submit">
         <AppPasswordField
@@ -41,7 +40,7 @@
         </AppButton>
       </form>
     </section>
-  </main>
+  </div>
 </template>
 
 <script>
@@ -122,11 +121,7 @@ export default {
   font-size: 1.4rem;
 }
 
-.change-password-panel p {
-  margin: 8px 0 24px;
-  color: #526b78;
-  line-height: 1.7;
-}
+.change-password-panel form { margin-top: 24px; }
 
 .change-password-panel__field {
   margin-bottom: 16px;

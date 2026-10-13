@@ -4,200 +4,93 @@
       v-if="forms.length"
       class="assessment-inline-builder__list"
     >
-      <article
-        v-for="(form, formIndex) in forms"
-        :key="`question-form-${formIndex}`"
-        class="assessment-form-card assessment-form-card--inline"
-      >
-        <div class="assessment-form-card__prompt-row">
-          <div class="assessment-form-card__field-group assessment-form-card__field-group--compact assessment-form-card__field-group--prompt">
-            <div class="assessment-form-card__label-row">
-              <label
-                class="assessment-form-card__label"
-                :for="promptId(formIndex)"
-              >{{ existingCount + formIndex + 1 }}.السؤال</label>
-              <AppRawButton
-                v-if="canRemoveForm(form)"
-                type="button"
-                class="assessment-form-card__trash"
-                :aria-label="`حذف السؤال ${existingCount + formIndex + 1}`"
-                :disabled="saving"
-                @click="$emit('remove-form', formIndex)"
-              >
-                <v-icon
-                  class="app-action-icon app-action-icon--delete"
-                  aria-hidden="true"
-                >
-                  mdi-delete-outline
-                </v-icon>
-              </AppRawButton>
-            </div>
-            <input
-              :id="promptId(formIndex)"
-              :value="form.prompt"
-              type="text"
-              class="assessment-input"
-              placeholder="اكتب السؤال"
-              @input="updateForm(formIndex, { prompt: $event.target.value }, true)"
-              @paste="$emit('prompt-paste', formIndex, $event)"
-            >
-          </div>
-
-          <div class="assessment-form-card__field-group assessment-form-card__field-group--compact assessment-form-card__field-group--points-inline">
-            <label
-              class="assessment-form-card__label"
-              :for="pointsId(formIndex)"
-            >الدرجة</label>
-            <input
-              :id="pointsId(formIndex)"
-              :value="form.points"
-              type="number"
-              min="0"
-              class="assessment-input assessment-input--points"
-              placeholder="1"
-              @input="updateForm(formIndex, { points: $event.target.value })"
-            >
-          </div>
-        </div>
-
-        <div
-          v-if="form.type === 'multiple'"
-          class="assessment-form-card__field-group"
-        >
-          <div class="assessment-options-grid">
-            <div
-              v-for="(option, optionIndex) in form.options"
-              :key="`form-${formIndex}-option-${optionIndex}`"
-              class="assessment-options-grid__item"
-              :class="{ 'assessment-options-grid__item--correct': isCorrect(form, option) }"
-            >
-              <AppRawButton
-                v-if="option.trim()"
-                type="button"
-                class="assessment-options-grid__check"
-                :class="{ 'assessment-options-grid__check--active': isCorrect(form, option) }"
-                :aria-pressed="isCorrect(form, option)"
-                :aria-label="`تحديد الخيار ${optionIndex + 1} إجابة صحيحة`"
-                @click="$emit('select-correct', formIndex, optionIndex)"
-              >
-                <v-icon
-                  small
-                  aria-hidden="true"
-                >
-                  mdi-check
-                </v-icon>
-              </AppRawButton>
-              <input
-                :value="option"
-                type="text"
-                class="assessment-input"
-                :aria-label="`الخيار ${optionIndex + 1} للسؤال ${existingCount + formIndex + 1}`"
-                :placeholder="`الخيار ${optionIndex + 1}`"
-                @input="$emit('option-change', formIndex, optionIndex, $event.target.value)"
-                @paste="$emit('option-paste', formIndex, optionIndex, $event)"
-              >
-              <AppRawButton
-                v-if="optionIndex === form.options.length - 1"
-                type="button"
-                class="assessment-options-grid__append"
-                aria-label="إضافة خيار"
-                @click="$emit('add-option', formIndex)"
-              >
-                <v-icon
-                  small
-                  aria-hidden="true"
-                >
-                  mdi-plus
-                </v-icon>
-              </AppRawButton>
-            </div>
-          </div>
-        </div>
-
-        <p
-          v-if="errors[formIndex]"
-          class="assessment-form-card__error"
-          role="alert"
-        >
-          {{ errors[formIndex] }}
-        </p>
-      </article>
+      <AssessmentEditorQuestion
+        v-for="(form, index) in forms"
+        :key="`question-form-${index}`"
+        :draft="form"
+        :number="existingCount + index + 1"
+        :prompt-id="`assessment-new-question-${index}-prompt`"
+        :points-id="`assessment-new-question-${index}-points`"
+        :error="errors[index] || ''"
+        :removable="canRemoveForm(form)"
+        :allow-option-removal="allowOptionRemoval"
+        :saving="saving"
+        @update="updateForm(index, $event)"
+        @remove="$emit('remove-form', index)"
+        @prompt-paste="$emit('prompt-paste', index, $event)"
+        @option-change="(optionIndex, value) => $emit('option-change', index, optionIndex, value)"
+        @option-paste="(optionIndex, event) => $emit('option-paste', index, optionIndex, event)"
+        @select-correct="$emit('select-correct', index, $event)"
+        @add-option="$emit('add-option', index)"
+        @remove-option="$emit('remove-option', index, $event)"
+      />
     </div>
-
     <div class="assessment-inline-builder__actions">
-      <v-menu
-        offset-y
-        left
-      >
+      <v-menu location="bottom start">
         <template #activator="{ props }">
-          <AppRawButton
-            type="button"
+          <AppButton
+            variant="secondary"
             class="assessment-inline-builder__add"
-            :aria-label="isTasksPage ? 'إضافة مهمة أدائية' : 'إضافة سؤال'"
+            :disabled="saving"
             v-bind="props"
           >
-            <v-icon
-              small
-              aria-hidden="true"
-            >
-              mdi-plus
-            </v-icon>
-          </AppRawButton>
+            {{ isTasksPage ? 'إضافة مهمة أدائية' : 'إضافة سؤال' }}
+          </AppButton>
         </template>
-
-        <div class="assessment-inline-builder__menu">
-          <AppRawButton
-            type="button"
+        <div
+          class="assessment-inline-builder__menu"
+          aria-label="نوع السؤال الجديد"
+        >
+          <AppButton
+            variant="plain"
             class="assessment-inline-builder__menu-item"
             @click="$emit('add-question', 'multiple')"
           >
             خيارات
-          </AppRawButton>
-          <AppRawButton
-            type="button"
+          </AppButton>
+          <AppButton
+            variant="plain"
             class="assessment-inline-builder__menu-item"
             @click="$emit('add-question', 'text')"
           >
             نصي
-          </AppRawButton>
-          <AppRawButton
-            type="button"
+          </AppButton>
+          <AppButton
+            variant="plain"
             class="assessment-inline-builder__menu-item"
             @click="$emit('add-question', 'truefalse')"
           >
             صح أو خطأ
-          </AppRawButton>
-          <AppRawButton
+          </AppButton>
+          <AppButton
             v-if="canAddDocument"
-            type="button"
+            variant="plain"
             class="assessment-inline-builder__menu-item"
             @click="$emit('add-question', 'document')"
           >
             وورد
-          </AppRawButton>
+          </AppButton>
         </div>
       </v-menu>
-
       <AppButton
         variant="primary"
         :loading="saving"
         :disabled="saving"
         @click="$emit('save')"
       >
-        {{ saving ? 'جارٍ الحفظ...' : 'حفظ' }}
+        {{ saving ? 'جارٍ الحفظ...' : 'حفظ الأسئلة' }}
       </AppButton>
     </div>
   </div>
 </template>
 
 <script>
-import '../../styles/components/assessment-question-editor.css';
-import { isCorrectQuestionOption } from '../../features/assessmentQuestions/questionModel.mjs';
-import { AppButton, AppRawButton } from '../ui';
+import { AppButton } from '../ui';
+import AssessmentEditorQuestion from './AssessmentEditorQuestion.vue';
 
 export default {
   name: 'AssessmentQuestionBuilder',
-  components: { AppButton, AppRawButton },
+  components: { AppButton, AssessmentEditorQuestion },
   props: {
     forms: { type: Array, default: () => [] },
     errors: { type: Array, default: () => [] },
@@ -205,45 +98,34 @@ export default {
     isTasksPage: { type: Boolean, default: false },
     hasExistingQuestions: { type: Boolean, default: false },
     isDocumentMode: { type: Boolean, default: false },
+    allowOptionRemoval: { type: Boolean, default: false },
     saving: { type: Boolean, default: false },
   },
-  emits: [
-    'remove-form',
-    'prompt-paste',
-    'select-correct',
-    'option-change',
-    'option-paste',
-    'add-option',
-    'add-question',
-    'save',
-    'update-form',
-    'clear-error',
-  ],
+  emits: ['remove-form', 'prompt-paste', 'select-correct', 'option-change', 'option-paste', 'add-option', 'remove-option', 'add-question', 'save', 'update-form', 'clear-error'],
   computed: {
-    canAddDocument() {
-      return this.isTasksPage && !this.hasExistingQuestions && !this.forms.length && !this.isDocumentMode;
-    },
+    canAddDocument() { return this.isTasksPage && !this.hasExistingQuestions && !this.forms.length && !this.isDocumentMode; },
   },
   methods: {
     canRemoveForm(form) {
       return this.existingCount > 0 || this.forms.length > 1
         || Boolean(String(form.prompt || '').trim() || String(form.correctAnswer || '').trim())
-        || (form.options || []).some((option) => String(option).trim())
+        || (form.options || []).some(option => String(option).trim())
         || Number(form.points ?? 1) !== 1;
     },
-    promptId(index) {
-      return `assessment-new-question-${index}-prompt`;
-    },
-    pointsId(index) {
-      return `assessment-new-question-${index}-points`;
-    },
-    isCorrect(form, option) {
-      return isCorrectQuestionOption(form, option);
-    },
-    updateForm(index, patch, clearError = false) {
+    updateForm(index, patch) {
       this.$emit('update-form', index, patch);
-      if (clearError) this.$emit('clear-error', index);
+      this.$emit('clear-error', index);
     },
   },
 };
 </script>
+
+<style scoped>
+.assessment-inline-builder { display: grid; margin-top: 16px; gap: 16px; }
+.assessment-inline-builder__list { display: grid; gap: 16px; }
+.assessment-inline-builder__actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+.assessment-inline-builder__actions > .app-button { flex: 1 1 120px; }
+.assessment-inline-builder__menu { display: grid; min-width: 180px; padding: 4px; border: 1px solid var(--app-border); border-radius: var(--app-radius-card); background: var(--app-surface); box-shadow: var(--app-shadow-overlay); }
+.assessment-inline-builder__actions .assessment-inline-builder__add { width: auto; height: auto; min-height: 48px; min-width: 0; padding: 8px 16px; border: 1px solid var(--app-border); border-radius: 8px; background: var(--app-surface); }
+.assessment-inline-builder__menu .assessment-inline-builder__menu-item { min-height: 48px; padding: 8px 16px; text-align: start; justify-content: start; }
+</style>

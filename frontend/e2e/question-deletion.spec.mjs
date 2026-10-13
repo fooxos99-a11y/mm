@@ -1,5 +1,5 @@
 import { expect, test } from './support/isolatedTest.mjs';
-import { login } from './support/gesture-helpers.mjs';
+import { login, selectOption } from './support/gesture-helpers.mjs';
 
 test.use({ screenshot: 'off' });
 
@@ -13,14 +13,14 @@ const apiSession = async (page, context) => {
     return response.status() === 204 ? null : response.json();
   };
 };
-const questionValues = page => page.locator('.assessment-inline-list__item input[placeholder="اكتب السؤال"]')
+const questionValues = page => page.locator('.assessment-inline-list__item textarea[placeholder="اكتب السؤال"]')
   .evaluateAll(inputs => inputs.map(input => input.value));
 const deleteCard = async (page, prompt) => {
   const cards = page.locator('.assessment-inline-list__item');
   await expect.poll(() => questionValues(page)).toContain(prompt);
   for (let index = 0; index < await cards.count(); index += 1) {
     const card = cards.nth(index);
-    if (await card.locator('input[placeholder="اكتب السؤال"]').inputValue() === prompt) {
+    if (await card.locator('textarea[placeholder="اكتب السؤال"]').inputValue() === prompt) {
       await card.getByRole('button', { name: /حذف السؤال/ }).click();
       break;
     }
@@ -49,19 +49,19 @@ for (const type of ['pre', 'post', 'tasks']) {
     await page.goto(type === 'tasks' ? 'dashboard?panel=tasks' : `dashboard?panel=courses&courseId=${course.id}&assessmentType=${type}`);
     if (type === 'tasks') {
       await page.locator('.assessment-select:visible').first().locator('.v-field').click();
-      await page.getByText(title, { exact: true }).click();
+      await selectOption(page, title);
     } else {
       await page.locator('#assessment-toolbar-mode').locator('xpath=ancestor::div[contains(@class,"v-input")]').locator('.v-field').click();
-      await page.getByRole('option').filter({ hasText: type === 'pre' ? 'الاختبار القبلي' : 'الاختبار البعدي' }).click();
+      await selectOption(page, type === 'pre' ? 'الاختبار القبلي' : 'الاختبار البعدي');
     }
     await deleteCard(page, 'السؤال المحذوف');
     const firstSave = page.waitForResponse(response => response.url().endsWith(`/courses/${course.id}/questions/sync`));
-    await page.getByRole('button', { name: 'حفظ', exact: true }).click();
+    await page.getByRole('button', { name: 'حفظ الأسئلة', exact: true }).click();
     expect((await firstSave).status()).toBe(200);
     await expect.poll(() => questionValues(page)).toEqual(['السؤال المتبقي']);
     await deleteCard(page, 'السؤال المتبقي');
     const secondSave = page.waitForResponse(response => response.url().endsWith(`/courses/${course.id}/questions/sync`));
-    await page.getByRole('button', { name: 'حفظ', exact: true }).click();
+    await page.getByRole('button', { name: 'حفظ الأسئلة', exact: true }).click();
     expect((await secondSave).status()).toBe(200);
     await page.reload();
     const snapshot = await api('GET', 'snapshot');
@@ -86,14 +86,14 @@ test('final exam supports successive delete-only saves without forcing a new que
   }
   await page.goto('dashboard?panel=finalexam');
   await page.getByRole('combobox', { name: 'الفرع', exact: true }).locator('xpath=ancestor::div[contains(@class,"v-input")]').locator('.v-field').click();
-  await page.getByRole('option', { name: 'معلمات', exact: true }).click();
+  await selectOption(page, 'معلمات', { exact: true });
   for (const question of questions) {
     await deleteCard(page, question.prompt);
     const deleted = page.waitForResponse(response => response.url().endsWith(`/final-exam/questions/${question.id}`)
       && response.request().method() === 'DELETE');
-    await page.getByRole('button', { name: 'حفظ', exact: true }).click();
+    await page.getByRole('button', { name: 'حفظ الأسئلة', exact: true }).click();
     expect((await deleted).status()).toBe(204);
-    await expect(page.locator('.assessment-inline-builder input[placeholder="اكتب السؤال"]')).toHaveCount(0);
+    await expect(page.locator('.assessment-inline-builder textarea[placeholder="اكتب السؤال"]')).toHaveCount(0);
   }
   const snapshot = await api('GET', 'snapshot');
   expect(snapshot.finalExamQuestions.filter(item => questions.some(question => question.id === item.id))).toEqual([]);
@@ -113,7 +113,7 @@ test('deleting a global satisfaction indicator keeps answers and stops future in
   }] });
   await page.goto('dashboard?panel=satisfaction');
   await page.locator('.satisfaction-admin__select .v-field').click();
-  await page.getByRole('option').filter({ hasText: title }).click();
+  await selectOption(page, title);
   const card = page.locator('.satisfaction-admin__metric-card').filter({ hasText: prompt });
   await card.locator('.satisfaction-admin__delete-indicator').click();
   await expect(card).toHaveCount(0);

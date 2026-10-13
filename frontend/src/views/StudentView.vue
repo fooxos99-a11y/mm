@@ -8,7 +8,7 @@
       @close="mobileMenuOpen = false"
     />
 
-    <main class="dashboard-main">
+    <div class="dashboard-main">
       <StudentTopbar
         :menu-open="mobileMenuOpen"
         :student-name="studentAccount?.name || ''"
@@ -56,7 +56,6 @@
           :course-options="courseOptions"
           :task-options="taskOptions"
           :title="activeSectionTitle"
-          :description="activeSectionDescription"
           :login="currentStudentLogin"
           :branch-label="currentBranchLabel"
           :reciter-name="assignedReciter?.name || ''"
@@ -222,7 +221,7 @@
           </div>
         </section>
       </template>
-    </main>
+    </div>
   </div>
 </template>
 

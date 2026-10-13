@@ -7,9 +7,12 @@
     >
       {{ icon }}
     </v-icon>
-    <h3 class="app-state__title">
+    <component
+      :is="titleTag"
+      class="app-state__title"
+    >
       {{ title }}
-    </h3>
+    </component>
     <p
       v-if="description"
       class="app-state__description"
@@ -30,6 +33,7 @@ export default {
   name: 'AppEmptyState',
   props: {
     title: { type: String, default: 'لا توجد بيانات' },
+    titleTag: { type: String, default: 'h3', validator: value => /^h[1-6]$/.test(value) },
     description: { type: String, default: '' },
     icon: { type: String, default: 'mdi-inbox-outline' },
   },

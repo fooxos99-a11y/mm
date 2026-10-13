@@ -50,11 +50,15 @@
             'attendance-toggle--partial': selectedCount > 0 && !allSelected,
           }"
           :disabled="!students.length || submitting"
+          :aria-pressed="selectedCount > 0 && !allSelected ? 'mixed' : allSelected"
           :aria-label="allSelected ? 'إلغاء تحديد الكل' : 'تحديد الكل'"
           :title="allSelected ? 'إلغاء تحديد الكل' : 'تحديد الكل'"
           @click="$emit('toggle-all')"
         >
-          <span class="attendance-toggle__dot" />
+          <span
+            class="attendance-toggle__dot"
+            aria-hidden="true"
+          />
         </AppRawButton>
       </div>
 
@@ -63,14 +67,13 @@
           <thead>
             <tr>
               <th>الاسم</th>
-              <th>رقم الدخول</th>
               <th>التحديد</th>
             </tr>
           </thead>
           <tbody>
             <tr v-if="!students.length">
               <td
-                colspan="3"
+                colspan="2"
                 class="prep-table__empty"
               >
                 لا يوجد معلمون مطابقون للفرع المحدد.
@@ -83,19 +86,20 @@
               <td class="prep-table__name">
                 {{ student.label }}
               </td>
-              <td class="prep-table__login">
-                {{ student.value || '---' }}
-              </td>
               <td class="prep-table__status">
                 <AppRawButton
                   type="button"
                   class="attendance-toggle"
                   :class="{ 'attendance-toggle--active': selectedIds.includes(student.value) }"
                   :disabled="submitting"
+                  :aria-pressed="selectedIds.includes(student.value)"
                   :aria-label="selectedIds.includes(student.value) ? `إلغاء تحديد ${student.label}` : `تحديد ${student.label}`"
                   @click.prevent="$emit('toggle-student', student.value)"
                 >
-                  <span class="attendance-toggle__dot" />
+                  <span
+                    class="attendance-toggle__dot"
+                    aria-hidden="true"
+                  />
                 </AppRawButton>
               </td>
             </tr>

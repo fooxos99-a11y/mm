@@ -49,6 +49,7 @@
 
         <div class="prep-field prep-field--wide">
           <label
+            id="results-attendance-course-label"
             class="prep-field__label"
             for="results-attendance-course"
           >الدورة / المهام</label>
@@ -67,27 +68,22 @@
           >
             <template
               v-if="canManageCourses"
-              #item="{ item, on, attrs }"
+              #item-actions="{ item, actionAttrs }"
             >
-              <div
-                class="results-course-option"
-                v-bind="attrs"
-                v-on="on"
+              <AppIconButton
+                v-bind="actionAttrs"
+                variant="plain-danger"
+                :disabled="deletingCourseId === item.value"
+                :aria-label="`حذف ${item.course?.entityType === 'task' ? 'المهمة' : 'الدورة'} ${item.label}`"
+                @click.stop.prevent="$emit('request-course-delete', item.course)"
               >
-                <span class="results-course-option__label">{{ item.label }}</span>
-                <AppRawButton
-                  type="button"
-                  class="results-course-option__delete"
-                  :disabled="deletingCourseId === item.value"
-                  :aria-label="`حذف ${item.course?.entityType === 'task' ? 'المهمة' : 'الدورة'} ${item.label}`"
-                  @mousedown.stop.prevent
-                  @click.stop.prevent="$emit('request-course-delete', item.course)"
+                <v-icon
+                  color="inherit"
+                  aria-hidden="true"
                 >
-                  <v-icon aria-hidden="true">
-                    mdi-delete-outline
-                  </v-icon>
-                </AppRawButton>
-              </div>
+                  mdi-delete-outline
+                </v-icon>
+              </AppIconButton>
             </template>
           </AppSelect>
         </div>
@@ -154,11 +150,11 @@
 </template>
 
 <script>
-import { AppButton, AppRawButton, AppSelect } from '../ui';
+import { AppButton, AppIconButton, AppRawButton, AppSelect } from '../ui';
 
 export default {
   name: 'ResultsAttendancePanel',
-  components: { AppButton, AppRawButton, AppSelect },
+  components: { AppButton, AppIconButton, AppRawButton, AppSelect },
   props: {
     embedded: { type: Boolean, default: false },
     saveStatusText: { type: String, default: '' },

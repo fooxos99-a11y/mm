@@ -42,15 +42,20 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
-  min-width: 28px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
   padding: 0;
   border-radius: 8px;
 }
 
 .rich-text-editor__toolbar :deep(.ql-picker-label svg) {
   display: none;
+}
+
+.rich-text-editor__toolbar :deep(.ql-formats button svg) {
+  width: 20px;
+  height: 20px;
 }
 
 .rich-text-editor__toolbar :deep(select.ql-font) {
@@ -65,8 +70,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: 44px;
+  height: 44px;
   padding: 0;
   border: 0;
   background: transparent;

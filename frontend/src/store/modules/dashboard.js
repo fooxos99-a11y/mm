@@ -16,10 +16,10 @@ const replaceSnapshotSection = (state, commit, key, value) => {
 };
 
 export const dashboardActions = {
-  refreshDashboardSnapshot({ state, dispatch }) {
-    return dispatch('loadDashboardSnapshot', { mode: state.dashboardSnapshot?.snapshotMode === 'shell' ? 'shell' : 'full' });
+  refreshDashboardSnapshot({ state, dispatch }, { background = false } = {}) {
+    return dispatch('loadDashboardSnapshot', { mode: state.dashboardSnapshot?.snapshotMode === 'shell' ? 'shell' : 'full', background });
   },
-  async loadDashboardSnapshot({ state, commit }, { mode = 'full' } = {}) {
+  async loadDashboardSnapshot({ state, commit }, { mode = 'full', background = false } = {}) {
     if (!state.currentUser) {
       commit('setDashboardSnapshot', null);
       commit('setDashboardError', '');
@@ -30,8 +30,10 @@ export const dashboardActions = {
     const requestId = (requests.get(state) || 0) + 1;
     requests.set(state, requestId);
     const isCurrent = () => state.authGeneration === authGeneration && requests.get(state) === requestId;
-    commit('setDashboardLoading', true);
-    commit('setDashboardError', '');
+    if (!background) {
+      commit('setDashboardLoading', true);
+      commit('setDashboardError', '');
+    }
     try {
       const snapshot = await (mode === 'shell' ? fetchDashboardShell() : fetchDashboardSnapshot());
       if (isCurrent()) commit('setDashboardSnapshot', snapshot);
@@ -44,7 +46,7 @@ export const dashboardActions = {
         commit('setDashboardError', 'انتهت صلاحية الجلسة. سجّل الدخول مرة أخرى.');
         return;
       }
-      commit('setDashboardError', error?.response?.data?.message || error?.message || 'تعذر تحميل بيانات لوحة التحكم.');
+      if (!background) commit('setDashboardError', error?.response?.data?.message || error?.message || 'تعذر تحميل بيانات لوحة التحكم.');
     } finally {
       if (isCurrent()) commit('setDashboardLoading', false);
     }

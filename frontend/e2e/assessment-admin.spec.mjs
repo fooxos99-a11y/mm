@@ -1,5 +1,6 @@
 import { expect, test } from './support/isolatedTest.mjs';
 import { rolePassword } from './support/credentials.mjs';
+import { openCourseManagement, selectOption } from './support/gesture-helpers.mjs';
 
 const login = async (page) => {
   await page.goto('login', { waitUntil: 'domcontentloaded' });
@@ -36,25 +37,25 @@ test('manager can add and save a task question from the plus menu', async ({ pag
 
   const taskSelect = page.locator('.assessment-select:visible').first();
   await taskSelect.locator('.v-field').click();
-  await page.getByRole('option').filter({ hasText: 'مهمة اختبار الواجهة' }).click();
+  await selectOption(page, 'مهمة اختبار الواجهة');
 
   await page.locator('.assessment-inline-builder__add:visible').click();
   await page.getByRole('button', { name: 'صح أو خطأ', exact: true }).click();
-  const form = page.locator('.assessment-form-card--inline').last();
-  await form.locator('input[placeholder="اكتب السؤال"]').fill('هل تعمل إضافة المهمة؟');
+  const form = page.locator('.assessment-editor-question').last();
+  await form.locator('textarea[placeholder="اكتب السؤال"]').fill('هل تعمل إضافة المهمة؟');
   await form.getByRole('button', { name: 'تحديد الخيار 1 إجابة صحيحة' }).click();
-  await page.getByRole('button', { name: 'حفظ', exact: true }).click();
+  await page.getByRole('button', { name: 'حفظ الأسئلة', exact: true }).click();
 
-  await expect.poll(() => page.locator('input').evaluateAll(
+  await expect.poll(() => page.locator('textarea').evaluateAll(
     (inputs, expected) => inputs.some((input) => input.value === expected),
     'هل تعمل إضافة المهمة؟',
   )).toBe(true);
-  const savedQuestion = page.locator('.assessment-form-card--inline').last();
+  const savedQuestion = page.locator('.assessment-editor-question').last();
   await expect(savedQuestion.getByRole('textbox', { name: 'الخيار 1 للسؤال 1' })).toHaveValue('صح');
   await expect(savedQuestion.getByRole('textbox', { name: 'الخيار 2 للسؤال 1' })).toHaveValue('خطأ');
   await expect(savedQuestion.getByRole('button', { name: 'تحديد الخيار 1 إجابة صحيحة' })).toHaveAttribute('aria-pressed', 'true');
   const readQuestionLayout = () => savedQuestion.evaluate((card) => {
-    const field = card.querySelector('.assessment-input');
+    const field = card.querySelector('.app-field__input')?.closest('.app-field__control');
     const cardStyle = getComputedStyle(card);
     const fieldStyle = field ? getComputedStyle(field) : null;
     return {
@@ -65,11 +66,11 @@ test('manager can add and save a task question from the plus menu', async ({ pag
   });
   await expect.poll(async () => (await readQuestionLayout()).cardBorderWidth).toBeGreaterThanOrEqual(1);
   await expect.poll(async () => (await readQuestionLayout()).fieldBorderWidth).toBeGreaterThanOrEqual(1);
-  await expect.poll(async () => (await readQuestionLayout()).fieldHeight).toBeGreaterThanOrEqual(58);
+  await expect.poll(async () => (await readQuestionLayout()).fieldHeight).toBeGreaterThanOrEqual(48);
   const pointsContainment = await savedQuestion.evaluate((card) => {
     const cardRect = card.getBoundingClientRect();
-    const pointsRect = card.querySelector('.assessment-input--points')?.getBoundingClientRect();
-    const trashRect = card.querySelector('.assessment-form-card__trash')?.getBoundingClientRect();
+    const pointsRect = card.querySelector('.assessment-editor-question__points')?.getBoundingClientRect();
+    const trashRect = card.querySelector('.assessment-editor-question__delete')?.getBoundingClientRect();
 
     return {
       cardLeft: cardRect.left,
@@ -97,11 +98,11 @@ test('task start action opens its availability dialog', async ({ page }) => {
 
   const taskSelect = page.locator('.assessment-select:visible').first();
   await taskSelect.locator('.v-field').click();
-  await page.getByRole('option').filter({ hasText: 'مهمة اختبار الواجهة' }).click();
+  await selectOption(page, 'مهمة اختبار الواجهة');
   await expect(page.getByRole('button', { name: 'بدء المهمة الأدائية', exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'بدء المهمة الأدائية', exact: true }).click();
   await expect(page.getByText('فتح المهام الأدائية', { exact: true })).toBeVisible();
-  await expect(page.locator('#assessment-availability-minutes')).toBeVisible();
+  await expect(page.locator('#assessment-availability-hours')).toBeVisible();
 });
 
 test('final exam question editor keeps the same clear assessment layout', async ({ page }, info) => {
@@ -111,16 +112,16 @@ test('final exam question editor keeps the same clear assessment layout', async 
   await page.locator('.assessment-inline-builder__add:visible').click();
   await page.getByRole('button', { name: 'خيارات', exact: true }).click();
 
-  const card = page.locator('.final-exam-page .assessment-form-card--inline:visible').last();
-  await expect(card.locator('input[placeholder="اكتب السؤال"]')).toBeVisible();
-  await expect(card.locator('.assessment-form-card__trash')).toHaveCount(0);
-  await card.locator('input[placeholder="اكتب السؤال"]').fill('سؤال لفحص التنسيق');
-  await expect(card.locator('.assessment-form-card__trash')).toBeVisible();
+  const card = page.locator('.final-exam-page .assessment-editor-question:visible').last();
+  await expect(card.locator('textarea[placeholder="اكتب السؤال"]')).toBeVisible();
+  await expect(card.locator('.assessment-editor-question__delete')).toHaveCount(0);
+  await card.locator('textarea[placeholder="اكتب السؤال"]').fill('سؤال لفحص التنسيق');
+  await expect(card.locator('.assessment-editor-question__delete')).toBeVisible();
   const layout = await card.evaluate((element) => {
     const cardRect = element.getBoundingClientRect();
-    const promptRect = element.querySelector('input[placeholder="اكتب السؤال"]')?.getBoundingClientRect();
-    const pointsRect = element.querySelector('.assessment-input--points')?.getBoundingClientRect();
-    const trashRect = element.querySelector('.assessment-form-card__trash')?.getBoundingClientRect();
+    const promptRect = element.querySelector('textarea[placeholder="اكتب السؤال"]')?.getBoundingClientRect();
+    const pointsRect = element.querySelector('.assessment-editor-question__points')?.closest('.app-field__control')?.getBoundingClientRect();
+    const trashRect = element.querySelector('.assessment-editor-question__delete')?.getBoundingClientRect();
 
     return {
       cardLeft: cardRect.left,
@@ -149,12 +150,11 @@ test('final exam question editor keeps the same clear assessment layout', async 
   expect(layout.trashTopGap).toBeLessThanOrEqual(18);
   expect(layout.trashBottom).toBeLessThanOrEqual(layout.promptTop);
   expect(layout.promptHeight).toBeGreaterThanOrEqual(58);
-  expect(layout.pointsHeight).toBeGreaterThanOrEqual(58);
+  expect(layout.pointsHeight).toBeGreaterThanOrEqual(48);
 
-  if ((page.viewportSize()?.width || 0) > 960) {
+  if ((page.viewportSize()?.width || 0) >= 640) {
     expect(Math.abs(layout.promptTop - layout.pointsTop)).toBeLessThanOrEqual(1);
-    expect(layout.pointsWidth).toBeGreaterThanOrEqual(138);
-    expect(layout.pointsWidth).toBeLessThanOrEqual(142);
+    expect(layout.pointsWidth).toBeGreaterThanOrEqual(44);
   } else {
     expect(layout.pointsTop).toBeGreaterThan(layout.promptBottom);
   }
@@ -170,12 +170,13 @@ test('course and task management actions stay inside the shared dropdown', async
   const taskSelect = page.locator('.assessment-select:visible').first();
   await taskSelect.locator('.v-field').click();
   await expect(page.getByText('إضافة مهمة أدائية جديدة', { exact: true })).toBeVisible();
-  await expect(page.locator('.assessment-course-menu:visible .assessment-select-option').last())
+  await expect(page.locator('.assessment-course-menu:visible .app-select-action-row').last())
     .toContainText('إضافة مهمة أدائية جديدة');
+  await openCourseManagement(page);
   await expect(page.getByRole('button', { name: /تعديل اسم المهمة مهمة اختبار الواجهة/ })).toBeVisible();
   await expect(page.getByRole('button', { name: /حذف المهمة مهمة اختبار الواجهة/ })).toBeVisible();
   const menuAlignment = await page.locator('.assessment-course-menu:visible').evaluate((menu) => {
-    const actions = menu.querySelector('.assessment-select-option__actions');
+    const actions = menu.querySelector('.app-select-action-row__actions');
     const reorderButtons = [...menu.querySelectorAll(
       '[aria-label^="رفع "], [aria-label^="خفض "]',
     )];

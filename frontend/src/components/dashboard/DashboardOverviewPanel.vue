@@ -40,56 +40,11 @@
           class="dashboard-indicator-card"
           :aria-label="`${indicator.label}: ${indicator.display}، ${indicator.meta}`"
         >
-          <div
-            class="dashboard-indicator-ring"
-            :class="{ 'dashboard-indicator-ring--complete': indicator.progress >= 100, 'dashboard-indicator-ring--empty': indicator.progress <= 0 }"
-            :style="indicatorStyle(indicator.progress)"
-          >
-            <svg
-              viewBox="0 0 200 200"
-              class="dashboard-indicator-ring__svg"
-              aria-hidden="true"
-            >
-              <defs>
-                <linearGradient
-                  :id="`dashboard-indicator-gradient-${indicator.key}`"
-                  x1="0%"
-                  y1="0%"
-                  x2="100%"
-                  y2="100%"
-                >
-                  <stop
-                    offset="0%"
-                    stop-color="#2a94b2"
-                  />
-                  <stop
-                    offset="55%"
-                    stop-color="#1b7692"
-                  />
-                  <stop
-                    offset="100%"
-                    stop-color="#0d5a73"
-                  />
-                </linearGradient>
-              </defs>
-              <circle
-                class="dashboard-indicator-ring__track"
-                cx="100"
-                cy="100"
-                r="78"
-              />
-              <circle
-                class="dashboard-indicator-ring__progress"
-                :style="{ stroke: `url(#dashboard-indicator-gradient-${indicator.key})` }"
-                cx="100"
-                cy="100"
-                r="78"
-              />
-            </svg>
-            <div class="dashboard-indicator-ring__inner">
-              {{ animatedDisplay(indicator.display) }}
-            </div>
-          </div>
+          <AppIndicatorRing
+            :progress="indicator.progress"
+            :display="animatedDisplay(indicator.display)"
+            :ring-style="indicatorStyle(indicator.progress)"
+          />
           <div class="dashboard-indicator-card__label">
             {{ indicator.label }}
           </div>
@@ -103,11 +58,11 @@
 </template>
 
 <script>
-import { AppNativeSelect } from '../ui';
+import { AppIndicatorRing, AppNativeSelect } from '../ui';
 
 export default {
   name: 'DashboardOverviewPanel',
-  components: { AppNativeSelect },
+  components: { AppIndicatorRing, AppNativeSelect },
   props: {
     animatedDisplay: { type: Function, required: true },
     branchOptions: { type: Array, default: () => [] },

@@ -6,6 +6,7 @@ export default {
   props: {
     embedded: { type: Boolean, default: false },
     clockTimestamp: { type: Number, default: 0 },
+    initialSelection: { type: Object, default: () => ({}) },
   },
   methods: {
     confirmDiscardChanges() {

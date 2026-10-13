@@ -1,0 +1,307 @@
+import AxeBuilder from '@axe-core/playwright';
+import { expect, test } from './support/isolatedTest.mjs';
+import { login, openCourseManagement, selectOption } from './support/gesture-helpers.mjs';
+import { rolePassword, studentPassword } from './support/credentials.mjs';
+
+test.use({ actionTimeout: 20_000 });
+
+const apiSession = async (page, context) => {
+  const origin = new URL(process.env.VUE_APP_API_BASE_URL).origin;
+  const token = (await context.cookies(origin)).find(cookie => cookie.name === 'XSRF-TOKEN');
+  return async (method, path, data) => {
+    const route = path.startsWith('/') ? path : `/dashboard/${path}`;
+    const response = await page.request.fetch(`${origin}/api${route}`, {
+      method, data, headers: { Referer: page.url(), 'X-XSRF-TOKEN': decodeURIComponent(token.value), Accept: 'application/json' },
+    });
+    expect(response.ok(), `${method} ${path}: ${response.status()} ${await response.text()}`).toBeTruthy();
+    return response.status() === 204 ? null : response.json();
+  };
+};
+const choose = async (page, id, label) => {
+  await expect(page.locator(`#${id}`)).toBeEnabled();
+  await page.locator(`#${id}`).locator('xpath=ancestor::div[contains(@class,"v-input")]').locator('.v-field').click();
+  await selectOption(page, label);
+  await expect(page.locator('.app-dropdown-menu').filter({ visible: true })).toHaveCount(0);
+};
+const selected = (page, id) => page.locator(`#${id}`).locator('xpath=ancestor::div[contains(@class,"v-input")]').locator('.v-select__selection-text');
+const verifyPage = async (page, info, name) => {
+  await expect(page.locator('.Vue-Toastification__toast')).toHaveCount(0);
+  await page.evaluate(() => document.fonts.ready);
+  await expect(page.locator('.assessment-page h1:not(.d-sr-only)')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'معاينة الأسئلة', exact: true })).toHaveCount(0);
+  for (const text of ['عدد الأسئلة', 'مجموع الدرجات', 'إتاحة الاختبار للمعلمين']) await expect(page.getByText(text, { exact: true })).toHaveCount(0);
+  const bounds = await page.locator('.admin-workspace-card').first().boundingBox();
+  expect(bounds.x).toBeGreaterThanOrEqual(0);
+  expect(bounds.x + bounds.width).toBeLessThanOrEqual(page.viewportSize().width + 1);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(page.viewportSize().width + 1);
+  const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
+  expect(results.violations.filter(item => ['serious', 'critical'].includes(item.impact)), JSON.stringify(results.violations)).toEqual([]);
+  await page.screenshot({ path: info.outputPath(`${name}.png`), fullPage: true });
+};
+const createQuestion = (api, course, assessmentType, points) => api('POST', `courses/${course.id}/questions`, {
+  assessmentType, prompt: `سؤال ${assessmentType}`, type: 'multiple', options: ['صحيح', 'آخر'], points, correctAnswer: 'صحيح', allowFile: false,
+});
+
+test('indicator cards show the existing score averages, real denominators and signed comparison', async ({ page, context }, info) => {
+  await login(page);
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  const api = await apiSession(page, context);
+  const snapshot = await api('GET', 'snapshot');
+  const student = snapshot.students.find(item => item.branchId === 'male');
+  const course = await api('POST', 'courses', { title: 'مدخل إلى التجويد وعلوم القرآن، دورة متقدمة لاختبار وضوح العناوين الطويلة', isActive: false });
+  const pre = await createQuestion(api, course, 'pre', 10);
+  const post = await createQuestion(api, course, 'post', 20);
+  for (const [type, question, answer] of [['pre', pre, 'آخر'], ['post', post, 'صحيح']]) {
+    await api('POST', 'assessment-submissions', { courseId: course.id, assessmentType: type, studentName: student.name, loginId: student.loginId, answers: [{ questionId: question.id, value: answer }] });
+  }
+  await page.goto(`dashboard?panel=courses&courseId=${course.id}`);
+  await choose(page, 'assessment-toolbar-mode', 'المؤشرات');
+  await choose(page, 'assessment-indicators-branch', 'معلمين');
+  const rings = page.locator('.assessment-indicator');
+  await expect(rings).toHaveCount(2);
+  await expect(rings.nth(0)).toHaveAttribute('aria-label', /متوسط الدرجة 0 من 10/);
+  await expect(rings.nth(1)).toHaveAttribute('aria-label', /متوسط الدرجة 20 من 20/);
+  await expect(rings.nth(0).locator('.dashboard-indicator-ring__inner')).toHaveText('0');
+  await expect(rings.nth(1).locator('.dashboard-indicator-ring__inner')).toHaveText('20');
+  await expect(page.locator('.assessment-indicators__difference')).toHaveText('+100%');
+  await expect(page.locator('.assessment-indicators__change')).toHaveClass(/--positive/);
+  await verifyPage(page, info, 'indicators');
+  // Existing scoring rounds each percentage first: 33 - 67 = -34.
+  for (const [index, change, className] of [[1, '0%', ''], [2, '-34%', '--negative']]) {
+    const person = { name: 'معلم مقارنة ' + index, loginId: 'Compare' + page.viewportSize().width + index, branchId: 'male' };
+    await api('POST', '/students', person);
+    for (const [type, question, answer] of [['pre', pre, 'صحيح'], ['post', post, 'آخر']]) {
+      await api('POST', 'assessment-submissions', { courseId: course.id, assessmentType: type, studentName: person.name, loginId: person.loginId, answers: [{ questionId: question.id, value: answer }] });
+    }
+    await page.reload();
+    await choose(page, 'assessment-toolbar-mode', 'المؤشرات');
+    await choose(page, 'assessment-indicators-branch', 'معلمين');
+    await expect(page.locator('.assessment-indicators__difference')).toHaveText(change);
+    if (className) {
+      await expect(page.locator('.assessment-indicators__change')).toHaveClass(/--negative/);
+      expect(await page.locator('.assessment-indicators__difference').evaluate(el => getComputedStyle(el).color)).toBe('rgb(209, 67, 67)');
+    } else await expect(page.locator('.assessment-indicators__change')).not.toHaveClass(/--positive|--negative/);
+  }
+  expect(errors).toEqual([]);
+});
+
+test('question editing supports long text, option removal, validation, save failure and a compact header action', async ({ page, context }, info) => {
+  await login(page);
+  const api = await apiSession(page, context);
+  const course = await api('POST', 'courses', { title: 'إنشاء الاختبار وتحرير الأسئلة', isActive: false });
+  await page.goto(`dashboard?panel=courses&courseId=${course.id}`);
+  await choose(page, 'assessment-toolbar-mode', 'الاختبار القبلي');
+  await expect(page.getByRole('heading', { name: 'لا توجد أسئلة بعد', exact: true })).toBeVisible();
+  const start = page.locator('.dashboard-topbar').getByRole('button', { name: 'بدء الاختبار القبلي', exact: true });
+  await expect(start).toBeVisible();
+  expect((await start.boundingBox()).y).toBeLessThan((await page.locator('.assessment-card').boundingBox()).y);
+  await expect(page.locator('.assessment-availability-panel')).toHaveCount(0);
+  await page.getByRole('button', { name: 'إضافة سؤال', exact: true }).click();
+  await page.getByRole('button', { name: 'خيارات', exact: true }).click();
+  const form = page.locator('.assessment-inline-builder .assessment-editor-question').first();
+  await expect(page.getByText('تعديلات غير محفوظة', { exact: true })).toHaveCount(0);
+  await expect(form.locator('.assessment-editor-question__option-head')).toHaveCount(0);
+  await expect(form.getByRole('button', { name: 'تحديد الخيار 1 إجابة صحيحة', exact: true })).toHaveText('');
+  const longPrompt = 'كيف تميّز أحكام التجويد في الأمثلة التالية مع بيان السبب؟ '.repeat(8);
+  await form.locator('#assessment-new-question-0-prompt').fill(longPrompt);
+  await form.locator('#assessment-new-question-0-points').fill('5');
+  for (const [index, value] of ['الإجابة الأولى', 'الإجابة الثانية'].entries()) await form.getByRole('textbox', { name: `الخيار ${index + 1} للسؤال 1`, exact: true }).fill(value);
+  await form.getByRole('button', { name: 'إضافة خيار', exact: true }).click();
+  await form.getByRole('textbox', { name: 'الخيار 3 للسؤال 1', exact: true }).fill('إجابة ستُحذف');
+  await form.getByRole('button', { name: 'تحديد الخيار 3 إجابة صحيحة', exact: true }).click();
+  await form.getByRole('button', { name: 'حذف الخيار 3 للسؤال 1', exact: true }).click();
+  await page.getByRole('button', { name: 'حفظ الأسئلة', exact: true }).click();
+  await expect(form.getByRole('alert')).toHaveText('اختر الإجابة الصحيحة.');
+  await form.getByRole('button', { name: 'تحديد الخيار 1 إجابة صحيحة', exact: true }).click();
+  await page.route(`**/courses/${course.id}/questions/sync`, route => route.fulfill({ status: 503, json: { message: 'تعذّر الحفظ مؤقتًا' } }));
+  await page.getByRole('button', { name: 'حفظ الأسئلة', exact: true }).click();
+  await expect(page.getByText('تعذّر الحفظ مؤقتًا', { exact: true })).toBeVisible();
+  await expect(form.locator('#assessment-new-question-0-prompt')).toHaveValue(longPrompt);
+  await page.unroute(`**/courses/${course.id}/questions/sync`);
+  await page.getByRole('button', { name: 'حفظ الأسئلة', exact: true }).click();
+  await expect(page.locator('.assessment-inline-list__item')).toHaveCount(1);
+  await expect(page.locator('.assessment-inline-builder .assessment-editor-question')).toHaveCount(0);
+  const prompt = page.locator('.assessment-inline-list__item textarea[placeholder="اكتب السؤال"]');
+  expect(await prompt.evaluate(input => input.scrollHeight <= input.clientHeight + 1)).toBe(true);
+  const originalViewport = page.viewportSize();
+  await page.setViewportSize({ width: 320, height: 568 });
+  await expect.poll(() => prompt.evaluate(input => input.scrollHeight <= input.clientHeight + 1)).toBe(true);
+  await expect(prompt).toHaveValue(longPrompt.trim());
+  await page.setViewportSize(originalViewport);
+  await expect.poll(() => prompt.evaluate(input => input.scrollHeight <= input.clientHeight + 1)).toBe(true);
+  await expect(page.locator('.assessment-inline-list__item').getByRole('button', { name: 'تحديد الخيار 1 إجابة صحيحة', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('.assessment-inline-list__item').getByRole('textbox', { name: 'الخيار 1 للسؤال 1', exact: true })).toHaveValue('الإجابة الأولى');
+  await verifyPage(page, info, 'question-editor');
+  await choose(page, 'assessment-toolbar-mode', 'الاختبار البعدي');
+  await verifyPage(page, info, 'tests');
+  await page.getByRole('button', { name: 'بدء الاختبار البعدي', exact: true }).click();
+  const opening = page.getByRole('dialog', { name: 'فتح الاختبار البعدي', exact: true });
+  await expect(opening).toBeVisible();
+  await opening.getByRole('button', { name: 'إلغاء', exact: true }).click();
+});
+
+test('unsaved questions stay intact when course, mode or panel navigation is canceled', async ({ page, context }) => {
+  await login(page);
+  const api = await apiSession(page, context);
+  const first = await api('POST', 'courses', { title: 'مسودة أولى', isActive: false });
+  const second = await api('POST', 'courses', { title: 'دورة أخرى', isActive: false });
+  await page.goto(`dashboard?panel=courses&courseId=${first.id}`);
+  await choose(page, 'assessment-toolbar-mode', 'الاختبار القبلي');
+  await page.getByRole('button', { name: 'إضافة سؤال', exact: true }).click();
+  await page.getByRole('button', { name: 'نصي', exact: true }).click();
+  const prompt = page.locator('#assessment-new-question-0-prompt');
+  await prompt.fill('مسودة لا ينبغي فقدانها');
+  const discard = page.getByRole('dialog', { name: 'تغييرات غير محفوظة', exact: true });
+  await choose(page, 'assessment-toolbar-mode', 'الاختبار البعدي');
+  await expect(discard).toBeVisible();
+  await discard.getByRole('button', { name: 'متابعة التحرير', exact: true }).click();
+  await expect(selected(page, 'assessment-toolbar-mode')).toHaveText('الاختبار القبلي');
+  await expect(prompt).toHaveValue('مسودة لا ينبغي فقدانها');
+  await choose(page, 'assessment-toolbar-course', second.title);
+  await expect(discard).toBeVisible();
+  await discard.getByRole('button', { name: 'متابعة التحرير', exact: true }).click();
+  await expect(selected(page, 'assessment-toolbar-course')).toHaveText(first.title);
+  if (page.viewportSize().width <= 1024) await page.locator('.dashboard-topbar__mobile button').click();
+  await page.locator('.dashboard-nav__item').filter({ hasText: 'المستخدمين' }).click();
+  await expect(discard).toBeVisible();
+  await discard.getByRole('button', { name: 'متابعة التحرير', exact: true }).click();
+  const closeMenu = page.getByRole('button', { name: 'إغلاق القائمة', exact: true });
+  if (await closeMenu.isVisible()) await closeMenu.click();
+  await expect(prompt).toHaveValue('مسودة لا ينبغي فقدانها');
+  if (page.viewportSize().width <= 1024) await page.locator('.dashboard-topbar__mobile button').click();
+  await page.locator('.dashboard-sidebar__brand').click();
+  await expect(discard).toBeVisible();
+  await discard.getByRole('button', { name: 'متابعة التحرير', exact: true }).click();
+  if (await closeMenu.isVisible()) await closeMenu.click();
+  await expect(page).toHaveURL(new RegExp(`courseId=${first.id}`));
+  await expect(prompt).toHaveValue('مسودة لا ينبغي فقدانها');
+  expect(await page.evaluate(() => {
+    const event = new Event('beforeunload', { cancelable: true });
+    window.dispatchEvent(event);
+    return event.defaultPrevented;
+  })).toBe(true);
+  await choose(page, 'assessment-toolbar-mode', 'الاختبار البعدي');
+  await expect(discard).toBeVisible();
+  await discard.getByRole('button', { name: 'مغادرة دون حفظ', exact: true }).click();
+  await expect(selected(page, 'assessment-toolbar-mode')).toHaveText('الاختبار البعدي');
+  await expect(prompt).toHaveCount(0);
+  await choose(page, 'assessment-toolbar-course', second.title);
+  await expect(selected(page, 'assessment-toolbar-course')).toHaveText(second.title);
+  await page.getByRole('button', { name: 'إضافة سؤال', exact: true }).click();
+  await page.getByRole('button', { name: 'نصي', exact: true }).click();
+  await prompt.fill('مسودة تخص الدورة المختارة');
+  await page.locator('#assessment-toolbar-course').locator('xpath=ancestor::div[contains(@class,"v-input")]').locator('.v-field').click();
+  await openCourseManagement(page);
+  await page.getByRole('button', { name: `تعديل اسم الدورة ${second.title}`, exact: true }).click();
+  const edit = page.getByRole('dialog', { name: 'تعديل اسم الدورة', exact: true });
+  const changedTitle = `${second.title} بعد التعديل`;
+  await edit.locator('#assessment-course-edit-title').fill(changedTitle);
+  await edit.getByRole('button', { name: 'حفظ', exact: true }).click();
+  await expect(edit).toBeHidden();
+  await page.keyboard.press('Escape');
+  await expect(selected(page, 'assessment-toolbar-course')).toHaveText(changedTitle);
+  await expect(prompt).toHaveValue('مسودة تخص الدورة المختارة');
+  await page.getByRole('button', { name: 'حفظ الأسئلة', exact: true }).click();
+  await expect(page.locator('.assessment-inline-list__item')).toHaveCount(1);
+  const persisted = await api('GET', 'snapshot');
+  expect(persisted.courses.find(course => course.id === second.id).postQuestions[0].prompt).toBe('مسودة تخص الدورة المختارة');
+  expect(persisted.courses.find(course => course.id === first.id).postQuestions).toHaveLength(0);
+  await page.getByRole('button', { name: 'إضافة سؤال', exact: true }).click();
+  await page.getByRole('button', { name: 'نصي', exact: true }).click();
+  await prompt.fill('مسودة تتبع الدورة المحذوفة');
+  await page.locator('#assessment-toolbar-course').locator('xpath=ancestor::div[contains(@class,"v-input")]').locator('.v-field').click();
+  await openCourseManagement(page);
+  await page.getByRole('button', { name: `حذف الدورة ${changedTitle}`, exact: true }).click();
+  const deletion = page.getByRole('dialog', { name: 'تأكيد حذف الدورة', exact: true });
+  await deletion.getByRole('button', { name: 'حذف', exact: true }).click();
+  await expect(deletion).toBeHidden();
+  await page.keyboard.press('Escape');
+  await expect(prompt).toHaveCount(0);
+  await expect(selected(page, 'assessment-toolbar-course')).toHaveText(first.title);
+});
+
+test('attendance keeps the greeting and whole-branch selection and recovers a failed automatic save', async ({ page, context }, info) => {
+  await login(page);
+  const api = await apiSession(page, context);
+  const course = await api('POST', 'courses', { title: 'تحضير الدورة', isActive: false });
+  const loginId = String(page.viewportSize().width).padStart(10, '8');
+  await api('POST', '/students', { name: 'معلّم إضافي باسم طويل للتحقق من احتواء صف التحضير', loginId, branchId: 'male', password: studentPassword, passwordConfirmation: studentPassword });
+  const roster = (await api('GET', 'snapshot')).students.filter(student => student.branchId === 'male');
+  await page.goto(`dashboard?panel=courses&courseId=${course.id}`);
+  await expect(page.locator('.assessment-attendance__row')).toHaveCount(roster.length);
+  const header = page.locator('.dashboard-topbar');
+  await expect(header).toBeVisible();
+  await expect(header.locator('.dashboard-topbar__label')).toHaveText('مرحبًا');
+  await expect(header.locator('.dashboard-topbar__actions')).toHaveCount(0);
+  await expect(page.getByRole('searchbox', { name: 'البحث بالاسم أو رقم الدخول', exact: true })).toHaveCount(0);
+  await expect(page.getByText('المحضّرون:', { exact: false })).toHaveCount(0);
+  await page.route('**/dashboard/manual-attendance', route => route.fulfill({ status: 503, json: { message: 'تعذّر حفظ التحضير مؤقتًا' } }));
+  await page.getByRole('button', { name: 'تحديد حضور الجميع', exact: true }).click();
+  await expect(page.locator('.assessment-attendance__footer [role=alert]')).toHaveText('تعذر حفظ التحضير');
+  await expect(page.locator('.attendance-toggle[aria-pressed=true]')).toHaveCount(roster.length);
+  await page.unroute('**/dashboard/manual-attendance');
+  let releaseSnapshot;
+  const snapshotGate = new Promise(resolve => { releaseSnapshot = resolve; });
+  let snapshotPending = false;
+  await page.route('**/dashboard/snapshot**', async route => {
+    snapshotPending = true;
+    await snapshotGate;
+    await route.continue();
+  });
+  const firstRow = await page.locator('.assessment-attendance__row').first().elementHandle();
+  const allBounds = await page.getByRole('button', { name: 'إلغاء تحديد حضور الجميع', exact: true }).boundingBox();
+  const listBounds = await page.locator('.assessment-attendance').boundingBox();
+  expect(allBounds.x).toBeLessThan(listBounds.x + listBounds.width / 2);
+  const save = page.waitForResponse(response => response.url().endsWith('/dashboard/manual-attendance') && response.request().method() === 'POST');
+  await page.getByRole('button', { name: 'إعادة محاولة الحفظ', exact: true }).click();
+  expect((await save).status()).toBe(204);
+  await expect.poll(() => snapshotPending).toBe(true);
+  await expect(page.locator('.dashboard-loader')).toHaveCount(0);
+  expect(await firstRow.evaluate(row => row.isConnected)).toBe(true);
+  const refreshed = page.waitForResponse(response => response.url().includes('/dashboard/snapshot'));
+  releaseSnapshot();
+  await refreshed;
+  await page.unroute('**/dashboard/snapshot**');
+  await expect(page.locator('.assessment-attendance__footer')).toHaveCount(0);
+  await expect(page.locator('.assessment-attendance__login')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'حفظ التحضير', exact: true })).toHaveCount(0);
+  await expect(page.locator('.attendance-toggle[aria-pressed=true]').first()).toBeEnabled();
+  expect(await page.locator('.attendance-toggle[aria-pressed=true]').first().evaluate(button => getComputedStyle(button).backgroundColor)).toBe('rgb(29, 106, 133)');
+  const snapshot = await api('GET', 'snapshot');
+  expect(snapshot.attendance.filter(record => record.courseId === course.id)).toHaveLength(roster.length);
+  await verifyPage(page, info, 'attendance');
+  await page.getByRole('button', { name: `تبديل حضور ${roster[0].name}`, exact: true }).click();
+  await choose(page, 'assessment-attendance-branch', 'معلمات');
+  await expect(selected(page, 'assessment-attendance-branch')).toHaveText('معلمات');
+  expect((await api('GET', 'snapshot')).attendance.filter(record => record.courseId === course.id)).toHaveLength(roster.length - 1);
+  await choose(page, 'assessment-attendance-branch', 'معلمين');
+  await expect(selected(page, 'assessment-attendance-branch')).toHaveText('معلمين');
+  await expect(page.locator('.assessment-attendance__row')).toHaveCount(roster.length);
+  await page.getByRole('button', { name: `تبديل حضور ${roster[0].name}`, exact: true }).click();
+  await choose(page, 'assessment-toolbar-mode', 'المؤشرات');
+  await expect(page.getByRole('region', { name: 'مؤشرات الاختبار', exact: true })).toBeVisible();
+  expect((await api('GET', 'snapshot')).attendance.filter(record => record.courseId === course.id)).toHaveLength(roster.length);
+});
+
+test('a manager without edit, start or attendance permissions keeps a read-only workspace', async ({ page, context }) => {
+  await login(page);
+  const api = await apiSession(page, context);
+  const course = await api('POST', 'courses', { title: 'دورة بصلاحية قراءة', isActive: false });
+  await createQuestion(api, course, 'pre', 3);
+  for (const key of ['edit_pre_questions', 'open_pre_exam', 'page_results']) await api('PUT', 'role-permissions', { role: 'male_manager', key, isEnabled: false });
+  await page.goto('about:blank');
+  await context.clearCookies();
+  await login(page, 'e2e-male-manager', rolePassword);
+  await page.goto(`dashboard?panel=courses&courseId=${course.id}`);
+  await expect(page.locator('.assessment-attendance .attendance-toggle').first()).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'حفظ التحضير', exact: true })).toHaveCount(0);
+  await choose(page, 'assessment-toolbar-mode', 'الاختبار القبلي');
+  await expect(page.locator('.assessment-editor-question textarea').first()).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'إضافة سؤال', exact: true })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'بدء الاختبار القبلي', exact: true })).toHaveCount(0);
+  const origin = new URL(process.env.VUE_APP_API_BASE_URL).origin;
+  const token = (await context.cookies(origin)).find(cookie => cookie.name === 'XSRF-TOKEN');
+  const denied = await page.request.post(`${origin}/api/dashboard/manual-attendance`, { headers: { Referer: page.url(), 'X-XSRF-TOKEN': decodeURIComponent(token.value) }, data: { courseId: course.id, branchCode: 'male', presentStudents: [] } });
+  expect(denied.status()).toBe(403);
+});

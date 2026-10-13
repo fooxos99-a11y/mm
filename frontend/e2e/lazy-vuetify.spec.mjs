@@ -18,15 +18,22 @@ test('home defers Vuetify while login and dashboard install it before rendering'
   await expect(preload).toHaveAttribute('href', /tajawal-arabic-800-normal.*\.woff2$/);
   expect(pluginRequests).toHaveLength(0);
 
-  await page.goto('?login=1', { waitUntil: 'domcontentloaded' });
+  const [session] = await Promise.all([
+    page.waitForResponse(response => new URL(response.url()).pathname.endsWith('/auth/session')),
+    page.goto('?login=1', { waitUntil: 'domcontentloaded' }),
+  ]);
+  await session.finished();
+  expect(session.status()).toBe(200);
   const loginDialog = page.getByRole('dialog', { name: 'تسجيل الدخول', exact: true });
   await expect(loginDialog).toBeVisible();
   await loginDialog.locator('input[autocomplete="username"]').fill(adminLogin);
   await loginDialog.locator('input[autocomplete="current-password"]').fill(adminPassword);
-  await Promise.all([
-    page.waitForURL((url) => url.pathname === '/momars/dashboard'),
+  const [signedIn] = await Promise.all([
+    page.waitForResponse(response => new URL(response.url()).pathname.endsWith('/auth/login') && response.request().method() === 'POST'),
     loginDialog.locator('button[type="submit"]').click(),
   ]);
+  expect(signedIn.status()).toBe(200);
+  await page.waitForURL((url) => url.pathname === '/momars/dashboard');
   await expect(page.locator('.dashboard-page')).toBeVisible();
   expect(pluginRequests).toHaveLength(1);
   await expect(page.locator('.v-application')).toBeVisible();

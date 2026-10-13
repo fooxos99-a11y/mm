@@ -1,5 +1,5 @@
 import { expect, test } from './support/isolatedTest.mjs';
-import { login } from './support/gesture-helpers.mjs';
+import { login, openCourseManagement, selectOption } from './support/gesture-helpers.mjs';
 
 const warning = 'ستُحذف الأسئلة والإجابات والنتائج والمرفقات المرتبطة نهائيًا. لا يمكن التراجع.';
 const cases = [
@@ -40,7 +40,15 @@ for (const scenario of cases) {
     const route = `dashboard?panel=${scenario.panel}&courseId=${course.id}&assessmentType=${scenario.assessment || 'tasks'}`;
     const openDelete = async () => {
       await page.goto(route);
-      await page.locator('.assessment-select:visible').first().locator('.v-field').click();
+      const courseSelect = page.locator('.assessment-select:visible').first();
+      await courseSelect.locator('.v-field').click();
+      if (await courseSelect.locator('.v-select__selection-text').textContent() !== title) {
+        await selectOption(page, title, { exact: true });
+        await expect(courseSelect.locator('.v-select__selection-text')).toHaveText(title);
+        await expect(page.locator('.app-dropdown-menu').filter({ visible: true })).toHaveCount(0);
+        await courseSelect.locator('.v-field').click();
+      }
+      await openCourseManagement(page);
       await page.getByRole('button', { name: `حذف ${scenario.type === 'task' ? 'المهمة' : 'الدورة'} ${title}`, exact: true }).click();
       const dialog = page.getByRole('dialog').filter({ hasText: warning });
       await expect(dialog).toBeVisible();

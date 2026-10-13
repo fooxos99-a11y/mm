@@ -1,4 +1,5 @@
-import { CREATE_COURSE_OPTION } from './adminAssessmentConfig';
+import { CREATE_COURSE_OPTION } from './adminAssessmentConfig.js';
+import { attendanceSelectionFromRecords } from './assessmentWorkspaceUi.js';
 
 
 export default {
@@ -29,7 +30,8 @@ export default {
         }
 
         if (this.showUnifiedToolbar) {
-          this.viewMode = 'attendance';
+          this.viewMode = ['attendance', 'indicators', 'pre', 'post'].includes(this.initialSelection?.viewMode)
+            ? this.initialSelection.viewMode : 'attendance';
           this.selectedDetailAssessmentType = type;
           return;
         }
@@ -61,8 +63,10 @@ export default {
         this.syncSelectedCourse();
       },
     },
-    resolvedCourseId() {
-      this.syncSelectedCourse();
+    async resolvedCourseId(value) {
+      if (value && this.filteredCourses.some(course => course.id === value)) {
+        await this.requestCourseChange(value);
+      } else this.syncSelectedCourse();
     },
     selectedCourseId(newValue, oldValue) {
       if ((!this.showUnifiedToolbar && !this.isTasksPage) || newValue !== CREATE_COURSE_OPTION) {
@@ -105,11 +109,7 @@ export default {
     selectedAttendanceRecords: {
       immediate: true,
       handler(records) {
-        this.attendanceChecked = records.map((record) => {
-          const student = this.students.find((item) => item.loginId === record.loginId);
-
-          return student?.id || null;
-        }).filter(Boolean);
+        this.attendanceChecked = attendanceSelectionFromRecords(records, this.students);
       },
     },
     selectedQuestions: {

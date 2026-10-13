@@ -270,7 +270,7 @@
   .rich-text-editor__toolbar :deep(.ql-toolbar.ql-snow),
   .rich-text-editor__toolbar {
     display: grid;
-    grid-template-columns: repeat(7, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(44px, 1fr));
     gap: 6px;
     padding: 8px;
     align-items: stretch;
@@ -283,15 +283,15 @@
 
   .rich-text-editor__toolbar :deep(.ql-formats button:not(.ql-table)) {
     width: 100%;
-    min-width: 0;
-    height: 30px;
+    min-width: 44px;
+    height: 44px;
     border-radius: 6px;
   }
 
   .rich-text-editor__toolbar :deep(button.ql-table.rich-text-editor__table-trigger) {
     width: 100%;
-    min-width: 0;
-    height: 30px;
+    min-width: 44px;
+    height: 44px;
     border-radius: 6px;
     background: rgba(15, 23, 42, 0.04);
   }
@@ -311,19 +311,19 @@
 
   .rich-text-editor__toolbar :deep(.ql-picker.ql-font .ql-picker-label),
   .rich-text-editor__toolbar :deep(.ql-picker.ql-table .ql-picker-label) {
-    min-height: 30px;
+    min-height: 44px;
     padding-right: 8px !important;
     padding-left: 22px !important;
     border-radius: 8px;
-    font-size: 0.64rem;
+    font-size: var(--app-font-sm);
   }
 
   .rich-text-editor__toolbar :deep(.ql-picker.ql-font .ql-picker-item),
   .rich-text-editor__toolbar :deep(.ql-picker.ql-table .ql-picker-item) {
-    min-height: 30px;
+    min-height: 44px;
     padding-right: 8px !important;
     padding-left: 8px !important;
-    font-size: 0.66rem;
+    font-size: var(--app-font-sm);
   }
 
   .rich-text-editor__toolbar :deep(.ql-picker.ql-font .ql-picker-label::after),

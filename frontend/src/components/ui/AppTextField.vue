@@ -1,6 +1,7 @@
 <template>
   <v-text-field
     v-bind="forwardedAttrs"
+    class="app-text-field"
     :model-value="currentValue"
     @update:model-value="updateValue"
   >
@@ -29,7 +30,7 @@ export default {
   emits: ['update:modelValue', 'input'],
   computed: {
     forwardedAttrs() {
-      return normalizeVuetifyFieldAttrs(this.$attrs);
+      return { variant: 'outlined', density: 'comfortable', color: 'primary', ...normalizeVuetifyFieldAttrs(this.$attrs) };
     },
     currentValue() {
       return this.modelValue !== undefined ? this.modelValue : this.value;

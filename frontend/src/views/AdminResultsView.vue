@@ -39,19 +39,6 @@
       class="results-board"
     >
       <AppCard class="results-shell admin-workspace-card">
-        <div class="results-shell__header">
-          <h1 class="results-shell__title">
-            لوحة النتائج
-          </h1>
-          <AppButton
-            v-if="canEnterGrades"
-            :disabled="resultsLoading"
-            @click="openGradeDialog"
-          >
-            إدخال الدرجات
-          </AppButton>
-        </div>
-
         <AppFilterToolbar :columns="1 + Number(!managedBranchId) + Number(isCourseResultsSection) + Number(showStudentFilter)">
           <AppFilterField
             for-id="results-filter-course"
@@ -132,6 +119,17 @@
             />
           </AppFilterField>
         </AppFilterToolbar>
+        <div
+          v-if="canEnterGrades"
+          class="results-shell__actions"
+        >
+          <AppButton
+            :disabled="resultsLoading"
+            @click="openGradeDialog"
+          >
+            إدخال الدرجات
+          </AppButton>
+        </div>
       </AppCard>
 
       <AppCard class="results-list-shell admin-workspace-card">
@@ -329,5 +327,5 @@
 .results-search { width: 100%; min-height: 44px; border: 1px solid #bdced1; border-radius: 8px; padding: 10px; margin-bottom: 12px; }
 .results-pagination { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-top: 16px; }
 .results-retry { min-height: 44px; padding: 8px 16px; }
-.results-shell__header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.results-shell__actions { display: flex; justify-content: flex-end; }
 </style>

@@ -57,14 +57,6 @@
   font-size: 1.9rem;
 }
 
-.registration-admin__description {
-  max-width: 620px;
-  margin: 0;
-  color: #475569;
-  font-size: 1rem;
-  line-height: 1.8;
-}
-
 .registration-admin__hero-actions,
 .registration-admin__request-actions {
   display: flex;

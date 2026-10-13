@@ -1,3 +1,4 @@
+import { selectOption } from './support/gesture-helpers.mjs';
 import { expect, test } from './support/isolatedTest.mjs';
 
 test('results page searches, paginates and retains full attendance totals without a snapshot', async ({ page, request }, info) => {
@@ -26,16 +27,16 @@ test('results page searches, paginates and retains full attendance totals withou
   await Promise.all([page.waitForResponse((response) => response.url().endsWith('/dashboard/shell')), page.locator('form button[type="submit"]').click()]);
   await page.goto('dashboard?panel=results');
   await page.getByRole('combobox', { name: 'القسم', exact: true }).locator('..').click();
-  await page.getByRole('option', { name: prefix, exact: true }).click();
+  await selectOption(page, prefix, { exact: true });
   await page.getByRole('combobox', { name: 'نوع البيانات', exact: true }).locator('..').click();
-  await page.getByRole('option', { name: 'الاختبار القبلي', exact: true }).click();
+  await selectOption(page, 'الاختبار القبلي', { exact: true });
   await page.getByRole('searchbox').fill(prefix);
   await expect(page.locator('.results-pagination')).toContainText('عدد النتائج: 21');
   await expect(page.locator('.results-entry')).toHaveCount(20);
   await page.getByRole('button', { name: 'الصفحة التالية', exact: true }).click();
   await expect(page.locator('.results-entry')).toHaveCount(1);
   await page.getByRole('combobox', { name: 'نوع البيانات', exact: true }).locator('..').click();
-  await page.getByRole('option', { name: 'التحضير', exact: true }).click();
+  await selectOption(page, 'التحضير', { exact: true });
   await expect(page.locator('.results-attendance-summary')).toContainText('عدد الحضور: 20');
   await expect(page.locator('.results-entry')).toHaveCount(20);
   const summary = await page.locator('.results-attendance-summary').innerText();
@@ -43,7 +44,7 @@ test('results page searches, paginates and retains full attendance totals withou
   await expect(page.locator('.results-entry')).toHaveCount(1);
   await expect(page.locator('.results-attendance-summary')).toHaveText(summary, { useInnerText: true });
   await page.getByRole('combobox', { name: 'حالة المعلمين', exact: true }).locator('..').click();
-  await page.getByRole('option', { name: 'الغائبين', exact: true }).click();
+  await selectOption(page, 'الغائبين', { exact: true });
   await expect(page.locator('.results-entry')).toHaveCount(1);
   expect(snapshots).toBe(0);
   expect(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1)).toBe(false);

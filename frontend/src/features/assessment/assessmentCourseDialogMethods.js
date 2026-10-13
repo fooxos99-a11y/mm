@@ -72,12 +72,19 @@ export default {
     }
 
     const courseId = this.courseDeleteId;
+    const deletedCurrentCourse = this.selectedCourseId === courseId;
 
     this.deletingCourseId = courseId;
     this.assessmentDeleteSubmitting = true;
 
     try {
       await this.deleteCourse(courseId);
+
+      if (deletedCurrentCourse) {
+        this.resetQuestionForms();
+        this.pendingDeletedQuestionIds = [];
+        this.syncSelectedCourse();
+      }
 
       if (this.selectedCourseId === courseId) {
         this.closeQuestionDetails();

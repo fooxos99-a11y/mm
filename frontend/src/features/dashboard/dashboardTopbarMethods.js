@@ -45,6 +45,9 @@ export default {
     await this.openPanel('settings');
   },
   handleAssessmentTopbarState(payload) {
+    if (['courses', 'tasks'].includes(payload?.workspace) && payload.selection?.courseId) {
+      this.assessmentSelections[payload.workspace] = payload.selection;
+    }
     this.assessmentTopbarState = {
       visible: !!payload?.visible,
       label: payload?.label || '',

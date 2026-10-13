@@ -1,10 +1,10 @@
 import { expect, test } from './support/isolatedTest.mjs';
-import { login } from './support/gesture-helpers.mjs';
+import { login, selectOption } from './support/gesture-helpers.mjs';
 import { rolePassword } from './support/credentials.mjs';
 
 const choose = async (page, id, name) => {
   await page.locator(`#${id}`).locator('xpath=ancestor::div[contains(@class,"v-input")]').locator('.v-field').click();
-  await page.getByRole('option').filter({ hasText: name }).click();
+  await selectOption(page, name);
 };
 const selectedText = (page, id) => page.locator(`#${id}`)
   .locator('xpath=ancestor::div[contains(@class,"v-input")]').locator('.v-select__selection-text');
@@ -50,18 +50,24 @@ test('administrative pages select available defaults and share card and field ge
     geometries.push(await card.evaluate(element => {
       const rect = element.getBoundingClientRect();
       const header = document.querySelector('.dashboard-topbar').getBoundingClientRect();
-      const field = element.querySelector('.v-field').getBoundingClientRect();
+      const fieldElement = element.querySelector('.v-field');
+      const field = fieldElement.getBoundingClientRect();
       const label = element.querySelector('.app-filter-field__label');
       return { x: rect.x, width: rect.width, topGap: rect.top - header.bottom, fieldHeight: field.height,
+        fieldRadius: getComputedStyle(fieldElement).borderRadius,
+        fieldFont: getComputedStyle(fieldElement.querySelector('.v-field__input')).fontSize,
         fontSize: getComputedStyle(label).fontSize, weight: getComputedStyle(label).fontWeight };
     }));
     await noOverflow(page);
     await page.screenshot({ path: info.outputPath(`${panel}.png`), fullPage: true });
   }
   for (const geometry of geometries) {
-    for (const property of ['x', 'width', 'topGap', 'fieldHeight']) {
+    for (const property of ['x', 'width', 'topGap']) {
       expect(Math.abs(geometry[property] - geometries[0][property]), JSON.stringify(geometries)).toBeLessThanOrEqual(1);
     }
+    expect(geometry.fieldHeight).toBeGreaterThanOrEqual(48);
+    expect(geometry.fieldRadius).toBe(geometries[0].fieldRadius);
+    expect(geometry.fieldFont).toBe(geometries[0].fieldFont);
     expect(geometry.fontSize).toBe(geometries[0].fontSize);
     expect(geometry.weight).toBe(geometries[0].weight);
   }
@@ -72,8 +78,8 @@ test('administrative pages select available defaults and share card and field ge
       const rect = field.getBoundingClientRect(); return { y: rect.y, height: rect.height };
     }));
     expect(boxes).toHaveLength(3);
-    expect(new Set(boxes.map(box => Math.round(box.height))).size).toBe(1);
-    if (page.viewportSize().width >= 768) expect(new Set(boxes.map(box => Math.round(box.y))).size).toBe(1);
+    for (const box of boxes) expect(box.height).toBeGreaterThanOrEqual(48);
+    if (page.viewportSize().width >= 768) expect(new Set(boxes.map(box => Math.round(box.y + box.height))).size).toBe(1);
     await noOverflow(page);
     await page.screenshot({ path: info.outputPath(`courses-${mode === 'التحضير' ? 'attendance' : 'indicators'}.png`), fullPage: true });
   }
@@ -96,18 +102,18 @@ test('delayed catalogs choose the first course and switching courses keeps the c
   await choose(page, 'assessment-toolbar-course', other.title);
   await expect(selectedText(page, 'assessment-toolbar-mode')).toHaveText('الاختبار البعدي');
   await expect(selectedText(page, 'assessment-toolbar-course')).toHaveText(other.title);
-  const draft = page.locator('.assessment-form-card--inline');
+  const draft = page.locator('.assessment-editor-question');
   await page.locator('.assessment-inline-builder__add').click();
   await page.getByRole('button', { name: 'خيارات', exact: true }).click();
   await expect(draft.getByRole('button', { name: 'حذف السؤال 1', exact: true })).toHaveCount(0);
-  await draft.locator('input[placeholder="اكتب السؤال"]').fill('سؤال جديد');
+  await draft.locator('textarea[placeholder="اكتب السؤال"]').fill('سؤال جديد');
   const deletion = draft.getByRole('button', { name: 'حذف السؤال 1', exact: true });
   await expect(deletion).toBeVisible();
   const bounds = await draft.evaluate(card => {
     const cardRect = card.getBoundingClientRect();
-    const label = card.querySelector('.assessment-form-card__label').getBoundingClientRect();
-    const button = card.querySelector('.assessment-form-card__trash').getBoundingClientRect();
-    const prompt = card.querySelector('input[placeholder="اكتب السؤال"]').getBoundingClientRect();
+    const label = card.querySelector('.assessment-editor-question__title').getBoundingClientRect();
+    const button = card.querySelector('.assessment-editor-question__delete').getBoundingClientRect();
+    const prompt = card.querySelector('textarea[placeholder="اكتب السؤال"]').getBoundingClientRect();
     return { leftGap: button.left - cardRect.left, topGap: button.top - cardRect.top, promptGap: prompt.top - button.bottom,
       labelLeft: label.left, buttonRight: button.right, width: button.width, height: button.height };
   });
@@ -161,9 +167,10 @@ test('directory, notifications and settings share the same card and populated se
     }
   }
   for (const box of boxes) {
-    for (const property of ['left', 'width', 'topGap', 'fieldHeight']) {
+    for (const property of ['left', 'width', 'topGap']) {
       expect(Math.abs(box[property] - boxes[0][property]), JSON.stringify(boxes)).toBeLessThanOrEqual(1);
     }
+    expect(box.fieldHeight).toBeGreaterThanOrEqual(48);
     expect(box.fontSize).toBe(boxes[0].fontSize);
     expect(box.weight).toBe(boxes[0].weight);
   }

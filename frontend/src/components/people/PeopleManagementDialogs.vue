@@ -83,57 +83,37 @@
 
     <AppDialog
       :value="reciterOpen"
+      :persistent="reciterSaving"
       max-width="520"
       @input="$emit('reciter-toggle', $event)"
     >
       <div class="people-dialog people-reciter-dialog">
         <AppDialogHeader
-          class="people-dialog__header"
-          title="اختر المقرئ"
+          :title="reciterBranch === 'female' ? 'اختيار المقرئة' : 'اختيار المقرئ'"
           title-tag="h2"
+          closable
+          :close-disabled="reciterSaving"
+          @close="$emit('reciter-close')"
         />
-        <div class="people-dialog__divider" />
-        <AppDialogBody
-          class="people-dialog__form people-reciter-dialog__form"
-          compact
-        >
-          <div class="people-dialog__field">
-            <label
-              class="people-dialog__label"
-              for="people-manage-reciter"
-            >اختر المقرئ/ة</label>
-            <PeopleRemotePicker
-              v-if="reciterOpen"
-              input-id="people-manage-reciter"
-              type="reciter"
-              :branch="reciterBranch"
-              label="البحث عن مقرئ للإسناد"
-              :current-label="reciterLabel"
-              :selected-ids="[reciterId]"
-              :disabled="reciterSaving"
-              :allow-empty="allowUnassign"
-              @select="$emit('update:reciter-id', $event)"
-            />
-          </div>
+        <AppDialogBody>
+          <p
+            v-if="reciterError"
+            role="alert"
+          >
+            {{ reciterError }}
+          </p>
+          <PeopleRemotePicker
+            v-if="reciterOpen"
+            type="reciter"
+            tiles
+            :branch="reciterBranch"
+            :current-label="reciterLabel"
+            :selected-ids="[reciterId]"
+            :disabled="reciterSaving"
+            :allow-empty="allowUnassign"
+            @select="$emit('update:reciter-id', $event)"
+          />
         </AppDialogBody>
-        <AppDialogFooter class="people-dialog__actions">
-          <AppButton
-            variant="secondary"
-            class="people-dialog__cancel"
-            :disabled="reciterSaving"
-            @click="$emit('reciter-close')"
-          >
-            إلغاء
-          </AppButton>
-          <AppButton
-            variant="primary"
-            class="people-dialog__submit"
-            :disabled="reciterSaving"
-            @click="$emit('reciter-submit')"
-          >
-            حفظ
-          </AppButton>
-        </AppDialogFooter>
       </div>
     </AppDialog>
 
@@ -272,7 +252,7 @@ export default {
     deleteSubmitting: { type: Boolean, default: false },
     reciterOpen: { type: Boolean, default: false },
     reciterId: { type: String, default: '' },
-    reciterOptions: { type: Array, required: true },
+    reciterError: { type: String, default: '' },
     reciterSaving: { type: Boolean, default: false },
     manageOpen: { type: Boolean, default: false },
     manageEntityType: { type: String, required: true },
@@ -300,7 +280,6 @@ export default {
     'parts-close',
     'parts-toggle',
     'reciter-close',
-    'reciter-submit',
     'reciter-toggle',
     'update:manage-branch-id',
     'update:manage-entity-type',

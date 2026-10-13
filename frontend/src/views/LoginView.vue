@@ -24,7 +24,6 @@
             تسجيل الدخول
           </p>
           <h1>الدخول إلى الحساب</h1>
-          <p>استخدم رقم الدخول وكلمة المرور للدخول إلى لوحة البرنامج.</p>
         </div>
 
         <v-alert
@@ -41,7 +40,7 @@
           class="login-form"
           @submit.prevent="submitLogin"
         >
-          <v-text-field
+          <AppTextField
             v-model.trim="form.loginCode"
             label="رقم الدخول"
             outlined
@@ -75,7 +74,7 @@
 
 <script>
 import { mapActions, mapState } from 'vuex';
-import { AppButton, AppPasswordField } from '../components/ui';
+import { AppButton, AppPasswordField, AppTextField } from '../components/ui';
 import { resolveUserHomeRoute } from '../utils/authRoutes';
 
 export default {
@@ -83,6 +82,7 @@ export default {
   components: {
     AppButton,
     AppPasswordField,
+    AppTextField,
   },
   data() {
     return {

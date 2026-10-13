@@ -37,8 +37,9 @@ export const peopleActions = {
     await dispatch('refreshDashboardSnapshot').catch(() => {});
   },
   async saveReciter({ dispatch }, payload) {
-    const result = await saveReciterRequest(payload);
-    await dispatch('refreshDashboardSnapshot');
+    const { backgroundRefresh = false, ...record } = payload;
+    const result = await saveReciterRequest(record);
+    await dispatch('refreshDashboardSnapshot', { background: backgroundRefresh });
     return result;
   },
   async deleteReciter({ dispatch }, loginCode) {

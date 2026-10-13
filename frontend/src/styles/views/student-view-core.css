@@ -284,14 +284,6 @@
   font-size: 1.55rem;
 }
 
-.student-page .student-summary-card__subtitle {
-  margin-top: 8px;
-  color: #64748b;
-  font-size: 0.92rem;
-  font-weight: 600;
-  line-height: 1.8;
-}
-
 .student-page .student-overview-filter {
   width: min(220px, 100%);
 }

@@ -72,12 +72,7 @@
 
 .prep-table__name {
   font-weight: 700;
-}
-
-.prep-table__login {
-  width: 160px;
-  color: #577089;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 .prep-table__status {
@@ -98,10 +93,15 @@
   width: 44px;
   height: 44px;
   padding: 0;
-  border: 2px solid #6aaecd;
+  border: 0;
   border-radius: 50%;
   background: transparent;
   transition: background-color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+}
+
+.attendance-toggle:focus-visible {
+  outline: 2px solid var(--app-primary);
+  outline-offset: 2px;
 }
 
 .attendance-toggle:disabled {
@@ -110,20 +110,25 @@
 }
 
 .attendance-toggle__dot {
-  width: 14px;
-  height: 14px;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--app-primary);
   border-radius: 50%;
   background: transparent;
   transition: background-color 0.2s ease;
 }
 
-.attendance-toggle--active {
-  border-color: #1484a7;
+.attendance-toggle--active .attendance-toggle__dot {
+  background: var(--app-primary);
 }
 
-.attendance-toggle--active .attendance-toggle__dot,
-.attendance-toggle--partial .attendance-toggle__dot {
-  background: #1484a7;
+.attendance-toggle--partial .attendance-toggle__dot::after {
+  content: '';
+  width: 10px;
+  height: 2px;
+  background: var(--app-primary);
 }
 
 .communications-page__bulk-toggle {
@@ -207,10 +212,6 @@
 
   .prep-table__name {
     min-width: 0;
-  }
-
-  .prep-table__login {
-    display: none !important;
   }
 
   .prep-table__status {

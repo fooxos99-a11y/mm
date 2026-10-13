@@ -67,6 +67,7 @@ export default {
       assessmentTopbarState: {
         visible: false, label: '', type: '', isEnabled: false, closesAt: null, timers: [],
       },
+      assessmentSelections: { courses: {}, tasks: {} },
       registrationTopbarState: { isOpen: false, loading: false },
       permissionsTopbarState: { isAdmin: false, activeSection: 'permissions' },
       completionTopbarState: { canEditSettings: false, canCloseResults: false, isClosed: false },

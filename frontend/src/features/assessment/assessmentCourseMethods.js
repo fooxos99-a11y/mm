@@ -2,22 +2,18 @@ import { createEmptyQuestionForm } from '../assessmentQuestions/questionModel.mj
 
 
 export default {
-    confirmDiscardChanges() {
-      if (!this.hasUnsavedAssessmentChanges || typeof window === 'undefined') return true;
-      return window.confirm('لديك تغييرات غير محفوظة. هل تريد مغادرة المهمة أو الدورة دون حفظها؟');
-    },
     syncSelectedCourse() {
       if (!this.hasCourseSelectionUi) {
         this.selectedCourseId = '';
         return;
       }
 
-      if (this.resolvedCourseId && this.filteredCourses.some((course) => course.id === this.resolvedCourseId)) {
-        this.selectedCourseId = this.resolvedCourseId;
+      if (this.filteredCourses.some((course) => course.id === this.selectedCourseId)) {
         return;
       }
 
-      if (this.filteredCourses.some((course) => course.id === this.selectedCourseId)) {
+      if (this.resolvedCourseId && this.filteredCourses.some((course) => course.id === this.resolvedCourseId)) {
+        this.selectedCourseId = this.resolvedCourseId;
         return;
       }
 

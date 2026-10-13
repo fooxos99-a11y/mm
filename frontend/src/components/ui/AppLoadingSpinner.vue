@@ -5,7 +5,7 @@
     :aria-label="label"
   >
     <span
-      class="app-spinner__ring"
+      class="app-loading-indicator"
       aria-hidden="true"
     />
     <span

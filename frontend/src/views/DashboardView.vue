@@ -14,7 +14,7 @@
       @close="mobileMenuOpen = false"
     />
 
-    <main class="dashboard-main">
+    <div class="dashboard-main">
       <DashboardTopbar
         :active-menu="activeMenu"
         :admin-name="adminName"
@@ -52,6 +52,7 @@
       <div
         v-if="dashboardError"
         class="dashboard-error"
+        role="alert"
       >
         تعذر تحميل بيانات لوحة التحكم: {{ dashboardError }}
       </div>
@@ -59,6 +60,9 @@
       <section
         v-if="showDashboardLoader"
         class="dashboard-loader-shell"
+        role="status"
+        aria-label="جارٍ تحميل لوحة التحكم"
+        aria-busy="true"
       >
         <div class="dashboard-loader-shell__inner">
           <div
@@ -138,7 +142,7 @@
         @update-template="updateTemplateDraft"
         @save-templates="saveNotificationTemplates"
       />
-    </main>
+    </div>
   </div>
 </template>
 

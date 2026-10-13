@@ -91,15 +91,11 @@
   font-weight: 900;
 }
 
-.people-page .people-dialog__divider {
-  height: 1px;
-  margin: 18px 0 26px;
-  background: #e1edf2;
-}
+.people-page .people-dialog__divider { display: none; }
 
 .people-page .people-dialog__form {
   display: grid;
-  gap: 18px;
+  gap: 16px;
   min-height: 0;
   overflow-y: auto;
 }
@@ -220,72 +216,8 @@
 .people-page .people-dialog__actions {
   display: flex;
   align-items: center;
-  gap: 14px;
-  margin-top: 18px;
-}
-
-.people-page .people-dialog__submit,
-.people-page .people-dialog__cancel {
-  min-height: 54px;
-  padding: 0 26px;
-  border-radius: 999px;
-  font-size: 1rem;
-  font-weight: 900;
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
-}
-
-.people-page .people-dialog__submit--danger {
-  border-color: transparent;
-  background: linear-gradient(180deg, #dc2626 0%, #b91c1c 100%);
-  color: #fff;
-  box-shadow: 0 10px 24px rgba(185, 28, 28, 0.18);
-}
-
-.people-page .people-dialog__submit--danger:hover,
-.people-page .people-dialog__submit--danger:focus,
-.people-page .people-dialog__submit--danger:active {
-  background: linear-gradient(180deg, #dc2626 0%, #b91c1c 100%);
-  color: #fff;
-  transform: translateY(-2px);
-  box-shadow: 0 14px 28px rgba(185, 28, 28, 0.18);
-}
-
-.people-page .people-dialog__submit--manage {
-  border-color: rgba(16, 118, 153, 0.18);
-  background: #ffffff;
-  color: #154b67;
-  box-shadow: rgba(27, 31, 35, 0.06) 0 1px 0;
-}
-
-.people-page .people-dialog__submit--manage:hover,
-.people-page .people-dialog__submit--manage:focus,
-.people-page .people-dialog__submit--manage:active {
-  background: #ffffff;
-  color: #154b67;
-  transform: translateY(-2px);
-  box-shadow: 0 12px 24px rgba(27, 31, 35, 0.08);
-}
-
-.people-page .people-dialog__submit {
-  border: 0;
-  background: linear-gradient(180deg, #1e809b 0%, #146d88 100%);
-  color: #fff;
-}
-
-.people-page .people-dialog__cancel {
-  border: 1px solid #c9e0e9;
-  background: #fff;
-  color: #315f73;
-}
-
-.people-page .people-dialog__cancel:hover,
-.people-page .people-dialog__cancel:focus,
-.people-page .people-dialog__cancel:active {
-  border-color: #c9e0e9;
-  background: #fff;
-  color: #315f73;
-  transform: translateY(-2px);
-  box-shadow: 0 12px 24px rgba(44, 125, 156, 0.08);
+  gap: 12px;
+  margin-top: 0;
 }
 
 @media (max-width: 960px) {
@@ -356,13 +288,13 @@
   }
 
   .people-page .people-dialog {
-    padding: 26px 18px 28px;
-    border-radius: 28px;
+    padding: 0;
+    border-radius: var(--app-radius-card);
   }
 
   .people-page .people-parts-dialog__body {
     width: 100%;
-    padding-inline: 0;
+    padding-inline: var(--app-dialog-padding);
   }
 
   .people-page .people-parts-dialog__grid {

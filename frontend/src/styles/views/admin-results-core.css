@@ -69,49 +69,6 @@
   font-weight: 700;
 }
 
-.results-view .results-course-option {
-  position: relative;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  width: 100%;
-  min-height: 50px;
-  padding-inline: 14px 54px;
-  border-bottom: 1px solid rgba(189, 219, 231, 0.55);
-}
-
-.results-view .results-course-option__label {
-  min-width: 0;
-  flex: 1;
-}
-
-.results-view .results-course-option__delete {
-  position: absolute;
-  top: 50%;
-  inset-inline-end: 10px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  border: none;
-  border-radius: 999px;
-  background: rgba(248, 231, 231, 0.83);
-  color: #c13636;
-  cursor: pointer;
-  transform: translateY(-50%);
-  transition: background-color 0.2s ease, color 0.2s ease;
-}
-
-.results-view .results-course-option__delete:hover:not(:disabled) {
-  background: rgba(193, 54, 54, 0.18);
-}
-
-.results-view .results-course-option__delete:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
 .results-view .results-delete-dialog {
   padding: 28px;
   background: #fff;

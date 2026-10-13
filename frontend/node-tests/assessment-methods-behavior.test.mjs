@@ -61,8 +61,12 @@ test('course deletion resets selection and dialog state after success', async ()
     courseDeleteId: 'course-1',
     selectedCourseId: 'course-1',
     courseEditId: 'course-1',
+    questionForms: [{ prompt: 'مسودة الدورة المحذوفة' }],
+    pendingDeletedQuestionIds: ['question-1'],
     isTasksPage: false,
     deleteCourse: async (courseId) => { deleted.push(courseId); },
+    resetQuestionForms() { this.questionForms = []; },
+    syncSelectedCourse() {},
     closeQuestionDetails() { this.selectedCourseId = ''; },
     closeCourseEditDialog() { this.courseEditId = ''; },
     closeCourseDeleteDialog() { this.courseDeleteId = ''; },
@@ -77,6 +81,8 @@ test('course deletion resets selection and dialog state after success', async ()
   assert.equal(context.courseDeleteId, '');
   assert.equal(context.deletingCourseId, '');
   assert.equal(context.assessmentDeleteSubmitting, false);
+  assert.equal(context.questionForms.length, 0);
+  assert.equal(context.pendingDeletedQuestionIds.length, 0);
 });
 
 test('manager assessment permissions distinguish editing opening and attendance', () => {

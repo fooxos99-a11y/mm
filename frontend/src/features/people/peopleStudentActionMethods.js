@@ -71,6 +71,7 @@ export default {
     this.reciterDialogOpen = true;
   },
   closeReciterDialog() {
+    if (this.reciterDialogSaving || this.dialogDataLoading) return;
     this.reciterDialogOpen = false;
     this.reciterDialogStudentId = '';
     this.reciterDialogReciterId = '';
@@ -94,39 +95,45 @@ export default {
   },
   async submitReciterAssignment() {
     const student = this.reciterDialogStudent;
-    const currentReciter = this.assignedReciterRecord;
-    const nextReciter = this.reciters.find((reciter) => reciter.id === this.reciterDialogReciterId) || null;
+    const previousId = student?.reciterId || '';
+    const nextId = this.reciterDialogReciterId;
     if (!student || this.reciterDialogSaving || !this.canAssignReciter) return;
-    if ((currentReciter?.id || '') === (nextReciter?.id || '')) {
-      this.showTimedToast('info', 'لم يتم تغيير المقرئ.');
-      this.closeReciterDialog();
+    if (previousId === nextId) return;
+    if (!nextId && !this.canEditReciter) {
+      this.reciterDialogReciterId = previousId;
       return;
     }
-
     this.reciterDialogSaving = true;
+    this.dialogDataError = '';
     try {
-      if (nextReciter) {
-        await transferStudentToReciter(student.id, nextReciter.id);
-      } else if (currentReciter && this.canEditReciter) {
-        await this.saveReciter({
-          currentLoginCode: currentReciter.loginCode,
-          name: currentReciter.name,
-          loginCode: currentReciter.loginCode,
-          branchId: currentReciter.branchId,
-          linkedStudentIds: (currentReciter.studentIds || []).filter((studentId) => studentId !== student.id),
-        });
+      if (nextId) {
+        await transferStudentToReciter(student.id, nextId);
       } else {
-        this.showTimedToast('error', 'لا توجد صلاحية لفك الربط بدون اختيار مقرئ بديل');
-        this.reciterDialogSaving = false;
-        return;
+        // Reload the complete assignment before unlinking so other teachers stay linked.
+        const current = await this.loadPerson('reciter', previousId);
+        await this.saveReciter({
+          currentLoginCode: current.loginCode, name: current.name,
+          loginCode: current.loginCode, branchId: current.branchId,
+          linkedStudentIds: (current.studentIds || []).filter((id) => id !== student.id),
+          backgroundRefresh: true,
+        });
       }
-      this.showTimedToast('success', nextReciter ? 'تم تحديث ربط المقرئ' : 'تم فك ربط المقرئ');
-      this.closeReciterDialog();
-      await this.refreshDashboardSnapshot();
+      this.personRecords.student[student.id] = { ...student, reciterId: nextId || null };
+      for (const id of [previousId, nextId].filter(Boolean)) {
+        const reciter = this.personRecords.reciter[id];
+        if (!reciter) continue;
+        const others = (reciter.studentIds || []).filter((value) => value !== student.id);
+        this.personRecords.reciter[id] = { ...reciter, studentIds: id === nextId ? [...others, student.id] : others };
+      }
+      this.showTimedToast('success', nextId ? 'تم تحديث الربط' : 'تم فك الربط');
     } catch (error) {
-      this.showTimedToast('error', error?.response?.data?.message || 'تعذر تحديث ربط المقرئ');
+      this.reciterDialogReciterId = previousId;
+      this.dialogDataError = error?.response?.data?.message || 'تعذر تحديث الربط. حاول مرة أخرى.';
+      return;
+    } finally {
       this.reciterDialogSaving = false;
     }
+    if (nextId) await this.refreshDashboardSnapshot({ background: true });
   },
   async toggleDialogPart(partNumber) {
     const student = this.partsDialogStudent;

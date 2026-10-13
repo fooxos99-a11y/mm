@@ -3,9 +3,7 @@
   min-height: 100vh;
   overflow: hidden;
   direction: rtl;
-  background:
-    radial-gradient(circle at top, rgba(16, 185, 129, 0.12), transparent 38%),
-    linear-gradient(180deg, #f7fcfb 0%, #eff8f7 100%);
+  background: var(--app-background);
 }
 
 .assessment-page--embedded {
@@ -13,30 +11,6 @@
   overflow: visible;
   border-radius: 0;
   background: transparent;
-}
-
-.assessment-page__glow {
-  position: absolute;
-  border-radius: 999px;
-  pointer-events: none;
-  filter: blur(18px);
-  opacity: 0.5;
-}
-
-.assessment-page__glow--one {
-  top: 40px;
-  left: 8%;
-  width: 260px;
-  height: 260px;
-  background: radial-gradient(circle, rgba(45, 212, 191, 0.25), transparent 70%);
-}
-
-.assessment-page__glow--two {
-  top: 120px;
-  right: 4%;
-  width: 340px;
-  height: 340px;
-  background: radial-gradient(circle, rgba(8, 65, 89, 0.12), transparent 70%);
 }
 
 .assessment-page__container {
@@ -109,72 +83,6 @@
   min-width: 0;
 }
 
-.assessment-page .assessment-select-option {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  width: 100%;
-}
-
-.assessment-page .assessment-select-option__label {
-  min-width: 0;
-  flex: 1;
-}
-
-.assessment-page .assessment-select-option__actions {
-  display: inline-flex;
-  align-items: center;
-  flex: 0 0 auto;
-  gap: 2px;
-  direction: ltr;
-}
-
-.assessment-page .assessment-select-option__action {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  border: 0;
-  border-radius: 12px;
-  background: transparent;
-  color: #416476;
-}
-
-.assessment-page .assessment-select-option__action:hover:not(:disabled) {
-  background: rgba(228, 240, 243, 0.89);
-  color: #0f7495;
-}
-
-.assessment-page .assessment-select-option__action:disabled {
-  opacity: 0.28;
-}
-
-.assessment-page .assessment-select-option__delete {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  border: none;
-  background: transparent;
-  color: #c13636;
-  cursor: pointer;
-  transition: color 0.2s ease, opacity 0.2s ease;
-}
-
-.assessment-page .assessment-select-option__delete:hover:not(:disabled) {
-  color: #9f1f1f;
-}
-
-.assessment-page .assessment-select-option__delete:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
 .assessment-page .assessment-toolbar--tasks-document {
   grid-template-columns: minmax(240px, 1.2fr) minmax(160px, 0.55fr) minmax(220px, 0.95fr);
 }
@@ -209,139 +117,6 @@
   border-radius: 30px;
   padding: 28px 28px 18px;
   box-shadow: 0 12px 34px rgba(15, 23, 42, 0.04);
-}
-
-.assessment-page .prep-card__status {
-  margin-top: 8px;
-  color: #6c8193;
-  font-size: 0.95rem;
-}
-
-.assessment-page .prep-card__status--inline {
-  margin: 0 0 18px;
-}
-
-.assessment-page .prep-card__status--saving {
-  color: #1787a6;
-}
-
-.assessment-page .prep-filters {
-  display: grid;
-  grid-template-columns: minmax(220px, 0.95fr) 54px;
-  align-items: end;
-  gap: 16px;
-  padding-bottom: 14px;
-  border-bottom: 1px solid #e8eef4;
-}
-
-.assessment-page .prep-filters--single {
-  grid-template-columns: minmax(240px, 1fr) 54px;
-}
-
-.assessment-page .prep-filters__toggle {
-  align-self: start;
-  margin-top: 42px;
-}
-
-.assessment-page .prep-field {
-  min-width: 0;
-}
-
-.assessment-page .prep-field--wide {
-  min-width: 0;
-}
-
-.assessment-page .prep-field__label {
-  display: block;
-  margin: 0 0 10px;
-  color: #0f3554;
-  font-size: 1rem;
-  font-weight: 700;
-}
-
-.assessment-page .prep-table-wrap {
-  overflow: hidden;
-}
-
-.assessment-page .prep-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.assessment-page .prep-table thead th {
-  padding: 18px 12px 14px;
-  color: #5f7790;
-  font-size: 1rem;
-  font-weight: 700;
-  text-align: right;
-  border-bottom: 1px solid #dfe8f0;
-}
-
-.assessment-page .prep-table tbody td {
-  padding: 18px 12px;
-  color: #244764;
-  font-size: 1rem;
-  border-bottom: 1px solid #e7eef4;
-}
-
-.assessment-page .prep-table tbody tr:last-child td {
-  border-bottom: none;
-}
-
-.assessment-page .prep-table__name {
-  font-weight: 700;
-}
-
-.assessment-page .prep-table__login {
-  width: 160px;
-  color: #577089;
-  white-space: nowrap;
-}
-
-.assessment-page .prep-table__status {
-  width: 88px;
-  text-align: left;
-}
-
-.assessment-page .prep-table__empty {
-  padding: 34px 12px !important;
-  color: #6c8193 !important;
-  text-align: center !important;
-}
-
-.assessment-page .attendance-toggle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  border: 2px solid #6aaecd;
-  border-radius: 50%;
-  background: transparent;
-  transition: background-color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
-}
-
-.assessment-page .attendance-toggle:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-
-.assessment-page .attendance-toggle__dot {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: transparent;
-  transition: background-color 0.2s ease;
-}
-
-.assessment-page .attendance-toggle--active {
-  border-color: #1484a7;
-}
-
-.assessment-page .attendance-toggle--active .attendance-toggle__dot,
-.assessment-page .attendance-toggle--partial .attendance-toggle__dot {
-  background: #1484a7;
 }
 
 .assessment-page .assessment-cards-shell {
