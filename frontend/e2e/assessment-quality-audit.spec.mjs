@@ -196,7 +196,8 @@ test('independent audit: forty questions and thirty long-name teachers preserve 
     expect(Math.min(first.y + first.height, second.y + second.height) - Math.max(first.y, second.y)).toBeGreaterThan(0);
   }
   await expect(page.locator('.dashboard-topbar')).toBeVisible();
-  await expect(page.locator('.dashboard-topbar')).toHaveText('');
+  await expect(page.locator('.dashboard-topbar__label')).toHaveText('مرحبًا');
+  await expect(page.locator('.dashboard-topbar__actions')).toHaveCount(0);
   await expect(page.getByRole('searchbox', { name: 'البحث بالاسم أو رقم الدخول', exact: true })).toHaveCount(0);
   await expect(page.getByText('المحضّرون:', { exact: false })).toHaveCount(0);
   await expect(page.locator('.assessment-attendance__login')).toHaveCount(0);
