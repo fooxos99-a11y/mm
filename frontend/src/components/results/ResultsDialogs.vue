@@ -2,44 +2,17 @@
   <div>
     <AppDialog
       :value="resultOpen"
-      max-width="980"
+      max-width="720"
       scrollable
       @input="$emit('update:result-open', $event)"
     >
-      <div class="results-detail-dialog">
-        <div class="results-detail-dialog__header">
-          <div v-if="!taskSection">
-            <div class="results-detail-dialog__eyebrow">
-              {{ sectionLabel }}
-            </div>
-            <div class="results-detail-dialog__title">
-              {{ resultTypeLabel }}: {{ selectedRow?.submission?.scoreOnly ? 'النتيجة' : 'الإجابة' }}
-            </div>
-          </div>
-          <div class="results-detail-dialog__actions">
-            <AppRawButton
-              v-if="taskSection && selectedRow && selectedRow.submission"
-              type="button"
-              class="results-detail-dialog__download-btn"
-              title="تحميل PDF"
-              @click="$emit('download')"
-            >
-              <v-icon small>
-                mdi-file-pdf-box
-              </v-icon>
-              تحميل PDF
-            </AppRawButton>
-            <AppRawButton
-              type="button"
-              class="results-detail-dialog__close"
-              @click="$emit('close-result')"
-            >
-              <v-icon small>
-                mdi-close
-              </v-icon>
-            </AppRawButton>
-          </div>
-        </div>
+      <div class="app-dialog results-detail-dialog">
+        <AppDialogHeader
+          :title="taskSection ? 'الإجابة' : `${resultTypeLabel}: ${selectedRow?.submission?.scoreOnly ? 'النتيجة' : 'الإجابة'}`"
+          closable
+          initial-focus
+          @close="$emit('close-result')"
+        />
 
         <div
           v-if="finalExamSection && selectedRow && selectedRow.submission && !hasManualReviewAnswers"
@@ -64,37 +37,14 @@
               v-if="totalPoints"
               class="results-score-editor__total"
             >/ {{ totalPoints }}</span>
-            <AppRawButton
+            <AppButton
               type="button"
               class="results-score-editor__save-btn"
               :disabled="saving"
               @click="$emit('save-score')"
             >
               {{ saving ? 'جارٍ الحفظ...' : 'حفظ الدرجة' }}
-            </AppRawButton>
-          </div>
-        </div>
-
-        <div
-          v-if="taskSection && selectedRow && selectedRow.submission"
-          class="results-score-editor results-task-review"
-        >
-          <span class="results-score-editor__label">حالة المهمة</span>
-          <div class="results-score-editor__controls">
-            <AppRawButton
-              v-for="action in reviewActions"
-              :key="action.value"
-              type="button"
-              class="results-task-review__button"
-              :class="[
-                `results-task-review__button--${action.className}`,
-                { 'results-task-review__button--active': selectedRow.submission.taskReviewStatus === action.value },
-              ]"
-              :disabled="saving"
-              @click="$emit('review-task', action.value)"
-            >
-              {{ action.label }}
-            </AppRawButton>
+            </AppButton>
           </div>
         </div>
 
@@ -104,7 +54,7 @@
         >
           لا توجد تفاصيل متاحة لهذه النتيجة.
         </div>
-        <div
+        <AppDialogBody
           v-else
           class="results-detail-dialog__body"
           :class="{ 'results-detail-dialog__body--tasks': taskSection }"
@@ -121,11 +71,14 @@
             class="results-answer-card"
           >
             <div
-              v-if="detail.prompt"
+              v-if="detail.prompt && !(taskSection && detail.prompt === 'إرفاق ملف المهمة الأدائية')"
               class="results-answer-card__question"
             >
               {{ detail.index }}. {{ detail.prompt }}
-              <span class="results-answer-card__points">الدرجة: {{ detail.points }}</span>
+              <span
+                v-if="!detail.requiresManualReview"
+                class="results-answer-card__points"
+              >الدرجة: {{ detail.points }}</span>
             </div>
             <div
               v-if="!detail.hideCorrectAnswer"
@@ -134,7 +87,7 @@
               الإجابة الصحيحة: {{ detail.correctAnswer }}
             </div>
             <div
-              v-if="detail.statusText"
+              v-if="detail.statusText && !detail.requiresManualReview"
               class="results-answer-card__status"
               :class="detail.requiresManualReview
                 ? 'results-answer-card__status--manual'
@@ -154,26 +107,20 @@
               </div>
               <RichTextDocumentView
                 :value="detail.studentAnswerHtml"
-                :min-height="taskSection ? '0' : '420px'"
+                compact
+                min-height="0"
               />
             </div>
             <div
-              v-else
+              v-else-if="detail.answerText || !detail.attachment"
               class="results-answer-card__line results-answer-card__line--student"
             >
-              إجابة المعلم: {{ detail.studentAnswer }}
+              {{ detail.answerText || detail.studentAnswer }}
             </div>
-            <AppRawButton
+            <AttachmentContent
               v-if="detail.attachment"
-              type="button"
-              class="results-answer-card__attachment"
-              @click="$emit('preview-attachment', detail.attachment)"
-            >
-              <v-icon small>
-                mdi-paperclip
-              </v-icon>
-              {{ detail.attachment.fileName }}
-            </AppRawButton>
+              :attachment="detail.attachment"
+            />
             <div
               v-if="detail.requiresManualReview"
               class="results-answer-review"
@@ -196,14 +143,14 @@
                   @keydown.enter="$emit('save-answer-score', detail)"
                 >
                 <span class="results-answer-review__total">/ {{ detail.points }}</span>
-                <AppRawButton
+                <AppButton
                   type="button"
                   class="results-answer-review__save"
                   :disabled="!detail.answerId || savingAnswerId === detail.answerId"
                   @click="$emit('save-answer-score', detail)"
                 >
                   {{ savingAnswerId === detail.answerId ? 'جارٍ الحفظ...' : 'حفظ الدرجة' }}
-                </AppRawButton>
+                </AppButton>
               </div>
               <div
                 v-if="!detail.answerId"
@@ -213,7 +160,31 @@
               </div>
             </div>
           </article>
-        </div>
+          <div
+            v-if="taskSection && selectedRow && selectedRow.submission"
+            class="results-score-editor results-task-review"
+          >
+            <span class="results-score-editor__label">حالة المهمة</span>
+            <div class="results-score-editor__controls">
+              <AppButton
+                v-for="action in reviewActions"
+                :key="action.value"
+                type="button"
+                variant="secondary"
+                class="results-task-review__button"
+                :class="[
+                  `results-task-review__button--${action.className}`,
+                  { 'results-task-review__button--active': selectedRow.submission.taskReviewStatus === action.value },
+                ]"
+                :disabled="saving"
+                :aria-pressed="selectedRow.submission.taskReviewStatus === action.value"
+                @click="$emit('review-task', action.value)"
+              >
+                {{ action.label }}
+              </AppButton>
+            </div>
+          </div>
+        </AppDialogBody>
       </div>
     </AppDialog>
 
@@ -255,11 +226,12 @@
 
 <script>
 import RichTextDocumentView from '../RichTextDocumentView.vue';
-import { AppButton, AppDialog, AppRawButton } from '../ui';
+import { AppButton, AppDialog, AppDialogBody, AppDialogHeader } from '../ui';
+import AttachmentContent from '../tasks/AttachmentContent.vue';
 
 export default {
   name: 'ResultsDialogs',
-  components: { AppButton, AppDialog, AppRawButton, RichTextDocumentView },
+  components: { AppButton, AppDialog, AppDialogBody, AppDialogHeader, RichTextDocumentView, AttachmentContent },
   props: {
     resultOpen: Boolean,
     deleteOpen: Boolean,
@@ -283,8 +255,6 @@ export default {
     'close-delete',
     'close-result',
     'confirm-delete',
-    'download',
-    'preview-attachment',
     'review-task',
     'save-answer-score',
     'save-score',
@@ -301,3 +271,5 @@ export default {
   }),
 };
 </script>
+
+<style scoped src="../../styles/components/results-answer-dialog.css"></style>

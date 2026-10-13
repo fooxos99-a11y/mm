@@ -25,6 +25,18 @@ test('historical answer cards preserve attachments and pending manual review', (
   assert.equal(liveCards[0].statusText, 'تم التصحيح: 2 / 3')
 })
 
+test('answers retain text and an attachment together in current and historical results', () => {
+  const answer = { id: 'a', questionId: 'q', value: '<p>جواب مع الملف</p>', fileName: 'answer.png' }
+  for (const questions of [[], [{ id: 'q', type: 'text', points: 3 }]]) {
+    const [card] = buildResultDetailCards(questions, { answers: [answer] }, {
+      richTextAnswers: true, attachmentResolver: value => value.fileName,
+    })
+    assert.equal(card.studentAnswerHtml, answer.value)
+    assert.equal(card.answerText, answer.value)
+    assert.equal(card.attachment, 'answer.png')
+  }
+})
+
 test('result values and answer labels are normalized consistently', () => {
   assert.equal(normalizeResultAnswer('  إجابة   صحيحة '), 'إجابة صحيحة')
   assert.equal(formatScoreValue(2), '2')

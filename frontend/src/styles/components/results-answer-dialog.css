@@ -1,0 +1,33 @@
+.results-detail-dialog { direction: rtl; color: var(--app-primary-dark); }
+.results-detail-dialog__body { grid-template-columns: minmax(0, 1fr); }
+.results-answer-card { min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+.results-answer-card + .results-answer-card { border-top: 1px solid var(--app-border); padding-top: 16px; }
+.results-answer-card__question { font-weight: 700; overflow-wrap: anywhere; line-height: 1.7; }
+.results-answer-card__points { display: block; font-size: 0.875rem; color: var(--app-text-muted); }
+.results-answer-card__line { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.8; }
+.results-answer-card__line--correct, .results-answer-card__status--correct { color: var(--app-success); }
+.results-answer-card__status--incorrect { color: var(--app-danger); }
+.results-answer-card__document { min-width: 0; }
+.results-answer-card__answer-label { margin-bottom: 8px; color: var(--app-text-muted); }
+.results-answer-review { border-top: 1px solid var(--app-border); padding-top: 16px; display: grid; gap: 8px; }
+.results-answer-review__label, .results-score-editor__label { font-weight: 700; }
+.results-answer-review__controls, .results-score-editor__controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-width: 0; }
+.results-answer-review__input, .results-score-editor__input {
+  width: 80px; min-width: 0; min-height: 48px; border: 1px solid var(--app-border); border-radius: 8px;
+  background: #fff; color: inherit; text-align: center; padding: 8px; font: inherit;
+}
+.results-answer-review__input:focus-visible, .results-score-editor__input:focus-visible { outline: 2px solid var(--app-primary); outline-offset: 2px; }
+.results-answer-review__total { direction: ltr; color: var(--app-text-muted); }
+.results-answer-review__save, .results-score-editor__save-btn {
+  min-height: 48px; padding: 8px 16px; border-radius: 8px; background: var(--app-primary); color: #fff;
+  margin-inline-start: auto; font-weight: 700;
+}
+.results-answer-review__save:disabled, .results-task-review__button:disabled { opacity: 0.6; }
+.results-answer-review__hint { color: var(--app-text-muted); }
+.results-score-editor { padding: 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.results-task-review { padding: 16px 0 0; border-top: 1px solid var(--app-border); }
+.results-task-review__button { min-height: 44px; padding: 8px 16px; border: 1px solid var(--app-border); border-radius: 8px; }
+.results-task-review__button--approve { color: var(--app-success); }
+.results-task-review__button--reject { color: var(--app-danger); }
+.results-task-review__button--approve.results-task-review__button--active { background: var(--app-success); color: #fff; }
+.results-task-review__button--reject.results-task-review__button--active { background: var(--app-danger); color: #fff; }

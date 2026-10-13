@@ -1,5 +1,6 @@
 import { expect, test } from './support/isolatedTest.mjs';
 import { login, selectOption } from './support/gesture-helpers.mjs';
+import { expectDialogContained } from './support/dialogGeometry.mjs';
 
 test.use({ actionTimeout: 20_000 });
 
@@ -16,6 +17,7 @@ test('shared dialog names follow pre, post, tasks and edit titles after reuse', 
     await page.getByRole('button', { name: `بدء ${mode}`, exact: true }).click();
     const dialog = page.getByRole('dialog', { name: title, exact: true });
     await expect(dialog).toBeVisible();
+    await expectDialogContained(dialog);
     await dialog.getByRole('button', { name: 'إلغاء', exact: true }).click();
   }
   await page.goto('dashboard?panel=tasks');
@@ -24,13 +26,16 @@ test('shared dialog names follow pre, post, tasks and edit titles after reuse', 
   await page.getByRole('button', { name: 'بدء المهمة الأدائية', exact: true }).click();
   const taskDialog = page.getByRole('dialog', { name: 'فتح المهام الأدائية', exact: true });
   await expect(taskDialog).toBeVisible();
+  await expectDialogContained(taskDialog);
   await taskDialog.getByRole('button', { name: 'إلغاء', exact: true }).click();
   await page.goto('dashboard?panel=users');
   await page.locator('.dashboard-topbar').getByRole('button', { name: 'إضافة', exact: true }).click();
   await expect(page.getByRole('dialog')).toHaveAccessibleName('إضافة معلم/ة');
+  await expectDialogContained(page.getByRole('dialog'));
   await page.getByRole('dialog').getByRole('button', { name: 'إلغاء', exact: true }).click();
   await page.locator('.people-card').first().getByRole('button', { name: 'تعديل المعلم', exact: true }).click();
   await expect(page.getByRole('dialog')).toHaveAccessibleName('تعديل معلم/ة');
+  await expectDialogContained(page.getByRole('dialog'));
 });
 
 test('public duplicate submissions keep one pending request and show a recoverable error', async ({ page, context }) => {

@@ -88,7 +88,7 @@ export const buildResultDetailCards = (questions, submission, {
 } = {}) => {
   if (!submission || submission.scoreOnly) return []
   const answerMap = new Map((submission.answers || []).map(answer => [answer.questionId, answer]))
-  const buildRichText = answer => richTextAnswers && !answer?.fileName && String(answer?.value || '').trim()
+  const buildRichText = answer => richTextAnswers && String(answer?.value || '').trim()
     ? String(answer.value)
     : ''
   const buildAttachment = answer => (attachmentResolver ? attachmentResolver(answer) : undefined)
@@ -113,6 +113,7 @@ export const buildResultDetailCards = (questions, submission, {
         correctAnswer,
         hideCorrectAnswer: richTextAnswers || manualReview || !String(question.correctAnswer || '').trim(),
         studentAnswer,
+        answerText: String(answer?.value || '').trim(),
         studentAnswerHtml: buildRichText(answer),
         ...(attachmentResolver ? { attachment: buildAttachment(answer) } : {}),
         requiresManualReview: manualReview,
@@ -137,6 +138,7 @@ export const buildResultDetailCards = (questions, submission, {
       correctAnswer: resolveCorrectAnswer(answer),
       hideCorrectAnswer: richTextAnswers || manualReview || !String(answer.correctAnswer || '').trim(),
       studentAnswer: resolveStudentAnswer(answer),
+      answerText: String(answer.value || '').trim(),
       studentAnswerHtml: buildRichText(answer),
       ...(attachmentResolver ? { attachment: buildAttachment(answer) } : {}),
       requiresManualReview: manualReview,

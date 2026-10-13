@@ -1,6 +1,7 @@
 import { expect, test } from './support/isolatedTest.mjs';
 import { login, selectOption } from './support/gesture-helpers.mjs';
 import { studentPassword } from './support/credentials.mjs';
+import { expectDialogContained } from './support/dialogGeometry.mjs';
 
 test.use({ actionTimeout: 20_000 });
 
@@ -81,6 +82,8 @@ for (const mode of ['questions', 'document']) {
     const answer = 'هذه إجابة الطالب المحفوظة للمراجعة والتصحيح';
     if (mode === 'document') {
       await page.locator('.ql-editor').fill(answer);
+      await page.locator('.ql-editor').press('ControlOrMeta+A');
+      await page.locator('.ql-bold').click();
     } else {
       await page.locator('.assessment-question textarea').fill(answer);
     }
@@ -122,6 +125,8 @@ for (const mode of ['questions', 'document']) {
     if (info.project.use.hasTouch) await eye.tap();
     else await eye.click();
     const dialog = page.getByRole('dialog').filter({ has: page.locator('.results-answer-card') });
+    await expect(dialog.getByRole('button', { name: 'تحميل PDF' })).toHaveCount(0);
+    await expectDialogContained(dialog);
     await expect(dialog.locator(mode === 'document' ? '.rich-text-document-view' : '.results-answer-card__line--student')).toContainText(answer);
     await dialog.getByLabel('درجة الإجابة', { exact: true }).fill('4');
     const scored = page.waitForResponse(response => response.url().includes('/answers/') && response.url().endsWith('/manual-score') && response.request().method() === 'PUT');
@@ -135,7 +140,12 @@ for (const mode of ['questions', 'document']) {
     await eye.click();
     await expect(dialog.getByLabel('درجة الإجابة', { exact: true })).toHaveValue('4');
     await expect(dialog.locator('.results-answer-card')).toContainText(answer);
-    await page.screenshot({ path: info.outputPath(`${mode}-saved-answer.png`), fullPage: true });
+    if (mode === 'document') await expect(dialog.locator('.rich-text-document-view strong')).toContainText(answer);
+    await expectDialogContained(dialog);
+    if (mode === 'document') await expect(dialog.locator('.results-answer-card__question')).toHaveCount(0);
+    await page.screenshot({ path: info.outputPath(`${mode}-saved-answer.png`) });
+    await dialog.getByRole('button', { name: 'إغلاق', exact: true }).click();
+    await expect(dialog).toBeHidden();
     expect(errors).toEqual([]);
   });
 }

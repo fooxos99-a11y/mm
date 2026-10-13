@@ -316,8 +316,6 @@
         @close-result="closeResultDialog"
         @save-score="handleSaveScore"
         @review-task="handleTaskReview"
-        @download="downloadResultAsPdf"
-        @preview-attachment="openAttachmentPreview"
         @close-delete="closeCourseDeleteDialog"
         @confirm-delete="confirmCourseDelete"
       />
@@ -329,7 +327,6 @@
 
 <style src="../styles/views/admin-results-core.css"></style>
 <style src="../styles/views/admin-results-details.css"></style>
-<style src="../styles/views/admin-results-responsive.css"></style>
 <style scoped>
 .results-search { width: 100%; min-height: 44px; border: 1px solid #bdced1; border-radius: 8px; padding: 10px; margin-bottom: 12px; }
 .results-pagination { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-top: 16px; }

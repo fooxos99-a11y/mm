@@ -93,12 +93,16 @@ export default {
         const width = entries[0]?.contentRect.width;
         if (width === this.lastTextareaWidth) return;
         this.lastTextareaWidth = width;
-        this.resizeTextarea();
+        cancelAnimationFrame(this.textareaResizeFrame);
+        this.textareaResizeFrame = requestAnimationFrame(() => this.resizeTextarea());
       });
       this.textareaResizeObserver.observe(this.$refs.textarea.parentElement);
     }
   },
-  beforeUnmount() { this.textareaResizeObserver?.disconnect(); },
+  beforeUnmount() {
+    this.textareaResizeObserver?.disconnect();
+    cancelAnimationFrame(this.textareaResizeFrame);
+  },
   methods: {
     resizeTextarea() {
       const textarea = this.$refs.textarea;

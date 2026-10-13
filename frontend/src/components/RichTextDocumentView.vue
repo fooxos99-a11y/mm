@@ -1,6 +1,9 @@
 <template>
   <!-- eslint-disable vue/no-v-html -->
-  <div class="rich-text-document-view">
+  <div
+    class="rich-text-document-view"
+    :class="{ 'rich-text-document-view--compact': compact }"
+  >
     <div class="rich-text-document-view__surface">
       <div
         class="rich-text-document-view__page ql-editor"
@@ -18,6 +21,7 @@ import { sanitizeRichTextHtml } from '@/utils/documentContent';
 export default {
   name: 'RichTextDocumentView',
   props: {
+    compact: { type: Boolean, default: false },
     value: {
       type: String,
       default: '',
@@ -43,6 +47,7 @@ export default {
 <style scoped>
 .rich-text-document-view {
   width: 100%;
+  min-width: 0;
 }
 
 .rich-text-document-view__surface {
@@ -127,5 +132,21 @@ export default {
     padding: 20px 16px;
     box-shadow: 0 16px 32px rgba(15, 23, 42, 0.1);
   }
+}
+.rich-text-document-view--compact .rich-text-document-view__surface {
+  padding: 0; border: 0; border-radius: 0; background: transparent;
+}
+.rich-text-document-view--compact .rich-text-document-view__page {
+  width: 100%; min-height: 0; padding: 0; border: 0; box-shadow: none; overflow: visible;
+}
+.rich-text-document-view--compact :deep(img) {
+  max-width: 100% !important; height: auto !important; position: static !important;
+  transform: none !important; margin: 12px auto;
+}
+.rich-text-document-view--compact :deep(table) {
+  width: 100% !important; max-width: 100%; table-layout: fixed;
+}
+.rich-text-document-view--compact :deep(td), .rich-text-document-view--compact :deep(th) {
+  overflow-wrap: anywhere; min-width: 0;
 }
 </style>
