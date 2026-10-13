@@ -28,12 +28,14 @@
   align-items: center;
   justify-content: center;
   min-width: 66px;
+  max-width: 100%;
   min-height: 34px;
   padding: 0 14px;
   border-radius: 999px;
   font-size: 0.98rem;
   font-weight: 900;
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .results-view .results-entry__score-pill {
@@ -438,7 +440,6 @@
 .results-view .results-entry--task .results-entry__identity {
   order: -1;
   flex: 1;
-  overflow-wrap: anywhere;
 }
 
 .results-view .results-entry--task .results-entry__actions {

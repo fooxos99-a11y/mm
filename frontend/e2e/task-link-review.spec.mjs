@@ -35,13 +35,28 @@ for (const mode of ['questions', 'document']) {
       await page.locator('.assessment-select:visible').first().locator('.v-field').click();
       await selectOption(page, title, { exact: true });
     };
+    let releaseEditor;
+    if (mode === 'document') {
+      const editorGate = new Promise(resolve => { releaseEditor = resolve; });
+      await page.route('**/assets/RichTextEditor-*.js', async route => {
+        await editorGate;
+        await route.continue();
+      });
+    }
     await page.goto('dashboard?panel=tasks');
     await selectTask();
     const link = 'https://example.com/task-resource?course=arabic#instructions';
     await page.getByRole('textbox', { name: 'الرابط', exact: true }).fill(link);
+    if (mode === 'document') {
+      releaseEditor();
+      await expect(page.locator('.ql-editor')).toBeVisible();
+      await expect(page.getByRole('textbox', { name: 'الرابط', exact: true })).toBeFocused();
+      await expect(page.locator('.ql-editor')).not.toContainText(link);
+    }
     const saved = page.waitForResponse(response => response.url().endsWith(`/courses/${task.id}/questions/sync`) && response.request().method() === 'PUT', { timeout: 20_000 });
     await page.getByRole('button', { name: mode === 'questions' ? 'حفظ الأسئلة' : 'حفظ', exact: true }).click();
     expect((await saved).status()).toBe(200);
+    await expect(page.getByText(mode === 'questions' ? 'تم حفظ الأسئلة بنجاح' : 'تم حفظ إعدادات المهمة بنجاح', { exact: true })).toBeVisible();
     await page.reload();
     await selectTask();
     await expect(page.getByRole('textbox', { name: 'الرابط', exact: true })).toHaveValue(link);
@@ -91,21 +106,28 @@ for (const mode of ['questions', 'document']) {
     await expect(row).not.toContainText(title);
     await expect(row.locator('.results-entry__score-pill')).toHaveCount(0);
     const geometry = await eye.boundingBox();
+    const card = await row.boundingBox();
     expect(geometry.width).toBeGreaterThanOrEqual(44);
     expect(geometry.height).toBeGreaterThanOrEqual(44);
+    expect(geometry.x).toBeGreaterThanOrEqual(card.x);
+    expect(geometry.x + geometry.width).toBeLessThanOrEqual(card.x + card.width);
+    expect(geometry.y).toBeGreaterThanOrEqual(card.y);
+    expect(geometry.y + geometry.height).toBeLessThanOrEqual(card.y + card.height);
     expect(geometry.x).toBeGreaterThanOrEqual(0);
     expect(geometry.x + geometry.width).toBeLessThanOrEqual(page.viewportSize().width);
     const identity = await row.locator('.results-entry__identity').boundingBox();
     expect(Math.min(geometry.y + geometry.height, identity.y + identity.height)).toBeGreaterThan(Math.max(geometry.y, identity.y));
     expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
     await page.screenshot({ path: info.outputPath(`${mode}-results-eye.png`), fullPage: true });
-    await eye.click();
+    if (info.project.use.hasTouch) await eye.tap();
+    else await eye.click();
     const dialog = page.getByRole('dialog').filter({ has: page.locator('.results-answer-card') });
     await expect(dialog.locator(mode === 'document' ? '.rich-text-document-view' : '.results-answer-card__line--student')).toContainText(answer);
     await dialog.getByLabel('درجة الإجابة', { exact: true }).fill('4');
     const scored = page.waitForResponse(response => response.url().includes('/answers/') && response.url().endsWith('/manual-score') && response.request().method() === 'PUT');
     await dialog.getByRole('button', { name: 'حفظ الدرجة', exact: true }).click();
     expect((await scored).ok()).toBeTruthy();
+    await expect(page.getByText('تم حفظ درجة الإجابة', { exact: true })).toBeVisible();
     await expect(dialog.getByLabel('درجة الإجابة', { exact: true })).toHaveValue('4');
     await page.reload();
     await page.getByRole('combobox', { name: 'القسم', exact: true }).locator('..').click();

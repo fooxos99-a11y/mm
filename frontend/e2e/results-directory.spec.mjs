@@ -11,7 +11,10 @@ test('results page searches, paginates and retains full attendance totals withou
   const course = await courseResponse.json();
   const students = [];
   for (let i = 0; i < 21; i++) {
-    const result = await request.post(`${api}/students`, { headers, data: { name: `${prefix} ${String(i).padStart(2, '0')}`, loginId: `${prefix}${i}`, branchId: 'male' } });
+    const result = await request.post(`${api}/students`, { headers, data: {
+      name: `${prefix} ${String(i).padStart(2, '0')}${i === 0 ? ` ${'اسم طويل لاختبار التفاف النص '.repeat(5)}` : ''}`,
+      loginId: `${prefix}${i}${i === 0 ? '1234567890'.repeat(12) : ''}`, branchId: 'male',
+    } });
     expect(result.status()).toBe(201);
     students.push(await result.json());
   }
@@ -33,6 +36,15 @@ test('results page searches, paginates and retains full attendance totals withou
   await page.getByRole('searchbox').fill(prefix);
   await expect(page.locator('.results-pagination')).toContainText('عدد النتائج: 21');
   await expect(page.locator('.results-entry')).toHaveCount(20);
+  const firstRow = page.locator('.results-entry').filter({ hasText: students[0].loginId });
+  const cardBounds = await firstRow.boundingBox();
+  const eyeBounds = await firstRow.locator('.results-entry__preview').boundingBox();
+  expect(cardBounds.x).toBeGreaterThanOrEqual(0);
+  expect(cardBounds.x + cardBounds.width).toBeLessThanOrEqual(page.viewportSize().width);
+  expect(eyeBounds.x).toBeGreaterThanOrEqual(cardBounds.x);
+  expect(eyeBounds.x + eyeBounds.width).toBeLessThanOrEqual(cardBounds.x + cardBounds.width);
+  expect(await firstRow.evaluate(element => element.scrollWidth - element.clientWidth)).toBeLessThanOrEqual(1);
+  await page.screenshot({ path: info.outputPath('results-long-content.png'), fullPage: true });
   await page.getByRole('button', { name: 'الصفحة التالية', exact: true }).click();
   await expect(page.locator('.results-entry')).toHaveCount(1);
   await page.getByRole('combobox', { name: 'نوع البيانات', exact: true }).locator('..').click();

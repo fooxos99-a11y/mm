@@ -183,6 +183,7 @@
 
 .results-view .results-board {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 18px;
 }
 
@@ -279,11 +280,13 @@
 
 .results-view .results-list {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 14px;
 }
 
 .results-view .results-entry {
   display: flex;
+  min-width: 0;
   direction: ltr;
   align-items: center;
   justify-content: space-between;
@@ -297,6 +300,7 @@
 
 .results-view .results-entry__identity {
   min-width: 0;
+  overflow-wrap: anywhere;
   text-align: right;
 }
 
@@ -322,6 +326,9 @@
 
 .results-view .results-entry__actions {
   display: inline-flex;
+  flex-wrap: wrap;
+  min-width: 0;
+  max-width: 100%;
   align-items: center;
   gap: 10px;
 }

@@ -110,7 +110,8 @@ export default {
         return;
       }
 
-      this.editor.clipboard.dangerouslyPasteHTML(value || '');
+      // Loading saved content must not move focus away from another form field.
+      this.editor.setContents(this.editor.clipboard.convert({ html: value || '', text: '' }));
       this.$nextTick(() => {
         this.refreshEditorImages();
         this.updateProtectedBoundary();
