@@ -154,7 +154,7 @@
           inputmode="url"
           class="assessment-input"
           :disabled="!canEdit"
-          placeholder="ألصق رابط يوتيوب أو رابط فيديو مباشر"
+          placeholder="ألصق رابط المهمة"
           @input="$emit('update:task-video-url', $event.target.value)"
         >
       </AppFilterField>

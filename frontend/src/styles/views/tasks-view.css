@@ -389,6 +389,10 @@
   font-weight: 700;
 }
 
+.task-resource-link {
+  margin-bottom: 16px;
+}
+
 .assessment-submit-row {
   display: flex;
   justify-content: flex-end;

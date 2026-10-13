@@ -189,6 +189,7 @@
             v-for="row in displayedRows"
             :key="row.key"
             class="results-entry"
+            :class="{ 'results-entry--task': isTaskResultsSection }"
           >
             <div class="results-entry__actions">
               <template v-if="isAttendanceResultsType">
@@ -212,8 +213,10 @@
                     mdi-paperclip
                   </v-icon>
                 </AppRawButton>
-                <AppRawButton
-                  type="button"
+                <AppIconButton
+                  :label="`عرض إجابة ${row.name}`"
+                  :title="row.submission ? 'عرض الإجابة' : 'لم تُرسل إجابة بعد'"
+                  variant="primary"
                   class="results-entry__preview"
                   :disabled="!row.submission"
                   @click="openResultDialog(row)"
@@ -221,8 +224,9 @@
                   <v-icon small>
                     mdi-eye-outline
                   </v-icon>
-                </AppRawButton>
+                </AppIconButton>
                 <span
+                  v-if="!isTaskResultsSection"
                   class="results-entry__score-pill"
                   :class="{ 'results-entry__score-pill--empty': !row.submission }"
                 >
@@ -237,6 +241,9 @@
               </div>
               <div class="results-entry__login">
                 {{ row.loginId || '---' }}
+              </div>
+              <div v-if="isTaskResultsSection && !selectedTaskResultCourse">
+                {{ row.sectionLabel }}
               </div>
               <div
                 v-if="row.attachment"

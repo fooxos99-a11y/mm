@@ -3,6 +3,7 @@ import AttachmentPreviewDialog from '../../components/tasks/AttachmentPreviewDia
 import { AppButton } from '../../components/ui';
 import AssessmentQuestionAnswer from '../../components/assessment/AssessmentQuestionAnswer.vue';
 import taskMethods from './tasksViewMethods';
+import { resolveTaskResource } from './taskResource.mjs';
 const RichTextEditor = defineAsyncComponent(() => import(
   /* webpackChunkName: "rich-text-editor" */ '@/components/RichTextEditor.vue'
 ));
@@ -94,8 +95,11 @@ export default {
       const draft = this.answers[this.documentQuestion.id];
       return draft === undefined ? this.documentInitialContent : draft;
     },
+    currentTaskResource() {
+      return resolveTaskResource(this.selectedTask?.youtubeUrl);
+    },
     currentTaskVideo() {
-      return this.resolveTaskVideo(this.selectedTask?.youtubeUrl || '');
+      return this.currentTaskResource?.video || null;
     },
     student() {
       return (this.publicSnapshot?.students || []).find((student) => student.loginId === this.studentLoginId) || null;

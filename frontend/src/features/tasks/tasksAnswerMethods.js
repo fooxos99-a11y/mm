@@ -26,51 +26,6 @@ export default {
     this.answers[this.documentQuestion.id] = value;
     this.pageError = '';
   },
-  resolveTaskVideo(rawUrl) {
-    const value = String(rawUrl || '').trim();
-
-    if (!value) {
-      return null;
-    }
-
-    const directVideoPattern = /\.(mp4|webm|ogg)(\?.*)?$/i;
-
-    if (directVideoPattern.test(value)) {
-      return {
-        kind: 'video',
-        src: value,
-      };
-    }
-
-    try {
-      const parsed = new URL(value);
-      const host = parsed.hostname.replace(/^www\./i, '').toLowerCase();
-      let videoId = '';
-
-      if (host === 'youtu.be') {
-        videoId = parsed.pathname.replace(/^\//, '').split('/')[0] || '';
-      } else if (host.endsWith('youtube.com')) {
-        if (parsed.pathname === '/watch') {
-          videoId = parsed.searchParams.get('v') || '';
-        } else if (parsed.pathname.startsWith('/embed/')) {
-          videoId = parsed.pathname.split('/embed/')[1]?.split('/')[0] || '';
-        } else if (parsed.pathname.startsWith('/shorts/')) {
-          videoId = parsed.pathname.split('/shorts/')[1]?.split('/')[0] || '';
-        }
-      }
-
-      if (videoId) {
-        return {
-          kind: 'embed',
-          src: `https://www.youtube-nocookie.com/embed/${videoId}?rel=0`,
-        };
-      }
-    } catch {
-      return null;
-    }
-
-    return null;
-  },
   openAttachmentPreview(attachment) {
     this.previewAttachment = attachment;
     this.previewDialogOpen = true;

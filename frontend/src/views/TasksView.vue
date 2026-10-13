@@ -101,6 +101,20 @@
             </div>
 
             <div
+              v-if="currentTaskResource"
+              class="task-resource-link"
+            >
+              <AppButton
+                :href="currentTaskResource.href"
+                target="_blank"
+                rel="noopener noreferrer"
+                variant="secondary"
+              >
+                فتح رابط المهمة
+              </AppButton>
+            </div>
+
+            <div
               v-if="existingSubmission"
               class="assessment-state assessment-state--success"
             >
