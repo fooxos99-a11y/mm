@@ -129,6 +129,7 @@ export default {
 .public-header--scrolled .public-header__logo--program { filter: brightness(0) saturate(100%) invert(24%) sepia(42%) saturate(1162%) hue-rotate(149deg) brightness(92%) contrast(96%); }
 .public-header__title { display: none; font-size: 1rem; font-weight: 800; line-height: 1.4; }
 .public-header__actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.public-header__actions :deep(.license-programs-menu) { display: flex; align-items: center; }
 .public-header__sections { display: none; align-items: center; justify-content: center; gap: 4px; }
 .public-header__sections a { padding: 12px; color: inherit; font-weight: 700; text-decoration: none; white-space: nowrap; border-radius: 10px; }
 .public-header__sections a:hover { background: rgba(127, 169, 185, 0.16); }

@@ -43,7 +43,7 @@ test('public headers keep the same menu, alignment and touch sizes before and af
     expect(toggleBox.height).toBeGreaterThanOrEqual(44);
     expect(toggleBox.width).toBeGreaterThanOrEqual(44);
     expect(headerBox.y).toBeCloseTo(0, 0);
-    expect(Math.abs(toggleBox.y + toggleBox.height / 2 - (headerBox.y + headerBox.height / 2))).toBeLessThanOrEqual(1);
+    expect(Math.abs(toggleBox.y + toggleBox.height / 2 - (headerBox.y + headerBox.height / 2)), JSON.stringify({ headerBox, toggleBox })).toBeLessThanOrEqual(1);
     for (const scrollY of [0, 450]) {
       await page.evaluate((y) => window.scrollTo(0, y), scrollY);
       if (scrollY) await expect(header).toHaveClass(/public-header--scrolled/);
