@@ -6,13 +6,13 @@
     @close="$emit('close')"
   >
     <div class="archive-dialog archive-dialog--detail">
-      <AppDialogHeader title="سجل الطالب المؤرشف" />
+      <AppDialogHeader :title="detail?.archive?.id === null ? 'سجل المعلم' : 'سجل المعلم المؤرشف'" />
       <AppDialogBody class="archive-dialog__detail-body">
         <div
           v-if="loading"
           class="admin-archive-view__details-empty"
         >
-          جارٍ تحميل بيانات الطالب المؤرشف...
+          جارٍ تحميل السجل...
         </div>
         <div
           v-else-if="detail"
@@ -23,6 +23,18 @@
               <h3 class="admin-archive-view__details-name">
                 {{ detail.student.name }}
               </h3>
+              <div
+                v-if="detail.student.loginCode"
+                class="admin-archive-view__details-meta"
+              >
+                رقم الدخول: <bdi>{{ detail.student.loginCode }}</bdi> · {{ detail.student.branchName }}
+              </div>
+              <div
+                v-if="detail.student.completedParts"
+                class="admin-archive-view__details-meta"
+              >
+                الأجزاء المكتملة: {{ detail.student.completedParts.length }}
+              </div>
               <div
                 v-if="detail.student.note"
                 class="admin-archive-view__details-meta"
@@ -104,12 +116,35 @@
               </div>
             </div>
           </section>
+          <section
+            v-if="detail.courses?.length"
+            class="admin-archive-view__course-records"
+          >
+            <h4>الدورات والمهام</h4>
+            <AppTable
+              :items="detail.courses"
+              :columns="courseColumns"
+            >
+              <template #cell-attendance="{ item }">
+                {{ item.attendance?.isPresent ? 'حاضر' : 'لم يحضر' }}
+              </template>
+              <template #cell-pre="{ item }">
+                {{ item.pre ? (item.pre.manualScore ?? 'مرسل') : 'لم يرسل' }}
+              </template>
+              <template #cell-post="{ item }">
+                {{ item.post ? (item.post.manualScore ?? 'مرسل') : 'لم يرسل' }}
+              </template>
+              <template #cell-tasks="{ item }">
+                {{ item.tasks ? (item.tasks.manualScore ?? 'مرسل') : 'لم يرسل' }}
+              </template>
+            </AppTable>
+          </section>
         </div>
         <div
           v-else
           class="admin-archive-view__details-empty"
         >
-          لا توجد بيانات لعرضها لهذا الطالب المؤرشف.
+          لا توجد بيانات لعرضها لهذا المعلم.
         </div>
       </AppDialogBody>
       <AppDialogFooter class="archive-dialog__footer">
@@ -126,12 +161,12 @@
 
 <script>
 import {
-  AppButton, AppDialog, AppDialogBody, AppDialogFooter, AppDialogHeader,
+  AppButton, AppDialog, AppDialogBody, AppDialogFooter, AppDialogHeader, AppTable,
 } from '../ui';
 
 export default {
   name: 'ArchivedStudentDetailDialog',
-  components: { AppButton, AppDialog, AppDialogBody, AppDialogFooter, AppDialogHeader },
+  components: { AppButton, AppDialog, AppDialogBody, AppDialogFooter, AppDialogHeader, AppTable },
   props: {
     value: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
@@ -144,5 +179,9 @@ export default {
     formatDateTime: { type: Function, required: true },
   },
   emits: ['input', 'close'],
+  data: () => ({ courseColumns: [
+    { key: 'title', label: 'الدورة أو المهمة' }, { key: 'attendance', label: 'الحضور' },
+    { key: 'pre', label: 'الاختبار القبلي' }, { key: 'post', label: 'الاختبار البعدي' }, { key: 'tasks', label: 'المهام' },
+  ] }),
 };
 </script>

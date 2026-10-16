@@ -68,6 +68,8 @@ Route::prefix('management')->middleware(['auth:sanctum', 'password.changed', 'ge
     Route::get('accounts', [DepartmentManagementController::class, 'accounts']);
     Route::put('context', [DepartmentManagementController::class, 'context']);
     Route::get('overview', [DepartmentManagementController::class, 'overview']);
+    Route::get('records', [DepartmentManagementController::class, 'records']);
+    Route::get('students/{studentId}', [DepartmentManagementController::class, 'currentStudent']);
     Route::get('archives', [DepartmentManagementController::class, 'archives']);
     Route::get('archives/search/students', [DepartmentManagementController::class, 'searchStudents']);
     Route::get('archives/{archiveId}', [DepartmentManagementController::class, 'archive']);

@@ -1,141 +1,187 @@
 <template>
-  <main
+  <div
     class="system-management"
     dir="rtl"
   >
-    <header class="system-management__header">
-      <div>
-        <p class="system-management__eyebrow">
-          المدير العام
-        </p>
-        <h1>إدارة النظام</h1>
-        <p>مرحبًا {{ currentUser?.name }}</p>
-      </div>
-      <div class="system-management__actions">
-        <AppButton
-          variant="primary"
-          @click="openDepartment()"
-        >
-          إضافة إدارة
-        </AppButton>
-        <AppButton
-          variant="secondary"
-          @click="signOut"
-        >
-          تسجيل الخروج
-        </AppButton>
-      </div>
-    </header>
-    <AppErrorState
-      v-if="error"
-      :message="error"
-      @retry="load"
-    />
-    <AppLoadingSpinner
-      v-else-if="loading"
-      label="جارٍ تحميل الإدارات"
-    />
-    <template v-else>
-      <section
-        class="system-management__totals"
-        aria-label="ملخص النظام"
+    <AppMobileSidebar
+      :open="menuOpen"
+      label="قائمة إدارة النظام"
+      @close="menuOpen = false"
+    >
+      <router-link
+        :to="{ name: 'practitioner' }"
+        class="system-management__brand"
       >
-        <AppCard
-          v-for="item in totalCards"
-          :key="item.key"
-          :title="item.label"
+        <span class="system-management__brand-mark"><v-icon>mdi-shield-account-outline</v-icon></span>
+        <span>ممارس<small>لوحة المدير العام</small></span>
+      </router-link>
+      <nav
+        class="system-management__navigation"
+        aria-label="أقسام إدارة النظام"
+      >
+        <AppButton
+          v-for="item in navigation"
+          :key="item.id"
+          variant="plain"
+          :class="{ 'is-active': activeSection === item.id }"
+          :aria-current="activeSection === item.id ? 'page' : null"
+          @click="selectSection(item.id)"
         >
-          <strong class="system-management__number">{{ item.value }}</strong>
-        </AppCard>
-      </section>
-      <AppCard title="الإدارات">
-        <AppTable
-          :columns="columns"
-          :items="departments"
-          empty-title="لا توجد إدارات"
-          empty-description="أضف إدارة وعيّن مسؤولها لتبدأ."
+          <v-icon size="20">
+            {{ item.icon }}
+          </v-icon>{{ item.label }}
+        </AppButton>
+      </nav>
+      <div class="system-management__sidebar-account">
+        <span class="system-management__avatar">{{ currentUser?.name?.charAt(0) }}</span>
+        <div><strong>{{ currentUser?.name }}</strong><small>المدير العام</small></div>
+      </div>
+    </AppMobileSidebar>
+    <main class="system-management__main">
+      <header class="system-management__header">
+        <AppIconButton
+          class="system-management__menu-toggle"
+          variant="secondary"
+          aria-label="فتح القائمة"
+          @click="menuOpen = true"
         >
-          <template #cell-manager="{ item }">
-            <div class="system-management__manager">
-              <span>{{ item.manager?.name || 'لم يعيّن مسؤول' }}</span>
-              <small
-                v-if="item.manager"
-                class="system-management__meta"
-              >{{ item.managerTitle }} · <bdi>{{ item.manager.loginCode }}</bdi></small>
-            </div>
-          </template>
-          <template #cell-status="{ item }">
-            {{ item.isActive === false ? 'موقوفة' : 'نشطة' }}
-          </template>
-          <template #cell-actions="{ item }">
-            <div class="system-management__actions">
-              <AppButton
-                variant="secondary"
-                :aria-label="`تعديل ${item.name}`"
-                @click="openDepartment(item)"
-              >
-                تعديل
-              </AppButton>
-              <AppButton
-                variant="primary"
-                :loading="entering === item.id"
-                :disabled="Boolean(entering) || item.isActive === false"
-                :aria-label="`فتح ${item.name}`"
-                @click="enterDepartment(item)"
-              >
-                فتح الإدارة
-              </AppButton>
-            </div>
-          </template>
-        </AppTable>
-      </AppCard>
-      <AppCard title="المؤشرات العامة">
-        <AppSelect
-          v-model="overviewDepartmentId"
-          label="الإدارة"
-          :items="filterOptions"
-          item-text="label"
-          item-value="value"
-          @update:model-value="loadOverview"
-        />
-        <AppErrorState
-          v-if="overviewError"
-          :message="overviewError"
-          @retry="loadOverview"
-        />
-        <AppLoadingSpinner v-else-if="overviewLoading" />
-        <div
-          v-else
+          <v-icon>mdi-menu</v-icon>
+        </AppIconButton>
+        <div>
+          <p class="system-management__eyebrow">
+            {{ navigation.find(item => item.id === activeSection)?.label }}
+          </p>
+          <h1>إدارة النظام</h1>
+        </div>
+        <div class="system-management__actions">
+          <AppButton
+            variant="primary"
+            @click="openDepartment()"
+          >
+            إضافة إدارة
+          </AppButton>
+          <AppButton
+            variant="secondary"
+            @click="signOut"
+          >
+            تسجيل الخروج
+          </AppButton>
+        </div>
+      </header>
+      <AppErrorState
+        v-if="error"
+        :message="error"
+        @retry="load"
+      />
+      <AppLoadingSpinner
+        v-else-if="loading"
+        label="جارٍ تحميل الإدارات"
+      />
+      <template v-else>
+        <section
+          v-if="activeSection === 'overview'"
           class="system-management__totals"
+          aria-label="ملخص النظام"
         >
-          <div
-            v-for="item in overviewCards"
+          <AppCard
+            v-for="item in totalCards"
             :key="item.key"
+            class="system-management__summary-card"
           >
-            <span>{{ item.label }}</span><strong class="system-management__number">{{ item.value }}</strong>
-          </div>
-        </div>
-        <div
-          v-if="!overviewLoading && !overviewError"
-          class="system-management__indicators"
+            <span>{{ item.label }}</span>
+            <strong class="system-management__number">{{ item.value }}</strong>
+            <span class="system-management__summary-icon"><v-icon>{{ item.icon }}</v-icon></span>
+          </AppCard>
+        </section>
+        <AppCard
+          v-if="['overview', 'departments'].includes(activeSection)"
+          title="الإدارات"
         >
-          <div
-            v-for="indicator in overviewIndicators"
-            :key="indicator.key"
-            class="system-management__indicator"
-            :aria-label="`${indicator.label}: ${indicator.display}، ${indicator.meta}`"
+          <AppTable
+            :columns="columns"
+            :items="departments"
+            empty-title="لا توجد إدارات"
+            empty-description="أضف إدارة وعيّن مسؤولها لتبدأ."
           >
-            <AppIndicatorRing
-              :progress="indicator.progress"
-              :display="indicator.display"
-            />
-            <strong>{{ indicator.label }}</strong>
-            <small>{{ indicator.meta }}</small>
+            <template #cell-manager="{ item }">
+              <div class="system-management__manager">
+                <span>{{ item.manager?.name || 'لم يعيّن مسؤول' }}</span>
+                <small
+                  v-if="item.manager"
+                  class="system-management__meta"
+                >{{ item.managerTitle }} · <bdi>{{ item.manager.loginCode }}</bdi></small>
+              </div>
+            </template>
+            <template #cell-status="{ item }">
+              <span
+                class="system-management__status"
+                :class="{ 'is-paused': item.isActive === false }"
+              >{{ item.isActive === false ? 'موقوفة' : 'نشطة' }}</span>
+            </template>
+            <template #cell-actions="{ item }">
+              <div class="system-management__actions">
+                <AppButton
+                  variant="secondary"
+                  :aria-label="`تعديل ${item.name}`"
+                  @click="openDepartment(item)"
+                >
+                  تعديل
+                </AppButton>
+                <AppButton
+                  variant="primary"
+                  :loading="entering === item.id"
+                  :disabled="Boolean(entering) || item.isActive === false"
+                  :aria-label="`فتح ${item.name}`"
+                  @click="enterDepartment(item)"
+                >
+                  فتح الإدارة
+                </AppButton>
+              </div>
+            </template>
+          </AppTable>
+        </AppCard>
+        <AppCard
+          v-if="['overview', 'indicators'].includes(activeSection)"
+          title="مؤشرات الأداء"
+        >
+          <AppSelect
+            v-model="overviewDepartmentId"
+            label="الإدارة"
+            :items="filterOptions"
+            item-text="label"
+            item-value="value"
+            @update:model-value="loadOverview"
+          />
+          <AppErrorState
+            v-if="overviewError"
+            :message="overviewError"
+            @retry="loadOverview"
+          />
+          <AppLoadingSpinner v-else-if="overviewLoading" />
+          <div
+            v-if="!overviewLoading && !overviewError"
+            class="system-management__indicators"
+          >
+            <div
+              v-for="indicator in overviewIndicators"
+              :key="indicator.key"
+              class="system-management__indicator"
+              :aria-label="`${indicator.label}: ${indicator.display}، ${indicator.meta}`"
+            >
+              <AppIndicatorRing
+                :progress="indicator.progress"
+                :display="indicator.display"
+              />
+              <div><strong>{{ indicator.label }}</strong><small>{{ indicator.meta }}</small></div>
+            </div>
           </div>
-        </div>
-      </AppCard>
-      <CentralArchivesPanel :departments="departments" />
-    </template>
+        </AppCard>
+        <CentralArchivesPanel
+          v-if="activeSection === 'archives'"
+          :departments="departments"
+        />
+      </template>
+    </main>
     <AppDialog
       v-model="dialogOpen"
       :persistent="saving"
@@ -233,25 +279,33 @@
         </AppDialogFooter>
       </form>
     </AppDialog>
-  </main>
+  </div>
 </template>
 <script>
 import { mapState } from 'vuex';
-import { AppButton, AppCard, AppDialog, AppDialogBody, AppDialogFooter, AppDialogHeader, AppErrorState, AppIndicatorRing, AppInput, AppLoadingSpinner, AppSelect, AppTable } from '../components/ui';
+import { AppButton, AppCard, AppDialog, AppDialogBody, AppDialogFooter, AppDialogHeader, AppErrorState, AppIconButton, AppIndicatorRing, AppInput, AppLoadingSpinner, AppSelect, AppTable } from '../components/ui';
+import AppMobileSidebar from '../components/ui/AppMobileSidebar.vue';
 import CentralArchivesPanel from '../components/departments/CentralArchivesPanel.vue';
 import { fetchDepartments, fetchManagementOverview, lookupManagementAccount, saveDepartment } from '../services/managementApi';
 import { canAssignDepartmentAccount, createDepartmentForm, departmentFormIsValid } from '../features/departments/departmentModel.mjs';
 const totals = (values = {}) => [
-  { key: 'departments', label: 'الإدارات', value: values.departments ?? 0 },
-  { key: 'users', label: 'الحسابات', value: values.users ?? 0 },
-  { key: 'students', label: 'المعلمون والمعلمات', value: values.students ?? 0 },
-  { key: 'courses', label: 'الدورات', value: values.courses ?? 0 },
-  { key: 'archives', label: 'الدفعات المؤرشفة', value: values.archives ?? 0 },
+  { key: 'departments', label: 'الإدارات', icon: 'mdi-bookshelf', value: values.departments ?? 0 },
+  { key: 'users', label: 'الحسابات', icon: 'mdi-account-group-outline', value: values.users ?? 0 },
+  { key: 'students', label: 'المعلمون والمعلمات', icon: 'mdi-school-outline', value: values.students ?? 0 },
+  { key: 'courses', label: 'الدورات', icon: 'mdi-book-open-page-variant-outline', value: values.courses ?? 0 },
+  { key: 'archives', label: 'الدفعات المؤرشفة', icon: 'mdi-archive-outline', value: values.archives ?? 0 },
 ];
 export default {
   name: 'SystemManagementView',
-  components: { AppButton, AppCard, AppDialog, AppDialogBody, AppDialogFooter, AppDialogHeader, AppErrorState, AppIndicatorRing, AppInput, AppLoadingSpinner, AppSelect, AppTable, CentralArchivesPanel },
+  components: { AppButton, AppCard, AppDialog, AppDialogBody, AppDialogFooter, AppDialogHeader, AppErrorState, AppIconButton, AppIndicatorRing, AppInput, AppLoadingSpinner, AppSelect, AppTable, AppMobileSidebar, CentralArchivesPanel },
   data: () => ({
+    activeSection: 'overview', menuOpen: false,
+    navigation: [
+      { id: 'overview', label: 'نظرة عامة', icon: 'mdi-view-dashboard-outline' },
+      { id: 'departments', label: 'الإدارات', icon: 'mdi-bookshelf' },
+      { id: 'indicators', label: 'مؤشرات الأداء', icon: 'mdi-chart-box-outline' },
+      { id: 'archives', label: 'الأرشيف المركزي', icon: 'mdi-archive-outline' },
+    ],
     departments: [], loading: false, error: '', overview: {}, overallTotals: {}, overviewDepartmentId: '', overviewLoading: false, overviewError: '',
     dialogOpen: false, editingId: null, form: createDepartmentForm(), candidate: null, lookingUp: false, lookupError: '', saving: false, saveError: '', fieldErrors: {}, entering: '', lookupGeneration: 0, overviewGeneration: 0,
     columns: [{ key: 'name', label: 'الإدارة' }, { key: 'manager', label: 'المسؤول' }, { key: 'status', label: 'الحالة' }, { key: 'actions', label: 'الإجراءات' }],
@@ -269,6 +323,7 @@ export default {
   },
   created() { this.load(); },
   methods: {
+    selectSection(id) { this.activeSection = id; this.menuOpen = false; },
     async load() {
       this.loading = true; this.error = '';
       try {

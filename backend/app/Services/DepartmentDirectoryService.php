@@ -53,6 +53,51 @@ final class DepartmentDirectoryService
         return DepartmentContext::run($this->archiveDepartment($archiveId), fn () => $this->archives->show($archiveId));
     }
 
+    public function records(array $filters): array
+    {
+        $batch = $filters['batch'] ?? 'current';
+        $query = DB::table('students')->join('departments', 'departments.id', '=', 'students.department_id')
+            ->leftJoin('branches', 'branches.id', '=', 'students.branch_id')
+            ->leftJoin('archives', function ($join): void {
+                $join->on('archives.id', '=', 'students.archive_id')->on('archives.department_id', '=', 'students.department_id');
+            })
+            ->where(fn ($q) => $q->whereNull('students.archive_id')->orWhereNotNull('archives.id'))
+            ->when($filters['departmentId'] ?? null, fn ($q, $id) => $q->where('students.department_id', $id))
+            ->when($batch === 'current', fn ($q) => $q->whereNull('students.archive_id'))
+            ->when($batch === 'archived', fn ($q) => $q->whereNotNull('students.archive_id'))
+            ->when($filters['archiveId'] ?? null, fn ($q, $id) => $q->where('students.archive_id', $id))
+            ->when($filters['search'] ?? null, fn ($q, $search) => $q->where(fn ($q) => $q
+                ->where('students.full_name', 'like', '%'.$search.'%')
+                ->orWhere('students.login_code', 'like', '%'.$search.'%')
+                ->orWhere('students.archived_login_code', 'like', '%'.$search.'%')));
+        $total = (clone $query)->count();
+        $perPage = 25;
+        $lastPage = max(1, (int) ceil($total / $perPage));
+        $page = min((int) ($filters['page'] ?? 1), $lastPage);
+        $students = $query->orderBy('students.full_name')->orderBy('students.id')->forPage($page, $perPage)
+            ->get(['students.id', 'students.full_name', 'students.archive_id', 'students.department_id as departmentId',
+                'students.login_code', 'students.archived_login_code', 'archives.name as archive_name',
+                'branches.name as branchName', 'departments.name as departmentName'])
+            ->map(function ($student) {
+                $student->login_code = $student->archived_login_code ?: $student->login_code;
+                unset($student->archived_login_code);
+
+                return $student;
+            });
+
+        return ['students' => $students, 'pagination' => [
+            'total' => $total, 'page' => $page, 'perPage' => $perPage, 'lastPage' => $lastPage,
+        ]];
+    }
+
+    public function currentStudent(string $studentId): array
+    {
+        $id = DB::table('students')->where('id', $studentId)->whereNull('archive_id')->value('department_id');
+        abort_unless($id, 404);
+
+        return DepartmentContext::run($id, fn () => $this->studentDetails->get(null, $studentId));
+    }
+
     public function searchStudents(string $name, ?string $departmentId = null): Collection
     {
         return $this->archivedStudents($departmentId)

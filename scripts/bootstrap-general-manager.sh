@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-if [[ $# -ne 3 || ! "$2" =~ ^[0-9]{4,100}$ || ! "$1" =~ ^[A-Za-z0-9+/=]+$ || ! "$3" =~ ^[A-Za-z0-9+/=]+$ ]]; then
+if [[ $# -lt 3 || $# -gt 4 || ! "$2" =~ ^[0-9]{4,100}$ || ! "$1" =~ ^[A-Za-z0-9+/=]+$ || ! "$3" =~ ^[A-Za-z0-9+/=]+$ || ( -n "${4:-}" && ! "${4:-}" =~ ^[0-9]{4,100}$ ) ]]; then
   echo "Invalid account bootstrap arguments." >&2
   exit 64
 fi
@@ -20,10 +20,12 @@ fi
 
 # The inherited standard input is the password pipe. It is never read into a shell
 # variable, written to disk, or included in the process arguments.
+account_options=()
+if [[ -n "${4:-}" ]]; then account_options+=("--replace-login=$4"); fi
 if sudo -n -u www-data true 2>/dev/null; then
   sudo -n -u www-data php "$deploy_root/current/backend/artisan" \
-    departments:create-general-manager --password-stdin --no-interaction -- "$2" "$manager_name"
+    departments:create-general-manager --password-stdin --no-interaction "${account_options[@]}" -- "$2" "$manager_name"
 else
   php "$deploy_root/current/backend/artisan" \
-    departments:create-general-manager --password-stdin --no-interaction -- "$2" "$manager_name"
+    departments:create-general-manager --password-stdin --no-interaction "${account_options[@]}" -- "$2" "$manager_name"
 fi

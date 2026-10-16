@@ -92,5 +92,13 @@ test('live department assignment, teacher login and global number uniqueness sha
   const defaultData = await defaultSnapshot.json();
   expect(defaultData.courses.some(course => course.title === courseTitle)).toBe(false);
   expect(defaultData.students.some(student => student.loginId === '0924')).toBe(false);
+  await loginAs(page, 'e2e-general-manager', rolePassword, 'management');
+  if (page.viewportSize().width <= 1024) await page.getByRole('button', { name: 'فتح القائمة', exact: true }).click();
+  await page.getByRole('navigation', { name: 'أقسام إدارة النظام' }).getByRole('button', { name: 'الأرشيف المركزي', exact: true }).click();
+  await page.getByLabel('الاسم أو رقم الدخول').fill('0924');
+  await page.getByRole('button', { name: 'بحث', exact: true }).click();
+  await expect(page.getByText('معلم الإدارة الجديدة', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'عرض سجل معلم الإدارة الجديدة', exact: true }).click();
+  await expect(page.getByRole('dialog')).toContainText(courseTitle);
   expect(runtimeErrors).toEqual([]);
 });

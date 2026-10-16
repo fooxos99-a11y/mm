@@ -23,6 +23,8 @@ test('public headers keep the same menu, alignment and touch sizes before and af
   for (const [path, current] of [['', 'الرئيسية'], ['practitioner', 'رخصة ممارس']]) {
     await page.goto(path, { waitUntil: 'domcontentloaded' });
     const header = page.locator('.public-header');
+    await expect(header).toHaveCSS('color', 'rgb(8, 56, 74)');
+    await expect(header).toHaveCSS('background-color', 'rgba(255, 255, 255, 0.97)');
     const toggle = header.getByRole('button', { name: 'البرامج والرخص', exact: true });
     await expect(toggle).toBeVisible();
     await expect(header.getByRole('img', { name: 'شعار الجمعية', exact: true })).toBeVisible();

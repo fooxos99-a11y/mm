@@ -10,9 +10,11 @@ use Illuminate\Support\Collection;
 
 final class ArchivedStudentDetailService
 {
-    public function get(string $archiveId, string $studentId): array
+    public function get(?string $archiveId, string $studentId): array
     {
-        Archive::findOrFail($archiveId);
+        if ($archiveId !== null) {
+            Archive::findOrFail($archiveId);
+        }
 
         $student = Student::query()
             ->where('archive_id', $archiveId)
@@ -36,11 +38,14 @@ final class ArchivedStudentDetailService
         return [
             'archive' => [
                 'id' => $archiveId,
-                'name' => Archive::query()->whereKey($archiveId)->value('name'),
+                'name' => $archiveId === null ? 'الدفعة الحالية' : Archive::query()->whereKey($archiveId)->value('name'),
             ],
             'student' => [
                 'id' => $student->id,
                 'name' => $student->full_name,
+                'loginCode' => $student->archived_login_code ?: $student->login_code,
+                'branchName' => $student->branch?->name,
+                'completedParts' => $student->parts->pluck('part_number')->sort()->values()->all(),
                 'note' => $student->note,
                 'createdAt' => optional($student->created_at)?->toISOString(),
                 'registrationProfile' => $this->registrationProfile($student->registrationRequest),
@@ -57,7 +62,7 @@ final class ArchivedStudentDetailService
         ];
     }
 
-    private function courseRecords(string $archiveId, Collection $courses, Collection $loginCodes): array
+    private function courseRecords(?string $archiveId, Collection $courses, Collection $loginCodes): array
     {
         $courseIds = $courses->pluck('id')->filter()->values();
         if ($courseIds->isEmpty()) {
@@ -191,7 +196,7 @@ final class ArchivedStudentDetailService
         ];
     }
 
-    private function finalExam(string $archiveId, Collection $loginCodes): ?array
+    private function finalExam(?string $archiveId, Collection $loginCodes): ?array
     {
         $submission = DB::table('final_exam_submissions')
             ->where('archive_id', $archiveId)

@@ -7,15 +7,15 @@
         :items="departmentOptions"
         item-text="label"
         item-value="value"
-        @update:model-value="loadArchives"
+        @update:model-value="resetRecords"
       />
       <AppSelect
-        v-model="archiveId"
+        v-model="batch"
         label="الدفعة"
         :items="archiveOptions"
         item-text="label"
         item-value="value"
-        @update:model-value="loadArchive"
+        @update:model-value="resetRecords"
       />
       <form
         class="central-archives__search"
@@ -23,8 +23,9 @@
       >
         <AppInput
           v-model.trim="name"
-          label="اسم المعلم أو المعلمة"
+          label="الاسم أو رقم الدخول"
           type="search"
+          maxlength="255"
         />
         <AppButton
           native-type="submit"
@@ -35,38 +36,64 @@
         </AppButton>
       </form>
     </div>
+    <p
+      v-if="catalogError"
+      role="alert"
+      class="central-archives__notice"
+    >
+      {{ catalogError }} <AppButton
+        variant="plain"
+        @click="loadArchives"
+      >
+        إعادة المحاولة
+      </AppButton>
+    </p>
+    <div
+      class="central-archives__summary"
+      role="status"
+    >
+      {{ loading ? 'جارٍ تحميل السجلات...' : pagination.total + ' سجل · ' + batchLabel }}
+    </div>
     <AppErrorState
       v-if="error"
       :message="error"
-      @retry="loadArchives"
+      @retry="loadRecords"
     />
     <AppTable
       v-else
       :items="students"
       :columns="columns"
       :loading="loading"
-      empty-title="لا توجد سجلات"
-      empty-description="اختر دفعة أو ابحث بالاسم في الأرشيف."
+      empty-title="لا توجد سجلات لهذه التصفية"
+      empty-description="غيّر الإدارة أو الدفعة أو كلمة البحث."
     >
       <template #cell-name="{ item }">
-        {{ item.full_name || item.name }}
+        <strong>{{ item.full_name }}</strong>
       </template>
-      <template #cell-department="{ item }">
-        {{ item.departmentName || archiveDepartmentName }}
+      <template #cell-login_code="{ item }">
+        <bdi>{{ item.login_code }}</bdi>
       </template>
       <template #cell-archive="{ item }">
-        {{ item.archive_name || selectedArchiveName }}
+        <span
+          class="central-archives__batch"
+          :class="{ 'is-current': !item.archive_id }"
+        >{{ item.archive_name || 'الدفعة الحالية' }}</span>
       </template>
       <template #cell-actions="{ item }">
         <AppButton
           variant="secondary"
-          :aria-label="`عرض سجل ${item.full_name || item.name}`"
+          :aria-label="'عرض سجل ' + item.full_name"
           @click="openStudent(item)"
         >
           عرض السجل
         </AppButton>
       </template>
     </AppTable>
+    <AppPagination
+      :model-value="page"
+      :page-count="pagination.lastPage"
+      @update:model-value="changePage"
+    />
     <ArchivedStudentDetailDialog
       :value="detailOpen"
       :loading="detailLoading"
@@ -83,63 +110,76 @@
   </AppCard>
 </template>
 <script>
-import { AppButton, AppCard, AppErrorState, AppInput, AppSelect, AppTable } from '../ui';
+import { AppButton, AppCard, AppErrorState, AppInput, AppPagination, AppSelect, AppTable } from '../ui';
 import ArchivedStudentDetailDialog from '../archive/ArchivedStudentDetailDialog.vue';
 import presentation from '../../features/archive/archivePresentation';
-import { fetchManagementArchive, fetchManagementArchives, fetchManagementArchivedStudent, searchManagementArchivedStudents } from '../../services/managementApi';
+import { fetchManagementArchives, fetchManagementRecords, fetchManagementArchivedStudent, fetchManagementCurrentStudent } from '../../services/managementApi';
 export default {
   name: 'CentralArchivesPanel',
-  components: { AppButton, AppCard, AppErrorState, AppInput, AppSelect, AppTable, ArchivedStudentDetailDialog },
+  components: { AppButton, AppCard, AppErrorState, AppInput, AppPagination, AppSelect, AppTable, ArchivedStudentDetailDialog },
   props: { departments: { type: Array, default: () => [] } },
-  data: () => ({ departmentId: '', archiveId: '', archives: [], students: [], name: '', error: '', loading: false, detail: null, detailOpen: false, detailLoading: false, requestGeneration: 0,
-    columns: [{ key: 'name', label: 'الاسم' }, { key: 'department', label: 'الإدارة' }, { key: 'archive', label: 'الدفعة' }, { key: 'actions', label: 'السجل' }],
+  data: () => ({
+    departmentId: '', batch: 'current', archives: [], students: [], name: '', appliedSearch: '', page: 1,
+    pagination: { total: 0, lastPage: 1 }, error: '', catalogError: '', loading: false,
+    detail: null, detailOpen: false, detailLoading: false, requestGeneration: 0, detailGeneration: 0,
+    columns: [{ key: 'name', label: 'الاسم' }, { key: 'login_code', label: 'رقم الدخول' }, { key: 'departmentName', label: 'الإدارة' }, { key: 'branchName', label: 'الفرع' }, { key: 'archive', label: 'الدفعة' }, { key: 'actions', label: 'السجل' }],
   }),
   computed: {
     departmentOptions() { return [{ label: 'جميع الإدارات', value: '' }, ...this.departments.map(d => ({ label: d.name, value: d.id }))]; },
-    archiveOptions() { return [{ label: 'اختر دفعة', value: '' }, ...this.archives.map(a => ({ label: `${a.name} · ${a.departmentName || ''}`, value: a.id }))]; },
-    selectedArchiveName() { return this.archives.find(a => a.id === this.archiveId)?.name || ''; },
-    archiveDepartmentName() { return this.archives.find(a => a.id === this.archiveId)?.departmentName || ''; },
+    archiveOptions() { return [{ label: 'الدفعة الحالية', value: 'current' }, { label: 'جميع الدفعات', value: 'all' }, { label: 'الدفعات المؤرشفة', value: 'archived' }, ...this.archives.map(a => ({ label: a.name + ' · ' + (a.departmentName || ''), value: a.id }))]; },
+    batchLabel() { return this.archiveOptions.find(a => a.value === this.batch)?.label || ''; },
   },
-  created() { this.loadArchives(); },
+  created() { this.loadArchives(); this.loadRecords(); },
+  beforeUnmount() { this.requestGeneration += 1; this.detailGeneration += 1; },
   methods: {
     ...presentation,
     async loadArchives() {
-      const generation = ++this.requestGeneration;
-      this.loading = true; this.error = ''; this.students = []; this.archiveId = ''; this.name = ''; this.detailOpen = false;
-      try { const payload = await fetchManagementArchives(this.departmentId); if (generation === this.requestGeneration) this.archives = payload?.archives || payload || []; }
-      catch (error) { if (generation === this.requestGeneration) this.error = error?.response?.data?.message || 'تعذر تحميل الأرشيف.'; }
-      finally { if (generation === this.requestGeneration) this.loading = false; }
+      this.catalogError = '';
+      try { const payload = await fetchManagementArchives(); this.archives = payload?.archives || []; }
+      catch { this.catalogError = 'تعذر تحميل قائمة الدفعات السابقة.'; }
     },
-    async loadArchive() {
+    resetRecords() { this.page = 1; this.loadRecords(); },
+    search() { this.appliedSearch = this.name; this.resetRecords(); },
+    changePage(page) { if (!this.loading) { this.page = page; this.loadRecords(); } },
+    async loadRecords() {
       const generation = ++this.requestGeneration;
-      this.students = []; this.error = ''; this.name = ''; this.detailOpen = false;
-      if (!this.archiveId) return;
-      this.loading = true;
-      try { const payload = await fetchManagementArchive(this.archiveId); if (generation === this.requestGeneration) this.students = payload?.students || []; }
-      catch (error) { if (generation === this.requestGeneration) this.error = error?.response?.data?.message || 'تعذر تحميل الدفعة.'; }
-      finally { if (generation === this.requestGeneration) this.loading = false; }
-    },
-    async search() {
-      if (!this.name) return this.loadArchive();
-      const generation = ++this.requestGeneration;
-      this.loading = true; this.error = ''; this.students = []; this.detailOpen = false;
-      try { const payload = await searchManagementArchivedStudents(this.name, this.departmentId); if (generation === this.requestGeneration) this.students = payload?.students || payload || []; }
-      catch (error) { if (generation === this.requestGeneration) this.error = error?.response?.data?.message || 'تعذر البحث في الأرشيف.'; }
+      this.detailGeneration += 1; this.detailLoading = false; this.detailOpen = false;
+      this.loading = true; this.error = ''; this.students = [];
+      const namedBatch = ['current', 'all', 'archived'].includes(this.batch);
+      const params = { batch: namedBatch ? this.batch : 'archived', page: this.page };
+      if (!namedBatch) params.archiveId = this.batch;
+      if (this.departmentId) params.departmentId = this.departmentId;
+      if (this.appliedSearch) params.search = this.appliedSearch;
+      try {
+        const payload = await fetchManagementRecords(params);
+        if (generation !== this.requestGeneration) return;
+        this.students = payload?.students || [];
+        this.pagination = payload?.pagination || { total: this.students.length, lastPage: 1 };
+        this.page = this.pagination.page || this.page;
+      } catch (error) { if (generation === this.requestGeneration) this.error = error?.response?.data?.message || 'تعذر تحميل السجلات.'; }
       finally { if (generation === this.requestGeneration) this.loading = false; }
     },
     async openStudent(student) {
       if (this.detailLoading) return;
+      const generation = ++this.detailGeneration;
       this.detail = null; this.detailOpen = true; this.detailLoading = true;
-      try { this.detail = await fetchManagementArchivedStudent(student.archive_id || this.archiveId, student.id); }
-      catch (error) { this.detailOpen = false; this.$toast.error(error?.response?.data?.message || 'تعذر تحميل سجل المعلم.'); }
-      finally { this.detailLoading = false; }
+      try {
+        const detail = student.archive_id ? await fetchManagementArchivedStudent(student.archive_id, student.id) : await fetchManagementCurrentStudent(student.id);
+        if (generation === this.detailGeneration) this.detail = detail;
+      } catch (error) {
+        if (generation === this.detailGeneration) { this.detailOpen = false; this.$toast.error(error?.response?.data?.message || 'تعذر تحميل سجل المعلم.'); }
+      } finally { if (generation === this.detailGeneration) this.detailLoading = false; }
     },
   },
 };
 </script>
 <style scoped>
-.central-archives__filters { display: grid; gap: var(--app-space-4); margin-block-end: var(--app-space-4); }
-.central-archives__search { display: grid; gap: var(--app-space-3); align-items: start; }
+.central-archives__filters { display: grid; gap: 14px; margin-block-end: 18px; }
+.central-archives__search { display: grid; gap: 10px; align-items: start; }
+.central-archives__summary { padding-block: 0 16px; color: #536b7b; font-size: .85rem; }
+.central-archives__batch { display: inline-block; border-radius: 6px; padding: 4px 9px; background: #f1f4f6; color: #536b7b; font-size: .8rem; }
+.central-archives__batch.is-current { background: #eaf5f8; color: #1c718a; }
+.central-archives__notice { color: #8c6340; }
 @media (min-width: 768px) { .central-archives__filters { grid-template-columns: 1fr 1fr 2fr; } .central-archives__search { grid-template-columns: minmax(0, 1fr) auto; } }
 </style>
 <style>

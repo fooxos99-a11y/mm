@@ -17,9 +17,10 @@ final class CreateGeneralManager extends Command
     protected $signature = 'departments:create-general-manager
         {loginCode : New globally unique account number}
         {name : Full name of the new general manager}
+        {--replace-login= : Existing general manager number to update instead of creating an account}
         {--password-stdin : Read the password from standard input without displaying it}';
 
-    protected $description = 'Create a new general manager account using private password input';
+    protected $description = 'Create or update an explicitly identified general manager using private password input';
 
     public function handle(): int
     {
@@ -39,7 +40,7 @@ final class CreateGeneralManager extends Command
             }
 
             $this->createUser($loginCode, $name, $password);
-            $this->info('تم إنشاء حساب المدير العام.');
+            $this->info('حُفظ حساب المدير العام.');
 
             return self::SUCCESS;
         } catch (Throwable) {
@@ -78,11 +79,31 @@ final class CreateGeneralManager extends Command
     private function createUser(string $loginCode, string $name, #[\SensitiveParameter] string $password): void
     {
         DB::transaction(function () use ($loginCode, $name, $password): void {
+            $existing = null;
+            if (filled($this->option('replace-login'))) {
+                $existing = User::query()->where('login_code', trim((string) $this->option('replace-login')))->lockForUpdate()->first();
+                if (! $existing || $existing->role !== 'super_admin' || ! $existing->is_active || $existing->department_id !== null) {
+                    throw new RuntimeException('The existing general manager is unavailable.');
+                }
+            }
+            if ($existing && $existing->login_code === $loginCode) {
+                $existing->forceFill(['password' => Hash::make($password), 'must_change_password' => false])->save();
+                $existing->invalidateAuthentication();
+
+                return;
+            }
             if (DB::table('users')->where('login_code', $loginCode)->exists()
                 || DB::table('reserved_login_codes')->where('login_code', $loginCode)->exists()
                 || DB::table('students')->where(fn ($query) => $query->where('login_code', $loginCode)
                     ->orWhere('archived_login_code', $loginCode))->exists()) {
                 throw new RuntimeException('Account number is unavailable.');
+            }
+
+            if ($existing) {
+                $existing->forceFill(['login_code' => $loginCode, 'password' => Hash::make($password), 'must_change_password' => false])->save();
+                $existing->invalidateAuthentication();
+
+                return;
             }
 
             User::query()->create([

@@ -68,6 +68,22 @@ final class DepartmentManagementController extends Controller
         return response()->json($this->directory->archive($archiveId));
     }
 
+    public function records(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'departmentId' => ['nullable', 'uuid'], 'archiveId' => ['nullable', 'uuid'],
+            'batch' => ['sometimes', 'in:current,archived,all'],
+            'search' => ['nullable', 'string', 'max:255'], 'page' => ['sometimes', 'integer', 'min:1', 'max:100000'],
+        ]);
+
+        return response()->json($this->directory->records($data));
+    }
+
+    public function currentStudent(string $studentId): JsonResponse
+    {
+        return response()->json($this->directory->currentStudent($studentId));
+    }
+
     public function searchStudents(Request $request): JsonResponse
     {
         $data = $request->validate(['name' => ['required', 'string', 'max:255'], 'departmentId' => ['nullable', 'uuid']]);

@@ -22,7 +22,7 @@
             v-if="programLogo"
             :src="$publicAsset('اللوقو-شفاف.webp')"
             alt="شعار برنامج رخصة ممارس"
-            class="public-header__logo"
+            class="public-header__logo public-header__logo--program"
           >
         </span>
         <span class="public-header__title">{{ brandTitle }}</span>
@@ -88,7 +88,9 @@ export default {
 
 <style scoped>
 .public-header {
-  --public-header-color: #fff;
+  --public-header-color: #08384a;
+  background: rgba(255, 255, 255, 0.97);
+  border-bottom: 1px solid #dce9ed;
   position: fixed;
   inset: 0 0 auto;
   z-index: 30;
@@ -121,8 +123,10 @@ export default {
   text-decoration: none;
 }
 .public-header__logos { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-.public-header__logo { display: block; width: auto; height: 40px; object-fit: contain; filter: brightness(0) invert(1); }
+.public-header__logo { display: block; width: auto; height: 40px; object-fit: contain; }
 .public-header--scrolled .public-header__logo { filter: none; }
+.public-header__logo--program,
+.public-header--scrolled .public-header__logo--program { filter: brightness(0) saturate(100%) invert(24%) sepia(42%) saturate(1162%) hue-rotate(149deg) brightness(92%) contrast(96%); }
 .public-header__title { display: none; font-size: 1rem; font-weight: 800; line-height: 1.4; }
 .public-header__actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 .public-header__sections { display: none; align-items: center; justify-content: center; gap: 4px; }

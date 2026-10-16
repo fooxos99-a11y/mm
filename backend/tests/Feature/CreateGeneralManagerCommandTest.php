@@ -27,15 +27,19 @@ final class CreateGeneralManagerCommandTest extends TestCase
         parent::tearDown();
     }
 
-    private function command(string $loginCode, string $name, string $password, bool $stdin = true): CommandTester
+    private function command(string $loginCode, string $name, string $password, bool $stdin = true, ?string $replace = null): CommandTester
     {
         $command = app(CreateGeneralManager::class);
         $command->setLaravel($this->app);
         $tester = new CommandTester($command);
         $tester->setInputs([$password]);
-        $tester->execute([
+        $options = [
             'loginCode' => $loginCode, 'name' => $name, '--password-stdin' => $stdin,
-        ], ['interactive' => false]);
+        ];
+        if ($replace !== null) {
+            $options['--replace-login'] = $replace;
+        }
+        $tester->execute($options, ['interactive' => false]);
 
         return $tester;
     }
@@ -101,5 +105,62 @@ final class CreateGeneralManagerCommandTest extends TestCase
         ])->assertCreated()->assertJsonPath('user.role', 'unassigned');
         $this->assertDatabaseHas('users', ['login_code' => '54835', 'role' => 'unassigned']);
         $this->assertDatabaseMissing('users', ['login_code' => '54835', 'role' => 'super_admin']);
+    }
+
+    public function test_update_preserves_general_manager_identity_and_reserves_both_numbers_and_revokes_authentication(): void
+    {
+        $user = User::factory()->create(['role' => 'super_admin', 'department_id' => null, 'login_code' => '54836']);
+        $name = $user->full_name;
+        $user->createToken('old-browser');
+        DB::table('sessions')->insert(['id' => 'old-manager-session', 'user_id' => $user->id, 'payload' => '', 'last_activity' => time()]);
+        $tester = $this->command('54837', 'اسم لا يستبدل الاسم القائم', '24681357', true, '54836');
+        $this->assertSame(0, $tester->getStatusCode());
+        $this->assertSame('54837', $user->fresh()->login_code);
+        $this->assertSame($name, $user->fresh()->full_name);
+        $this->assertTrue(Hash::check('24681357', $user->fresh()->password));
+        $this->assertDatabaseMissing('sessions', ['user_id' => $user->id]);
+        $this->assertDatabaseCount('personal_access_tokens', 0);
+        foreach (['54836', '54837'] as $number) {
+            $this->assertDatabaseHas('reserved_login_codes', ['login_code' => $number, 'user_id' => $user->id]);
+        }
+        $this->assertDatabaseMissing('users', ['login_code' => '54836']);
+        $this->assertStringNotContainsString('24681357', $tester->getDisplay());
+    }
+
+    public function test_update_cannot_take_another_accounts_number_or_historical_reservation(): void
+    {
+        $user = User::factory()->create(['role' => 'super_admin', 'department_id' => null, 'login_code' => '54838']);
+        User::factory()->create(['login_code' => '54839']);
+        DB::table('reserved_login_codes')->insert(['login_code' => '54840', 'user_id' => null, 'department_id' => DepartmentContext::DEFAULT_ID, 'created_at' => now()]);
+        $before = $user->fresh()->getAttributes();
+        foreach (['54839', '54840'] as $number) {
+            $tester = $this->command($number, 'تحديث الحساب المرفوض', '24681357', true, '54838');
+            $this->assertSame(1, $tester->getStatusCode());
+            $this->assertSame($before, $user->fresh()->getAttributes());
+            $this->assertStringNotContainsString('24681357', $tester->getDisplay());
+        }
+    }
+
+    public function test_update_never_promotes_a_non_general_manager_or_creates_a_missing_source(): void
+    {
+        $user = User::factory()->create(['role' => 'admin', 'login_code' => '54841']);
+        $before = $user->fresh()->getAttributes();
+        foreach (['54841', '54842'] as $oldNumber) {
+            $tester = $this->command('54843', 'محاولة تحديث مرفوضة', '24681357', true, $oldNumber);
+            $this->assertSame(1, $tester->getStatusCode());
+            $this->assertDatabaseMissing('users', ['login_code' => '54843']);
+        }
+        $this->assertSame($before, $user->fresh()->getAttributes());
+    }
+
+    public function test_password_can_be_rotated_without_changing_the_same_general_manager_number(): void
+    {
+        $user = User::factory()->create(['role' => 'super_admin', 'department_id' => null, 'login_code' => '54844']);
+        $user->createToken('old-token');
+        $tester = $this->command('54844', 'اسم الحساب العام', '24681357', true, '54844');
+        $this->assertSame(0, $tester->getStatusCode());
+        $this->assertTrue(Hash::check('24681357', $user->fresh()->password));
+        $this->assertDatabaseCount('personal_access_tokens', 0);
+        $this->assertDatabaseCount('users', 1);
     }
 }
