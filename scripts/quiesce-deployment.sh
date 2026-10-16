@@ -31,8 +31,17 @@ wait_for_exit() {
 }
 
 queue_command="$(systemctl show momars-queue --property=ExecStart --value)"
+queue_working_directory="$(systemctl show momars-queue --property=WorkingDirectory --value)"
+if [[ "$queue_working_directory" != "$deploy_root/current/backend" ]]; then
+  echo "Queue service must use the current release backend as its working directory." >&2
+  exit 78
+fi
 if [[ "$queue_command" != *queue:work* || "$queue_command" == *--force* ]]; then
   echo "Queue service must use maintenance-aware queue:work without --force." >&2
+  exit 78
+fi
+if [[ "$queue_command" != *' artisan queue:work'* && "$queue_command" != *" $deploy_root/current/backend/artisan queue:work"* ]]; then
+  echo "Queue executable must use relative artisan or the current release artisan path." >&2
   exit 78
 fi
 queue_pid="$(systemctl show momars-queue --property=MainPID --value)"

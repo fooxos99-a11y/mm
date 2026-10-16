@@ -46,7 +46,12 @@ const fixture = () => {
   shellFile(bin, 'flock', '[[ "${FAIL_LOCK:-}" != 1 ]]');
   shellFile(bin, 'composer', 'echo composer >> "$EVENT_LOG"');
   shellFile(bin, 'systemctl', `case "$1" in
-  show) if [[ "$*" == *ExecStart* ]]; then echo '/usr/bin/php artisan queue:work --sleep=3';
+  show) if [[ "$*" == *WorkingDirectory* ]]; then
+      if [[ "\${FAIL_STAGE:-}" == wrong-working-directory ]]; then echo "\${TEST_SHARED%/shared}/releases/previous1/backend";
+      else echo "\${TEST_SHARED%/shared}/current/backend"; fi
+    elif [[ "$*" == *ExecStart* ]]; then
+      if [[ "\${FAIL_STAGE:-}" == old-queue-executable ]]; then echo "/usr/bin/php \${TEST_SHARED%/shared}/releases/previous1/backend/artisan queue:work --sleep=3";
+      else echo '/usr/bin/php artisan queue:work --sleep=3'; fi
     elif [[ "$2" == momars-queue ]]; then echo 0; else echo "$TEST_FPM_MASTER"; fi ;;
   reload)
     echo fpm-reload >> "$EVENT_LOG"
@@ -147,6 +152,23 @@ const releaseFixture = () => {
   return data;
 };
 const linuxOnly = { skip: process.platform === 'win32' || !bash ? 'Atomic Linux symlink behavior runs on the Ubuntu release runner.' : false };
+
+for (const stage of ['wrong-working-directory', 'old-queue-executable']) {
+  test(`queue ${stage} stops deployment before backup or migration`, linuxOnly, () => {
+    const data = releaseFixture();
+    try {
+      const result = run('scripts/deploy-release.sh', [data.deployment, data.archive, 'release123'], data, { env: { FAIL_STAGE: stage } });
+      assert.equal(result.status, 78, result.stderr);
+      const events = readFileSync(data.events, 'utf8').trim().split('\n');
+      assert.equal(events.includes('backup'), false);
+      assert.equal(events.includes('migrate'), false);
+      assert.equal(existsSync(path.join(data.shared, 'storage/framework/down')), false);
+      assert.equal(existsSync(path.join(data.shared, 'deployment-recovery-required')), false);
+    } finally {
+      cleanup(data.root);
+    }
+  });
+}
 
 test('release verifies snapshots before migration and secures legacy media before activation', linuxOnly, () => {
   const data = releaseFixture();
