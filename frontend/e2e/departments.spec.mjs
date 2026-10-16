@@ -120,8 +120,8 @@ test('registered accounts wait for assignment and cannot access system managemen
 });
 
 
-test('responsible account registration reports a globally occupied login number', async ({ page }) => {
-  await mockSystem(page, null);
+test('general manager alone creates responsible accounts and sees globally occupied numbers', async ({ page }) => {
+  await mockSystem(page);
   const submissions = [];
   await page.route('**/api/auth/register-account', async route => {
     const payload = route.request().postDataJSON();
@@ -129,7 +129,9 @@ test('responsible account registration reports a globally occupied login number'
     if (payload.loginCode === '1483') return route.fulfill({ status: 422, json: { message: 'رقم الدخول مستخدم مسبقًا.', errors: { loginCode: ['رقم الدخول مستخدم مسبقًا.'] } } });
     return route.fulfill({ status: 201, json: { message: 'حسابك جاهز.' } });
   });
-  await page.goto('register-account');
+  await page.goto('management');
+  await page.getByRole('link', { name: 'إنشاء حساب مسؤول', exact: true }).click();
+  await expect(page).toHaveURL(/\/register-account$/);
   await page.getByLabel('الاسم الكامل', { exact: true }).fill('مسؤول الإدارة الجديدة');
   await page.getByLabel('رقم الدخول').fill('1483');
   await page.locator('input[autocomplete="new-password"]').nth(0).fill('12345678');
@@ -138,7 +140,32 @@ test('responsible account registration reports a globally occupied login number'
   await expect(page.locator('.account-entry__error')).toContainText('رقم الدخول مستخدم مسبقًا.');
   await page.getByLabel('رقم الدخول').fill('1484');
   await page.getByRole('button', { name: 'إنشاء الحساب', exact: true }).click();
-  await expect(page).toHaveURL(/\/login$/);
+  await expect(page).toHaveURL(/\/management$/);
+  await expect(page.getByRole('heading', { name: 'إدارة النظام', exact: true })).toBeVisible();
   expect(submissions[1]).toMatchObject({ loginCode: '1484', name: 'مسؤول الإدارة الجديدة' });
   await expectNoOverflow(page);
+});
+
+test('guests see a blue login logo with no responsible registration and cannot open its URL', async ({ page }, info) => {
+  await mockSystem(page, null);
+  await page.goto('login');
+  await expect(page.getByRole('heading', { name: 'الدخول إلى الحساب' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'إنشاء حساب مسؤول' })).toHaveCount(0);
+  const programLogo = page.getByRole('img', { name: 'شعار البرنامج', exact: true });
+  await expect(programLogo).toHaveCSS('filter', /brightness\(0\).*invert\(0\.24\)/);
+  await expect.poll(() => programLogo.evaluate(image => image.complete && image.naturalWidth > 0)).toBe(true);
+  await expectNoOverflow(page);
+  const artifactDirectory = path.resolve('../.deploy/departments');
+  mkdirSync(artifactDirectory, { recursive: true });
+  await page.screenshot({ path: path.join(artifactDirectory, `${info.project.name}-restricted-login.png`), fullPage: true });
+  await page.goto('register-account');
+  await expect(page).toHaveURL(/\/login\?redirect=.*register-account/);
+  await expect(page.getByLabel('الاسم الكامل', { exact: true })).toHaveCount(0);
+});
+
+test('department administrators cannot open responsible account creation', async ({ page }) => {
+  await mockSystem(page, { id: 2, name: 'مسؤول الإدارة', role: 'admin', departmentId: 'd1', mustChangePassword: false });
+  await page.goto('register-account');
+  await expect(page).toHaveURL(/\/dashboard$/);
+  await expect(page.getByRole('heading', { name: 'إنشاء حساب مسؤول' })).toHaveCount(0);
 });

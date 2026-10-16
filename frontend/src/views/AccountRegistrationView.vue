@@ -4,7 +4,7 @@
     dir="rtl"
   >
     <AppCard title="إنشاء حساب مسؤول">
-      <p>أنشئ حسابك، ثم أعطِ رقم الدخول للمدير العام لربطك بإدارة.</p>
+      <p>أنشئ حساب المسؤول، ثم اربطه بإدارة من لوحة المدير العام.</p>
       <form
         class="account-entry__form"
         @submit.prevent="submit"
@@ -57,9 +57,13 @@
         >
           إنشاء الحساب
         </AppButton>
-        <router-link :to="{ name: 'login' }">
-          لديك حساب؟ تسجيل الدخول
-        </router-link>
+        <AppButton
+          variant="secondary"
+          :to="{ name: 'system-management' }"
+          :disabled="saving"
+        >
+          العودة إلى إدارة النظام
+        </AppButton>
       </form>
     </AppCard>
   </main>
@@ -85,8 +89,8 @@ export default {
       this.saving = true;
       try {
         await registerAccount(this.form);
-        this.$toast.success('حسابك جاهز. سجّل الدخول لمتابعة ربطه بإدارة.');
-        await this.$router.replace({ name: 'login' });
+        this.$toast.success('أُنشئ حساب المسؤول. يمكنك الآن ربطه بإدارة.');
+        await this.$router.replace({ name: 'system-management' });
       } catch (error) {
         this.errors = Object.fromEntries(Object.entries(error?.response?.data?.errors || {}).map(([key, values]) => [key, values[0]]));
         this.error = error?.response?.data?.message || 'تعذر إنشاء الحساب. حاول مرة أخرى.';

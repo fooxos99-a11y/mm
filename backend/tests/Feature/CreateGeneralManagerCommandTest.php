@@ -102,9 +102,8 @@ final class CreateGeneralManagerCommandTest extends TestCase
         $this->postJson('/api/auth/register-account', [
             'name' => 'حساب التسجيل العادي', 'loginCode' => '54835', 'password' => '13572468',
             'passwordConfirmation' => '13572468', 'role' => 'super_admin', 'is_active' => true,
-        ])->assertCreated()->assertJsonPath('user.role', 'unassigned');
-        $this->assertDatabaseHas('users', ['login_code' => '54835', 'role' => 'unassigned']);
-        $this->assertDatabaseMissing('users', ['login_code' => '54835', 'role' => 'super_admin']);
+        ])->assertUnauthorized();
+        $this->assertDatabaseMissing('users', ['login_code' => '54835']);
     }
 
     public function test_update_preserves_general_manager_identity_and_reserves_both_numbers_and_revokes_authentication(): void

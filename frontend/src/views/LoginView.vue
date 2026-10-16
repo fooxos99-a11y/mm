@@ -15,7 +15,7 @@
           <img
             :src="$publicAsset('اللوقو-شفاف.webp')"
             alt="شعار البرنامج"
-            class="login-panel__logo"
+            class="login-panel__logo login-panel__logo--program"
           >
         </router-link>
 
@@ -67,12 +67,6 @@
             دخول
           </AppButton>
         </v-form>
-        <router-link
-          :to="{ name: 'account-registration' }"
-          class="login-panel__register"
-        >
-          إنشاء حساب مسؤول
-        </router-link>
       </section>
     </div>
   </div>
@@ -168,6 +162,10 @@ export default {
   object-fit: contain;
 }
 
+.login-panel__logo--program {
+  filter: brightness(0) saturate(100%) invert(24%) sepia(42%) saturate(1162%) hue-rotate(149deg) brightness(92%) contrast(96%);
+}
+
 .login-panel__copy {
   text-align: center;
   color: #063041;
@@ -210,5 +208,4 @@ export default {
   border-radius: 16px;
   font-weight: 800;
 }
-.login-panel__register { display: block; margin-block-start: 20px; text-align: center; color: #063041; }
 </style>

@@ -84,7 +84,7 @@ const router = createRouter({
       path: '/register-account',
       name: 'account-registration',
       component: () => import('../views/AccountRegistrationView.vue'),
-      meta: { guestOnly: true },
+      meta: { requiresAuth: true, requiresSystemAdmin: true },
     },
     {
       path: '/account-assignment',

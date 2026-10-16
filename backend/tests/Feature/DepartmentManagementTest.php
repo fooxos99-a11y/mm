@@ -20,8 +20,10 @@ final class DepartmentManagementTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_registered_account_waits_for_assignment_and_cannot_choose_its_own_role(): void
+    public function test_general_manager_creates_an_account_that_waits_for_assignment_and_cannot_choose_its_own_role(): void
     {
+        $general = User::factory()->create(['role' => 'super_admin', 'department_id' => null]);
+        Sanctum::actingAs($general);
         $response = $this->postJson('/api/auth/register-account', [
             'name' => 'مسؤول إدارة جديد', 'loginCode' => '1483', 'password' => '12345678',
             'passwordConfirmation' => '12345678', 'role' => 'super_admin',
@@ -33,6 +35,49 @@ final class DepartmentManagementTest extends TestCase
         $this->getJson('/api/management/departments')->assertForbidden();
         $this->withHeader('X-Department-Id', DepartmentContext::DEFAULT_ID)->getJson('/api/dashboard/snapshot')
             ->assertForbidden();
+    }
+
+    public function test_guests_cannot_create_responsible_accounts(): void
+    {
+        $this->postJson('/api/auth/register-account', [
+            'name' => 'مسؤول غير مصرح له', 'loginCode' => '1483', 'password' => '12345678',
+            'passwordConfirmation' => '12345678',
+        ])->assertUnauthorized();
+        $this->assertDatabaseMissing('users', ['login_code' => '1483']);
+        $this->assertDatabaseMissing('reserved_login_codes', ['login_code' => '1483']);
+    }
+
+    public function test_only_the_general_manager_can_create_responsible_accounts(): void
+    {
+        foreach (['admin', 'male_manager', 'female_manager', 'trainee', 'reciter', 'student', 'unassigned'] as $role) {
+            $user = User::factory()->create([
+                'role' => $role, 'department_id' => $role === 'unassigned' ? null : DepartmentContext::DEFAULT_ID,
+            ]);
+            Sanctum::actingAs($user);
+            $this->postJson('/api/auth/register-account', [
+                'name' => 'مسؤول غير مصرح له', 'loginCode' => '1483', 'password' => '12345678',
+                'passwordConfirmation' => '12345678', 'role' => 'super_admin',
+            ])->assertForbidden();
+            $this->assertDatabaseMissing('users', ['login_code' => '1483']);
+            $this->assertDatabaseMissing('reserved_login_codes', ['login_code' => '1483']);
+        }
+    }
+
+    public function test_general_manager_cannot_reuse_existing_or_reserved_responsible_numbers(): void
+    {
+        $general = User::factory()->create(['role' => 'super_admin', 'department_id' => null]);
+        User::factory()->create(['login_code' => '1483']);
+        DB::table('reserved_login_codes')->insert([
+            'login_code' => '1484', 'user_id' => null, 'department_id' => null, 'created_at' => now(),
+        ]);
+        Sanctum::actingAs($general);
+        foreach (['1483', '1484'] as $loginCode) {
+            $this->postJson('/api/auth/register-account', [
+                'name' => 'مسؤول برقم مكرر', 'loginCode' => $loginCode, 'password' => '12345678',
+                'passwordConfirmation' => '12345678',
+            ])->assertUnprocessable()->assertJsonValidationErrors('loginCode');
+        }
+        $this->assertDatabaseMissing('users', ['login_code' => '1484']);
     }
 
     public function test_general_manager_assigns_existing_account_and_preserves_custom_title(): void

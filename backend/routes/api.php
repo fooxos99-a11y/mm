@@ -32,7 +32,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('health/operations', OperationalHealthController::class)->middleware('throttle:30,1');
 
 Route::prefix('auth')->group(function () {
-    Route::post('register-account', [AuthController::class, 'register'])->middleware('throttle:5,1');
+    Route::post('register-account', [AuthController::class, 'register'])
+        ->middleware(['auth:sanctum', 'password.changed', 'general.manager', 'throttle:5,1']);
     Route::post('login', [AuthController::class, 'login']);
     Route::get('session', [AuthController::class, 'session']);
 

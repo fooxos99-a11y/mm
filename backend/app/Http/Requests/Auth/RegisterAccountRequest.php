@@ -9,7 +9,7 @@ final class RegisterAccountRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user('sanctum') === null;
+        return $this->user('sanctum')?->role === 'super_admin';
     }
 
     public function rules(): array

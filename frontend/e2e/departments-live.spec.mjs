@@ -32,13 +32,20 @@ test('live department assignment, teacher login and global number uniqueness sha
   page.on('pageerror', error => runtimeErrors.push(error.message));
   const name = `إدارة التدريب ${info.project.name}`;
   await loginAs(page, 'e2e-general-manager', rolePassword, 'management');
+  await page.getByRole('link', { name: 'إنشاء حساب مسؤول', exact: true }).click();
+  await page.getByLabel('الاسم الكامل', { exact: true }).fill('مسؤول الإدارة الجديدة');
+  await page.getByLabel('رقم الدخول').fill('14830');
+  await page.locator('input[autocomplete="new-password"]').nth(0).fill(rolePassword);
+  await page.locator('input[autocomplete="new-password"]').nth(1).fill(rolePassword);
+  await page.getByRole('button', { name: 'إنشاء الحساب', exact: true }).click();
+  await expect(page).toHaveURL(/\/management$/);
   await page.getByRole('button', { name: 'إضافة إدارة', exact: true }).click();
   const dialog = page.getByRole('dialog');
   await dialog.getByLabel('اسم الإدارة', { exact: true }).fill(name);
   await dialog.getByLabel('مسمى المسؤول').fill('مدير التدريب');
-  await dialog.getByLabel('رقم دخول المسؤول').fill('e2ependingmanager');
+  await dialog.getByLabel('رقم دخول المسؤول').fill('14830');
   await dialog.getByRole('button', { name: 'التحقق من الحساب' }).click();
-  await expect(dialog.getByRole('status')).toContainText('e2ependingmanager');
+  await expect(dialog.getByRole('status')).toContainText('14830');
   await dialog.getByRole('button', { name: 'حفظ الإدارة' }).click();
   await expect(dialog).not.toBeVisible();
   await expect(page.getByRole('button', { name: `فتح ${name}`, exact: true })).toBeVisible();
@@ -50,7 +57,7 @@ test('live department assignment, teacher login and global number uniqueness sha
   await page.locator('.dashboard-sidebar').getByRole('button', { name: 'إدارة النظام', exact: true }).click();
   await expect(page).toHaveURL(/\/management$/);
 
-  await loginAs(page, 'e2ependingmanager', rolePassword, 'dashboard');
+  await loginAs(page, '14830', rolePassword, 'dashboard');
   await expect(page.locator('.department-context')).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'إدارة النظام', exact: true })).toHaveCount(0);
   const headers = await apiHeaders(page);

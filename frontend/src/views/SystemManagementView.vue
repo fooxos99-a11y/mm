@@ -55,6 +55,12 @@
         </div>
         <div class="system-management__actions">
           <AppButton
+            variant="secondary"
+            :to="{ name: 'account-registration' }"
+          >
+            إنشاء حساب مسؤول
+          </AppButton>
+          <AppButton
             variant="primary"
             @click="openDepartment()"
           >
@@ -349,7 +355,7 @@ export default {
         const payload = await lookupManagementAccount(this.form.managerLoginCode);
         if (generation !== this.lookupGeneration) return;
         this.candidate = payload?.accounts?.[0] || payload?.account || (Array.isArray(payload) ? payload[0] : null);
-        if (!this.candidate) this.lookupError = 'لم نجد حسابًا بهذا الرقم. اطلب من المسؤول إنشاء حساب أولًا.';
+        if (!this.candidate) this.lookupError = 'لم نجد حسابًا بهذا الرقم. أنشئ حساب المسؤول أولًا من لوحة إدارة النظام.';
       } catch (error) { if (generation === this.lookupGeneration) this.lookupError = error?.response?.data?.message || 'تعذر التحقق من الحساب.'; }
       finally { this.lookingUp = false; }
     },
