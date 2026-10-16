@@ -39,9 +39,27 @@ final class DepartmentManagementService
                 'is_active' => $data['isActive'] ?? true,
             ]);
             $manager = User::query()->where('login_code', trim($data['managerLoginCode']))->lockForUpdate()->first();
-            if (! $manager || ! $manager->is_active || ! in_array($manager->role, ['unassigned', 'admin'], true)) {
+            if (! empty($data['managerPassword'])) {
+                if ($manager) {
+                    throw ValidationException::withMessages(['managerLoginCode' => 'رقم الدخول مستخدم مسبقًا.']);
+                }
+                try {
+                    $manager = app(AccountRegistrationService::class)->register([
+                        'name' => trim($data['managerTitle']), 'loginCode' => trim($data['managerLoginCode']),
+                        'password' => $data['managerPassword'],
+                    ]);
+                } catch (ValidationException $exception) {
+                    throw ValidationException::withMessages([
+                        'managerLoginCode' => $exception->errors()['loginCode'] ?? $exception->errors()['login_code'] ?? ['تعذر إنشاء حساب المسؤول.'],
+                    ]);
+                }
+            }
+            if (! $manager) {
+                throw ValidationException::withMessages(['managerPassword' => 'أدخل رمز دخول المسؤول لإنشاء حسابه.']);
+            }
+            if (! $manager->is_active || ! in_array($manager->role, ['unassigned', 'admin'], true)) {
                 throw ValidationException::withMessages([
-                    'managerLoginCode' => 'اختر حسابًا مسجّلًا ومتاحًا لتعيينه مسؤولًا للإدارة.',
+                    'managerLoginCode' => 'هذا الحساب غير متاح لتعيينه مسؤولًا للإدارة.',
                 ]);
             }
             if ($manager->department_id && ($isNew || $manager->department_id !== $department->id)) {

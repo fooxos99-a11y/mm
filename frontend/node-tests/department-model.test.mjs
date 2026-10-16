@@ -1,31 +1,27 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { canAssignDepartmentAccount, createDepartmentForm, departmentFormIsValid, isSystemAdministrator } from '../src/features/departments/departmentModel.mjs';
+import { createDepartmentForm, departmentFormIsValid, isSystemAdministrator } from '../src/features/departments/departmentModel.mjs';
 import { publicDepartmentParams, setAuthenticatedDepartment } from '../src/services/departmentContext.js';
 import { resolveUserHomeLabel, resolveUserHomeRoute } from '../src/utils/authRoutes.js';
 
 test('department forms isolate defaults and preserve the selected responsible account', () => {
   const first = createDepartmentForm();
   first.name = 'changed';
-  assert.deepEqual(createDepartmentForm(), { name: '', managerTitle: 'مسؤول الإدارة', managerLoginCode: '', isActive: true });
-  assert.deepEqual(createDepartmentForm({ name: 'أ', managerTitle: 'مدير التدريب', manager: { loginCode: '1483' }, isActive: false }), { name: 'أ', managerTitle: 'مدير التدريب', managerLoginCode: '1483', isActive: false });
+  assert.deepEqual(createDepartmentForm(), { name: '', managerTitle: '', managerLoginCode: '', managerPassword: '', isActive: true });
+  assert.deepEqual(createDepartmentForm({ name: 'أ', managerTitle: 'مدير التدريب', manager: { loginCode: '1483' }, isActive: false }), { name: 'أ', managerTitle: 'مدير التدريب', managerLoginCode: '1483', managerPassword: '', isActive: false });
 });
 
-test('only an available verified account can become the department manager', () => {
+test('creating a department requires new credentials while editing preserves the same account', () => {
   const form = { name: 'الإدارة الأولى', managerTitle: 'مدير التدريب', managerLoginCode: '1483' };
-  const candidate = { id: 1, name: 'مسؤول الإدارة', loginCode: '1483', role: 'unassigned' };
-  assert.equal(departmentFormIsValid(form, candidate), true);
-  assert.equal(departmentFormIsValid(form, { ...candidate, departmentId: 'other' }, 'current'), false);
-  assert.equal(departmentFormIsValid(form, { ...candidate, departmentId: 'current' }, 'current'), true);
-  assert.equal(departmentFormIsValid({ ...form, managerLoginCode: '1484' }, candidate), false);
-  assert.equal(departmentFormIsValid({ ...form, name: '' }, candidate), false);
-  assert.equal(departmentFormIsValid({ ...form, managerTitle: '' }, candidate), false);
-  assert.equal(departmentFormIsValid({ ...form, managerLoginCode: '' }, candidate), false);
+  assert.equal(departmentFormIsValid(form), false);
+  assert.equal(departmentFormIsValid({ ...form, managerPassword: '12345678' }), true);
+  assert.equal(departmentFormIsValid({ ...form, managerPassword: '1234' }), false);
+  assert.equal(departmentFormIsValid(form, '1483'), true);
+  assert.equal(departmentFormIsValid({ ...form, managerLoginCode: '1484' }, '1483'), false);
+  assert.equal(departmentFormIsValid({ ...form, name: '' }, '1483'), false);
+  assert.equal(departmentFormIsValid({ ...form, managerTitle: '' }, '1483'), false);
+  assert.equal(departmentFormIsValid({ ...form, managerLoginCode: '' }, '1483'), false);
   assert.equal(departmentFormIsValid(), false);
-  assert.equal(departmentFormIsValid({}, {}), false);
-  assert.equal(canAssignDepartmentAccount({ ...candidate, role: 'super_admin' }), false);
-  assert.equal(canAssignDepartmentAccount(null), false);
-  assert.equal(canAssignDepartmentAccount({ departmentId: 'other' }), false);
 });
 
 test('one login routes each system role to its own workspace', () => {

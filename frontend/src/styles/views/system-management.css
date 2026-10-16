@@ -37,9 +37,6 @@
 .system-management__indicator strong { display: block; font-size: .85rem; line-height: 1.6; }
 .system-management__indicator small { display: block; margin-top: 5px; color: #536b7b; font-size: .72rem; }
 .system-management__form { display: grid; gap: 16px; }
-.system-management__lookup { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: start; }
-.system-management__account { margin: 0; padding: 14px; border: 1px solid #dce7ed; border-radius: 10px; overflow-wrap: anywhere; }
-.system-management__account span { display: block; margin-block-start: 6px; }
 .system-management__error { margin: 0; color: var(--app-danger); }
 @media (max-width: 1250px) { .system-management__indicators { grid-template-columns: repeat(2, minmax(0, 1fr)); } .system-management__totals { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 1024px) {
@@ -58,5 +55,4 @@
   .system-management__summary-icon { width: 26px; height: 26px; inset-inline-end: 10px; }
   .system-management__number { font-size: 1.8rem; }
   .system-management__indicators { grid-template-columns: minmax(0, 1fr); }
-  .system-management__lookup { grid-template-columns: minmax(0, 1fr); }
 }

@@ -55,12 +55,6 @@
         </div>
         <div class="system-management__actions">
           <AppButton
-            variant="secondary"
-            :to="{ name: 'account-registration' }"
-          >
-            إنشاء حساب مسؤول
-          </AppButton>
-          <AppButton
             variant="primary"
             @click="openDepartment()"
           >
@@ -192,8 +186,13 @@
       v-model="dialogOpen"
       :persistent="saving"
       max-width="620"
+      scrollable
+      @close="form.managerPassword = ''"
     >
-      <form @submit.prevent="submitDepartment">
+      <form
+        class="app-dialog"
+        @submit.prevent="submitDepartment"
+      >
         <AppDialogHeader
           :title="editingId ? 'تعديل الإدارة' : 'إضافة إدارة'"
           closable
@@ -212,45 +211,29 @@
             v-model.trim="form.managerTitle"
             label="مسمى المسؤول"
             required
-            maxlength="120"
+            maxlength="100"
             :error="fieldErrors.managerTitle"
-            hint="مثل مدير التدريب أو مدير النمو المهني"
           />
-          <div class="system-management__lookup">
-            <AppInput
-              v-model.trim="form.managerLoginCode"
-              label="رقم دخول المسؤول"
-              autocomplete="off"
-              inputmode="numeric"
-              required
-              :error="fieldErrors.managerLoginCode"
-              hint="أدخل رقم حساب مسجّل في الموقع"
-              @update:model-value="clearAccountLookup"
-            />
-            <AppButton
-              variant="secondary"
-              :loading="lookingUp"
-              :disabled="!form.managerLoginCode || saving"
-              @click="lookupAccount"
-            >
-              التحقق من الحساب
-            </AppButton>
-          </div>
-          <p
-            v-if="candidate"
-            class="system-management__account"
-            role="status"
-          >
-            {{ candidate.name }} · <bdi>{{ candidate.loginCode }}</bdi>
-            <span v-if="!candidateAllowed">الحساب مرتبط بإدارة أخرى، أو لا يمكن تعيينه مسؤولًا.</span>
-          </p>
-          <p
-            v-if="lookupError"
-            role="alert"
-            class="system-management__error"
-          >
-            {{ lookupError }}
-          </p>
+          <AppInput
+            v-model.trim="form.managerLoginCode"
+            label="رقم الدخول"
+            autocomplete="off"
+            inputmode="numeric"
+            required
+            maxlength="100"
+            :error="fieldErrors.managerLoginCode"
+            @update:model-value="form.managerPassword = ''"
+          />
+          <AppPasswordField
+            v-if="needsManagerPassword"
+            v-model="form.managerPassword"
+            label="رمز الدخول"
+            autocomplete="new-password"
+            inputmode="numeric"
+            :error-messages="managerPasswordError"
+            hide-details="auto"
+            required
+          />
           <AppSelect
             v-model="form.isActive"
             label="حالة الإدارة"
@@ -289,11 +272,12 @@
 </template>
 <script>
 import { mapState } from 'vuex';
-import { AppButton, AppCard, AppDialog, AppDialogBody, AppDialogFooter, AppDialogHeader, AppErrorState, AppIconButton, AppIndicatorRing, AppInput, AppLoadingSpinner, AppSelect, AppTable } from '../components/ui';
+import { AppButton, AppCard, AppDialog, AppDialogBody, AppDialogFooter, AppDialogHeader, AppErrorState, AppIconButton, AppIndicatorRing, AppInput, AppLoadingSpinner, AppPasswordField, AppSelect, AppTable } from '../components/ui';
 import AppMobileSidebar from '../components/ui/AppMobileSidebar.vue';
 import CentralArchivesPanel from '../components/departments/CentralArchivesPanel.vue';
-import { fetchDepartments, fetchManagementOverview, lookupManagementAccount, saveDepartment } from '../services/managementApi';
-import { canAssignDepartmentAccount, createDepartmentForm, departmentFormIsValid } from '../features/departments/departmentModel.mjs';
+import { fetchDepartments, fetchManagementOverview, saveDepartment } from '../services/managementApi';
+import { createDepartmentForm, departmentFormIsValid } from '../features/departments/departmentModel.mjs';
+import { passwordMeetsPolicy } from '../utils/passwordPolicy.mjs';
 const totals = (values = {}) => [
   { key: 'departments', label: 'الإدارات', icon: 'mdi-bookshelf', value: values.departments ?? 0 },
   { key: 'users', label: 'الحسابات', icon: 'mdi-account-group-outline', value: values.users ?? 0 },
@@ -303,7 +287,7 @@ const totals = (values = {}) => [
 ];
 export default {
   name: 'SystemManagementView',
-  components: { AppButton, AppCard, AppDialog, AppDialogBody, AppDialogFooter, AppDialogHeader, AppErrorState, AppIconButton, AppIndicatorRing, AppInput, AppLoadingSpinner, AppSelect, AppTable, AppMobileSidebar, CentralArchivesPanel },
+  components: { AppButton, AppCard, AppDialog, AppDialogBody, AppDialogFooter, AppDialogHeader, AppErrorState, AppIconButton, AppIndicatorRing, AppInput, AppLoadingSpinner, AppPasswordField, AppSelect, AppTable, AppMobileSidebar, CentralArchivesPanel },
   data: () => ({
     activeSection: 'overview', menuOpen: false,
     navigation: [
@@ -313,7 +297,7 @@ export default {
       { id: 'archives', label: 'الأرشيف المركزي', icon: 'mdi-archive-outline' },
     ],
     departments: [], loading: false, error: '', overview: {}, overallTotals: {}, overviewDepartmentId: '', overviewLoading: false, overviewError: '',
-    dialogOpen: false, editingId: null, form: createDepartmentForm(), candidate: null, lookingUp: false, lookupError: '', saving: false, saveError: '', fieldErrors: {}, entering: '', lookupGeneration: 0, overviewGeneration: 0,
+    dialogOpen: false, editingId: null, form: createDepartmentForm(), originalManagerLoginCode: '', saving: false, saveError: '', fieldErrors: {}, entering: '', overviewGeneration: 0,
     columns: [{ key: 'name', label: 'الإدارة' }, { key: 'manager', label: 'المسؤول' }, { key: 'status', label: 'الحالة' }, { key: 'actions', label: 'الإجراءات' }],
     statusOptions: [{ label: 'نشطة', value: true }, { label: 'موقوفة', value: false }],
   }),
@@ -321,11 +305,11 @@ export default {
     ...mapState(['currentUser']),
     totalCards() { return totals(this.overallTotals); },
     selectedOverview() { return this.overviewDepartmentId ? this.overview?.departments?.find(d => String(d.id) === String(this.overviewDepartmentId)) : this.overview; },
-    overviewCards() { return totals(this.overviewDepartmentId ? { ...this.selectedOverview?.counts, departments: this.selectedOverview ? 1 : 0 } : this.overview?.totals); },
     overviewIndicators() { return this.selectedOverview?.indicators || []; },
     filterOptions() { return [{ label: 'جميع الإدارات', value: '' }, ...this.departments.map(d => ({ label: d.name, value: d.id }))]; },
-    candidateAllowed() { return canAssignDepartmentAccount(this.candidate, this.editingId); },
-    formValid() { return departmentFormIsValid(this.form, this.candidate, this.editingId); },
+    needsManagerPassword() { return !this.originalManagerLoginCode || this.form.managerLoginCode !== this.originalManagerLoginCode; },
+    managerPasswordError() { return this.fieldErrors.managerPassword || (this.form.managerPassword && !passwordMeetsPolicy(this.form.managerPassword) ? 'الرمز يجب أن يتكوّن من 8 أرقام.' : ''); },
+    formValid() { return departmentFormIsValid(this.form, this.originalManagerLoginCode); },
   },
   created() { this.load(); },
   methods: {
@@ -343,27 +327,15 @@ export default {
     openDepartment(department) {
       this.editingId = department?.id || null;
       this.form = createDepartmentForm(department);
-      this.candidate = department?.manager ? { ...department.manager, role: 'admin', departmentId: department.id } : null;
-      this.saveError = ''; this.fieldErrors = {}; this.lookupError = ''; this.dialogOpen = true;
-      this.lookupGeneration += 1;
-    },
-    clearAccountLookup() { this.lookupGeneration += 1; this.candidate = null; this.lookupError = ''; },
-    async lookupAccount() {
-      const generation = ++this.lookupGeneration;
-      this.lookingUp = true; this.lookupError = ''; this.candidate = null;
-      try {
-        const payload = await lookupManagementAccount(this.form.managerLoginCode);
-        if (generation !== this.lookupGeneration) return;
-        this.candidate = payload?.accounts?.[0] || payload?.account || (Array.isArray(payload) ? payload[0] : null);
-        if (!this.candidate) this.lookupError = 'لم نجد حسابًا بهذا الرقم. أنشئ حساب المسؤول أولًا من لوحة إدارة النظام.';
-      } catch (error) { if (generation === this.lookupGeneration) this.lookupError = error?.response?.data?.message || 'تعذر التحقق من الحساب.'; }
-      finally { this.lookingUp = false; }
+      this.originalManagerLoginCode = department?.manager?.loginCode || '';
+      this.saveError = ''; this.fieldErrors = {}; this.dialogOpen = true;
     },
     async submitDepartment() {
       if (!this.formValid || this.saving) return;
       this.saving = true; this.saveError = ''; this.fieldErrors = {};
       try {
-        await saveDepartment(this.editingId, this.form);
+        await saveDepartment(this.editingId, { ...this.form, managerPassword: this.needsManagerPassword ? this.form.managerPassword : undefined });
+        this.form.managerPassword = '';
         this.dialogOpen = false;
         this.$toast.success('حُفظت الإدارة.');
         await this.load();

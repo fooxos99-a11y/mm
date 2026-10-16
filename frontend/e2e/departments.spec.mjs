@@ -31,6 +31,7 @@ async function mockSystem(page, initialUser = systemUser) {
     if (endpoint.startsWith('/management/departments') && ['POST', 'PUT'].includes(request.method())) {
       const payload = request.postDataJSON();
       writes.push(payload);
+      if (payload.managerLoginCode === '1002') return route.fulfill({ status: 422, json: { message: 'رقم الدخول مستخدم مسبقًا.', errors: { managerLoginCode: ['رقم الدخول مستخدم مسبقًا.'] } } });
       const id = endpoint.split('/')[3] || 'd2';
       const department = { ...payload, id, manager: { id: 2, name: 'مسؤول الإدارة الجديدة', loginCode: payload.managerLoginCode } };
       const index = departments.findIndex(item => item.id === id);
@@ -57,7 +58,7 @@ async function expectNoOverflow(page) {
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
 }
 
-test('general manager creates an independent department using a verified registered account', async ({ page }, info) => {
+test('general manager creates a department and its responsible account in one solid dialog', async ({ page }, info) => {
   const runtimeErrors = [];
   page.on('pageerror', error => runtimeErrors.push(error.message));
   const state = await mockSystem(page);
@@ -65,26 +66,38 @@ test('general manager creates an independent department using a verified registe
   await expect(page.getByRole('heading', { name: 'إدارة النظام', exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'إضافة إدارة', exact: true }).click();
   const dialog = page.getByRole('dialog');
+  await expect(dialog.locator('form.app-dialog')).toHaveCSS('background-color', 'rgb(255, 255, 255)');
+  await expect(dialog.getByText('مثل مدير التدريب أو مدير النمو المهني')).toHaveCount(0);
+  await expect(dialog.getByRole('button', { name: 'التحقق من الحساب' })).toHaveCount(0);
+  const artifactDirectory = path.resolve('../.deploy/departments');
+  mkdirSync(artifactDirectory, { recursive: true });
+  await page.screenshot({ path: path.join(artifactDirectory, `${info.project.name}-department-create-dialog.png`), fullPage: true });
   await dialog.getByLabel('اسم الإدارة', { exact: true }).fill('إدارة التدريب');
   await dialog.getByLabel('مسمى المسؤول').fill('مدير التدريب');
-  await dialog.getByLabel('رقم دخول المسؤول').fill('1483');
+  await dialog.getByLabel('رقم الدخول', { exact: true }).fill('1483');
   await expect(dialog.getByRole('button', { name: 'حفظ الإدارة' })).toBeDisabled();
-  await dialog.getByRole('button', { name: 'التحقق من الحساب' }).click();
-  await expect(dialog.getByRole('status')).toContainText('مسؤول الإدارة الجديدة');
+  await dialog.getByLabel('رمز الدخول', { exact: true }).fill('1234');
+  await expect(dialog.getByText('الرمز يجب أن يتكوّن من 8 أرقام.')).toBeVisible();
+  await expect(dialog.getByRole('button', { name: 'حفظ الإدارة' })).toBeDisabled();
+  await dialog.getByLabel('رمز الدخول', { exact: true }).fill('12345678');
   await dialog.getByRole('button', { name: 'حفظ الإدارة' }).click();
   await expect(dialog).not.toBeVisible();
   await expect(page.getByRole('button', { name: 'فتح إدارة التدريب', exact: true })).toBeVisible();
-  expect(state.writes[0]).toMatchObject({ name: 'إدارة التدريب', managerLoginCode: '1483', managerTitle: 'مدير التدريب', isActive: true });
+  expect(state.writes[0]).toMatchObject({ name: 'إدارة التدريب', managerLoginCode: '1483', managerPassword: '12345678', managerTitle: 'مدير التدريب', isActive: true });
   await expectNoOverflow(page);
-  const artifactDirectory = path.resolve('../.deploy/departments');
-  mkdirSync(artifactDirectory, { recursive: true });
   await page.screenshot({ path: path.join(artifactDirectory, `${info.project.name}-management.png`), fullPage: true });
   await page.getByRole('button', { name: 'تعديل إدارة التدريب', exact: true }).click();
   await expect(dialog.getByLabel('مسمى المسؤول')).toHaveValue('مدير التدريب');
-  await dialog.getByLabel('رقم دخول المسؤول').fill('1002');
-  await dialog.getByRole('button', { name: 'التحقق من الحساب' }).click();
-  await expect(dialog.getByRole('status')).toContainText('الحساب مرتبط بإدارة أخرى');
-  await expect(dialog.getByRole('button', { name: 'حفظ الإدارة' })).toBeDisabled();
+  await expect(dialog.getByLabel('رمز الدخول', { exact: true })).toHaveCount(0);
+  await dialog.getByLabel('مسمى المسؤول').fill('مدير التأهيل');
+  await dialog.getByRole('button', { name: 'حفظ الإدارة' }).click();
+  await expect(dialog).not.toBeVisible();
+  expect(state.writes[1]).not.toHaveProperty('managerPassword');
+  await page.getByRole('button', { name: 'تعديل إدارة التدريب', exact: true }).click();
+  await dialog.getByLabel('رقم الدخول', { exact: true }).fill('1002');
+  await dialog.getByLabel('رمز الدخول', { exact: true }).fill('12345678');
+  await dialog.getByRole('button', { name: 'حفظ الإدارة' }).click();
+  await expect(dialog.locator('.system-management__error')).toContainText('رقم الدخول مستخدم مسبقًا.');
   expect(runtimeErrors).toEqual([]);
 });
 
@@ -129,8 +142,7 @@ test('general manager alone creates responsible accounts and sees globally occup
     if (payload.loginCode === '1483') return route.fulfill({ status: 422, json: { message: 'رقم الدخول مستخدم مسبقًا.', errors: { loginCode: ['رقم الدخول مستخدم مسبقًا.'] } } });
     return route.fulfill({ status: 201, json: { message: 'حسابك جاهز.' } });
   });
-  await page.goto('management');
-  await page.getByRole('link', { name: 'إنشاء حساب مسؤول', exact: true }).click();
+  await page.goto('register-account');
   await expect(page).toHaveURL(/\/register-account$/);
   await page.getByLabel('الاسم الكامل', { exact: true }).fill('مسؤول الإدارة الجديدة');
   await page.getByLabel('رقم الدخول').fill('1483');

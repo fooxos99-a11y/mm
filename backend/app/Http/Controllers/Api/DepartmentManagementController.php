@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\DepartmentDirectoryService;
 use App\Services\DepartmentManagementService;
 use App\Support\DepartmentContext;
+use App\Support\Security\PasswordPolicy;
 use App\Support\UserPresenter;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -106,6 +107,7 @@ final class DepartmentManagementController extends Controller
         return $request->validate([
             'name' => ['required', 'string', 'max:255'], 'managerTitle' => ['required', 'string', 'max:100'],
             'managerLoginCode' => ['required', 'string', 'max:100'], 'isActive' => ['sometimes', 'boolean'],
+            'managerPassword' => ['nullable', 'string', PasswordPolicy::rule()],
         ]);
     }
 }
