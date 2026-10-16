@@ -43,11 +43,22 @@ test('live department assignment, teacher login and global number uniqueness sha
   await expect(dialog).not.toBeVisible();
   await expect(page.getByRole('button', { name: `فتح ${name}`, exact: true })).toBeVisible();
   await screenshot(page, `${info.project.name}-live-management.png`);
+  await page.getByRole('button', { name: `فتح ${name}`, exact: true }).click();
+  await expect(page).toHaveURL(/\/dashboard$/);
+  await expect(page.locator('.department-context')).toHaveCount(0);
+  if (page.viewportSize().width <= 1024) await page.getByRole('button', { name: 'فتح القائمة', exact: true }).click();
+  await page.locator('.dashboard-sidebar').getByRole('button', { name: 'إدارة النظام', exact: true }).click();
+  await expect(page).toHaveURL(/\/management$/);
 
   await loginAs(page, 'e2ependingmanager', rolePassword, 'dashboard');
-  await expect(page.getByRole('complementary', { name: 'الإدارة الحالية' })).toContainText(name);
-  await expect(page.getByRole('complementary', { name: 'الإدارة الحالية' })).toContainText('مدير التدريب');
+  await expect(page.locator('.department-context')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'إدارة النظام', exact: true })).toHaveCount(0);
   const headers = await apiHeaders(page);
+  const managerSession = await page.request.get(`${apiOrigin}/api/auth/session`, { headers });
+  expect(managerSession.ok()).toBe(true);
+  const managerUser = (await managerSession.json()).user;
+  expect(managerUser).toMatchObject({ departmentName: name, role: 'admin', roleLabel: 'مدير التدريب' });
+  expect(managerUser.departmentId).toBeTruthy();
   const teacher = await page.request.post(`${apiOrigin}/api/students`, { headers, data: { name: 'معلم الإدارة الجديدة', loginId: '0924', branchId: 'male', password: studentPassword, passwordConfirmation: studentPassword } });
   expect(teacher.status(), await teacher.text()).toBe(201);
   const courseTitle = `دورة الإدارة المستقلة ${info.project.name}`;
@@ -59,7 +70,10 @@ test('live department assignment, teacher login and global number uniqueness sha
 
   await loginAs(page, '0924', studentPassword, 'student');
   await expect(page.locator('.student-page')).toBeVisible();
-  await expect(page.getByRole('complementary', { name: 'الإدارة الحالية' })).toContainText(name);
+  await expect(page.locator('.department-context')).toHaveCount(0);
+  const teacherSession = await page.request.get(`${apiOrigin}/api/auth/session`, { headers: await apiHeaders(page) });
+  expect(teacherSession.ok()).toBe(true);
+  expect((await teacherSession.json()).user).toMatchObject({ departmentId: managerUser.departmentId, departmentName: name, role: 'student' });
   const snapshot = await page.request.get(`${apiOrigin}/api/dashboard/snapshot`, { headers: await apiHeaders(page) });
   expect(snapshot.ok()).toBe(true);
   const studentData = await snapshot.json();

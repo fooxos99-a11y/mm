@@ -51,7 +51,9 @@ final class DepartmentManagementService
             $department->manager_user_id = $manager->id;
             $department->save();
             $manager->forceFill(['department_id' => $department->id, 'role' => 'admin'])->save();
-            $manager->invalidateAuthentication();
+            if ($oldManagerId !== $manager->id || $department->wasChanged('is_active')) {
+                $manager->invalidateAuthentication();
+            }
             if ($oldManagerId && $oldManagerId !== $manager->id) {
                 $old = User::query()->find($oldManagerId);
                 if ($old) {

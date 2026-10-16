@@ -1,3 +1,5 @@
+import { isSystemAdministrator } from '../departments/departmentModel.mjs';
+
 
 
 export default {
@@ -15,7 +17,7 @@ export default {
     normalizeDashboardPanel(panel) {
       const value = typeof panel === 'string' ? panel.trim().toLowerCase() : '';
 
-      return this.dashboardMenu.some((item) => item.id === value) ? value : '';
+      return this.dashboardMenu.some((item) => item.mode === 'panel' && item.id === value) ? value : '';
     },
     normalizeDashboardAssessmentType(type) {
       return ['pre', 'post'].includes(type) ? type : 'pre';
@@ -175,7 +177,29 @@ export default {
         this.openTemplatesDialog();
       }
     },
+    async returnToSystemManagement() {
+      if (!isSystemAdministrator(this.currentUser) || this.panelLoading) return;
+      const currentPanel = this.$refs?.workspacePanel;
+      if (['courses', 'tasks'].includes(this.activeMenu)
+        && currentPanel?.confirmDiscardChanges
+        && !(await currentPanel.confirmDiscardChanges())) return;
+
+      this.panelLoading = true;
+      try {
+        await this.$store.dispatch('selectDepartmentContext', null);
+        this.mobileMenuOpen = false;
+        await this.$router.push({ name: 'system-management' });
+      } catch (error) {
+        this.$toast.error(error?.response?.data?.message || 'تعذر العودة إلى إدارة النظام.');
+      } finally {
+        this.panelLoading = false;
+      }
+    },
     async handleMenu(item) {
+      if (item.id === 'system-management') {
+        await this.returnToSystemManagement();
+        return;
+      }
       if (item.id === 'settings') {
         this.settingsMenuOpen = !this.settingsMenuOpen;
 

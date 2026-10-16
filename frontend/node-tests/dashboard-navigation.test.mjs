@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import navigationMethods from '../src/features/dashboard/dashboardNavigationMethods.js';
+import dashboardAccess from '../src/features/dashboard/dashboardAccessComputed.js';
 
 const createContext = (overrides = {}) => ({
   activeMenu: 'overview',
@@ -115,4 +116,68 @@ test('a changed route cannot be overwritten by an older loading result', async (
   finish(true);
   await loading;
   assert.equal(context.activeMenu, 'overview');
+});
+
+
+test('system management navigation appears only for the general manager', () => {
+  const menuFor = currentUser => dashboardAccess.dashboardMenu.call({ currentUser, canAccessPanel: () => true });
+  assert.equal(menuFor({ role: 'admin', systemRole: 'super_admin' }).at(-1).id, 'system-management');
+  assert.equal(menuFor({ role: 'admin' }).some(item => item.id === 'system-management'), false);
+  assert.equal(menuFor({ role: 'student' }).some(item => item.id === 'system-management'), false);
+});
+
+test('dashboard query accepts panels while rejecting system actions and unknown identifiers', () => {
+  const dashboardMenu = dashboardAccess.dashboardMenu.call({
+    currentUser: { role: 'admin', systemRole: 'super_admin' },
+    canAccessPanel: () => true,
+  });
+  const context = { dashboardMenu };
+  assert.equal(dashboardMenu.find(item => item.id === 'system-management')?.mode, 'system');
+  assert.equal(navigationMethods.normalizeDashboardPanel.call(context, ' Courses '), 'courses');
+  assert.equal(navigationMethods.normalizeDashboardPanel.call(context, 'system-management'), '');
+  assert.equal(navigationMethods.normalizeDashboardPanel.call(context, 'unknown-panel'), '');
+});
+
+test('general manager returns through the existing menu and clears the department context', async () => {
+  const events = [];
+  const context = createContext({
+    currentUser: { role: 'admin', systemRole: 'super_admin' },
+    $store: { dispatch: async (...args) => events.push(['dispatch', ...args]) },
+    $router: { push: async target => events.push(['route', target]) },
+    returnToSystemManagement: navigationMethods.returnToSystemManagement,
+  });
+  await navigationMethods.handleMenu.call(context, { id: 'system-management' });
+  assert.deepEqual(events, [['dispatch', 'selectDepartmentContext', null], ['route', { name: 'system-management' }]]);
+  assert.equal(context.mobileMenuOpen, false);
+  assert.equal(context.panelLoading, false);
+});
+
+test('returning to system management preserves rejected drafts and unauthorized contexts', async () => {
+  let requests = 0;
+  const context = createContext({
+    activeMenu: 'courses',
+    currentUser: { role: 'admin', systemRole: 'super_admin' },
+    $refs: { workspacePanel: { confirmDiscardChanges: async () => false } },
+    $store: { dispatch: async () => { requests++; } },
+  });
+  await navigationMethods.returnToSystemManagement.call(context);
+  assert.equal(requests, 0);
+  assert.equal(context.mobileMenuOpen, true);
+  context.currentUser = { role: 'admin' };
+  await navigationMethods.returnToSystemManagement.call(context);
+  assert.equal(requests, 0);
+});
+
+test('failed context changes keep the current page available for retry', async () => {
+  const errors = [];
+  const context = createContext({
+    currentUser: { role: 'admin', systemRole: 'super_admin' },
+    $store: { dispatch: async () => { throw new Error('network'); } },
+    $router: { push: async () => { throw new Error('unexpected navigation'); } },
+    $toast: { error: message => errors.push(message) },
+  });
+  await navigationMethods.returnToSystemManagement.call(context);
+  assert.deepEqual(errors, ['تعذر العودة إلى إدارة النظام.']);
+  assert.equal(context.mobileMenuOpen, true);
+  assert.equal(context.panelLoading, false);
 });

@@ -1,3 +1,5 @@
+import { isSystemAdministrator } from '../departments/departmentModel.mjs';
+
 export default {
   isAdmin() {
     return this.currentUser?.role === 'admin';
@@ -26,7 +28,7 @@ export default {
     return this.managedBranchId || this.selectedOverviewBranch;
   },
   dashboardMenu() {
-    return [
+    const items = [
       { id: 'overview', label: 'الرئيسية', icon: 'mdi-home-outline', mode: 'panel' },
       { id: 'courses', label: 'الدورات', icon: 'mdi-database-outline', mode: 'panel' },
       { id: 'tasks', label: 'المهام الأدائية', icon: 'mdi-clipboard-text-outline', mode: 'panel' },
@@ -39,6 +41,10 @@ export default {
       { id: 'completion', label: 'متطلبات الاجتياز', icon: 'mdi-certificate-outline', mode: 'panel' },
       { id: 'settings', label: 'الاعدادات', icon: 'mdi-cog-outline', mode: 'panel', dividerBefore: true },
     ].filter((item) => this.canAccessPanel(item.id));
+    if (isSystemAdministrator(this.currentUser)) {
+      items.push({ id: 'system-management', label: 'إدارة النظام', icon: 'mdi-view-dashboard-outline', mode: 'system', dividerBefore: true });
+    }
+    return items;
   },
   settingsItems() {
     const items = [];

@@ -93,10 +93,11 @@ test('general manager enters department context and returns to central managemen
   await page.goto('management');
   await page.getByRole('button', { name: 'فتح الإدارة الحالية', exact: true }).click();
   await expect(page).toHaveURL(/\/dashboard$/);
-  await expect(page.getByRole('complementary', { name: 'الإدارة الحالية' })).toContainText('الإدارة الحالية');
+  await expect(page.locator('.department-context')).toHaveCount(0);
   await expect.poll(() => state.dashboardHeaders.length).toBeGreaterThan(0);
   expect(state.dashboardHeaders.every(headers => headers['x-department-id'] === 'd1')).toBe(true);
-  await page.getByRole('button', { name: 'إدارة النظام', exact: true }).click();
+  if (page.viewportSize().width <= 1024) await page.getByRole('button', { name: 'فتح القائمة', exact: true }).click();
+  await page.locator('.dashboard-sidebar').getByRole('button', { name: 'إدارة النظام', exact: true }).click();
   await expect(page).toHaveURL(/\/management$/);
   await expect(page.getByRole('heading', { name: 'إدارة النظام', exact: true })).toBeVisible();
 });
@@ -110,9 +111,11 @@ test('registered accounts wait for assignment and cannot access system managemen
   await expect(page.getByText('رقم الدخول:', { exact: false })).toContainText('1483');
   await expectNoOverflow(page);
   state.setUser({ ...user, role: 'admin', departmentId: 'd1', departmentName: 'الإدارة الحالية', roleLabel: 'مدير التدريب' });
+  const sessionResponse = page.waitForResponse(response => new URL(response.url()).pathname.endsWith('/auth/session'));
   await page.getByRole('button', { name: 'التحقق من التعيين' }).click();
+  expect((await (await sessionResponse).json()).user).toMatchObject({ departmentId: 'd1', departmentName: 'الإدارة الحالية', roleLabel: 'مدير التدريب' });
   await expect(page).toHaveURL(/\/dashboard$/);
-  await expect(page.getByRole('complementary', { name: 'الإدارة الحالية' })).toContainText('مدير التدريب');
+  await expect(page.locator('.department-context')).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'إدارة النظام', exact: true })).toHaveCount(0);
 });
 

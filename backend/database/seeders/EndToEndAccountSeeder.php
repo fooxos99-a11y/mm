@@ -6,6 +6,7 @@ use App\Models\Branch;
 use App\Models\Reciter;
 use App\Models\Student;
 use App\Models\User;
+use App\Support\DepartmentContext;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -25,6 +26,10 @@ class EndToEndAccountSeeder extends Seeder
 
     public function run(): void
     {
+        if (! app()->environment('testing')) {
+            throw new \RuntimeException('End-to-end accounts can only be seeded in the testing environment.');
+        }
+
         $password = (string) env('MOMARS_SEED_E2E_ROLE_PASSWORD', '');
 
         if ($password === '') {
@@ -33,8 +38,7 @@ class EndToEndAccountSeeder extends Seeder
 
         $passwordHash = Hash::make($password);
         foreach (['e2e-general-manager' => 'super_admin', 'e2ependingmanager' => 'unassigned'] as $login => $role) {
-            $this->user($login, $role === 'super_admin' ? 'المدير العام للاختبار' : 'مسؤول الإدارة الجديدة', $role, $passwordHash)
-                ->forceFill(['department_id' => null])->save();
+            $this->user($login, $role === 'super_admin' ? 'المدير العام للاختبار' : 'مسؤول الإدارة الجديدة', $role, $passwordHash);
         }
         $maleBranch = Branch::query()->where('code', 'male')->firstOrFail();
         $femaleBranch = Branch::query()->where('code', 'female')->firstOrFail();
@@ -112,6 +116,7 @@ class EndToEndAccountSeeder extends Seeder
         return User::query()->updateOrCreate(
             ['login_code' => $loginCode],
             [
+                'department_id' => in_array($role, ['super_admin', 'unassigned'], true) ? null : DepartmentContext::id(),
                 'full_name' => $name,
                 'role' => $role,
                 'password' => $passwordHash,

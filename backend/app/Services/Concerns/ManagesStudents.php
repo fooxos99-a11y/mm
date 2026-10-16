@@ -19,7 +19,6 @@ trait ManagesStudents
         abort_unless($student->department_id === DepartmentContext::id(), 404);
         $payload = [];
         $originalLoginCode = $student->login_code;
-        $originalName = $student->full_name;
         $passwordHash = filled($updates['password'] ?? null) ? Hash::make((string) $updates['password']) : null;
 
         if (array_key_exists('name', $updates)) {
@@ -78,37 +77,34 @@ trait ManagesStudents
             $student,
             $payload,
             $updates,
-            $originalLoginCode,
-            $originalName,
             $passwordHash
         ): void {
+            $lockedStudent = Student::query()->whereKey($student->id)->lockForUpdate()->firstOrFail();
+            abort_unless($lockedStudent->archive_id === null, 404);
+            $student->setRawAttributes($lockedStudent->getAttributes(), true);
+            $originalLoginCode = $student->login_code;
+            $originalName = $student->full_name;
+            $user = $this->studentAccountForUpdate($student);
+
             if ($payload !== []) {
                 $student->fill($payload);
                 $student->save();
             }
 
+            $student->unsetRelation('branch');
             $student->loadMissing('branch');
             $partsLimit = $student->branch?->code === 'female' ? 10 : 30;
 
             $targetLoginCode = $payload['login_code'] ?? $originalLoginCode;
             $targetName = $payload['full_name'] ?? $originalName;
 
-            $user = User::query()->where('department_id', DepartmentContext::id())->updateOrCreate(
-                ['login_code' => $originalLoginCode],
-                [
-                    'department_id' => DepartmentContext::id(),
-                    'full_name' => $targetName,
-                    'role' => 'student',
-                    'login_code' => $targetLoginCode,
-                    'password' => User::query()->where('department_id', DepartmentContext::id())
-                        ->where('login_code', $originalLoginCode)->value('password')
-                        ?: Hash::make(Str::random(64)),
-                ],
-            );
-
-            if ($passwordHash) {
-                $user->forceFill(['password' => $passwordHash])->save();
-            }
+            $user->fill([
+                'department_id' => DepartmentContext::id(),
+                'full_name' => $targetName,
+                'role' => $user->exists ? $user->role : 'student',
+                'login_code' => $targetLoginCode,
+                'password' => $passwordHash ?: ($user->password ?: Hash::make(Str::random(64))),
+            ])->save();
 
             if (array_key_exists('completedParts', $updates) && is_array($updates['completedParts'])) {
                 $student->parts()->delete();
@@ -131,9 +127,50 @@ trait ManagesStudents
             } elseif ($partsLimit === 10) {
                 $student->parts()->where('part_number', '>', $partsLimit)->delete();
             }
-        });
+        }, 3);
 
         return $student->fresh(['branch', 'parts']);
+    }
+
+    private function studentAccountForUpdate(Student $student): User
+    {
+        $loginCode = (string) $student->login_code;
+        $user = User::query()->where('login_code', $loginCode)->lockForUpdate()->first();
+        if ($user) {
+            if ($user->department_id !== DepartmentContext::id() || ! in_array($user->role, ['student', 'trainee'], true)) {
+                throw ValidationException::withMessages(['loginCode' => 'رقم الدخول مستخدم مسبقًا.']);
+            }
+            DB::reserveLoginCode($loginCode, $user->id, DepartmentContext::id());
+
+            return $user;
+        }
+
+        // Only an active, uniquely identified legacy student can acquire its own provisional number.
+        $conflictingStudent = GlobalDB::table('students')->where('id', '!=', $student->id)
+            ->where(function ($query) use ($loginCode): void {
+                $query->where('login_code', $loginCode)->orWhere('archived_login_code', $loginCode);
+            })->exists();
+        if (trim($loginCode) === '' || $conflictingStudent) {
+            throw ValidationException::withMessages(['loginCode' => 'رقم الدخول مستخدم مسبقًا.']);
+        }
+
+        $user = new User;
+        $user->setAttribute($user->getKeyName(), $user->newUniqueId());
+        GlobalDB::table('reserved_login_codes')->insertOrIgnore([
+            'login_code' => $loginCode, 'user_id' => null,
+            'department_id' => DepartmentContext::id(), 'created_at' => now(),
+        ]);
+        $reservation = GlobalDB::table('reserved_login_codes')->where('login_code', $loginCode)->lockForUpdate()->first();
+        if ($reservation->user_id !== null || $reservation->department_id !== DepartmentContext::id()) {
+            throw ValidationException::withMessages(['loginCode' => 'رقم الدخول مستخدم مسبقًا.']);
+        }
+        $claimed = GlobalDB::table('reserved_login_codes')->where('login_code', $loginCode)
+            ->whereNull('user_id')->where('department_id', DepartmentContext::id())->update(['user_id' => $user->id]);
+        if ($claimed !== 1) {
+            throw ValidationException::withMessages(['loginCode' => 'رقم الدخول مستخدم مسبقًا.']);
+        }
+
+        return $user;
     }
 
     public function deleteStudent(Student $student): void
