@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Support\DepartmentContext;
+
 use App\Models\Reciter;
 use App\Models\Student;
 use App\Models\User;
@@ -15,7 +17,7 @@ class ReciterAccessService
 
     public function assertCanViewAccount(?User $user, string $loginCode): void
     {
-        $role = (string) ($user?->role ?? '');
+        $role = DepartmentContext::effectiveRole((string) ($user?->role ?? ''));
 
         if (in_array($role, ['admin', 'male_manager', 'female_manager'], true)) {
             $this->assertCanManageBranch($user, $loginCode);
@@ -32,7 +34,7 @@ class ReciterAccessService
 
     public function assertCanViewAssignedReciter(?User $user, string $loginCode): void
     {
-        $role = (string) ($user?->role ?? '');
+        $role = DepartmentContext::effectiveRole((string) ($user?->role ?? ''));
         $targetLoginCode = trim($loginCode);
 
         if (in_array($role, ['admin', 'male_manager', 'female_manager'], true)) {
@@ -55,7 +57,8 @@ class ReciterAccessService
 
     public function assertCanToggleStudentPart(?User $user, Student $student, ?string $reciterId): void
     {
-        $role = (string) ($user?->role ?? '');
+        abort_unless($student->department_id === DepartmentContext::id(), 404);
+        $role = DepartmentContext::effectiveRole((string) ($user?->role ?? ''));
 
         if ($role === 'admin') {
             return;
@@ -85,7 +88,7 @@ class ReciterAccessService
 
     public function assertCanManageBranch(?User $user, string $loginCode): void
     {
-        $role = (string) ($user?->role ?? '');
+        $role = DepartmentContext::effectiveRole((string) ($user?->role ?? ''));
         if ($role === 'admin') {
             return;
         }

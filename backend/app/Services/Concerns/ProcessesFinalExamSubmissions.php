@@ -3,8 +3,9 @@
 namespace App\Services\Concerns;
 
 use App\Models\Student;
+use App\Services\StudentIdentityGuard;
 use Illuminate\Database\UniqueConstraintViolationException;
-use Illuminate\Support\Facades\DB;
+use App\Support\DepartmentData as DB;
 use Illuminate\Validation\ValidationException;
 use Throwable;
 
@@ -13,6 +14,7 @@ trait ProcessesFinalExamSubmissions
     public function submitFinalExam(array $submission): array
     {
         $loginCode = trim((string) $submission['loginCode']);
+        StudentIdentityGuard::assertAllowed($loginCode, 'loginCode');
         [$branchCode, $studentName] = $this->resolveTrustedSubmissionIdentity($loginCode, $submission);
         $this->submissionValidator->assertOpen($branchCode);
         $questionSnapshots = $this->submissionValidator->questionSnapshots($submission['answers'] ?? [], $branchCode);
@@ -36,6 +38,7 @@ trait ProcessesFinalExamSubmissions
                 $questionSnapshots,
                 &$storedPaths
             ): void {
+                StudentIdentityGuard::assertAllowed($loginCode, 'loginCode', true);
                 DB::table('final_exam_submissions')->insert([
                     'id' => $submissionId,
                     'branch_code' => $branchCode,

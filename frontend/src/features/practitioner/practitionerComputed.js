@@ -77,7 +77,9 @@ export default {
     },
     accountRoleLabel() {
       const labels = {
-        admin: 'مدير النمو المهني',
+        super_admin: 'المدير العام',
+        unassigned: 'بانتظار التعيين',
+        admin: 'مسؤول الإدارة',
         male_manager: 'مشرف',
         female_manager: 'مشرفة',
         reciter: 'مقرئ',
@@ -85,7 +87,7 @@ export default {
         trainee: 'معلم',
       };
 
-      return labels[this.currentUser?.role] || 'مستخدم';
+      return this.currentUser?.roleLabel || labels[this.currentUser?.role] || 'مستخدم';
     },
     currentStudentRecord() {
       if (this.currentUser?.role !== 'student') {

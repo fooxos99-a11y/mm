@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
+use App\Support\DepartmentContext;
+
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
+use App\Support\DepartmentData as DB;
 use Illuminate\Validation\ValidationException;
 
 class CourseScoreService
@@ -14,9 +16,9 @@ class CourseScoreService
 
     public function save(User $user, array $data): array
     {
-        abort_unless(in_array($user->role, ['admin', 'male_manager', 'female_manager'], true), 403);
-        abort_if($user->role !== 'admin'
-            && $data['branchCode'] !== ($user->role === 'female_manager' ? 'female' : 'male'), 403);
+        abort_unless(in_array(DepartmentContext::effectiveRole((string) $user->role), ['admin', 'male_manager', 'female_manager'], true), 403);
+        abort_if(DepartmentContext::effectiveRole((string) $user->role) !== 'admin'
+            && $data['branchCode'] !== (DepartmentContext::effectiveRole((string) $user->role) === 'female_manager' ? 'female' : 'male'), 403);
 
         $saved = DB::transaction(function () use ($user, $data): int {
             // Serialize writes in this course, including the first score setting and absent grade rows.

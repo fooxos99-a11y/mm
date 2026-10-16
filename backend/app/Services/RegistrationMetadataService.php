@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Support\DepartmentContext;
 use Illuminate\Support\Facades\File;
 
 class RegistrationMetadataService
@@ -83,6 +84,13 @@ class RegistrationMetadataService
 
     private function path(): string
     {
-        return storage_path('app/registration-request-metadata.json');
+        $departmentId = DepartmentContext::id();
+        if ($departmentId === DepartmentContext::DEFAULT_ID) {
+            return storage_path('app/registration-request-metadata.json');
+        }
+
+        abort_unless($departmentId !== null, 403);
+
+        return storage_path('app/departments/'.$departmentId.'/registration-request-metadata.json');
     }
 }

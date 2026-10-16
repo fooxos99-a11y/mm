@@ -7,6 +7,7 @@ import {
   resolveRedirectPath,
 } from './accessPolicy.mjs';
 import HomeView from '../views/HomeView.vue';
+import { isSystemAdministrator } from '../features/departments/departmentModel.mjs';
 
 const PractitionerView = () => import(/* webpackChunkName: "public-practitioner" */ '../views/PractitionerView.vue');
 const LoginView = () => import(/* webpackChunkName: "auth" */ '../views/LoginView.vue');
@@ -78,6 +79,24 @@ const router = createRouter({
       path: '/registration',
       name: 'registration',
       component: RegistrationView,
+    },
+    {
+      path: '/register-account',
+      name: 'account-registration',
+      component: () => import('../views/AccountRegistrationView.vue'),
+      meta: { guestOnly: true },
+    },
+    {
+      path: '/account-assignment',
+      name: 'account-assignment',
+      component: () => import('../views/AccountAssignmentView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/management',
+      name: 'system-management',
+      component: () => import('../views/SystemManagementView.vue'),
+      meta: { requiresAuth: true, requiresSystemAdmin: true },
     },
     {
       path: '/login',
@@ -264,6 +283,14 @@ const resolveNavigationTarget = (to) => {
       query: redirectPath ? { redirect: redirectPath } : {},
     };
   }
+
+  if (routeHasMeta(to, 'requiresAuth') && user?.role === 'unassigned' && !['account-assignment', 'change-password'].includes(to.name)) {
+    return { name: 'account-assignment' };
+  }
+
+  if (to.name === 'account-assignment' && user?.role !== 'unassigned') return resolveUserHomeRoute(user);
+
+  if (routeHasMeta(to, 'requiresSystemAdmin') && !isSystemAdministrator(user)) return resolveUserHomeRoute(user);
 
   if (routeHasMeta(to, 'requiresDashboardAccess') && !canAccessAdminRoute(to, user, store.state.dashboardSnapshot)) {
     return resolveUserHomeRoute(user);

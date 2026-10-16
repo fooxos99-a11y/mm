@@ -110,6 +110,7 @@ class DashboardAccountsAssetsTest extends CoreDataApiTestCase
 
     public function test_training_materials_flow_works(): void
     {
+        Storage::fake('local');
         Storage::fake('public');
 
         $createResponse = $this->post('/api/dashboard/training-materials', [
@@ -153,8 +154,15 @@ class DashboardAccountsAssetsTest extends CoreDataApiTestCase
             'model_type' => TrainingMaterial::class,
             'model_id' => $materialId,
             'collection_name' => 'attachments',
-            'disk' => 'public',
+            'disk' => 'local',
         ]);
+
+        $attachment = $createResponse->json('attachments.0');
+        $media = \App\Models\Media::query()->where('model_id', $materialId)->firstOrFail();
+        Storage::disk('local')->assertExists($media->getPathRelativeToRoot());
+        Storage::disk('public')->assertMissing($media->getPathRelativeToRoot());
+        $this->get(parse_url($attachment['url'], PHP_URL_PATH))
+            ->assertOk()->assertHeader('Content-Type');
 
         $this->getJson('/api/dashboard/snapshot')
             ->assertOk()
@@ -174,7 +182,7 @@ class DashboardAccountsAssetsTest extends CoreDataApiTestCase
 
     public function test_training_material_attachment_without_uuid_has_a_working_preview_url(): void
     {
-        Storage::fake('public');
+        Storage::fake('local');
 
         $createResponse = $this->post('/api/dashboard/training-materials', [
             'title' => 'صورة للمعاينة',
@@ -194,7 +202,7 @@ class DashboardAccountsAssetsTest extends CoreDataApiTestCase
             ->json('0.attachments.0');
 
         $this->assertSame((string) $mediaId, $attachment['id']);
-        $this->assertStringEndsWith('/api/training-material-attachments/'.$mediaId, $attachment['url']);
+        $this->assertSame('/api/training-material-attachments/'.$mediaId, parse_url($attachment['url'], PHP_URL_PATH));
 
         $this->get(parse_url($attachment['url'], PHP_URL_PATH))
             ->assertOk()

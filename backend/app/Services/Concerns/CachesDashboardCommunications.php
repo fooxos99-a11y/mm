@@ -2,6 +2,7 @@
 
 namespace App\Services\Concerns;
 
+use App\Support\DepartmentContext;
 use Illuminate\Support\Facades\Cache;
 
 trait CachesDashboardCommunications
@@ -15,6 +16,7 @@ trait CachesDashboardCommunications
 
     private function remember(string $key, \DateTimeInterface|\DateInterval|int $ttl, callable $resolver): mixed
     {
+        $key = 'departments:'.(DepartmentContext::id() ?? 'none').':'.$key;
         try {
             return Cache::store('redis')->remember($key, $ttl, $resolver);
         } catch (\Throwable) {
@@ -24,6 +26,7 @@ trait CachesDashboardCommunications
 
     private function forget(string $key): void
     {
+        $key = 'departments:'.(DepartmentContext::id() ?? 'none').':'.$key;
         try {
             Cache::store('redis')->forget($key);
         } catch (\Throwable) {

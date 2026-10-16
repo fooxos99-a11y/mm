@@ -6,7 +6,7 @@ use App\Models\Archive;
 use App\Models\Student;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
+use App\Support\DepartmentData as DB;
 
 final class ArchiveQueryService
 {

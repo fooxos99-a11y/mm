@@ -5,7 +5,9 @@ namespace App\Services;
 use App\Models\Branch;
 use App\Models\Student;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
+use App\Support\DepartmentContext;
+use App\Support\DepartmentData as DB;
+use Illuminate\Support\Facades\DB as GlobalDB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -28,8 +30,9 @@ class StudentAccountService
         }
 
         if (
-            Student::query()->where('login_code', $loginCode)->exists()
+            GlobalDB::table('students')->where('login_code', $loginCode)->exists()
                 || User::query()->where('login_code', $loginCode)->exists()
+                || GlobalDB::table('reserved_login_codes')->where('login_code', $loginCode)->exists()
         ) {
             throw ValidationException::withMessages(['login_code' => 'رقم الدخول مستخدم مسبقًا.']);
         }
@@ -44,6 +47,7 @@ class StudentAccountService
             ]);
 
             User::query()->create([
+                'department_id' => DepartmentContext::id(),
                 'full_name' => $name,
                 'role' => 'student',
                 'login_code' => $loginCode,

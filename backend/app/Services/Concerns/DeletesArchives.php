@@ -3,7 +3,7 @@
 namespace App\Services\Concerns;
 
 use App\Models\Archive;
-use Illuminate\Support\Facades\DB;
+use App\Support\DepartmentData as DB;
 
 trait DeletesArchives
 {

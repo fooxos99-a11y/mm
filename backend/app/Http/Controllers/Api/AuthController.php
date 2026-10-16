@@ -6,6 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\UpdatePasswordRequest;
 use App\Models\User;
+use App\Services\AccountRegistrationService;
+use App\Support\DepartmentContext;
+use App\Support\UserPresenter;
+use App\Http\Requests\Auth\RegisterAccountRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -32,7 +36,7 @@ class AuthController extends Controller
 
         $user = User::query()->where('login_code', $credentials['login_code'])->first();
 
-        if (! $user || ! Hash::check($credentials['password'], $user->password ?? '')) {
+        if (! $user || ! $user->is_active || ! Hash::check($credentials['password'], $user->password ?? '')) {
             RateLimiter::hit($rateLimitKey, 60);
 
             throw ValidationException::withMessages([
@@ -41,12 +45,14 @@ class AuthController extends Controller
         }
 
         RateLimiter::clear($rateLimitKey);
+        DepartmentContext::set($user->role === 'super_admin' ? null : $user->department_id);
 
         $payload = [
             'user' => $this->serializeUser($user),
         ];
 
         if ($request->hasSession()) {
+            $request->session()->forget('management_department_id');
             Auth::guard('web')->login($user);
             $request->session()->regenerate();
         } else {
@@ -59,6 +65,13 @@ class AuthController extends Controller
     public function user(Request $request): JsonResponse
     {
         return response()->json($this->serializeUser($request->user()));
+    }
+
+    public function register(RegisterAccountRequest $request, AccountRegistrationService $registration): JsonResponse
+    {
+        $user = $registration->register($request->validated());
+
+        return response()->json(['user' => UserPresenter::serialize($user)], 201);
     }
 
     public function session(Request $request): JsonResponse
@@ -130,12 +143,6 @@ class AuthController extends Controller
      */
     private function serializeUser(User $user): array
     {
-        return [
-            'id' => $user->id,
-            'name' => $user->full_name,
-            'role' => $user->role,
-            'loginCode' => $user->login_code ?? '',
-            'mustChangePassword' => (bool) $user->must_change_password,
-        ];
+        return UserPresenter::serialize($user);
     }
 }

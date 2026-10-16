@@ -2,9 +2,11 @@
 
 namespace App\Services;
 
+use App\Support\DepartmentContext;
+
 use App\Models\Student;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
+use App\Support\DepartmentData as DB;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -82,7 +84,7 @@ class AssessmentAccessService
 
     public function assertCanManageSubmissionBranch(?User $user, string $submissionId, bool $finalExam = false): void
     {
-        $role = (string) ($user?->role ?? '');
+        $role = DepartmentContext::effectiveRole((string) ($user?->role ?? ''));
         if ($role === 'admin') {
             return;
         }
@@ -103,7 +105,7 @@ class AssessmentAccessService
 
     private function requiresStudentIdentity(?User $user, bool $publicRoute): bool
     {
-        return $publicRoute || in_array((string) ($user?->role ?? ''), ['student', 'trainee'], true);
+        return $publicRoute || in_array(DepartmentContext::effectiveRole((string) ($user?->role ?? '')), ['student', 'trainee'], true);
     }
 
     private function authenticatedStudent(?User $user, string $loginCode, string $field = 'loginCode'): Student
@@ -113,7 +115,7 @@ class AssessmentAccessService
 
         if (
             ! $user
-                || ! in_array((string) $user->role, ['student', 'trainee'], true)
+                || ! in_array((string) DepartmentContext::effectiveRole((string) $user->role), ['student', 'trainee'], true)
                 || $userLoginCode === ''
                 || $userLoginCode !== $targetLoginCode
         ) {

@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Support\DepartmentContext;
+
 use App\Models\Reciter;
 use App\Models\Student;
 use App\Models\TrainingMaterial;
@@ -12,7 +14,8 @@ class TrainingMaterialAccessService
 {
     public function assertCanView(?User $user, TrainingMaterial $material): void
     {
-        $role = (string) ($user?->role ?? '');
+        abort_unless($material->department_id === DepartmentContext::id(), 404);
+        $role = DepartmentContext::effectiveRole((string) ($user?->role ?? ''));
         if ($role === 'admin') {
             return;
         }
@@ -36,7 +39,7 @@ class TrainingMaterialAccessService
 
     private function userBranchCode(?User $user): string
     {
-        $role = (string) ($user?->role ?? '');
+        $role = DepartmentContext::effectiveRole((string) ($user?->role ?? ''));
 
         if ($role === 'male_manager') {
             return 'male';

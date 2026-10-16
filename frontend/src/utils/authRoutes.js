@@ -5,6 +5,9 @@ export const canUseDashboard = (role) => DASHBOARD_ROLES.has(role);
 export const resolveUserHomeRoute = (user) => {
   const role = user?.role || '';
 
+  if (role === 'super_admin') return { name: 'system-management' };
+  if (role === 'unassigned') return { name: 'account-assignment' };
+
   if (canUseDashboard(role)) {
     return { name: 'dashboard' };
   }
@@ -26,6 +29,9 @@ export const resolveUserHomeRoute = (user) => {
 
 export const resolveUserHomeLabel = (user) => {
   const role = user?.role || '';
+
+  if (role === 'super_admin') return 'إدارة النظام';
+  if (role === 'unassigned') return 'حسابي';
 
   if (canUseDashboard(role)) {
     return 'لوحة التحكم';

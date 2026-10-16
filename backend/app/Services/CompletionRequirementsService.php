@@ -2,12 +2,14 @@
 
 namespace App\Services;
 
+use App\Support\DepartmentContext;
+
 use App\Models\Student;
 use App\Models\User;
 use App\Services\Concerns\BuildsCompletionStudentRows;
 use App\Services\Concerns\FinalizesCompletionBranches;
 use App\Services\Concerns\ManagesCompletionSettings;
-use Illuminate\Support\Facades\DB;
+use App\Support\DepartmentData as DB;
 use Illuminate\Validation\ValidationException;
 
 class CompletionRequirementsService
@@ -68,7 +70,7 @@ class CompletionRequirementsService
 
     public function studentPayload(User $user): array
     {
-        abort_unless($user->role === 'student', 403, 'هذه البيانات مخصصة للطالب فقط.');
+        abort_unless(DepartmentContext::effectiveRole((string) $user->role) === 'student', 403, 'هذه البيانات مخصصة للطالب فقط.');
 
         $student = Student::query()
             ->whereNull('archive_id')

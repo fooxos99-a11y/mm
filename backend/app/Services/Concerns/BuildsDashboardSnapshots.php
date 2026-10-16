@@ -2,6 +2,8 @@
 
 namespace App\Services\Concerns;
 
+use App\Support\DepartmentContext;
+
 use App\Models\Reciter;
 use App\Models\Student;
 use App\Models\TrainingMaterial;
@@ -15,7 +17,7 @@ trait BuildsDashboardSnapshots
     public function loadDashboardSnapshot(bool $includeAll = false, int $page = 1): array
     {
         $currentUser = auth('sanctum')->user() ?: auth()->user();
-        $currentRole = (string) ($currentUser?->role ?? '');
+        $currentRole = DepartmentContext::effectiveRole((string) ($currentUser?->role ?? ''));
         $currentLoginCode = trim((string) ($currentUser?->login_code ?? ''));
         $managedBranchId = $this->resolveManagedDashboardBranchId($currentRole);
         [$students, $reciters] = $this->dashboardSnapshotPeopleLoader->load(

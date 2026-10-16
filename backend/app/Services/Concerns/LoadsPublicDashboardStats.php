@@ -2,7 +2,8 @@
 
 namespace App\Services\Concerns;
 
-use Illuminate\Support\Facades\DB;
+use App\Support\DepartmentContext;
+use App\Support\DepartmentData as DB;
 use Illuminate\Support\Facades\Schema;
 
 trait LoadsPublicDashboardStats
@@ -23,6 +24,23 @@ trait LoadsPublicDashboardStats
                 'practitioner' => ['graduates' => 1466, 'batches' => 29, 'courses' => 258],
             ],
         ];
+
+        if (DepartmentContext::id() !== DepartmentContext::DEFAULT_ID) {
+            $courses = DB::table('courses')->whereNull('archive_id')->where('entity_type', '!=', 'task')->count();
+            $batches = DB::table('archives')->count();
+            $graduates = DB::table('student_completion_results')->where('status', 'passed')->count();
+            $baseStats = [
+                'batches' => $batches, 'courses' => $courses,
+                'managerGraduates' => 0, 'supervisorGraduates' => 0, 'secretaryGraduates' => 0,
+                'practitionerGraduates' => $graduates,
+                'licenseDetails' => [
+                    'manager' => ['graduates' => 0, 'batches' => 0, 'courses' => 0],
+                    'supervisor' => ['graduates' => 0, 'batches' => 0, 'courses' => 0],
+                    'secretary' => ['graduates' => 0, 'batches' => 0, 'courses' => 0],
+                    'practitioner' => ['graduates' => $graduates, 'batches' => $batches, 'courses' => $courses],
+                ],
+            ];
+        }
 
         $graduatesCount = $baseStats['managerGraduates']
             + $baseStats['supervisorGraduates']

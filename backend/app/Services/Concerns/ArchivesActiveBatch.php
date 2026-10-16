@@ -6,7 +6,9 @@ use App\Models\Archive;
 use App\Models\Branch;
 use App\Models\Student;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
+use App\Support\DepartmentContext;
+use App\Support\DepartmentData as DB;
+use Illuminate\Support\Facades\DB as GlobalDB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
@@ -119,6 +121,14 @@ trait ArchivesActiveBatch
             $archivedLoginCodes = [];
             foreach ($activeStudents as $student) {
                 $originalLoginCode = trim((string) $student->login_code);
+                if ($originalLoginCode !== '') {
+                    GlobalDB::table('reserved_login_codes')->insertOrIgnore([
+                        'login_code' => $originalLoginCode,
+                        'user_id' => DB::table('users')->where('login_code', $originalLoginCode)->value('id'),
+                        'department_id' => DepartmentContext::id(),
+                        'created_at' => now(),
+                    ]);
+                }
                 $archivedLoginCode = $this->generateArchivedLoginCode();
                 $archivedLoginCodes[$originalLoginCode] = $archivedLoginCode;
                 DB::table('students')->where('id', $student->id)->update([
@@ -218,12 +228,15 @@ trait ArchivesActiveBatch
         } while (Student::query()->where('login_code', $loginCode)->exists()
             || DB::table('users')->where('login_code', $loginCode)->exists());
 
+        DB::reserveLoginCode($loginCode);
+
         return $loginCode;
     }
 
     private function clearDashboardCache(): void
     {
-        cache()->forget('dashboard:snapshot');
-        cache()->forget('dashboard:notifications');
+        $prefix = 'departments:'.(DepartmentContext::id() ?? 'none').':';
+        cache()->forget($prefix.'dashboard:snapshot');
+        app(\App\Services\DashboardCommunicationService::class)->clearCaches();
     }
 }

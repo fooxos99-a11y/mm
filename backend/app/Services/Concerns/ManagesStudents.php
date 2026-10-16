@@ -5,7 +5,9 @@ namespace App\Services\Concerns;
 use App\Models\Reciter;
 use App\Models\Student;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
+use App\Support\DepartmentContext;
+use App\Support\DepartmentData as DB;
+use Illuminate\Support\Facades\DB as GlobalDB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -14,6 +16,7 @@ trait ManagesStudents
 {
     public function updateStudent(Student $student, array $updates): Student
     {
+        abort_unless($student->department_id === DepartmentContext::id(), 404);
         $payload = [];
         $originalLoginCode = $student->login_code;
         $originalName = $student->full_name;
@@ -25,9 +28,9 @@ trait ManagesStudents
 
         if (array_key_exists('loginCode', $updates)) {
             $nextLoginCode = trim((string) $updates['loginCode']);
-            $exists = Student::query()
+            $exists = GlobalDB::table('students')
                 ->where('login_code', $nextLoginCode)
-                ->whereKeyNot($student->getKey())
+                ->where('id', '!=', $student->getKey())
                 ->exists();
 
             if ($exists) {
@@ -43,6 +46,16 @@ trait ManagesStudents
                 ->exists();
 
             if ($userExists) {
+                throw ValidationException::withMessages(['loginCode' => 'رقم الدخول مستخدم مسبقًا.']);
+            }
+
+            $accountId = User::query()->where('department_id', DepartmentContext::id())
+                ->where('login_code', $originalLoginCode)->where('role', 'student')->value('id');
+            $reservedForAnotherAccount = GlobalDB::table('reserved_login_codes')->where('login_code', $nextLoginCode)
+                ->when($accountId, fn ($query) => $query->where(function ($query) use ($accountId): void {
+                    $query->whereNull('user_id')->orWhere('user_id', '!=', $accountId);
+                }))->exists();
+            if ($nextLoginCode !== $originalLoginCode && $reservedForAnotherAccount) {
                 throw ValidationException::withMessages(['loginCode' => 'رقم الدخول مستخدم مسبقًا.']);
             }
 
@@ -80,13 +93,15 @@ trait ManagesStudents
             $targetLoginCode = $payload['login_code'] ?? $originalLoginCode;
             $targetName = $payload['full_name'] ?? $originalName;
 
-            $user = User::query()->updateOrCreate(
+            $user = User::query()->where('department_id', DepartmentContext::id())->updateOrCreate(
                 ['login_code' => $originalLoginCode],
                 [
+                    'department_id' => DepartmentContext::id(),
                     'full_name' => $targetName,
                     'role' => 'student',
                     'login_code' => $targetLoginCode,
-                    'password' => User::query()->where('login_code', $originalLoginCode)->value('password')
+                    'password' => User::query()->where('department_id', DepartmentContext::id())
+                        ->where('login_code', $originalLoginCode)->value('password')
                         ?: Hash::make(Str::random(64)),
                 ],
             );
@@ -123,8 +138,10 @@ trait ManagesStudents
 
     public function deleteStudent(Student $student): void
     {
+        abort_unless($student->department_id === DepartmentContext::id(), 404);
         DB::transaction(function () use ($student): void {
-            User::query()->where('login_code', $student->login_code)->where('role', 'student')->delete();
+            User::query()->where('department_id', DepartmentContext::id())
+                ->where('login_code', $student->login_code)->where('role', 'student')->delete();
             $student->delete();
         });
     }

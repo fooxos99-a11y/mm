@@ -2,10 +2,12 @@
 
 namespace App\Services\Concerns;
 
+use App\Support\DepartmentContext;
+
 use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
+use App\Support\DepartmentData as DB;
 
 trait ResolvesDashboardCommunicationAccess
 {
@@ -29,7 +31,7 @@ trait ResolvesDashboardCommunicationAccess
 
     private function actorIdentity(?User $user): array
     {
-        $role = (string) ($user?->role ?? '');
+        $role = DepartmentContext::effectiveRole((string) ($user?->role ?? ''));
 
         if ($user && in_array($role, ['admin', 'male_manager', 'female_manager'], true)) {
             $name = trim((string) $user->full_name) ?: trim((string) $user->login_code);
@@ -42,7 +44,7 @@ trait ResolvesDashboardCommunicationAccess
 
     private function currentActorRole(): string
     {
-        return (string) ($this->currentUser()?->role ?? '');
+        return DepartmentContext::effectiveRole((string) ($this->currentUser()?->role ?? ''));
     }
 
     private function managedBranchCode(): ?string

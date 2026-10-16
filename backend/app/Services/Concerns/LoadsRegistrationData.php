@@ -4,13 +4,20 @@ namespace App\Services\Concerns;
 
 use App\Models\Branch;
 use App\Models\RegistrationRequest;
-use Illuminate\Support\Facades\DB;
+use App\Support\DepartmentContext;
+use App\Support\DepartmentData as DB;
+use Illuminate\Support\Facades\DB as GlobalDB;
 
 trait LoadsRegistrationData
 {
     public function loadRegistrationPublicStatus(): array
     {
         return [
+            'departmentId' => DepartmentContext::id(),
+            'departments' => GlobalDB::table('departments')->where('is_active', true)->orderBy('name')
+                ->get(['id', 'name'])->map(fn ($department): array => [
+                    'id' => $department->id, 'name' => $department->name,
+                ])->all(),
             'isOpen' => $this->isRegistrationOpen(),
             'fields' => $this->registrationFormService->load(),
             'fixedLabels' => $this->registrationFormService->loadFixedLabels(),
@@ -53,7 +60,7 @@ trait LoadsRegistrationData
 
         return [
             'isOpen' => $this->isRegistrationOpen(),
-            'registrationUrl' => $origin.'/registration',
+            'registrationUrl' => $origin.'/registration?departmentId='.rawurlencode((string) DepartmentContext::id()),
             'fields' => $this->registrationFormService->load(),
             'fixedLabels' => $this->registrationFormService->loadFixedLabels(),
             'requests' => $requests->map(

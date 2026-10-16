@@ -2,6 +2,8 @@
 
 namespace App\Services\Concerns;
 
+use App\Support\DepartmentContext;
+
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Validation\ValidationException;
 
@@ -28,7 +30,7 @@ trait AuthorizesFinalExamAccess
 
     private function currentActorRole(): string
     {
-        return (string) ((auth('sanctum')->user() ?: auth()->user())?->role ?? '');
+        return DepartmentContext::effectiveRole((string) ((auth('sanctum')->user() ?: auth()->user())?->role ?? ''));
     }
 
     private function normalizeBranchCode(string $branchCode): string

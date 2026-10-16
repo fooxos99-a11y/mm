@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Database\Query\Builder;
-use Illuminate\Support\Facades\DB;
+use App\Support\DepartmentData as DB;
 
 class DashboardOverviewService
 {

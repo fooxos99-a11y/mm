@@ -67,6 +67,12 @@
             دخول
           </AppButton>
         </v-form>
+        <router-link
+          :to="{ name: 'account-registration' }"
+          class="login-panel__register"
+        >
+          إنشاء حساب مسؤول
+        </router-link>
       </section>
     </div>
   </div>
@@ -204,4 +210,5 @@ export default {
   border-radius: 16px;
   font-weight: 800;
 }
+.login-panel__register { display: block; margin-block-start: 20px; text-align: center; color: #063041; }
 </style>

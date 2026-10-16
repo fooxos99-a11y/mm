@@ -2,10 +2,12 @@
 
 namespace App\Services\Concerns;
 
+use App\Support\DepartmentContext;
+
 use App\Events\DashboardNotificationCreated;
 use App\Events\DashboardNotificationDeleted;
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Support\Facades\DB;
+use App\Support\DepartmentData as DB;
 
 trait ManagesDashboardNotifications
 {
@@ -64,7 +66,7 @@ trait ManagesDashboardNotifications
         $id = (string) str()->uuid();
         $timestamp = now();
         $user = $this->currentUser();
-        $role = (string) ($user?->role ?? '');
+        $role = DepartmentContext::effectiveRole((string) ($user?->role ?? ''));
         $targetBranchCode = trim((string) ($input['targetBranchId'] ?? '')) ?: null;
         $targetBranchCode = $targetBranchCode === 'all' ? null : $targetBranchCode;
         $targetLoginIds = $this->normalizeLoginIds($input['targetLoginIds'] ?? []);
@@ -82,6 +84,18 @@ trait ManagesDashboardNotifications
             }
         } elseif ($user && $role !== 'admin') {
             throw new AuthorizationException;
+        }
+
+        if ($targetLoginIds !== []) {
+            $matched = DB::table('users')->whereIn('login_code', $targetLoginIds)->pluck('login_code')
+                ->merge(DB::table('students')->whereNull('archive_id')
+                    ->whereIn('login_code', $targetLoginIds)->pluck('login_code'))->unique();
+            if ($matched->count() !== count($targetLoginIds)) {
+                throw new AuthorizationException;
+            }
+            if ($targetBranchCode !== null) {
+                $this->assertLoginIdsBelongToBranch($targetLoginIds, $targetBranchCode);
+            }
         }
 
         [$createdByName, $createdByRole] = $this->actorIdentity($user);

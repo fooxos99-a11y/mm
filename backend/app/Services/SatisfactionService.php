@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
+use App\Support\DepartmentData as DB;
 use Illuminate\Validation\ValidationException;
 
 class SatisfactionService
@@ -106,6 +106,7 @@ class SatisfactionService
 
     public function submitSatisfactionResponses(array $responses): array
     {
+        StudentIdentityGuard::assertAllowed(array_column($responses, 'loginCode'), 'responses');
         foreach ($responses as $response) {
             if (! DB::table('satisfaction_questions')->where('id', $response['questionId'])
                 ->where('course_id', $response['courseId'])->whereNull('archive_id')->whereNull('deleted_at')->exists()) {
@@ -126,11 +127,14 @@ class SatisfactionService
             $responses,
         );
 
-        DB::table('satisfaction_responses')->upsert(
-            $rows,
-            ['course_id', 'question_id', 'login_code'],
-            ['student_name', 'rating_value', 'text_value', 'submitted_at'],
-        );
+        DB::transaction(function () use ($rows): void {
+            StudentIdentityGuard::assertAllowed(array_column($rows, 'login_code'), 'responses', true);
+            DB::table('satisfaction_responses')->upsert(
+                $rows,
+                ['course_id', 'question_id', 'login_code'],
+                ['student_name', 'rating_value', 'text_value', 'submitted_at'],
+            );
+        });
 
         return array_map(
             fn (array $row) => [

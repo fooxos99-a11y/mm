@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
+use App\Support\DepartmentData as DB;
 use Illuminate\Support\Facades\Schema;
 
 class SatisfactionTemplateService

@@ -3,7 +3,7 @@
 namespace App\Services\Concerns;
 
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
+use App\Support\DepartmentData as DB;
 
 trait ManagesFinalExamSettings
 {

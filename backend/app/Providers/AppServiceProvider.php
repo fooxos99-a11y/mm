@@ -19,7 +19,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        config(['media-library.media_model' => \App\Models\Media::class]);
     }
 
     /**
@@ -53,7 +53,7 @@ class AppServiceProvider extends ServiceProvider
                 ->where('login_code', $loginCode)
                 ->first();
 
-            if (! $user || ! $user->password || ! Hash::check($password, $user->password)) {
+            if (! $user || ! $user->is_active || ! $user->password || ! Hash::check($password, $user->password)) {
                 return null;
             }
 

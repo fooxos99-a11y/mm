@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\TrainingMaterial;
 use App\Models\User;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use App\Models\Media;
 
 class TrainingMaterialAttachmentService
 {
@@ -26,7 +26,8 @@ class TrainingMaterialAttachmentService
             ->firstOrFail();
 
         abort_unless($media->model_type === TrainingMaterial::class, 404);
-        $this->accessService->assertCanView($user, $media->model);
+        $material = TrainingMaterial::query()->findOrFail($media->model_id);
+        $this->accessService->assertCanView($user, $material);
 
         return $media;
     }

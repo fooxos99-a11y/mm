@@ -2,9 +2,11 @@
 
 namespace App\Services;
 
+use App\Support\DepartmentContext;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\DB;
+use App\Support\DepartmentData as DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Validation\ValidationException;
 use Throwable;
 
@@ -56,7 +58,10 @@ class AssessmentAttachmentService
         }
 
         try {
-            return Storage::disk($this->disk())->temporaryUrl($path, now()->addMinutes(30));
+            return URL::temporarySignedRoute('assessment-attachments.show', now()->addMinutes(30), [
+                'reference' => rtrim(strtr(base64_encode($path), '+/', '-_'), '='),
+                'departmentId' => DepartmentContext::id(),
+            ]);
         } catch (Throwable) {
             return '';
         }

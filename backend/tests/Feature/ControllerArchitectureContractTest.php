@@ -3,8 +3,10 @@
 namespace Tests\Feature;
 
 use App\Http\Controllers\Api\AttendanceController;
+use App\Http\Controllers\Api\AssessmentAttachmentController;
 use App\Http\Controllers\Api\CourseAssessmentController;
 use App\Http\Controllers\Api\DashboardAccountController;
+use App\Http\Controllers\Api\DepartmentManagementController;
 use App\Http\Controllers\Api\EditorAssetController;
 use App\Http\Controllers\Api\FinalExamController;
 use App\Http\Controllers\Api\NotificationController;
@@ -47,7 +49,8 @@ class ControllerArchitectureContractTest extends TestCase
 
         foreach ($this->splitControllers() as $controller) {
             $this->assertTrue(
-                $actions->contains(fn (string $action): bool => str_starts_with($action, $controller.'@')),
+                $actions->contains(fn (string $action): bool => $action === $controller
+                    || str_starts_with($action, $controller.'@')),
                 $controller,
             );
         }
@@ -67,8 +70,10 @@ class ControllerArchitectureContractTest extends TestCase
     {
         return [
             AttendanceController::class,
+            AssessmentAttachmentController::class,
             CourseAssessmentController::class,
             DashboardAccountController::class,
+            DepartmentManagementController::class,
             EditorAssetController::class,
             FinalExamController::class,
             NotificationController::class,

@@ -3,6 +3,8 @@
 use App\Http\Middleware\AddSecurityHeaders;
 use App\Http\Middleware\EnsureDashboardAccess;
 use App\Http\Middleware\EnsurePasswordChanged;
+use App\Http\Middleware\ResolveDepartmentContext;
+use App\Http\Middleware\EnsureGeneralManager;
 use App\Http\Middleware\SanitizeRichTextInput;
 use App\Services\OperationalMetricsService;
 use Illuminate\Auth\AuthenticationException;
@@ -30,6 +32,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(AddSecurityHeaders::class);
         $middleware->append(SanitizeRichTextInput::class);
         $middleware->statefulApi();
+        $middleware->api(append: [ResolveDepartmentContext::class]);
+        $middleware->prependToPriorityList(
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            ResolveDepartmentContext::class,
+        );
 
         $middleware->redirectGuestsTo(function (Request $request) use ($isApiRequest): ?string {
             if ($isApiRequest($request)) {
@@ -44,6 +51,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'dashboard.access' => EnsureDashboardAccess::class,
             'password.changed' => EnsurePasswordChanged::class,
+            'general.manager' => EnsureGeneralManager::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) use ($isApiRequest): void {

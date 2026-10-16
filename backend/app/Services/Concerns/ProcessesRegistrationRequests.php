@@ -3,7 +3,7 @@
 namespace App\Services\Concerns;
 
 use App\Models\RegistrationRequest;
-use Illuminate\Support\Facades\DB;
+use App\Support\DepartmentData as DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 

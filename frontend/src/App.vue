@@ -1,5 +1,9 @@
 <template>
   <component :is="shellComponent">
+    <DepartmentContextBar
+      v-if="$store.state.currentUser?.departmentName"
+      :user="$store.state.currentUser"
+    />
     <router-view v-slot="{ Component }">
       <transition
         name="app-route"
@@ -25,7 +29,7 @@ const VuetifyAppShell = defineAsyncComponent(() => import(
 
 export default {
   name: 'AppRoot',
-  components: { PublicAppShell, VuetifyAppShell },
+  components: { PublicAppShell, VuetifyAppShell, DepartmentContextBar: defineAsyncComponent(() => import('./components/departments/DepartmentContextBar.vue')) },
   computed: {
     shellComponent() {
       const routeMatched = this.$route.matched.length > 0;

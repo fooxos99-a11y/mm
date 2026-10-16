@@ -88,7 +88,7 @@ trait SyncsTrainingMaterialAttachments
                     'display_name' => $label,
                     'original_client_name' => $file->getClientOriginalName(),
                 ])
-                ->toMediaCollection('attachments', 'public');
+                ->toMediaCollection('attachments', 'local');
             $keepMediaIds[] = (string) $newMedia->id;
         }
 

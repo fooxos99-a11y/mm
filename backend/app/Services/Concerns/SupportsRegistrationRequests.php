@@ -4,9 +4,9 @@ namespace App\Services\Concerns;
 
 use App\Models\Branch;
 use App\Models\RegistrationRequest;
-use App\Models\Student;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
+use App\Support\DepartmentData as DB;
+use Illuminate\Support\Facades\DB as GlobalDB;
 use Illuminate\Validation\ValidationException;
 
 trait SupportsRegistrationRequests
@@ -24,13 +24,14 @@ trait SupportsRegistrationRequests
         }
 
         if (
-            Student::query()->where('login_code', $loginCode)->exists()
+            GlobalDB::table('students')->where('login_code', $loginCode)->exists()
                 || User::query()->where('login_code', $loginCode)->exists()
+                || GlobalDB::table('reserved_login_codes')->where('login_code', $loginCode)->exists()
         ) {
             throw ValidationException::withMessages(['loginCode' => 'رقم الدخول مستخدم مسبقًا.']);
         }
 
-        $requestQuery = RegistrationRequest::query()
+        $requestQuery = GlobalDB::table('registration_requests')
             ->where('login_code', $loginCode)
             ->whereIn('status', ['pending', 'accepted']);
         if ($exceptRequestId) {

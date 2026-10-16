@@ -1,4 +1,5 @@
 import apiClient, { publicApiClient } from './httpClient';
+import { publicDepartmentParams } from './departmentContext';
 
 export const fetchRegistrationDashboardData = async () => {
   const response = await apiClient.get('/dashboard/registration');
@@ -34,14 +35,16 @@ export const markRegistrationRequestAccepted = async (requestId) => {
   return response.data;
 };
 
-export const fetchPublicRegistrationStatus = async () => {
-  const response = await publicApiClient.get('/public/registration');
+export const fetchPublicRegistrationStatus = async (departmentId) => {
+  const response = await publicApiClient.get('/public/registration', { params: publicDepartmentParams(departmentId) });
 
   return response.data;
 };
 
 export const submitPublicRegistrationRequest = async (payload) => {
-  const response = await publicApiClient.post('/public/registration-requests', payload);
+  const response = await publicApiClient.post('/public/registration-requests', { ...payload, ...publicDepartmentParams(payload.departmentId) });
 
   return response.data;
 };
+
+export const fetchPublicDepartments = async () => (await publicApiClient.get('/public/departments')).data;

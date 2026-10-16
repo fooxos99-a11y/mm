@@ -15,7 +15,7 @@ const actionMap = (loader, exportName, actionNames) => Object.fromEntries(
 );
 
 export const lazyDomainActions = {
-  ...actionMap(auth, 'authActions', ['bootstrapAuth', 'login', 'logout']),
+  ...actionMap(auth, 'authActions', ['bootstrapAuth', 'login', 'logout', 'selectDepartmentContext']),
   ...actionMap(dashboard, 'dashboardActions', [
     'loadDashboardSnapshot', 'refreshDashboardSnapshot', 'ensureDashboardSnapshot', 'initializeDashboard', 'initializeRealtime',
     'reloadNotifications',

@@ -32,6 +32,10 @@ class EndToEndAccountSeeder extends Seeder
         }
 
         $passwordHash = Hash::make($password);
+        foreach (['e2e-general-manager' => 'super_admin', 'e2ependingmanager' => 'unassigned'] as $login => $role) {
+            $this->user($login, $role === 'super_admin' ? 'المدير العام للاختبار' : 'مسؤول الإدارة الجديدة', $role, $passwordHash)
+                ->forceFill(['department_id' => null])->save();
+        }
         $maleBranch = Branch::query()->where('code', 'male')->firstOrFail();
         $femaleBranch = Branch::query()->where('code', 'female')->firstOrFail();
 

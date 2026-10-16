@@ -349,8 +349,10 @@ class PublicContentArchiveTest extends CoreDataApiTestCase
             'branchId' => 'male',
             'note' => 'إعادة استخدام الرقم',
         ])
-            ->assertCreated()
-            ->assertJsonPath('loginId', '8610');
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['login_code']);
+        $this->assertDatabaseHas('reserved_login_codes', ['login_code' => '8610']);
+        $this->assertDatabaseMissing('users', ['login_code' => '8610', 'role' => 'student']);
 
         $this->getJson('/api/dashboard/archives/'.$archiveId.'/students/'.$studentId)
             ->assertOk()

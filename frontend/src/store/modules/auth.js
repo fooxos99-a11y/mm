@@ -1,8 +1,10 @@
 import {
+  applyApiUserContext,
   fetchCurrentUser,
   login as loginRequest,
   logout as logoutRequest,
 } from '../../services/authApi';
+import { updateDepartmentContext } from '../../services/managementApi';
 import { cleanupDashboardRealtime } from '../realtimeLifecycle';
 export {
   authGetters,
@@ -11,6 +13,15 @@ export {
 } from './storeState.mjs';
 
 export const authActions = {
+  async selectDepartmentContext({ commit }, departmentId) {
+    const payload = await updateDepartmentContext(departmentId);
+    await cleanupDashboardRealtime();
+    applyApiUserContext(payload.user);
+    commit('setDashboardSnapshot', null);
+    commit('setDashboardLoading', false);
+    commit('setDashboardError', '');
+    commit('setAuthState', { user: payload.user });
+  },
   async bootstrapAuth({ state, commit }) {
     if (state.authChecked) return;
 
@@ -49,6 +60,7 @@ export const authActions = {
   },
   async logout({ commit }) {
     const request = logoutRequest().catch(() => {});
+    applyApiUserContext(null);
     commit('clearAuthState');
     commit('setAuthChecked', true);
     commit('setAuthError', '');

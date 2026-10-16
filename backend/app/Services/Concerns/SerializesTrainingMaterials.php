@@ -3,6 +3,7 @@
 namespace App\Services\Concerns;
 
 use App\Models\TrainingMaterial;
+use App\Support\DepartmentContext;
 use Illuminate\Support\Str;
 
 trait SerializesTrainingMaterials
@@ -23,7 +24,8 @@ trait SerializesTrainingMaterials
                 'size' => (int) $media->size,
                 'type' => 'file',
                 'url' => request()->getSchemeAndHttpHost().$pathPrefix
-                    .'/api/training-material-attachments/'.rawurlencode($attachmentId),
+                    .'/api/training-material-attachments/'.rawurlencode($attachmentId)
+                    .'?departmentId='.rawurlencode((string) DepartmentContext::id()),
             ];
         });
         $externalAttachments = collect($material->external_attachments ?? [])->map(fn (array $attachment): array => [

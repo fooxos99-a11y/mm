@@ -2,10 +2,12 @@
 
 namespace App\Services;
 
+use App\Support\DepartmentContext;
+
 use App\Models\Reciter;
 use App\Models\Student;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
+use App\Support\DepartmentData as DB;
 
 class PeopleDirectoryService
 {
@@ -15,10 +17,10 @@ class PeopleDirectoryService
 
     public function paginate(User $user, array $filters): array
     {
-        $branch = $filters['branchCode'] ?? match ($user->role) {
+        $branch = $filters['branchCode'] ?? match (DepartmentContext::effectiveRole((string) $user->role)) {
             'female_manager' => 'female', default => 'male',
         };
-        $managedBranch = match ($user->role) {
+        $managedBranch = match (DepartmentContext::effectiveRole((string) $user->role)) {
             'male_manager' => 'male', 'female_manager' => 'female', 'admin' => null,
             default => abort(403),
         };

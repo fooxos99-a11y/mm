@@ -204,7 +204,7 @@ export default {
       return this.loading || this.submitting || Boolean(this.deletingId);
     },
     roleOptions() {
-      return DASHBOARD_ACCOUNT_ROLE_OPTIONS;
+      return DASHBOARD_ACCOUNT_ROLE_OPTIONS.map(option => ({ ...option, label: option.value === 'admin' ? (this.currentUser?.roleLabel || option.label) : option.label }));
     },
   },
   watch: {
@@ -226,7 +226,7 @@ export default {
   methods: {
     ...mapActions(['fetchDashboardAccounts', 'createDashboardAccount', 'deleteDashboardAccount']),
     roleLabel(role) {
-      return resolveDashboardAccountRoleLabel(role);
+      return role === 'admin' ? (this.currentUser?.roleLabel || resolveDashboardAccountRoleLabel(role)) : resolveDashboardAccountRoleLabel(role);
     },
     async loadAccounts() {
       this.errorMessage = '';

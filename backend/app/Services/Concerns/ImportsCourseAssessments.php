@@ -3,7 +3,8 @@
 namespace App\Services\Concerns;
 
 use App\Models\Student;
-use Illuminate\Support\Facades\DB;
+use App\Services\StudentIdentityGuard;
+use App\Support\DepartmentData as DB;
 use Illuminate\Validation\ValidationException;
 
 trait ImportsCourseAssessments
@@ -26,6 +27,7 @@ trait ImportsCourseAssessments
         }
         $normalizedSubmissions = array_values($dedupedByLogin);
         $loginIds = array_values(array_map(fn (array $submission) => $submission['loginId'], $normalizedSubmissions));
+        StudentIdentityGuard::assertAllowed($loginIds, 'submissions');
         $actionableSubmissions = array_values(array_filter($normalizedSubmissions, function (array $submission): bool {
             $hasManualScore = isset($submission['manualScore'])
                 && is_numeric($submission['manualScore'])
@@ -51,6 +53,7 @@ trait ImportsCourseAssessments
             $normalizedSubmissions,
             $questionSnapshots
         ): array {
+            StudentIdentityGuard::assertAllowed(array_column($actionableSubmissions, 'loginId'), 'submissions', true);
             $existingIds = DB::table('course_submissions')
                 ->where('course_id', $courseId)->where('assessment_type', $assessmentType)
                 ->whereNull('archive_id')->whereIn('login_code', $loginIds)->pluck('id')->all();

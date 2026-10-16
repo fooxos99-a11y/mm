@@ -3,6 +3,9 @@
 namespace App\Services;
 
 use App\Models\User;
+use App\Support\DepartmentContext;
+use App\Support\DepartmentData as DB;
+use Illuminate\Support\Facades\DB as GlobalDB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
@@ -11,6 +14,7 @@ class DashboardAccountService
     public function list(): array
     {
         return User::query()
+            ->where('department_id', DepartmentContext::id())
             ->whereIn('role', ['admin', 'male_manager', 'female_manager'])
             ->orderBy('created_at')
             ->get()
@@ -36,22 +40,32 @@ class DashboardAccountService
             throw ValidationException::withMessages(['role' => 'نوع الحساب الإشرافي غير صالح.']);
         }
 
-        if (User::query()->where('login_code', $loginCode)->exists()) {
+        if (User::query()->where('login_code', $loginCode)->exists()
+            || GlobalDB::table('reserved_login_codes')->where('login_code', $loginCode)->exists()) {
             throw ValidationException::withMessages(['login_code' => 'رقم الدخول مستخدم مسبقًا.']);
         }
 
-        return User::query()->create([
+        return DB::transaction(fn (): User => User::query()->create([
+            'department_id' => DepartmentContext::id(),
             'full_name' => $name,
             'role' => $role,
             'login_code' => $loginCode,
             'password' => Hash::make($password),
             'must_change_password' => false,
-        ]);
+        ]));
     }
 
     public function delete(string $accountId): void
     {
+        if (GlobalDB::table('departments')->where('id', DepartmentContext::id())
+            ->where('manager_user_id', $accountId)->exists()) {
+            throw ValidationException::withMessages([
+                'accountId' => 'مسؤول الإدارة مرتبط بها. يمكن للمدير العام استبداله من إدارة الإدارات.',
+            ]);
+        }
+
         User::query()
+            ->where('department_id', DepartmentContext::id())
             ->whereKey($accountId)
             ->whereIn('role', ['admin', 'male_manager', 'female_manager'])
             ->delete();

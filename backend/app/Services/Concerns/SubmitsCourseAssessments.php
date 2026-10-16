@@ -3,8 +3,9 @@
 namespace App\Services\Concerns;
 
 use App\Models\Student;
+use App\Services\StudentIdentityGuard;
 use Illuminate\Database\UniqueConstraintViolationException;
-use Illuminate\Support\Facades\DB;
+use App\Support\DepartmentData as DB;
 use Illuminate\Validation\ValidationException;
 use Throwable;
 
@@ -22,6 +23,7 @@ trait SubmitsCourseAssessments
         }
 
         $loginId = trim($submission['loginId']);
+        StudentIdentityGuard::assertAllowed($loginId, 'loginId');
         $studentName = trim($submission['studentName']);
         if ($loginId === '' || $studentName === '') {
             throw ValidationException::withMessages(['loginId' => 'بيانات المعلم/ة غير مكتملة.']);
@@ -56,6 +58,7 @@ trait SubmitsCourseAssessments
                 $questionSnapshots,
                 &$storedPaths
             ) {
+                StudentIdentityGuard::assertAllowed($loginId, 'loginId', true);
                 // The unique scope rejects simultaneous retries without locking gaps for other students.
                 DB::table('course_submissions')->insert([
                     'id' => $submissionId,

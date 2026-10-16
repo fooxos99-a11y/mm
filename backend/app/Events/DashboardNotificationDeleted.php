@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Support\DepartmentContext;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
@@ -12,13 +13,20 @@ class DashboardNotificationDeleted implements ShouldBroadcastNow
     use Dispatchable;
     use SerializesModels;
 
+    public readonly ?string $departmentId;
+
     public function __construct(public readonly string $notificationId)
     {
+        $this->departmentId = DepartmentContext::id();
     }
 
     public function broadcastOn(): array
     {
-        return [new PrivateChannel('dashboard.notifications.admin')];
+        if ($this->departmentId === null) {
+            return [];
+        }
+        $prefix = "departments.{$this->departmentId}.";
+        return [new PrivateChannel($prefix.'dashboard.notifications.admin')];
     }
 
     public function broadcastAs(): string

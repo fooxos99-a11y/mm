@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\DepartmentManagementController;
+use App\Http\Controllers\Api\AssessmentAttachmentController;
 use App\Http\Controllers\Api\ClientErrorController;
 use App\Http\Controllers\Api\CourseAssessmentController;
 use App\Http\Controllers\Api\CourseController;
@@ -30,6 +32,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('health/operations', OperationalHealthController::class)->middleware('throttle:30,1');
 
 Route::prefix('auth')->group(function () {
+    Route::post('register-account', [AuthController::class, 'register'])->middleware('throttle:5,1');
     Route::post('login', [AuthController::class, 'login']);
     Route::get('session', [AuthController::class, 'session']);
 
@@ -42,6 +45,7 @@ Route::prefix('auth')->group(function () {
 });
 
 Route::prefix('public')->group(function () {
+    Route::get('departments', [DepartmentManagementController::class, 'publicDepartments']);
     Route::get('snapshot', [SnapshotController::class, 'snapshot']);
     Route::get('stats', [SnapshotController::class, 'publicStats']);
     Route::get('registration', [RegistrationController::class, 'publicStatus']);
@@ -57,7 +61,22 @@ Route::prefix('public')->group(function () {
     });
 });
 
+Route::prefix('management')->middleware(['auth:sanctum', 'password.changed', 'general.manager'])->group(function () {
+    Route::get('departments', [DepartmentManagementController::class, 'index']);
+    Route::post('departments', [DepartmentManagementController::class, 'store']);
+    Route::put('departments/{departmentId}', [DepartmentManagementController::class, 'update']);
+    Route::get('accounts', [DepartmentManagementController::class, 'accounts']);
+    Route::put('context', [DepartmentManagementController::class, 'context']);
+    Route::get('overview', [DepartmentManagementController::class, 'overview']);
+    Route::get('archives', [DepartmentManagementController::class, 'archives']);
+    Route::get('archives/search/students', [DepartmentManagementController::class, 'searchStudents']);
+    Route::get('archives/{archiveId}', [DepartmentManagementController::class, 'archive']);
+    Route::get('archives/{archiveId}/students/{studentId}', [DepartmentManagementController::class, 'student']);
+});
+
 Route::middleware(['auth:sanctum', 'password.changed'])->group(function () {
+    Route::get('assessment-attachments/{reference}', AssessmentAttachmentController::class)
+        ->middleware('signed')->name('assessment-attachments.show');
     Route::post('client-errors', ClientErrorController::class)->middleware('throttle:20,1');
     Route::get('training-material-attachments/{attachmentId}', [TrainingMaterialController::class, 'attachment']);
     Route::prefix('dashboard')->group(function () {

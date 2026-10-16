@@ -2,7 +2,7 @@
 
 namespace App\Services\Concerns;
 
-use Illuminate\Support\Facades\DB;
+use App\Support\DepartmentData as DB;
 use Illuminate\Validation\ValidationException;
 
 trait ManagesCourseLifecycle

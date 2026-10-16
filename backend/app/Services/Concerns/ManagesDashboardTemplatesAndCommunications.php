@@ -3,7 +3,7 @@
 namespace App\Services\Concerns;
 
 use App\Models\Student;
-use Illuminate\Support\Facades\DB;
+use App\Support\DepartmentData as DB;
 use Illuminate\Validation\ValidationException;
 
 trait ManagesDashboardTemplatesAndCommunications

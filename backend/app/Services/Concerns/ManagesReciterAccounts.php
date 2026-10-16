@@ -5,7 +5,9 @@ namespace App\Services\Concerns;
 use App\Models\Reciter;
 use App\Models\Student;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
+use App\Support\DepartmentContext;
+use App\Support\DepartmentData as DB;
+use Illuminate\Support\Facades\DB as GlobalDB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -39,18 +41,26 @@ trait ManagesReciterAccounts
         ): Reciter {
             $currentUser = $currentLoginCode === ''
                 ? null
-                : User::query()->where('login_code', $currentLoginCode)->where('role', 'reciter')->first();
+                : User::query()->where('department_id', DepartmentContext::id())
+                    ->where('login_code', $currentLoginCode)->where('role', 'reciter')->first();
 
-            $targetUser = User::query()->where('login_code', $loginCode)->where('role', 'reciter')->first();
+            if ($currentLoginCode !== '' && ! $currentUser) {
+                throw ValidationException::withMessages(['login_code' => 'حساب المقرئ غير موجود في هذه الإدارة.']);
+            }
+
             $conflictingUser = User::query()->where('login_code', $loginCode)
                 ->when($currentUser, fn ($query) => $query->whereKeyNot($currentUser->id))
                 ->first();
 
-            if ($conflictingUser || ($targetUser && (! $currentUser || $targetUser->id !== $currentUser->id))) {
+            $reserved = GlobalDB::table('reserved_login_codes')->where('login_code', $loginCode)
+                ->when($currentUser, fn ($query) => $query->where(function ($query) use ($currentUser): void {
+                    $query->whereNull('user_id')->orWhere('user_id', '!=', $currentUser->id);
+                }))->exists();
+            if ($conflictingUser || $reserved) {
                 throw ValidationException::withMessages(['login_code' => 'رقم دخول المقرئ مستخدم مسبقًا.']);
             }
 
-            $user = $currentUser ?? $targetUser;
+            $user = $currentUser;
 
             if ($user) {
                 $user->update(array_filter([
@@ -61,6 +71,7 @@ trait ManagesReciterAccounts
                 ], static fn ($value): bool => $value !== null));
             } else {
                 $user = User::query()->create([
+                    'department_id' => DepartmentContext::id(),
                     'full_name' => $name,
                     'role' => 'reciter',
                     'login_code' => $loginCode,
@@ -77,11 +88,20 @@ trait ManagesReciterAccounts
             $reciter->save();
 
             $validatedStudentIds = Student::query()
+                ->whereNull('archive_id')->where('branch_id', $branch->id)
                 ->whereIn('id', $linkedStudentIds)
                 ->pluck('id')
                 ->all();
 
-            $reciter->students()->sync($validatedStudentIds);
+            if (count(array_unique($linkedStudentIds)) !== count($validatedStudentIds)) {
+                throw ValidationException::withMessages(['studentIds' => 'اختر معلمين من فرع المقرئ وإدارته.']);
+            }
+            DB::table('reciter_students')->where('reciter_id', $reciter->id)->delete();
+            foreach ($validatedStudentIds as $studentId) {
+                DB::table('reciter_students')->insert([
+                    'reciter_id' => $reciter->id, 'student_id' => $studentId, 'created_at' => now(),
+                ]);
+            }
 
             return $reciter->fresh(['user', 'branch', 'students.branch', 'students.parts']);
         });
@@ -96,7 +116,8 @@ trait ManagesReciterAccounts
         }
 
         return DB::transaction(function () use ($loginCode): ?string {
-            $user = User::query()->where('login_code', $loginCode)->where('role', 'reciter')->first();
+            $user = User::query()->where('department_id', DepartmentContext::id())
+                ->where('login_code', $loginCode)->where('role', 'reciter')->first();
 
             if (! $user) {
                 return null;
@@ -124,7 +145,8 @@ trait ManagesReciterAccounts
             return null;
         }
 
-        $user = User::query()->where('login_code', $loginCode)->where('role', 'reciter')->first();
+        $user = User::query()->where('department_id', DepartmentContext::id())
+            ->where('login_code', $loginCode)->where('role', 'reciter')->first();
 
         if (! $user) {
             return null;

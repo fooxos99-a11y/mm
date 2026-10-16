@@ -45,7 +45,9 @@ export const subscribeDashboardRealtime = ({ user, ...handlers } = {}) => {
       'dashboard.notifications.all',
       `dashboard.notifications.${role === 'female_manager' ? 'female' : 'male'}`,
     ];
-  const notificationChannels = channelNames.map((name) => echo.private(name));
+  if (!user?.departmentId) return () => {};
+  const scopedChannelNames = channelNames.map(name => `departments.${user.departmentId}.${name}`);
+  const notificationChannels = scopedChannelNames.map((name) => echo.private(name));
 
   notificationChannels.forEach((channel) => {
     channel.listen('.dashboard.notification.created', ({ notification }) => {
@@ -58,7 +60,7 @@ export const subscribeDashboardRealtime = ({ user, ...handlers } = {}) => {
   });
 
   return () => {
-    channelNames.forEach((name) => echo.leave(name));
+    scopedChannelNames.forEach((name) => echo.leave(name));
   };
 };
 

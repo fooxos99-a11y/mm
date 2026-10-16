@@ -8,9 +8,11 @@ use App\Models\Student;
 use App\Services\CoreDataService;
 use App\Services\RegistrationService;
 use App\Support\Security\DashboardPermissionResolver;
+use App\Support\DepartmentContext;
 use Closure;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 
 class EnsureDashboardAccess
@@ -32,7 +34,9 @@ class EnsureDashboardAccess
         }
 
         $user = $request->user();
-        $role = (string) ($user?->role ?? '');
+        $role = DepartmentContext::effectiveRole($user?->role ?? '');
+
+        $this->assertDepartmentResources($request);
 
         if ($role === 'admin') {
             return $next($request);
@@ -66,6 +70,27 @@ class EnsureDashboardAccess
         return response()->json([
             'message' => 'غير مصرح لك بالوصول إلى لوحة التحكم.',
         ], Response::HTTP_FORBIDDEN);
+    }
+
+    private function assertDepartmentResources(Request $request): void
+    {
+        $path = $request->path();
+        $resources = [
+            'courseId' => 'courses', 'templateId' => 'task_templates', 'materialId' => 'training_materials',
+            'notificationId' => 'notifications', 'accountId' => 'users', 'archiveId' => 'archives',
+            'requestId' => 'registration_requests',
+            'questionId' => str_contains($path, 'satisfaction-questions') ? 'satisfaction_questions'
+                : (str_contains($path, 'final-exam') ? 'final_exam_questions' : 'course_questions'),
+            'submissionId' => str_contains($path, 'final-exam') ? 'final_exam_submissions' : 'course_submissions',
+        ];
+        foreach ($resources as $parameter => $table) {
+            $id = $request->route($parameter);
+            if (is_string($id) && DB::table($table)->where('id', $id)
+                ->where(fn ($query) => $query->where('department_id', '!=', DepartmentContext::id())->orWhereNull('department_id'))
+                ->exists()) {
+                abort(404);
+            }
+        }
     }
 
     private function requestTargetsOnlyManagedBranch(Request $request, string $managedBranch): bool

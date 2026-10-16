@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Support\DepartmentContext;
+
 use App\Models\Reciter;
 use App\Models\Student;
 use App\Models\User;
@@ -15,11 +17,11 @@ class PeopleEditorService
 
     private function query(User $user, string $type): Builder
     {
-        abort_unless(in_array($user->role, ['admin', 'male_manager', 'female_manager'], true), 403);
+        abort_unless(in_array(DepartmentContext::effectiveRole((string) $user->role), ['admin', 'male_manager', 'female_manager'], true), 403);
         $query = $type === 'reciter' ? Reciter::query()->with('user') : Student::query();
         $query->whereNull('archive_id')->with('branch');
-        if ($user->role !== 'admin') {
-            $branch = $user->role === 'male_manager' ? 'male' : 'female';
+        if (DepartmentContext::effectiveRole((string) $user->role) !== 'admin') {
+            $branch = DepartmentContext::effectiveRole((string) $user->role) === 'male_manager' ? 'male' : 'female';
             $query->whereHas('branch', fn ($query) => $query->where('code', $branch));
         }
 
@@ -29,8 +31,8 @@ class PeopleEditorService
     public function options(User $user, array $filters): array
     {
         $type = $filters['type'] ?? 'student';
-        $branch = $filters['branchCode'] ?? ($user->role === 'female_manager' ? 'female' : 'male');
-        abort_if($user->role !== 'admin' && $branch !== ($user->role === 'female_manager' ? 'female' : 'male'), 403);
+        $branch = $filters['branchCode'] ?? (DepartmentContext::effectiveRole((string) $user->role) === 'female_manager' ? 'female' : 'male');
+        abort_if(DepartmentContext::effectiveRole((string) $user->role) !== 'admin' && $branch !== (DepartmentContext::effectiveRole((string) $user->role) === 'female_manager' ? 'female' : 'male'), 403);
         $query = $this->query($user, $type)->whereHas('branch', fn ($query) => $query->where('code', $branch));
         $search = trim($filters['search'] ?? '');
         if ($search !== '') {

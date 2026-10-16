@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Models\Branch;
 use App\Models\TrainingMaterial;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
+use App\Support\DepartmentData as DB;
 
 class DashboardSnapshotReferenceLoader
 {

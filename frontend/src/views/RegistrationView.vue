@@ -27,6 +27,22 @@
             </h1>
           </div>
 
+          <AppSelect
+            v-if="departments.length"
+            v-model="departmentId"
+            label="الإدارة"
+            :items="departmentOptions"
+            item-text="label"
+            item-value="value"
+            :disabled="submitting || registrationState === 'success'"
+            @update:model-value="loadStatus"
+          />
+          <p
+            v-if="registrationState === 'choose'"
+            class="registration-entry__state"
+          >
+            اختر الإدارة لعرض نموذج التسجيل.
+          </p>
           <output
             v-if="registrationState === 'loading'"
             class="registration-entry__state d-block"
@@ -39,7 +55,7 @@
             v-else-if="registrationState === 'error'"
             class="registration-entry__state registration-entry__state--error"
             :message="loadError"
-            @retry="loadStatus"
+            @retry="initializeRegistration"
           />
 
           <div
@@ -54,7 +70,7 @@
             class="registration-entry__state registration-entry__state--success d-block"
             aria-live="polite"
           >
-            تم الإرسال بنجاح
+            أُرسل طلب التسجيل.
           </output>
 
           <form

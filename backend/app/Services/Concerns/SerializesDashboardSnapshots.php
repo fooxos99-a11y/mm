@@ -6,6 +6,8 @@ use App\Models\Branch;
 use App\Models\Reciter;
 use App\Models\Student;
 use App\Models\TrainingMaterial;
+use App\Support\DepartmentContext;
+use App\Support\DepartmentData as DB;
 use Illuminate\Support\Collection;
 
 trait SerializesDashboardSnapshots
@@ -18,7 +20,8 @@ trait SerializesDashboardSnapshots
     ): array {
         return [
             'roles' => [
-                ['id' => 'admin', 'label' => 'مدير النمو المهني'],
+                ['id' => 'admin', 'label' => (string) (DB::table('departments')
+                    ->where('id', DepartmentContext::id())->value('manager_title') ?: 'مدير الإدارة')],
                 ['id' => 'male_manager', 'label' => 'مشرف'],
                 ['id' => 'female_manager', 'label' => 'مشرفة'],
                 ['id' => 'student', 'label' => 'معلم/ة'],

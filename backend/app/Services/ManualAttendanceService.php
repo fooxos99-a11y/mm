@@ -2,16 +2,18 @@
 
 namespace App\Services;
 
+use App\Support\DepartmentContext;
+
 use App\Models\Student;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
+use App\Support\DepartmentData as DB;
 use Illuminate\Validation\ValidationException;
 
 class ManualAttendanceService
 {
     public function save(User $user, string $courseId, array $presentStudents, ?string $branchCode = null): void
     {
-        $managedBranch = match ($user->role) {
+        $managedBranch = match (DepartmentContext::effectiveRole((string) $user->role)) {
             'male_manager' => 'male',
             'female_manager' => 'female',
             'admin' => null,
@@ -28,6 +30,7 @@ class ManualAttendanceService
             }
 
             $logins = collect($presentStudents)->pluck('loginId');
+            StudentIdentityGuard::assertAllowed($logins->all(), 'presentStudents', true);
             $students = Student::query()->whereNull('archive_id')->with('branch')
                 ->whereIn('login_code', $logins)->get()->keyBy('login_code');
             if ($students->count() !== $logins->count()) {

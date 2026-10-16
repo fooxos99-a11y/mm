@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
+use App\Support\DepartmentContext;
+
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
+use App\Support\DepartmentData as DB;
 
 class ResultsDirectoryService
 {
@@ -27,8 +29,8 @@ class ResultsDirectoryService
     public function paginate(User $user, array $filters): array
     {
         $branch = $filters['branchCode'];
-        abort_unless(in_array($user->role, ['admin', 'male_manager', 'female_manager'], true), 403);
-        abort_if($user->role !== 'admin' && $branch !== ($user->role === 'female_manager' ? 'female' : 'male'), 403);
+        abort_unless(in_array(DepartmentContext::effectiveRole((string) $user->role), ['admin', 'male_manager', 'female_manager'], true), 403);
+        abort_if(DepartmentContext::effectiveRole((string) $user->role) !== 'admin' && $branch !== (DepartmentContext::effectiveRole((string) $user->role) === 'female_manager' ? 'female' : 'male'), 403);
         $type = $filters['assessmentType'];
         $courseId = $filters['courseId'] ?? '';
         $courses = collect();
@@ -100,13 +102,13 @@ class ResultsDirectoryService
             ->orderByDesc('submitted_at')
             ->orderByDesc('id')
             ->get() : collect();
-        $permissions = $this->core->loadRolePermissions()[$user->role] ?? [];
+        $permissions = $this->core->loadRolePermissions()[DepartmentContext::effectiveRole((string) $user->role)] ?? [];
         $manualScores = in_array($type, ['pre', 'post'], true) ? $this->scores->query()
             ->where('settings.course_id', $courseId)->where('settings.assessment_type', $type)
             ->where('settings.branch_code', $branch)->whereIn('scores.student_id', $page->getCollection()->pluck('id'))
             ->get() : collect();
         $submissions = $this->scores->merge($submissions, $manualScores);
-        $courseKeys = $user->role === 'admin' || collect(['edit_pre_questions', 'edit_post_questions', 'edit_tasks'])
+        $courseKeys = DepartmentContext::effectiveRole((string) $user->role) === 'admin' || collect(['edit_pre_questions', 'edit_post_questions', 'edit_tasks'])
             ->contains(fn ($key) => (bool) ($permissions[$key] ?? false));
         $data = $this->core->serializeResultsPage(
             $courses,
@@ -124,7 +126,7 @@ class ResultsDirectoryService
                 ->whereIn('submission_id', $finalSubmissions->pluck('id'))
                 ->get(),
             $courseKeys,
-            $user->role === 'admin' || ($permissions['page_final_exam'] ?? false),
+            DepartmentContext::effectiveRole((string) $user->role) === 'admin' || ($permissions['page_final_exam'] ?? false),
         );
 
         return [...$data,

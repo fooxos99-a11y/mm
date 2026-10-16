@@ -3,7 +3,7 @@ import { passwordMeetsPolicy } from '../../utils/passwordPolicy.mjs';
 export const DASHBOARD_ACCOUNT_ROLE_OPTIONS = Object.freeze([
   { label: 'مشرف معلمين', value: 'male_manager' },
   { label: 'مشرف معلمات', value: 'female_manager' },
-  { label: 'مدير النمو المهني', value: 'admin' },
+  { label: 'مسؤول الإدارة', value: 'admin' },
 ]);
 
 const ROLE_LABELS = Object.freeze(Object.fromEntries(

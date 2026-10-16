@@ -2,10 +2,12 @@
 
 namespace App\Services;
 
+use App\Support\DepartmentContext;
+
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\DB;
+use App\Support\DepartmentData as DB;
 
 class DashboardDatasetService
 {
@@ -43,8 +45,8 @@ class DashboardDatasetService
             $query->where('branch_code', $filters['branchCode']);
         }
 
-        if ($user->role !== 'admin') {
-            $managedBranchId = match ($user->role) {
+        if (DepartmentContext::effectiveRole((string) $user->role) !== 'admin') {
+            $managedBranchId = match (DepartmentContext::effectiveRole((string) $user->role)) {
                 'male_manager' => 'male',
                 'female_manager' => 'female',
                 default => '',
@@ -55,9 +57,9 @@ class DashboardDatasetService
 
             if ($managedBranchId !== '') {
                 $visibleStudents->whereHas('branch', fn ($branch) => $branch->where('code', $managedBranchId));
-            } elseif (in_array($user->role, ['student', 'trainee'], true)) {
+            } elseif (in_array(DepartmentContext::effectiveRole((string) $user->role), ['student', 'trainee'], true)) {
                 $visibleStudents->where('login_code', $user->login_code);
-            } elseif ($user->role === 'reciter') {
+            } elseif (DepartmentContext::effectiveRole((string) $user->role) === 'reciter') {
                 $visibleStudents->whereHas(
                     'reciters.user',
                     fn ($owner) => $owner->where('login_code', $user->login_code),

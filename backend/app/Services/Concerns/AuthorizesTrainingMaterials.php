@@ -2,6 +2,8 @@
 
 namespace App\Services\Concerns;
 
+use App\Support\DepartmentContext;
+
 use App\Models\TrainingMaterial;
 use Illuminate\Auth\Access\AuthorizationException;
 
@@ -43,6 +45,6 @@ trait AuthorizesTrainingMaterials
 
     private function currentActorRole(): string
     {
-        return (string) ((auth('sanctum')->user() ?: auth()->user())?->role ?? '');
+        return DepartmentContext::effectiveRole((string) ((auth('sanctum')->user() ?: auth()->user())?->role ?? ''));
     }
 }
