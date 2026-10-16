@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Carbon;
 use App\Support\DepartmentData as DB;
+use Illuminate\Support\Carbon;
 use Illuminate\Validation\ValidationException;
 
 class SatisfactionService

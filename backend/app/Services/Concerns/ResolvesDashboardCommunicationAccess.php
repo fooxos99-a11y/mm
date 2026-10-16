@@ -2,12 +2,11 @@
 
 namespace App\Services\Concerns;
 
-use App\Support\DepartmentContext;
-
 use App\Models\User;
+use App\Support\DepartmentContext;
+use App\Support\DepartmentData as DB;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Collection;
-use App\Support\DepartmentData as DB;
 
 trait ResolvesDashboardCommunicationAccess
 {

@@ -2,12 +2,11 @@
 
 namespace App\Services\Concerns;
 
-use App\Support\DepartmentContext;
-
 use App\Events\DashboardNotificationCreated;
 use App\Events\DashboardNotificationDeleted;
-use Illuminate\Auth\Access\AuthorizationException;
+use App\Support\DepartmentContext;
 use App\Support\DepartmentData as DB;
+use Illuminate\Auth\Access\AuthorizationException;
 
 trait ManagesDashboardNotifications
 {

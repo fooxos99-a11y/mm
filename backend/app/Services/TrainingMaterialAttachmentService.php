@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
+use App\Models\Media;
 use App\Models\TrainingMaterial;
 use App\Models\User;
-use App\Models\Media;
 
 class TrainingMaterialAttachmentService
 {

@@ -4,9 +4,9 @@ namespace App\Services;
 
 use App\Models\Archive;
 use App\Models\Student;
+use App\Support\DepartmentData as DB;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
-use App\Support\DepartmentData as DB;
 
 final class ArchiveQueryService
 {

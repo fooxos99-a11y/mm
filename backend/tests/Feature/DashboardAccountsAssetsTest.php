@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\EditorAsset;
+use App\Models\Media;
 use App\Models\TrainingMaterial;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -158,7 +159,7 @@ class DashboardAccountsAssetsTest extends CoreDataApiTestCase
         ]);
 
         $attachment = $createResponse->json('attachments.0');
-        $media = \App\Models\Media::query()->where('model_id', $materialId)->firstOrFail();
+        $media = Media::query()->where('model_id', $materialId)->firstOrFail();
         Storage::disk('local')->assertExists($media->getPathRelativeToRoot());
         Storage::disk('public')->assertMissing($media->getPathRelativeToRoot());
         $this->get(parse_url($attachment['url'], PHP_URL_PATH))

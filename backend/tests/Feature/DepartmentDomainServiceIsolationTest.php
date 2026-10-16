@@ -5,10 +5,14 @@ namespace Tests\Feature;
 use App\Events\DashboardNotificationCreated;
 use App\Models\User;
 use App\Services\ArchiveLifecycleService;
+use App\Services\CourseAssessmentService;
 use App\Services\CourseManagementService;
 use App\Services\DashboardAccountService;
 use App\Services\DashboardCommunicationService;
+use App\Services\FinalExamService;
+use App\Services\ManualAttendanceService;
 use App\Services\RegistrationService;
+use App\Services\SatisfactionService;
 use App\Services\StudentAccountService;
 use App\Services\UserManagementService;
 use App\Support\DepartmentContext;
@@ -195,10 +199,10 @@ class DepartmentDomainServiceIsolationTest extends TestCase
         $actor = $this->actor($first, '1483');
         $this->actingAs($actor);
         $course = app(CourseManagementService::class)->createCourse('دورة أولى', true);
-        $satisfaction = app(\App\Services\SatisfactionService::class);
+        $satisfaction = app(SatisfactionService::class);
         $question = $satisfaction->addSatisfactionQuestion('رضا', 'rating', true, 'course', $course['id'])[0];
         $submission = ['loginId' => '924', 'studentName' => 'اسم منتحل', 'answers' => []];
-        $assessments = app(\App\Services\CourseAssessmentService::class);
+        $assessments = app(CourseAssessmentService::class);
         $this->duplicate(fn () => $assessments->submitAssessment($course['id'], 'pre', $submission));
         $this->duplicate(fn () => $assessments->bulkImportAssessments($course['id'], 'pre', [
             [...$submission, 'manualScore' => 80],
@@ -207,9 +211,9 @@ class DepartmentDomainServiceIsolationTest extends TestCase
             'questionId' => $question['id'], 'courseId' => $course['id'],
             'loginCode' => '924', 'studentName' => 'اسم منتحل', 'ratingValue' => 10,
         ]]));
-        $this->duplicate(fn () => app(\App\Services\ManualAttendanceService::class)
+        $this->duplicate(fn () => app(ManualAttendanceService::class)
             ->save($actor, $course['id'], [['loginId' => '924']], 'male'));
-        $final = app(\App\Services\FinalExamService::class);
+        $final = app(FinalExamService::class);
         $this->duplicate(fn () => $final->submitFinalExam([
             'loginCode' => '924', 'studentName' => 'اسم منتحل', 'branchCode' => 'male', 'answers' => [],
         ]));
@@ -228,12 +232,12 @@ class DepartmentDomainServiceIsolationTest extends TestCase
         $second = $this->department('الثانية');
         DepartmentContext::set($first);
         $this->actingAs($this->actor($first, '1483'));
-        $final = app(\App\Services\FinalExamService::class);
+        $final = app(FinalExamService::class);
         $final->updateFinalExamSetting('male', true, null, '');
         $final->submitFinalExam(['loginCode' => 'legacy-7000', 'studentName' => 'استيراد قديم', 'branchCode' => 'male', 'answers' => []]);
         $this->assertDatabaseHas('reserved_login_codes', ['login_code' => 'legacy-7000', 'department_id' => $first, 'user_id' => null]);
         $course = app(CourseManagementService::class)->createCourse('دورة قديمة', true);
-        app(\App\Services\CourseAssessmentService::class)->submitAssessment($course['id'], 'pre', [
+        app(CourseAssessmentService::class)->submitAssessment($course['id'], 'pre', [
             'loginId' => 'legacy-7000', 'studentName' => 'استيراد قديم', 'answers' => [],
         ]);
         $this->assertDatabaseHas('course_submissions', ['login_code' => 'legacy-7000', 'department_id' => $first]);
@@ -260,7 +264,7 @@ class DepartmentDomainServiceIsolationTest extends TestCase
         DepartmentContext::set($first);
         $this->actingAs($this->actor($first, '1483'));
         foreach (['raw-7001', 'unknown-owner'] as $code) {
-            $this->duplicate(fn () => app(\App\Services\FinalExamService::class)->submitFinalExam([
+            $this->duplicate(fn () => app(FinalExamService::class)->submitFinalExam([
                 'loginCode' => $code, 'studentName' => 'محاولة استحواذ', 'branchCode' => 'male', 'answers' => [],
             ]));
         }

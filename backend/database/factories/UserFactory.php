@@ -17,6 +17,8 @@ class UserFactory extends Factory
      */
     protected static ?string $password;
 
+    protected static int $loginSequence = 0;
+
     /**
      * Define the model's default state.
      *
@@ -27,7 +29,8 @@ class UserFactory extends Factory
         return [
             'full_name' => fake()->name(),
             'role' => 'admin',
-            'login_code' => fake()->unique()->numerify('####'),
+            // Keep generated fixtures separate from manually assigned short numbers.
+            'login_code' => sprintf('8%011d', ++static::$loginSequence),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),

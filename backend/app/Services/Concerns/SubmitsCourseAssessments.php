@@ -4,8 +4,8 @@ namespace App\Services\Concerns;
 
 use App\Models\Student;
 use App\Services\StudentIdentityGuard;
-use Illuminate\Database\UniqueConstraintViolationException;
 use App\Support\DepartmentData as DB;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Validation\ValidationException;
 use Throwable;
 

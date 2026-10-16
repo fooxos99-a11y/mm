@@ -41,9 +41,9 @@ test('uploaded student image and accompanying text are visible together in the a
   await expectDialogContained(dialog);
   await dialog.getByRole('button', { name: 'إغلاق', exact: true }).click();
   await expect(dialog).toBeHidden();
-  await page.route('**/storage/assessment-attachments/**', route => route.abort('failed'));
+  await page.route(url => /\/api\/assessment-attachments\/[^/]+$/.test(url.pathname), route => route.abort('failed'));
   await eye.click();
   await expect(dialog.getByRole('alert')).toContainText('تعذّر عرض المرفق');
-  await expect(dialog.getByRole('link', { name: 'فتح الملف الأصلي', exact: true })).toHaveAttribute('href', /storage\/assessment-attachments/);
+  await expect(dialog.getByRole('link', { name: 'فتح الملف الأصلي', exact: true })).toHaveAttribute('href', /\/api\/assessment-attachments\/[^?]+\?.*\bsignature=/);
   await expectDialogContained(dialog);
 });

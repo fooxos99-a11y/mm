@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use Illuminate\Database\Query\Builder;
 use App\Support\DepartmentData as DB;
+use Illuminate\Database\Query\Builder;
 
 class DashboardOverviewService
 {

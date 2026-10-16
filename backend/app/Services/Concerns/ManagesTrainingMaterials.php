@@ -3,8 +3,8 @@
 namespace App\Services\Concerns;
 
 use App\Models\TrainingMaterial;
-use Illuminate\Auth\Access\AuthorizationException;
 use App\Support\DepartmentData as DB;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Validation\ValidationException;
 
 trait ManagesTrainingMaterials

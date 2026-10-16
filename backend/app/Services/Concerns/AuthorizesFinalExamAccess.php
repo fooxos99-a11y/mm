@@ -3,7 +3,6 @@
 namespace App\Services\Concerns;
 
 use App\Support\DepartmentContext;
-
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Validation\ValidationException;
 

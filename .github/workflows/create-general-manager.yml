@@ -1,0 +1,57 @@
+name: Create production general manager
+
+on:
+  workflow_dispatch:
+    inputs:
+      login_code:
+        description: New globally unique account number
+        required: true
+        type: string
+      name:
+        description: Full name of the new general manager
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  create:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    environment: production
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - name: Configure SSH host verification
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" | tr -d '\r' > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+      - name: Create account through private standard input
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_ROOT: ${{ secrets.DEPLOY_ROOT }}
+          MANAGER_LOGIN: ${{ inputs.login_code }}
+          MANAGER_NAME: ${{ inputs.name }}
+          MOMARS_GENERAL_MANAGER_PASSWORD: ${{ secrets.MOMARS_GENERAL_MANAGER_PASSWORD }}
+        run: |
+          set -euo pipefail
+          [[ "$MANAGER_LOGIN" =~ ^[0-9]{4,100}$ ]] || { echo "Invalid account number." >&2; exit 64; }
+          [[ "$MOMARS_GENERAL_MANAGER_PASSWORD" =~ ^[0-9]{8}$ ]] || { echo "A valid temporary password secret is required." >&2; exit 78; }
+          [[ -n "$MANAGER_NAME" && -n "$DEPLOY_ROOT" && -n "$DEPLOY_HOST" && -n "$DEPLOY_USER" ]] || exit 78
+          root_encoded="$(printf '%s' "$DEPLOY_ROOT" | base64 -w 0)"
+          name_encoded="$(printf '%s' "$MANAGER_NAME" | base64 -w 0)"
+          remote_script="/tmp/momars-account-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}.sh"
+          trap 'unset MOMARS_GENERAL_MANAGER_PASSWORD; ssh -T -o BatchMode=yes "${DEPLOY_USER}@${DEPLOY_HOST}" "rm -f -- $remote_script" >/dev/null 2>&1 || true' EXIT
+          scp scripts/bootstrap-general-manager.sh "${DEPLOY_USER}@${DEPLOY_HOST}:${remote_script}"
+          printf '%s' "$MOMARS_GENERAL_MANAGER_PASSWORD" | ssh -T -o BatchMode=yes \
+            "${DEPLOY_USER}@${DEPLOY_HOST}" "bash '$remote_script' '$root_encoded' '$MANAGER_LOGIN' '$name_encoded'"

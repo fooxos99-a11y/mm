@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\Media;
 use App\Models\User;
 use App\Policies\DashboardPolicy;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -19,7 +20,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        config(['media-library.media_model' => \App\Models\Media::class]);
+        config(['media-library.media_model' => Media::class]);
     }
 
     /**

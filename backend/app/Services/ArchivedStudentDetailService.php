@@ -5,8 +5,8 @@ namespace App\Services;
 use App\Models\Archive;
 use App\Models\RegistrationRequest;
 use App\Models\Student;
-use Illuminate\Support\Collection;
 use App\Support\DepartmentData as DB;
+use Illuminate\Support\Collection;
 
 final class ArchivedStudentDetailService
 {

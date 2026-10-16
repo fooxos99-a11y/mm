@@ -1,15 +1,15 @@
 <?php
 
+use App\Http\Controllers\Api\AssessmentAttachmentController;
 use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\DepartmentManagementController;
-use App\Http\Controllers\Api\AssessmentAttachmentController;
 use App\Http\Controllers\Api\ClientErrorController;
 use App\Http\Controllers\Api\CourseAssessmentController;
 use App\Http\Controllers\Api\CourseController;
 use App\Http\Controllers\Api\CourseScoreController;
 use App\Http\Controllers\Api\DashboardAccountController;
 use App\Http\Controllers\Api\DashboardDatasetController;
+use App\Http\Controllers\Api\DepartmentManagementController;
 use App\Http\Controllers\Api\EditorAssetController;
 use App\Http\Controllers\Api\FinalExamController;
 use App\Http\Controllers\Api\NotificationController;

@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
+use App\Support\DepartmentData as DB;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
-use App\Support\DepartmentData as DB;
 use Illuminate\Validation\ValidationException;
 
 class FinalExamSubmissionValidator

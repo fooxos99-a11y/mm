@@ -3,8 +3,8 @@
 namespace App\Services\Concerns;
 
 use App\Models\Branch;
-use Illuminate\Support\Collection;
 use App\Support\DepartmentData as DB;
+use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
 
 trait ManagesCoreDataPermissions

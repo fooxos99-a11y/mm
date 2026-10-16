@@ -244,6 +244,15 @@
   text-align: right;
 }
 
+/* Keep the assessment controls out of inline baseline line boxes. */
+.dashboard-page .dashboard-topbar__assessment-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: inherit;
+  min-width: 0;
+}
+
 .dashboard-page .dashboard-topbar__actions {
   display: inline-flex;
   align-items: center;

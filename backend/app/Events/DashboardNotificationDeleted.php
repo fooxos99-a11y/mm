@@ -26,6 +26,7 @@ class DashboardNotificationDeleted implements ShouldBroadcastNow
             return [];
         }
         $prefix = "departments.{$this->departmentId}.";
+
         return [new PrivateChannel($prefix.'dashboard.notifications.admin')];
     }
 

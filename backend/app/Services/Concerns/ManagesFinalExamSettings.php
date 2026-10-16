@@ -2,8 +2,8 @@
 
 namespace App\Services\Concerns;
 
-use Carbon\Carbon;
 use App\Support\DepartmentData as DB;
+use Carbon\Carbon;
 
 trait ManagesFinalExamSettings
 {

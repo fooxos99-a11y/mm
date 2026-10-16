@@ -3,8 +3,8 @@
 namespace App\Support;
 
 use Closure;
-use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Validation\ValidationException;
 use LogicException;
@@ -171,7 +171,7 @@ class DepartmentQueryBuilder extends Builder
             foreach ($this->globalUniqueColumns() as $column) {
                 if (isset($row[$column]) && $this->connection->table($this->baseTable($this->from))
                     ->where($column, $row[$column])->where(fn (Builder $query) => $query
-                        ->whereNull('department_id')->orWhere('department_id', '!=', $this->departmentId))->exists()) {
+                    ->whereNull('department_id')->orWhere('department_id', '!=', $this->departmentId))->exists()) {
                     throw ValidationException::withMessages([$column => 'السجل تابع لإدارة أخرى.']);
                 }
             }
@@ -188,7 +188,7 @@ class DepartmentQueryBuilder extends Builder
             $attributes = array_intersect_key($row, array_flip($uniqueBy));
             if (count($attributes) === count($uniqueBy) && $this->connection->table($this->baseTable($this->from))
                 ->where($attributes)->where(fn (Builder $query) => $query
-                    ->whereNull('department_id')->orWhere('department_id', '!=', $this->departmentId))->exists()) {
+                ->whereNull('department_id')->orWhere('department_id', '!=', $this->departmentId))->exists()) {
                 throw ValidationException::withMessages(['department_id' => 'السجل تابع لإدارة أخرى.']);
             }
         }

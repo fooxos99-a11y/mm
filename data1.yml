@@ -1,2 +1,23 @@
 version: 1
-targets: {}
+targets:
+  momars:
+    name: ممارس
+    aliases: [ممارس, mm]
+    enabled: true
+    provider: github-actions
+    repository: https://github.com/fooxos99-a11y/mm
+    branch: main
+    environment: production
+    url: https://license-qb.us/
+    workflow: .github/workflows/deploy.yml
+    deployment_script: scripts/deploy-release.sh
+    build_command: npm run build
+    verification_command: npm run verify:staging
+    verification_url_secret: DEPLOY_URL
+    cors_origin_secret: DEPLOY_CORS_ORIGIN
+    ssh_host_secret: DEPLOY_HOST
+    ssh_user_secret: DEPLOY_USER
+    ssh_key_secret: DEPLOY_SSH_KEY
+    ssh_known_hosts_secret: DEPLOY_KNOWN_HOSTS
+    deploy_root_secret: DEPLOY_ROOT
+    account_workflow: .github/workflows/create-general-manager.yml

@@ -6,6 +6,7 @@ use App\Models\Archive;
 use App\Models\Branch;
 use App\Models\Student;
 use App\Models\User;
+use App\Services\DashboardCommunicationService;
 use App\Support\DepartmentContext;
 use App\Support\DepartmentData as DB;
 use Illuminate\Support\Facades\DB as GlobalDB;
@@ -237,6 +238,6 @@ trait ArchivesActiveBatch
     {
         $prefix = 'departments:'.(DepartmentContext::id() ?? 'none').':';
         cache()->forget($prefix.'dashboard:snapshot');
-        app(\App\Services\DashboardCommunicationService::class)->clearCaches();
+        app(DashboardCommunicationService::class)->clearCaches();
     }
 }

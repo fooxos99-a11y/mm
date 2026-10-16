@@ -2,11 +2,10 @@
 
 namespace App\Services;
 
-use App\Support\DepartmentContext;
-
 use App\Models\Reciter;
 use App\Models\Student;
 use App\Models\User;
+use App\Support\DepartmentContext;
 use Illuminate\Database\Eloquent\Builder;
 
 class PeopleEditorService

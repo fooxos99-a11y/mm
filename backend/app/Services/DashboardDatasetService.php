@@ -2,12 +2,11 @@
 
 namespace App\Services;
 
-use App\Support\DepartmentContext;
-
 use App\Models\Student;
 use App\Models\User;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use App\Support\DepartmentContext;
 use App\Support\DepartmentData as DB;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class DashboardDatasetService
 {

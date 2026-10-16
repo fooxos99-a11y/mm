@@ -2,11 +2,10 @@
 
 namespace App\Services\Concerns;
 
-use App\Support\DepartmentContext;
-
 use App\Models\Reciter;
 use App\Models\Student;
 use App\Models\TrainingMaterial;
+use App\Support\DepartmentContext;
 use Illuminate\Support\Collection;
 
 trait BuildsDashboardSnapshots

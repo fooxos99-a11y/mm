@@ -57,7 +57,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         run: node scripts/wait-for-commit-checks.mjs
       - name: Package immutable release
-        run: tar --exclude=release.tgz --exclude=.git --exclude='.*-logs' --exclude=frontend/node_modules --exclude=backend/vendor --exclude=backend/storage --exclude=backend/.env -czf "$RUNNER_TEMP/release.tgz" .
+        run: tar --exclude=release.tgz --exclude=.git --exclude=.deploy --exclude='.*-logs' --exclude=frontend/node_modules --exclude=backend/vendor --exclude=backend/storage --exclude=backend/.env -czf "$RUNNER_TEMP/release.tgz" .
       - name: Configure SSH host verification
         env:
           DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}

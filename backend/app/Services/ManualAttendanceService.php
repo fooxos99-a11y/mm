@@ -2,10 +2,9 @@
 
 namespace App\Services;
 
-use App\Support\DepartmentContext;
-
 use App\Models\Student;
 use App\Models\User;
+use App\Support\DepartmentContext;
 use App\Support\DepartmentData as DB;
 use Illuminate\Validation\ValidationException;
 

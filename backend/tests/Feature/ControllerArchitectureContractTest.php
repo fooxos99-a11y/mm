@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\AssessmentAttachmentController;
+use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\CourseAssessmentController;
 use App\Http\Controllers\Api\DashboardAccountController;
 use App\Http\Controllers\Api\DepartmentManagementController;

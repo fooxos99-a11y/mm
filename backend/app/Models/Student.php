@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Models\Concerns\BelongsToDepartment;
 use App\Support\DepartmentContext;
-
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -16,7 +15,6 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 class Student extends Model
 {
     use BelongsToDepartment;
-
     use HasFactory, HasUuids;
 
     public $timestamps = false;

@@ -2,13 +2,12 @@
 
 namespace App\Services;
 
-use App\Support\DepartmentContext;
-
 use App\Models\Student;
 use App\Models\User;
 use App\Services\Concerns\BuildsCompletionStudentRows;
 use App\Services\Concerns\FinalizesCompletionBranches;
 use App\Services\Concerns\ManagesCompletionSettings;
+use App\Support\DepartmentContext;
 use App\Support\DepartmentData as DB;
 use Illuminate\Validation\ValidationException;
 

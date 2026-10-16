@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
+use App\Support\DepartmentData as DB;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
-use App\Support\DepartmentData as DB;
 
 class CourseScoreReadService
 {

@@ -2,16 +2,20 @@
 
 use App\Http\Middleware\AddSecurityHeaders;
 use App\Http\Middleware\EnsureDashboardAccess;
+use App\Http\Middleware\EnsureGeneralManager;
 use App\Http\Middleware\EnsurePasswordChanged;
 use App\Http\Middleware\ResolveDepartmentContext;
-use App\Http\Middleware\EnsureGeneralManager;
 use App\Http\Middleware\SanitizeRichTextInput;
+use App\Http\Middleware\StatefulAttachmentRequests;
 use App\Services\OperationalMetricsService;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Middleware\SubstituteBindings;
+use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 
 $isApiRequest = static fn (Request $request): bool => $request->is('api/*')
     || $request->is('*/api/*')
@@ -32,11 +36,16 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(AddSecurityHeaders::class);
         $middleware->append(SanitizeRichTextInput::class);
         $middleware->statefulApi();
+        $middleware->replaceInGroup('api',
+            EnsureFrontendRequestsAreStateful::class,
+            StatefulAttachmentRequests::class,
+        );
         $middleware->api(append: [ResolveDepartmentContext::class]);
         $middleware->prependToPriorityList(
-            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            SubstituteBindings::class,
             ResolveDepartmentContext::class,
         );
+        $middleware->prependToPriorityList(EncryptCookies::class, StatefulAttachmentRequests::class);
 
         $middleware->redirectGuestsTo(function (Request $request) use ($isApiRequest): ?string {
             if ($isApiRequest($request)) {

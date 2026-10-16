@@ -69,7 +69,7 @@ test('public registration persists a complete request', async ({ page }, testInf
 
   expect(response.status()).toBe(201);
   await expect(page.locator('.registration-entry__state--success')).toBeVisible();
-  await expect(page.locator('.Vue-Toastification__toast').filter({ hasText: 'سيحدد المسؤول بيانات الدخول' })).toBeVisible();
+  await expect(page.locator('.Vue-Toastification__toast').filter({ hasText: 'سيحدد مسؤول الإدارة بيانات الدخول' })).toBeVisible();
 
   await page.context().clearCookies();
   await page.goto('login', { waitUntil: 'domcontentloaded' });

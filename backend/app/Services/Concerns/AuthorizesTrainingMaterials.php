@@ -2,9 +2,8 @@
 
 namespace App\Services\Concerns;
 
-use App\Support\DepartmentContext;
-
 use App\Models\TrainingMaterial;
+use App\Support\DepartmentContext;
 use Illuminate\Auth\Access\AuthorizationException;
 
 trait AuthorizesTrainingMaterials

@@ -32,7 +32,7 @@ final class DepartmentManagementService
     public function save(array $data, ?string $id = null): array
     {
         return DB::transaction(function () use ($data, $id): array {
-            $department = $id ? Department::query()->lockForUpdate()->findOrFail($id) : new Department();
+            $department = $id ? Department::query()->lockForUpdate()->findOrFail($id) : new Department;
             $isNew = ! $department->exists;
             $department->fill([
                 'name' => trim($data['name']), 'manager_title' => trim($data['managerTitle']),

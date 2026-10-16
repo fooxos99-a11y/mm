@@ -3,8 +3,10 @@
 namespace Tests\Feature;
 
 use App\Models\EditorAsset;
+use App\Models\Media;
 use App\Models\TrainingMaterial;
 use App\Services\CoreDataService;
+use App\Services\CourseManagementService;
 use App\Support\DepartmentContext;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -31,7 +33,7 @@ class LegacyTrainingMediaPrivacyTest extends TestCase
         parent::tearDown();
     }
 
-    private function legacyAttachment(): \App\Models\Media
+    private function legacyAttachment(): Media
     {
         $material = TrainingMaterial::query()->create(['title' => 'ملف قديم']);
 
@@ -112,7 +114,7 @@ class LegacyTrainingMediaPrivacyTest extends TestCase
         $this->assertSame(0, $stats['graduates']);
         $this->assertSame(0, $stats['courses']);
         $this->assertSame(0, $stats['batches']);
-        app(\App\Services\CourseManagementService::class)->createCourse('دورة الإدارة', true);
+        app(CourseManagementService::class)->createCourse('دورة الإدارة', true);
         $this->assertSame(1, app(CoreDataService::class)->loadPublicStats()['courses']);
     }
 }

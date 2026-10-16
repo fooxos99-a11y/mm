@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Models\Concerns\BelongsToDepartment;
-
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,7 +12,6 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 class TrainingMaterial extends Model implements HasMedia
 {
     use BelongsToDepartment;
-
     use HasFactory, InteractsWithMedia;
 
     protected $fillable = [

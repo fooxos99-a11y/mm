@@ -4,12 +4,12 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Auth\RegisterAccountRequest;
 use App\Http\Requests\Auth\UpdatePasswordRequest;
 use App\Models\User;
 use App\Services\AccountRegistrationService;
 use App\Support\DepartmentContext;
 use App\Support\UserPresenter;
-use App\Http\Requests\Auth\RegisterAccountRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
