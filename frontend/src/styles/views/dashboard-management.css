@@ -410,7 +410,8 @@
   }
 
   .dashboard-page .dashboard-topbar__mobile {
-    display: block;
+    display: inline-flex;
+    align-items: center;
   }
 
   .dashboard-page .dashboard-grid {

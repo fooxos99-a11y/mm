@@ -68,8 +68,16 @@ test('assessment actions align with the menu and long course names stay on one l
     const action = header.getByRole('button', { name: `بدء الاختبار ${type === 'pre' ? 'القبلي' : 'البعدي'}`, exact: true });
     await expect(action).toBeVisible();
     if (page.viewportSize().width <= 700) {
-      const button = await action.boundingBox();
-      const menu = await header.getByRole('button', { name: 'فتح القائمة', exact: true }).boundingBox();
+      // Read both rectangles in one frame so the route transition cannot skew their centers.
+      const { button, menu } = await action.evaluate(element => {
+        const menuElement = element.closest('.dashboard-topbar').querySelector('.dashboard-topbar__mobile button');
+        const actionRect = element.getBoundingClientRect();
+        const menuRect = menuElement.getBoundingClientRect();
+        return {
+          button: { y: actionRect.y, height: actionRect.height, width: actionRect.width },
+          menu: { y: menuRect.y, height: menuRect.height },
+        };
+      });
       expect(Math.abs(button.y + button.height / 2 - menu.y - menu.height / 2)).toBeLessThanOrEqual(1);
       expect(button.width).toBeLessThan(page.viewportSize().width * .65);
       expect(button.height).toBeGreaterThanOrEqual(44);
@@ -102,10 +110,19 @@ test('assessment actions align with the menu and long course names stay on one l
   const start = header.getByRole('button', { name: 'بدء', exact: true });
   const copy = header.getByRole('button', { name: 'نسخ', exact: true });
   await expect(start).toBeVisible();
-  const boxes = await Promise.all([start.boundingBox(), copy.boundingBox()]);
+  await expect(copy).toBeVisible();
+  const { boxes, menu } = await start.evaluate(element => {
+    const header = element.closest('.dashboard-topbar');
+    const copy = [...header.querySelectorAll('button')].find(button => button.textContent.trim() === 'نسخ');
+    const menu = header.querySelector('.dashboard-topbar__mobile button');
+    const bounds = target => {
+      const rect = target.getBoundingClientRect();
+      return { y: rect.y, height: rect.height };
+    };
+    return { boxes: [bounds(element), bounds(copy)], menu: bounds(menu) };
+  });
   expect(Math.abs(boxes[0].y - boxes[1].y)).toBeLessThanOrEqual(1);
   if (page.viewportSize().width <= 700) {
-    const menu = await header.getByRole('button', { name: 'فتح القائمة', exact: true }).boundingBox();
     expect(Math.abs(boxes[0].y + boxes[0].height / 2 - menu.y - menu.height / 2)).toBeLessThanOrEqual(1);
   }
   await noOverflow(page);
