@@ -28,12 +28,22 @@ test('public headers keep the same menu, alignment and touch sizes before and af
     const toggle = header.getByRole('button', { name: 'البرامج والرخص', exact: true });
     await expect(toggle).toBeVisible();
     await expect(header.getByRole('img', { name: 'شعار الجمعية', exact: true })).toBeVisible();
-    const headerBox = await header.boundingBox();
-    const toggleBox = await toggle.boundingBox();
+    // The route transition translates the fixed header's containing block briefly.
+    // Check the settled layout and sample both boxes in one animation frame.
+    await expect(page.locator('.app-route-enter-active')).toHaveCount(0);
+    const { headerBox, toggleBox } = await toggle.evaluate(element => {
+      const header = element.closest('.public-header').getBoundingClientRect();
+      const toggle = element.getBoundingClientRect();
+      return {
+        headerBox: { y: header.y, height: header.height },
+        toggleBox: { y: toggle.y, height: toggle.height, width: toggle.width },
+      };
+    });
     sizes.push({ header: headerBox.height, button: toggleBox.height });
     expect(toggleBox.height).toBeGreaterThanOrEqual(44);
     expect(toggleBox.width).toBeGreaterThanOrEqual(44);
-    expect(Math.abs(toggleBox.y + toggleBox.height / 2 - headerBox.height / 2)).toBeLessThanOrEqual(1);
+    expect(headerBox.y).toBeCloseTo(0, 0);
+    expect(Math.abs(toggleBox.y + toggleBox.height / 2 - (headerBox.y + headerBox.height / 2))).toBeLessThanOrEqual(1);
     for (const scrollY of [0, 450]) {
       await page.evaluate((y) => window.scrollTo(0, y), scrollY);
       if (scrollY) await expect(header).toHaveClass(/public-header--scrolled/);
