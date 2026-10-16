@@ -28,9 +28,13 @@ const assessmentCourseMatcher = {
   tasks: isTaskCourse,
 };
 
-const isAssessmentEligibleForStudent = (course, student, assessmentType) => {
+const isAssessmentEligibleForStudent = (course, student, assessmentType, taskHistory) => {
   if (!course || !student || !assessmentCourseMatcher[assessmentType]?.(course)) {
     return false;
+  }
+
+  if (assessmentType === 'tasks' && taskHistory.has(makeKey(course.id, student.branchId))) {
+    return true;
   }
 
   const enabledKey = assessmentEnabledKey[assessmentType];
@@ -48,17 +52,17 @@ const isAssessmentEligibleForStudent = (course, student, assessmentType) => {
   return course.branchAvailability?.[branchId]?.[assessmentType] !== false;
 };
 
-const countEligibleAssessmentSlots = (students, courses, assessmentType) => (
+const countEligibleAssessmentSlots = (students, courses, assessmentType, taskHistory) => (
   (students || []).reduce((sum, student) => sum + (courses || []).filter((course) => (
-    isAssessmentEligibleForStudent(course, student, assessmentType)
+    isAssessmentEligibleForStudent(course, student, assessmentType, taskHistory)
   )).length, 0)
 );
 
-const countCompletedAssessmentSlots = (students, courses, submissions, assessmentType) => {
+const countCompletedAssessmentSlots = (students, courses, submissions, assessmentType, taskHistory) => {
   const eligibleKeys = new Set(
     (students || []).flatMap((student) => (
       (courses || [])
-        .filter((course) => isAssessmentEligibleForStudent(course, student, assessmentType))
+        .filter((course) => isAssessmentEligibleForStudent(course, student, assessmentType, taskHistory))
         .map((course) => makeKey(course.id, assessmentType, student.loginId))
     )),
   );
@@ -92,6 +96,10 @@ const countCompletedAttendanceSlots = (students, courses, attendance) => {
 };
 
 export const buildProgramIndicators = ({ students = [], courses = [], submissions = [], attendance = [] } = {}) => {
+  const studentBranches = new Map(students.map(student => [normalizeValue(student.loginId), student.branchId]));
+  const taskHistory = new Set(submissions
+    .filter(submission => submission.assessmentType === 'tasks' && studentBranches.has(normalizeValue(submission.loginId)))
+    .map(submission => makeKey(submission.courseId, studentBranches.get(normalizeValue(submission.loginId)))));
   const totalCompletedParts = students.reduce((sum, student) => {
     const completedParts = Array.isArray(student.completedParts) ? [...new Set(student.completedParts)] : [];
     return sum + completedParts.length;
@@ -103,8 +111,8 @@ export const buildProgramIndicators = ({ students = [], courses = [], submission
   const preEligibleSlots = countEligibleAssessmentSlots(students, courses, 'pre');
   const postCompletedSlots = countCompletedAssessmentSlots(students, courses, submissions, 'post');
   const postEligibleSlots = countEligibleAssessmentSlots(students, courses, 'post');
-  const tasksCompletedSlots = countCompletedAssessmentSlots(students, courses, submissions, 'tasks');
-  const tasksEligibleSlots = countEligibleAssessmentSlots(students, courses, 'tasks');
+  const tasksCompletedSlots = countCompletedAssessmentSlots(students, courses, submissions, 'tasks', taskHistory);
+  const tasksEligibleSlots = countEligibleAssessmentSlots(students, courses, 'tasks', taskHistory);
   const completed30 = students.filter((student) => {
     const completedParts = Array.isArray(student.completedParts) ? [...new Set(student.completedParts)] : [];
     return student.isCertified || completedParts.length >= partsLimitForStudent(student);
@@ -117,7 +125,7 @@ export const buildProgramIndicators = ({ students = [], courses = [], submission
   const completionProgress = completionRate(completed30, students.length);
 
   return [
-    { key: 'memorization', label: 'مجموع الأجزاء المقروءة', display: String(totalCompletedParts), meta: `${totalCompletedParts} من ${totalRequiredParts}`, progress: memorizationProgress },
+    { key: 'memorization', label: 'الأجزاء المقروءة', display: String(totalCompletedParts), meta: `${totalCompletedParts} من ${totalRequiredParts}`, progress: memorizationProgress },
     { key: 'attendance', label: 'الحضور', display: `${Math.round(attendanceProgress)}%`, meta: `${attendanceCompletedSlots} من ${attendanceEligibleSlots}`, progress: attendanceProgress },
     { key: 'pre', label: 'الاختبار القبلي', display: `${Math.round(preProgress)}%`, meta: `${preCompletedSlots} من ${preEligibleSlots}`, progress: preProgress },
     { key: 'post', label: 'الاختبار البعدي', display: `${Math.round(postProgress)}%`, meta: `${postCompletedSlots} من ${postEligibleSlots}`, progress: postProgress },

@@ -27,7 +27,8 @@ const expectNoOverflow = async (page) => {
 test('dashboard overview shows truthful indicator context', async ({ page }) => {
   await login(page);
   await expect(page.locator('.dashboard-indicator-card')).toHaveCount(6);
-  await expect(page.locator('.dashboard-indicator-card__meta')).toHaveCount(6);
+  await expect(page.locator('.dashboard-indicator-card__meta')).toHaveCount(0);
+  await expect(page.locator('.dashboard-indicator-card').first()).toHaveAccessibleName(/الأجزاء المقروءة: .+، \d+ من \d+/);
   await expectNoOverflow(page);
 });
 

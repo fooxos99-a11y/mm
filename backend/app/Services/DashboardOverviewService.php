@@ -31,7 +31,18 @@ class DashboardOverviewService
         ];
         foreach (['pre', 'post', 'tasks'] as $type) {
             $eligible = (clone $courses)->where('entity_type', $type === 'tasks' ? '=' : '!=', 'task')
-                ->where('is_'.$type.'_enabled', true)->where($branch.'_'.$type.'_enabled', true);
+                ->where(function (Builder $query) use ($type, $branch, $logins): void {
+                    $query->where(fn (Builder $open) => $open
+                        ->where('is_'.$type.'_enabled', true)->where($branch.'_'.$type.'_enabled', true));
+                    if ($type === 'tasks') {
+                        // Closing a task clears its availability flags, but not its saved responses.
+                        $query->orWhereExists(fn (Builder $history) => $history
+                            ->selectRaw('1')->from('course_submissions')
+                            ->whereColumn('course_submissions.course_id', 'courses.id')
+                            ->whereNull('course_submissions.archive_id')->where('assessment_type', 'tasks')
+                            ->whereIn('login_code', clone $logins));
+                    }
+                });
             $totals[$type] = [
                 $this->completed('course_submissions', $logins, $eligible, $type),
                 $total * $eligible->count(),
@@ -44,7 +55,7 @@ class DashboardOverviewService
 
     public function indicators(array $totals): array
     {
-        $labels = ['memorization' => 'مجموع الأجزاء المقروءة', 'attendance' => 'الحضور',
+        $labels = ['memorization' => 'الأجزاء المقروءة', 'attendance' => 'الحضور',
             'pre' => 'الاختبار القبلي', 'post' => 'الاختبار البعدي', 'tasks' => 'المهام الأدائية',
             'completed30' => 'من أكملوا الأجزاء المطلوبة'];
         $result = [];

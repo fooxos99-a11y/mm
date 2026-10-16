@@ -22,14 +22,14 @@ test('dashboard account validation applies identity role and password rules', ()
     role: 'female_manager',
     name: 'مشرفة جديدة',
     loginCode: '5002',
-    password: 'Secure-password-5002',
+    password: '12345002',
   }), true);
 
   assert.equal(dashboardAccountFormIsValid({
     role: 'unknown',
     name: 'مشرفة جديدة',
     loginCode: '5002',
-    password: 'Secure-password-5002',
+    password: '12345002',
   }), false);
 });
 

@@ -25,6 +25,18 @@ test('password change refreshes stale CSRF while preserving authentication and v
   };
 
   await test.step('sign in and open password form', () => signIn(adminPassword));
+  await expect(page.getByText('8 أرقام فقط', { exact: true })).toBeVisible();
+  await expect(page.getByText('10 أحرف على الأقل، وتتضمن حرفًا ورقمًا', { exact: true })).toHaveCount(0);
+  let passwordRequests = 0;
+  page.on('request', (request) => {
+    if (request.url().endsWith('/api/auth/password') && request.method() === 'PUT') passwordRequests += 1;
+  });
+  for (const invalidPassword of ['1234567', '123456789', 'abcd1234']) {
+    await fillPassword(adminPassword, invalidPassword);
+    await page.locator('form button[type="submit"]').click();
+    await expect(page.getByText('استخدم كلمة مرور مطابقة من 8 أرقام فقط', { exact: true }).last()).toBeVisible();
+    expect(passwordRequests).toBe(0);
+  }
   const apiOrigin = new URL(process.env.VUE_APP_API_BASE_URL).origin;
   const endpoint = `${apiOrigin}/api/auth/password`;
   const payload = {

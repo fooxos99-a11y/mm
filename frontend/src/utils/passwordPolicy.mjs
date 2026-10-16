@@ -1,15 +1,13 @@
-export const PASSWORD_MIN_LENGTH = 10;
-export const PASSWORD_REQUIREMENTS_TEXT = '10 أحرف على الأقل، وتتضمن حرفًا ورقمًا';
+export const PASSWORD_LENGTH = 8;
+export const PASSWORD_REQUIREMENTS_TEXT = '8 أرقام فقط';
 
-const LETTER_PATTERN = /\p{L}/u;
-const NUMBER_PATTERN = /\p{N}/u;
+const NON_DIGIT_PATTERN = /[^\p{Nd}]/u;
 
 export const passwordMeetsPolicy = (value) => {
   const password = String(value || '');
 
-  return password.length >= PASSWORD_MIN_LENGTH
-    && LETTER_PATTERN.test(password)
-    && NUMBER_PATTERN.test(password);
+  return [...password].length === PASSWORD_LENGTH
+    && !NON_DIGIT_PATTERN.test(password);
 };
 
 export const passwordConfirmationIsValid = (password, confirmation) => (

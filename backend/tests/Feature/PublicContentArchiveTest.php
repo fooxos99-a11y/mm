@@ -344,8 +344,8 @@ class PublicContentArchiveTest extends CoreDataApiTestCase
         $this->postJson('/api/students', [
             'name' => 'طالب جديد بعد الأرشفة',
             'loginId' => '8610',
-            'password' => 'Secure-password-1234',
-            'passwordConfirmation' => 'Secure-password-1234',
+            'password' => '56781234',
+            'passwordConfirmation' => '56781234',
             'branchId' => 'male',
             'note' => 'إعادة استخدام الرقم',
         ])
@@ -369,15 +369,15 @@ class PublicContentArchiveTest extends CoreDataApiTestCase
         $this->postJson('/api/students', [
             'name' => 'معلم الأرشيف',
             'loginId' => '7611',
-            'password' => 'Secure-password-1234',
-            'passwordConfirmation' => 'Secure-password-1234',
+            'password' => '56781234',
+            'passwordConfirmation' => '56781234',
             'branchId' => 'male',
         ])->assertCreated();
         $this->postJson('/api/students', [
             'name' => 'معلمة تبقى نشطة',
             'loginId' => '7612',
-            'password' => 'Secure-password-1234',
-            'passwordConfirmation' => 'Secure-password-1234',
+            'password' => '56781234',
+            'passwordConfirmation' => '56781234',
             'branchId' => 'female',
         ])->assertCreated();
 

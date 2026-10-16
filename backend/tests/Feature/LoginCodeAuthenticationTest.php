@@ -82,15 +82,15 @@ class LoginCodeAuthenticationTest extends TestCase
         $this->postJson('/api/students', [
             'name' => 'طالب دخول',
             'loginId' => '1234',
-            'password' => 'Secure-password-1234',
-            'passwordConfirmation' => 'Secure-password-1234',
+            'password' => '56781234',
+            'passwordConfirmation' => '56781234',
             'branchId' => 'male',
             'note' => '',
         ])->assertCreated();
 
         $response = $this->postJson('/api/auth/login', [
             'login_code' => '1234',
-            'password' => 'Secure-password-1234',
+            'password' => '56781234',
         ]);
 
         $response
@@ -124,10 +124,10 @@ class LoginCodeAuthenticationTest extends TestCase
         ])->assertUnprocessable();
 
         $this->putJson('/api/students/'.$studentId, [
-            'password' => 'Student-password-2026',
-            'passwordConfirmation' => 'Student-password-2026',
+            'password' => '12342026',
+            'passwordConfirmation' => '12342026',
         ])->assertOk();
 
-        $this->assertTrue(Hash::check('Student-password-2026', $user->fresh()->password));
+        $this->assertTrue(Hash::check('12342026', $user->fresh()->password));
     }
 }

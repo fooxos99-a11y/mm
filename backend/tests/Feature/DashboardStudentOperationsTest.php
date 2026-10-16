@@ -24,8 +24,8 @@ class DashboardStudentOperationsTest extends CoreDataApiTestCase
         $firstReciterResponse = $this->postJson('/api/reciters', [
             'name' => 'مقرئ أول',
             'loginCode' => '9101',
-            'password' => 'Secure-password-1234',
-            'passwordConfirmation' => 'Secure-password-1234',
+            'password' => '56781234',
+            'passwordConfirmation' => '56781234',
             'branchId' => 'male',
             'linkedStudentIds' => [$student->id],
         ])->assertOk();
@@ -33,8 +33,8 @@ class DashboardStudentOperationsTest extends CoreDataApiTestCase
         $secondReciterResponse = $this->postJson('/api/reciters', [
             'name' => 'مقرئ ثان',
             'loginCode' => '9102',
-            'password' => 'Secure-password-1234',
-            'passwordConfirmation' => 'Secure-password-1234',
+            'password' => '56781234',
+            'passwordConfirmation' => '56781234',
             'branchId' => 'male',
             'linkedStudentIds' => [],
         ])->assertOk();
@@ -97,8 +97,8 @@ class DashboardStudentOperationsTest extends CoreDataApiTestCase
         $reciterResponse = $this->postJson('/api/reciters', [
             'name' => 'مقرئ أجزاء',
             'loginCode' => '9201',
-            'password' => 'Secure-password-1234',
-            'passwordConfirmation' => 'Secure-password-1234',
+            'password' => '56781234',
+            'passwordConfirmation' => '56781234',
             'branchId' => 'male',
             'linkedStudentIds' => [$student->id],
         ])->assertOk();
@@ -176,16 +176,16 @@ class DashboardStudentOperationsTest extends CoreDataApiTestCase
         $this->postJson('/api/students', [
             'name' => 'متدرب فرع الرجال',
             'loginId' => '7101',
-            'password' => 'Secure-password-1234',
-            'passwordConfirmation' => 'Secure-password-1234',
+            'password' => '56781234',
+            'passwordConfirmation' => '56781234',
             'branchId' => 'male',
         ])->assertCreated();
 
         $this->postJson('/api/students', [
             'name' => 'متدربة فرع النساء',
             'loginId' => '7102',
-            'password' => 'Secure-password-1234',
-            'passwordConfirmation' => 'Secure-password-1234',
+            'password' => '56781234',
+            'passwordConfirmation' => '56781234',
             'branchId' => 'female',
         ])->assertCreated();
 

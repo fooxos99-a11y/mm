@@ -26,8 +26,8 @@ class ManagerPermissionsTest extends CoreDataApiTestCase
         $this->postJson('/api/students', [
             'name' => 'Blocked Student',
             'loginId' => '8301',
-            'password' => 'Secure-password-1234',
-            'passwordConfirmation' => 'Secure-password-1234',
+            'password' => '56781234',
+            'passwordConfirmation' => '56781234',
             'branchId' => 'male',
         ])->assertForbidden();
     }
@@ -206,8 +206,8 @@ class ManagerPermissionsTest extends CoreDataApiTestCase
         $this->postJson('/api/reciters', [
             'name' => 'مقرئ جديد',
             'loginCode' => '9001',
-            'password' => 'Secure-password-1234',
-            'passwordConfirmation' => 'Secure-password-1234',
+            'password' => '56781234',
+            'passwordConfirmation' => '56781234',
             'branchId' => 'female',
             'linkedStudentIds' => [$student->id],
         ])

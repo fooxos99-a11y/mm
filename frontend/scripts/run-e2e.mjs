@@ -1,6 +1,6 @@
 import { copyFileSync, existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
-import { randomBytes } from 'node:crypto';
+import { randomBytes, randomInt } from 'node:crypto';
 import os from 'node:os';
 import { createServer } from 'node:net';
 import path from 'node:path';
@@ -20,7 +20,7 @@ for (const directory of ['app/private', 'app/public', 'framework/cache/data', 'f
 }
 const adminLogin = 'e2e-admin';
 // Throw-away accounts for the temporary SQLite database, regenerated on every run.
-const createTestSecret = () => `E2e-${randomBytes(12).toString('base64url')}-9`;
+const createTestSecret = () => String(randomInt(100000000)).padStart(8, '0');
 const adminSecret = createTestSecret();
 const roleSecret = createTestSecret();
 const studentSecret = createTestSecret();

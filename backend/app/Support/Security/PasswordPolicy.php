@@ -6,7 +6,7 @@ use Illuminate\Validation\Rules\Password;
 
 final class PasswordPolicy
 {
-    public const MIN_LENGTH = 10;
+    public const LENGTH = 8;
 
     private function __construct()
     {
@@ -14,8 +14,8 @@ final class PasswordPolicy
 
     public static function rule(): Password
     {
-        return Password::min(self::MIN_LENGTH)
-            ->letters()
-            ->numbers();
+        return Password::min(self::LENGTH)
+            ->max(self::LENGTH)
+            ->rules(['regex:/\A\p{Nd}+\z/u']);
     }
 }

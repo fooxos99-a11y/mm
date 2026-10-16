@@ -23,13 +23,13 @@ class PasswordSecurityTest extends TestCase
             ->withHeader('Referer', 'http://127.0.0.1:8080')
             ->putJson('/api/auth/password', [
                 'currentPassword' => 'Current-password-2026',
-                'password' => 'Updated-password-2026',
-                'passwordConfirmation' => 'Updated-password-2026',
+                'password' => '01234567',
+                'passwordConfirmation' => '01234567',
             ])
             ->assertOk();
 
         $this->assertGuest('web');
-        $this->assertTrue(Hash::check('Updated-password-2026', (string) $user->fresh()->password));
+        $this->assertTrue(Hash::check('01234567', (string) $user->fresh()->password));
     }
 
     public function test_password_change_revokes_every_token_and_session(): void
@@ -62,8 +62,8 @@ class PasswordSecurityTest extends TestCase
         $this->withToken($currentToken->plainTextToken)
             ->putJson('/api/auth/password', [
                 'currentPassword' => 'Current-password-2026',
-                'password' => 'Updated-password-2026',
-                'passwordConfirmation' => 'Updated-password-2026',
+                'password' => '01234567',
+                'passwordConfirmation' => '01234567',
             ])
             ->assertOk()
             ->assertJsonPath('message', 'تم تغيير كلمة المرور. سجل الدخول بالبيانات الجديدة.');
@@ -75,10 +75,10 @@ class PasswordSecurityTest extends TestCase
             'id' => $obsoleteToken->accessToken->getKey(),
         ]);
         $this->assertDatabaseMissing('sessions', ['user_id' => $user->id]);
-        $this->assertTrue(Hash::check('Updated-password-2026', (string) $user->fresh()->password));
+        $this->assertTrue(Hash::check('01234567', (string) $user->fresh()->password));
     }
 
-    public function test_password_change_rejects_passwords_shorter_than_ten_characters(): void
+    public function test_password_change_rejects_letters_even_with_eight_characters(): void
     {
         $user = User::factory()->create([
             'password' => Hash::make('Current-password-2026'),
@@ -104,8 +104,8 @@ class PasswordSecurityTest extends TestCase
         $this->withToken($user->createToken('student')->plainTextToken)
             ->putJson('/api/auth/password', [
                 'currentPassword' => '123',
-                'password' => 'Updated-password-2026',
-                'passwordConfirmation' => 'Updated-password-2026',
+                'password' => '01234567',
+                'passwordConfirmation' => '01234567',
             ])
             ->assertForbidden()
             ->assertJsonPath('message', 'بيانات دخول الطالب يحددها المسؤول فقط.');
@@ -116,15 +116,15 @@ class PasswordSecurityTest extends TestCase
     public function test_password_change_rejects_reusing_the_current_password(): void
     {
         $user = User::factory()->create([
-            'password' => Hash::make('Current-password-2026'),
+            'password' => Hash::make('87654321'),
             'must_change_password' => true,
         ]);
 
         $this->withToken($user->createToken('current')->plainTextToken)
             ->putJson('/api/auth/password', [
-                'currentPassword' => 'Current-password-2026',
-                'password' => 'Current-password-2026',
-                'passwordConfirmation' => 'Current-password-2026',
+                'currentPassword' => '87654321',
+                'password' => '87654321',
+                'passwordConfirmation' => '87654321',
             ])
             ->assertUnprocessable()
             ->assertJsonValidationErrors(['password']);
@@ -140,8 +140,8 @@ class PasswordSecurityTest extends TestCase
         $token = $user->createToken('current')->plainTextToken;
         $payload = [
             'currentPassword' => 'Wrong-current-password',
-            'password' => 'Updated-password-2026',
-            'passwordConfirmation' => 'Updated-password-2026',
+            'password' => '01234567',
+            'passwordConfirmation' => '01234567',
         ];
 
         for ($attempt = 0; $attempt < 5; $attempt++) {

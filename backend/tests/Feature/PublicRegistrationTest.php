@@ -51,7 +51,7 @@ class PublicRegistrationTest extends CoreDataApiTestCase
         $acceptResponse = $this->postJson('/api/dashboard/registration-requests/'.$requestId.'/accept', [
             'name' => 'طالب تجريبي معدل',
             'loginCode' => '123',
-            'password' => 'Registration-456',
+            'password' => '12340456',
             'phone' => '0501234567',
             'gender' => 'female',
             'branchId' => 'female',
@@ -94,7 +94,7 @@ class PublicRegistrationTest extends CoreDataApiTestCase
             'role' => 'student',
         ]);
         $this->assertTrue(Hash::check(
-            'Registration-456',
+            '12340456',
             (string) User::query()->where('login_code', '123')->value('password'),
         ));
         $this->assertFalse((bool) User::query()->where('login_code', '123')->value('must_change_password'));

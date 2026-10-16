@@ -2,12 +2,12 @@
   <header
     class="dashboard-topbar"
     :class="{
-      'dashboard-topbar--assessment': ['courses', 'tasks'].includes(activeMenu),
+      'dashboard-topbar--assessment': ['courses', 'tasks', 'finalexam'].includes(activeMenu),
     }"
   >
     <div class="dashboard-topbar__mobile">
       <AppIconButton
-        variant="primary"
+        variant="plain"
         class="dashboard-icon-button"
         aria-label="فتح القائمة"
         @click="$emit('toggle-menu')"
@@ -248,10 +248,9 @@ export default {
 .dashboard-topbar .dashboard-topbar__assessment-controls .dashboard-topbar__timer-list { display: grid; gap: 4px; min-width: 0; }
 .dashboard-topbar .dashboard-topbar__assessment-controls .dashboard-topbar__timer { justify-content: space-between; min-height: 32px; padding: 4px 8px; font-size: .8rem; border-radius: 8px; }
 @media (max-width: 700px) {
-  .dashboard-topbar__assessment-controls { width: 100%; gap: 8px; }
-  .dashboard-topbar .dashboard-topbar__assessment-controls .dashboard-topbar__timer-list { flex: 1; width: auto; }
-  .dashboard-topbar .dashboard-topbar__assessment-controls .dashboard-topbar__timer { flex-wrap: wrap; }
-  .dashboard-topbar .dashboard-topbar__assessment-controls .dashboard-topbar__actions { flex: 1; min-width: 0; }
-  .dashboard-topbar .dashboard-topbar__assessment-controls .dashboard-topbar__action { width: 100%; white-space: normal; }
+  .dashboard-topbar__assessment-controls { display: contents; }
+  .dashboard-topbar .dashboard-topbar__assessment-controls .dashboard-topbar__timer-list { display: flex; flex: 1 0 100%; flex-wrap: wrap; order: 1; }
+  .dashboard-topbar .dashboard-topbar__assessment-controls .dashboard-topbar__actions { flex: 0 0 auto; flex-wrap: nowrap; margin-inline-start: auto; min-width: 0; }
+  .dashboard-topbar .dashboard-topbar__assessment-controls .dashboard-topbar__action { width: auto; min-width: 0; white-space: nowrap; }
 }
 </style>

@@ -17,8 +17,8 @@ class StudentAccessTest extends CoreDataApiTestCase
         $createResponse = $this->postJson('/api/students', [
             'name' => 'طالب جديد',
             'loginId' => '7001',
-            'password' => 'Secure-password-1234',
-            'passwordConfirmation' => 'Secure-password-1234',
+            'password' => '56781234',
+            'passwordConfirmation' => '56781234',
             'branchId' => 'male',
             'note' => 'ملاحظة',
         ]);
@@ -39,7 +39,7 @@ class StudentAccessTest extends CoreDataApiTestCase
         $studentUser = User::query()->where('login_code', '7001')->first();
         $this->assertNotNull($studentUser);
         $this->assertFalse(Hash::check('7001', $studentUser->password));
-        $this->assertTrue(Hash::check('Secure-password-1234', $studentUser->password));
+        $this->assertTrue(Hash::check('56781234', $studentUser->password));
 
         $this->putJson('/api/students/'.$studentId, [
             'name' => 'طالب محدث',
@@ -113,8 +113,8 @@ class StudentAccessTest extends CoreDataApiTestCase
         $this->postJson('/api/students', [
             'name' => 'Blocked Student',
             'loginId' => '8104',
-            'password' => 'Secure-password-1234',
-            'passwordConfirmation' => 'Secure-password-1234',
+            'password' => '56781234',
+            'passwordConfirmation' => '56781234',
             'branchId' => 'male',
         ])->assertForbidden();
     }

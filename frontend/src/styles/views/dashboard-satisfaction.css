@@ -148,13 +148,6 @@
   font-size: 1.06rem;
 }
 
-.dashboard-page .dashboard-indicator-card__meta {
-  margin-top: 6px;
-  color: #718394;
-  font-size: 0.84rem;
-  font-weight: 700;
-}
-
 .dashboard-page .dashboard-section__heading {
   display: flex;
   align-items: center;

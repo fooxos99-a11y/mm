@@ -15,6 +15,7 @@
           item-text="label"
           item-value="value"
           :placeholder="coursePlaceholder"
+          :title="selectedCourse?.title || coursePlaceholder"
           :disabled="changingContext"
           persistent-placeholder
           dense
@@ -38,7 +39,10 @@
             >
               mdi-plus
             </v-icon>
-            {{ item.label }}
+            <span
+              class="assessment-course-option-label"
+              :title="item.label"
+            >{{ item.label }}</span>
           </template>
           <template
             v-if="canEdit"
@@ -206,7 +210,7 @@ export default {
 </script>
 
 <style scoped>
-.assessment-toolbar :deep(.v-select__selection-text) { white-space: normal; overflow-wrap: anywhere; overflow: visible; }
+.assessment-course-option-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 @media (min-width: 360px) and (max-width: 767px) {
   .assessment-toolbar { --app-filter-columns: repeat(2, minmax(0, 1fr)); }
   .assessment-toolbar :deep(.app-filter-field:first-child) { grid-column: auto; }

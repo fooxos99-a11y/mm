@@ -147,8 +147,8 @@ class AuthApiTest extends TestCase
 
         $this->putJson('/api/auth/password', [
             'currentPassword' => 'legacy-password',
-            'password' => 'Updated-password-1484',
-            'passwordConfirmation' => 'Updated-password-1484',
+            'password' => '01231484',
+            'passwordConfirmation' => '01231484',
         ])
             ->assertOk()
             ->assertJsonPath('message', 'تم تغيير كلمة المرور. سجل الدخول بالبيانات الجديدة.');

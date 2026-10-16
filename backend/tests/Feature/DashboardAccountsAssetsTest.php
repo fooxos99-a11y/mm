@@ -22,7 +22,7 @@ class DashboardAccountsAssetsTest extends CoreDataApiTestCase
             'name' => 'Manager User',
             'loginCode' => '5001',
             'role' => 'male_manager',
-            'password' => 'Secure-password-5001',
+            'password' => '12345001',
         ]);
 
         $createResponse->assertCreated()->assertJsonPath('loginCode', '5001');
@@ -47,7 +47,7 @@ class DashboardAccountsAssetsTest extends CoreDataApiTestCase
             ->assertJsonMissing(['loginCode' => '5001']);
     }
 
-    public function test_dashboard_accounts_require_strong_passwords_without_forcing_a_change(): void
+    public function test_dashboard_accounts_require_eight_digit_passwords_without_forcing_a_change(): void
     {
         $this->postJson('/api/dashboard/accounts', [
             'name' => 'Admin1',
@@ -62,7 +62,7 @@ class DashboardAccountsAssetsTest extends CoreDataApiTestCase
             'name' => 'Admin1',
             'loginCode' => '5002',
             'role' => 'male_manager',
-            'password' => 'Secure-password-5002',
+            'password' => '12345002',
         ])->assertCreated();
 
         $this->assertDatabaseHas('users', [

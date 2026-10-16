@@ -32,7 +32,11 @@ const checkCountdownReturn = async (page, info, panelName, name) => {
   await expect(timer).not.toHaveText(tick);
   const timers = await controls.locator('.dashboard-topbar__timer-list').boundingBox();
   const action = await controls.locator('.dashboard-topbar__actions button').first().boundingBox();
-  expect(Math.min(timers.y + timers.height, action.y + action.height)).toBeGreaterThan(Math.max(timers.y, action.y));
+  if (page.viewportSize().width <= 700) {
+    expect(timers.y).toBeGreaterThanOrEqual(action.y + action.height);
+  } else {
+    expect(Math.min(timers.y + timers.height, action.y + action.height)).toBeGreaterThan(Math.max(timers.y, action.y));
+  }
   expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
   await page.screenshot({ path: info.outputPath(`${name}-navigation-countdown.png`), fullPage: false });
 };

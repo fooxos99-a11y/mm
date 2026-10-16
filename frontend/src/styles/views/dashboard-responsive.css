@@ -1,4 +1,15 @@
+@media (min-width: 701px) and (max-width: 1024px) {
+  .dashboard-page .dashboard-indicators-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 28px 16px;
+  }
 
+  .dashboard-page .dashboard-indicator-ring {
+    width: min(100%, 160px);
+    height: auto;
+    aspect-ratio: 1;
+  }
+}
 
 @media (max-width: 700px) {
   .dashboard-page .dashboard-topbar,
@@ -101,7 +112,25 @@
   }
 
   .dashboard-page .dashboard-indicators-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 22px 8px;
+  }
+
+  .dashboard-page .dashboard-card--indicators {
+    padding: 24px 10px;
+  }
+
+  .dashboard-page .dashboard-indicator-card {
+    gap: 10px;
+  }
+
+  .dashboard-page .dashboard-indicator-card__label {
+    max-width: 100%;
+    font-size: clamp(0.68rem, 2.6vw, 0.9rem);
+  }
+
+  .dashboard-page .dashboard-indicator-card:first-child .dashboard-indicator-card__label {
+    white-space: nowrap;
   }
 
   .dashboard-page .dashboard-links-grid {
@@ -113,12 +142,13 @@
   }
 
   .dashboard-page .dashboard-indicator-ring {
-    width: 152px;
-    height: 152px;
+    width: min(100%, 120px);
+    height: auto;
+    aspect-ratio: 1;
   }
 
   .dashboard-page .dashboard-indicator-ring__inner {
-    font-size: 2rem;
+    font-size: clamp(1.1rem, 4.6vw, 1.7rem);
   }
 }
 
@@ -152,8 +182,6 @@
   }
 
   .dashboard-page .dashboard-sidebar {
-    width: calc(100vw - 18px);
-    max-width: calc(100vw - 18px);
     padding: 16px 14px 22px;
   }
 
@@ -195,15 +223,6 @@
     border-radius: 18px;
   }
 
-  .dashboard-page .dashboard-indicator-ring {
-    width: 132px;
-    height: 132px;
-  }
-
-  .dashboard-page .dashboard-indicator-ring__inner {
-    font-size: 1.7rem;
-  }
-
   .dashboard-page .dashboard-dialog-card__actions,
   .dashboard-page .dashboard-course-manager__footer,
   .dashboard-page .dashboard-supervision-manager__footer {
@@ -215,11 +234,5 @@
   .dashboard-page .dashboard-course-manager__footer > *,
   .dashboard-page .dashboard-supervision-manager__footer > * {
     width: 100%;
-  }
-}
-
-@media (max-width: 340px) {
-  .dashboard-page .dashboard-indicators-grid {
-    grid-template-columns: 1fr;
   }
 }

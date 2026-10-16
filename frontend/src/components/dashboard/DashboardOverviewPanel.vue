@@ -48,9 +48,6 @@
           <div class="dashboard-indicator-card__label">
             {{ indicator.label }}
           </div>
-          <div class="dashboard-indicator-card__meta">
-            {{ indicator.meta }}
-          </div>
         </fieldset>
       </div>
     </div>

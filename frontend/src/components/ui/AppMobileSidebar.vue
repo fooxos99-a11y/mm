@@ -11,6 +11,7 @@
   >
     <AppIconButton
       v-if="mobile"
+      variant="plain"
       class="mobile-sidebar-close"
       aria-label="إغلاق القائمة"
       @click="requestClose"
@@ -54,6 +55,7 @@ async function sync() {
       opener = document.activeElement;
       releaseLock = lockPageScroll();
       panel.value.showModal();
+      if (!opener?.matches(':focus-visible')) panel.value.focus({ preventScroll: true });
     }
   } else {
     releaseLock?.(); releaseLock = undefined;
