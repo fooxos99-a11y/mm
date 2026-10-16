@@ -56,6 +56,7 @@ final class DepartmentDirectoryService
     public function records(array $filters): array
     {
         $batch = $filters['batch'] ?? 'current';
+        $search = trim((string) ($filters['search'] ?? ''));
         $query = DB::table('students')->join('departments', 'departments.id', '=', 'students.department_id')
             ->leftJoin('branches', 'branches.id', '=', 'students.branch_id')
             ->leftJoin('archives', function ($join): void {
@@ -66,7 +67,7 @@ final class DepartmentDirectoryService
             ->when($batch === 'current', fn ($q) => $q->whereNull('students.archive_id'))
             ->when($batch === 'archived', fn ($q) => $q->whereNotNull('students.archive_id'))
             ->when($filters['archiveId'] ?? null, fn ($q, $id) => $q->where('students.archive_id', $id))
-            ->when($filters['search'] ?? null, fn ($q, $search) => $q->where(fn ($q) => $q
+            ->when($search !== '', fn ($q) => $q->where(fn ($q) => $q
                 ->where('students.full_name', 'like', '%'.$search.'%')
                 ->orWhere('students.login_code', 'like', '%'.$search.'%')
                 ->orWhere('students.archived_login_code', 'like', '%'.$search.'%')));

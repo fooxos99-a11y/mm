@@ -60,12 +60,14 @@ final class ManagementRecordsTest extends TestCase
         $archive = Archive::create(['name' => 'دفعة العام السابق']);
         $record = $this->student('معلم سابق', '940004', null, $archive->id);
         $this->student('معلم حالي', '940005', $other->id);
+        $this->student('مشارك دون صفر', '981111', $other->id);
         $this->root();
-        $this->getJson('/api/management/records?batch=all')->assertOk()->assertJsonPath('pagination.total', 2);
+        $this->getJson('/api/management/records?batch=all')->assertOk()->assertJsonPath('pagination.total', 3);
         $query = http_build_query(['batch' => 'archived', 'archiveId' => $archive->id, 'departmentId' => DepartmentContext::DEFAULT_ID, 'search' => 'old-940004']);
         $this->getJson('/api/management/records?'.$query)->assertOk()->assertJsonPath('pagination.total', 1)
             ->assertJsonPath('students.0.id', $record->id)->assertJsonPath('students.0.login_code', 'old-940004');
-        $this->getJson('/api/management/records?batch=all&departmentId='.$other->id)->assertOk()->assertJsonPath('pagination.total', 1)
+        $this->getJson('/api/management/records?batch=all&departmentId='.$other->id)->assertOk()->assertJsonPath('pagination.total', 2);
+        $this->getJson('/api/management/records?batch=all&search=0&departmentId='.$other->id)->assertOk()->assertJsonPath('pagination.total', 1)
             ->assertJsonPath('students.0.full_name', 'معلم حالي');
         $this->getJson('/api/management/records?batch=all&search=absent')->assertOk()->assertJsonPath('pagination.total', 0);
     }
