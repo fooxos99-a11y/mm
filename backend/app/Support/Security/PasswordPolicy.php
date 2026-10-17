@@ -6,7 +6,9 @@ use Illuminate\Validation\Rules\Password;
 
 final class PasswordPolicy
 {
-    private function __construct() {}
+    private function __construct()
+    {
+    }
 
     public static function rule(): Password
     {
