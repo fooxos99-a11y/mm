@@ -218,7 +218,6 @@
             v-model.trim="form.managerLoginCode"
             label="رقم الدخول"
             autocomplete="off"
-            inputmode="numeric"
             required
             maxlength="100"
             :error="fieldErrors.managerLoginCode"
@@ -229,7 +228,6 @@
             v-model="form.managerPassword"
             label="رمز الدخول"
             autocomplete="new-password"
-            inputmode="numeric"
             :error-messages="managerPasswordError"
             hide-details="auto"
             required
@@ -308,7 +306,7 @@ export default {
     overviewIndicators() { return this.selectedOverview?.indicators || []; },
     filterOptions() { return [{ label: 'جميع الإدارات', value: '' }, ...this.departments.map(d => ({ label: d.name, value: d.id }))]; },
     needsManagerPassword() { return !this.originalManagerLoginCode || this.form.managerLoginCode !== this.originalManagerLoginCode; },
-    managerPasswordError() { return this.fieldErrors.managerPassword || (this.form.managerPassword && !passwordMeetsPolicy(this.form.managerPassword) ? 'الرمز يجب أن يتكوّن من 8 أرقام.' : ''); },
+    managerPasswordError() { return this.fieldErrors.managerPassword || (this.form.managerPassword && !passwordMeetsPolicy(this.form.managerPassword) ? 'أدخل رمز دخول صالحًا.' : ''); },
     formValid() { return departmentFormIsValid(this.form, this.originalManagerLoginCode); },
   },
   created() { this.load(); },

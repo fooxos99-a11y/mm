@@ -245,7 +245,7 @@ export default {
       this.errorMessage = '';
 
       if (!dashboardAccountFormIsValid(this.form)) {
-        this.errorMessage = `أدخل اسمًا من 6 أحرف على الأقل، ورقم الدخول، وكلمة مرور من ${PASSWORD_REQUIREMENTS_TEXT}.`;
+        this.errorMessage = 'أدخل اسمًا من 6 أحرف على الأقل، ورقم الدخول، وكلمة المرور.';
         return;
       }
 

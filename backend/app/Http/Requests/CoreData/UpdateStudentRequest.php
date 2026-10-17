@@ -11,7 +11,7 @@ class UpdateStudentRequest extends DashboardFormRequest
     {
         return [
             'name' => ['sometimes', 'required', 'string', 'max:255'],
-            'loginCode' => ['sometimes', 'required', 'string', 'min:4', 'max:255', 'regex:/^[\pL\pN]+$/u'],
+            'loginCode' => ['sometimes', 'required', 'string', 'max:255'],
             'password' => ['nullable', 'string', PasswordPolicy::rule(), 'max:255', 'same:passwordConfirmation'],
             'passwordConfirmation' => ['nullable', 'required_with:password', 'string', 'max:255'],
             'branchId' => ['sometimes', 'string', 'max:100'],
@@ -32,7 +32,6 @@ class UpdateStudentRequest extends DashboardFormRequest
             'loginCode.string' => 'رقم الدخول غير صالح.',
             'loginCode.min' => 'يجب ألا يقل رقم الدخول عن 4 أحرف أو أرقام.',
             'loginCode.max' => 'رقم الدخول طويل جدًا.',
-            'loginCode.regex' => 'رقم الدخول يقبل الحروف والأرقام فقط.',
             'password.string' => 'كلمة المرور غير صالحة.',
             'password.max' => 'كلمة المرور طويلة جدًا.',
             'password.same' => 'تأكيد كلمة المرور غير مطابق.',

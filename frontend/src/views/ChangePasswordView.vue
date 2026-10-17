@@ -71,7 +71,7 @@ export default {
   methods: {
     async submit() {
       if (!passwordConfirmationIsValid(this.form.password, this.form.passwordConfirmation)) {
-        this.$toast.error(`استخدم كلمة مرور مطابقة من ${PASSWORD_REQUIREMENTS_TEXT}`);
+        this.$toast.error('أدخل كلمة المرور وطابق تأكيدها.');
         return;
       }
 

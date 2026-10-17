@@ -16,7 +16,7 @@ final class RegisterAccountRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'min:6', 'max:255'],
-            'loginCode' => ['required', 'string', 'min:4', 'max:100', 'regex:/^[\pL\pN]+$/u'],
+            'loginCode' => ['required', 'string', 'max:100'],
             'password' => ['required', 'string', PasswordPolicy::rule(), 'same:passwordConfirmation'],
             'passwordConfirmation' => ['required', 'string'],
         ];

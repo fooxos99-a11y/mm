@@ -73,6 +73,15 @@ final class CreateGeneralManagerCommandTest extends TestCase
         $this->assertStringNotContainsString('24681357', $tester->getDisplay());
     }
 
+    public function test_single_letter_credentials_are_accepted_and_password_is_hashed(): void
+    {
+        $tester = $this->command('a', 'مدير النظام الجديد', '!');
+        $this->assertSame(0, $tester->getStatusCode());
+        $user = User::query()->where('login_code', 'a')->firstOrFail();
+        $this->assertTrue(Hash::check('!', $user->password));
+        $this->assertStringNotContainsString('!', $tester->getDisplay());
+    }
+
     public function test_reserved_historical_account_number_cannot_be_claimed(): void
     {
         DB::table('reserved_login_codes')->insert([
@@ -87,10 +96,9 @@ final class CreateGeneralManagerCommandTest extends TestCase
 
     public function test_invalid_password_and_noninteractive_missing_stdin_fail_without_creating_accounts(): void
     {
-        foreach (['secret42', '1234567', '123456789', "1234\n5678"] as $password) {
+        foreach (['', ' ', str_repeat('a', 256)] as $password) {
             $tester = $this->command('54834', 'حساب ببيانات مرفوضة', $password);
             $this->assertSame(1, $tester->getStatusCode());
-            $this->assertStringNotContainsString($password, $tester->getDisplay());
         }
         $tester = $this->command('54834', 'حساب دون إدخال آمن', '13572468', false);
         $this->assertSame(1, $tester->getStatusCode());

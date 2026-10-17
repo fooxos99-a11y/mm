@@ -39,7 +39,7 @@ final class DepartmentManagementService
                 'is_active' => $data['isActive'] ?? true,
             ]);
             $manager = User::query()->where('login_code', trim($data['managerLoginCode']))->lockForUpdate()->first();
-            if (! empty($data['managerPassword'])) {
+            if (filled($data['managerPassword'] ?? null)) {
                 if ($manager) {
                     throw ValidationException::withMessages(['managerLoginCode' => 'رقم الدخول مستخدم مسبقًا.']);
                 }

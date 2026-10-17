@@ -10,8 +10,6 @@ export default {
 
       if (!name) errors.push(this.dialogEntityType === 'student' ? 'أدخل اسم المعلم/ة.' : 'أدخل اسم المقرئ.');
       if (!loginCode) errors.push('أدخل رقم الدخول.');
-      else if (loginCode.length < 4) errors.push('يجب ألا يقل رقم الدخول عن 4 أحرف أو أرقام.');
-      else if (!/^[\p{L}\p{N}]+$/u.test(loginCode)) errors.push('رقم الدخول يقبل الحروف والأرقام فقط.');
       if (password && password !== confirmation) errors.push('تأكيد كلمة المرور غير مطابق.');
       if (password && !passwordMeetsPolicy(password)) errors.push(PASSWORD_REQUIREMENTS_TEXT);
 

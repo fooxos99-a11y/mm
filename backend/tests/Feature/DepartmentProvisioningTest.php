@@ -74,13 +74,31 @@ final class DepartmentProvisioningTest extends TestCase
 
     public function test_missing_or_invalid_new_manager_password_cannot_create_partial_accounts(): void
     {
-        foreach ([null, '1234', 'abcdefgh'] as $password) {
+        foreach ([null, '', ' ', str_repeat('a', 256)] as $password) {
             $this->postJson('/api/management/departments', [...$this->payload(), 'managerPassword' => $password])
                 ->assertUnprocessable()->assertJsonValidationErrors('managerPassword');
         }
         $this->assertDatabaseCount('departments', 1);
         $this->assertDatabaseMissing('users', ['login_code' => '76123456']);
         $this->assertDatabaseMissing('reserved_login_codes', ['login_code' => '76123456']);
+    }
+
+    public function test_short_credentials_create_usable_accounts_and_remain_globally_unique(): void
+    {
+        foreach (['0', '1', '12', 'a', 'ab', 'ع', 'سع', '!', 'name @'] as $credential) {
+            $password = $credential === '!' ? ' a! ' : $credential;
+            $payload = [...$this->payload($credential), 'managerPassword' => $password];
+            $created = $this->postJson('/api/management/departments', $payload)->assertCreated();
+            $manager = User::query()->where('login_code', $credential)->firstOrFail();
+            $this->assertTrue(Hash::check($password, $manager->password));
+            $this->assertSame($created->json('department.id'), $manager->department_id);
+            $this->postJson('/api/auth/login', ['login_code' => $credential, 'password' => $password])
+                ->assertOk()->assertJsonPath('user.role', 'admin')
+                ->assertJsonPath('user.departmentId', $manager->department_id);
+            $this->postJson('/api/management/departments', $payload)
+                ->assertUnprocessable()->assertJsonValidationErrors('managerLoginCode');
+        }
+        $this->assertDatabaseCount('departments', 10);
     }
 
     public function test_failure_after_account_creation_rolls_back_account_reservation_and_department(): void

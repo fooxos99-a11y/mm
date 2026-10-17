@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Http\Requests\Auth\RegisterAccountRequest;
 use App\Http\Requests\Auth\UpdatePasswordRequest;
 use App\Http\Requests\CoreData\StoreDashboardAccountRequest;
 use App\Http\Requests\CoreData\StoreReciterRequest;
@@ -17,6 +18,7 @@ class CredentialPolicyTest extends TestCase
     public static function requests(): array
     {
         return [
+            [RegisterAccountRequest::class],
             [UpdatePasswordRequest::class],
             [StoreDashboardAccountRequest::class],
             [StoreStudentRequest::class],
@@ -27,18 +29,40 @@ class CredentialPolicyTest extends TestCase
     }
 
     #[DataProvider('requests')]
-    public function test_new_credentials_require_exactly_eight_digits(string $request): void
+    public function test_new_credentials_accept_short_numbers_letters_and_symbols(string $request): void
     {
         $rules = ['password' => (new $request)->rules()['password']];
-        foreach (['1234567', '123456789', 'abcd1234', 'abcdefgh', '1234 678', "1234567\n", "12345678\n"] as $password) {
+        foreach ([str_repeat('a', 256), ['invalid']] as $password) {
             $this->assertTrue(
                 Validator::make(['password' => $password, 'passwordConfirmation' => $password], $rules)->fails()
             );
         }
-        foreach (['01234567', '87654321', '٠١٢٣٤٥٦٧'] as $password) {
+        if (in_array('required', $rules['password'], true)) {
+            $this->assertTrue(Validator::make(['password' => ' ', 'passwordConfirmation' => ' '], $rules)->fails());
+        }
+        foreach (['0', '1', '12', 'a', 'ab', 'ع', 'سع', '!', 'a !', ' a ', '01234567', '٠١٢٣٤٥٦٧', '123456789'] as $password) {
             $this->assertTrue(Validator::make([
                 'password' => $password, 'passwordConfirmation' => $password,
             ], $rules)->passes());
+        }
+    }
+
+    #[DataProvider('requests')]
+    public function test_login_codes_accept_one_character_and_still_reject_blank_values(string $request): void
+    {
+        $requestRules = (new $request)->rules();
+        $key = isset($requestRules['loginCode']) ? 'loginCode' : 'loginId';
+        if (! isset($requestRules[$key])) {
+            $this->assertArrayNotHasKey('loginCode', $requestRules);
+
+            return;
+        }
+        $rules = [$key => $requestRules[$key]];
+        foreach (['0', '1', '12', 'a', 'ab', 'ع', '!', 'name @'] as $loginCode) {
+            $this->assertTrue(Validator::make([$key => $loginCode], $rules)->passes());
+        }
+        foreach (['', ' '] as $loginCode) {
+            $this->assertTrue(Validator::make([$key => $loginCode], $rules)->fails());
         }
     }
 }

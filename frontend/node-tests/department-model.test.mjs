@@ -15,7 +15,8 @@ test('creating a department requires new credentials while editing preserves the
   const form = { name: 'الإدارة الأولى', managerTitle: 'مدير التدريب', managerLoginCode: '1483' };
   assert.equal(departmentFormIsValid(form), false);
   assert.equal(departmentFormIsValid({ ...form, managerPassword: '12345678' }), true);
-  assert.equal(departmentFormIsValid({ ...form, managerPassword: '1234' }), false);
+  assert.equal(departmentFormIsValid({ ...form, managerLoginCode: 'a', managerPassword: '1' }), true);
+  assert.equal(departmentFormIsValid({ ...form, managerPassword: ' ' }), false);
   assert.equal(departmentFormIsValid(form, '1483'), true);
   assert.equal(departmentFormIsValid({ ...form, managerLoginCode: '1484' }, '1483'), false);
   assert.equal(departmentFormIsValid({ ...form, name: '' }, '1483'), false);

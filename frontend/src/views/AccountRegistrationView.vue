@@ -21,7 +21,6 @@
           v-model.trim="form.loginCode"
           label="رقم الدخول"
           autocomplete="username"
-          inputmode="numeric"
           required
           maxlength="50"
           :error="errors.loginCode || errors.login_code"
@@ -83,7 +82,7 @@ export default {
       this.errors = {};
       this.error = '';
       if (!passwordConfirmationIsValid(this.form.password, this.form.passwordConfirmation)) {
-        this.error = 'أدخل كلمة مرور من 8 أرقام، وطابق تأكيدها.';
+        this.error = 'أدخل كلمة المرور وطابق تأكيدها.';
         return;
       }
       this.saving = true;

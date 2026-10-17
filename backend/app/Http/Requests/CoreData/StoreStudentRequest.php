@@ -11,7 +11,7 @@ class StoreStudentRequest extends DashboardFormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'loginId' => ['required', 'string', 'min:4', 'max:255', 'regex:/^[\pL\pN]+$/u'],
+            'loginId' => ['required', 'string', 'max:255'],
             'password' => ['nullable', 'string', PasswordPolicy::rule(), 'max:255', 'same:passwordConfirmation'],
             'passwordConfirmation' => ['nullable', 'required_with:password', 'string', 'max:255'],
             'branchId' => ['required', 'string', 'max:100'],

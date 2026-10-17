@@ -30,11 +30,11 @@ final class CreateGeneralManager extends Command
             $loginCode = trim((string) $this->argument('loginCode'));
             $name = trim((string) $this->argument('name'));
             if (Validator::make(['loginCode' => $loginCode, 'name' => $name, 'password' => $password], [
-                'loginCode' => ['required', 'string', 'min:4', 'max:100', 'regex:/^[\pL\pN]+$/u'],
+                'loginCode' => ['required', 'string', 'max:100'],
                 'name' => ['required', 'string', 'min:6', 'max:255'],
                 'password' => ['required', 'string', PasswordPolicy::rule()],
             ])->fails()) {
-                $this->error('تعذر إنشاء الحساب. تحقق من الاسم ورقم الدخول وكلمة المرور المكونة من 8 أرقام.');
+                $this->error('تعذر إنشاء الحساب. تحقق من الاسم ورقم الدخول وكلمة المرور.');
 
                 return self::FAILURE;
             }
@@ -60,7 +60,7 @@ final class CreateGeneralManager extends Command
                 throw new RuntimeException('Private password input is required.');
             }
 
-            return (string) $this->secret('كلمة المرور (8 أرقام)', false);
+            return (string) $this->secret('كلمة المرور', false);
         }
 
         $stream = $this->input instanceof StreamableInputInterface ? $this->input->getStream() : null;

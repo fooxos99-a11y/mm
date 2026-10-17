@@ -1,10 +1,11 @@
 import { expect, test } from './support/isolatedTest.mjs';
-import { adminLogin, adminPassword, rolePassword, studentPassword } from './support/credentials.mjs';
+import { adminLogin, adminPassword, rolePassword } from './support/credentials.mjs';
 import { mkdirSync } from 'node:fs';
 import path from 'node:path';
 
 test.use({ actionTimeout: 20_000 });
 
+const teacherPassword = '1';
 const apiOrigin = new URL(process.env.VUE_APP_API_BASE_URL).origin;
 async function loginAs(page, loginCode, password, home) {
   await page.goto('about:blank');
@@ -36,8 +37,8 @@ test('live department assignment, teacher login and global number uniqueness sha
   const dialog = page.getByRole('dialog');
   await dialog.getByLabel('اسم الإدارة', { exact: true }).fill(name);
   await dialog.getByLabel('مسمى المسؤول').fill('مدير التدريب');
-  await dialog.getByLabel('رقم الدخول', { exact: true }).fill('14830');
-  await dialog.getByLabel('رمز الدخول', { exact: true }).fill(rolePassword);
+  await dialog.getByLabel('رقم الدخول', { exact: true }).fill('a');
+  await dialog.getByLabel('رمز الدخول', { exact: true }).fill('b');
   await dialog.getByRole('button', { name: 'حفظ الإدارة' }).click();
   await expect(dialog).not.toBeVisible();
   await expect(page.getByRole('button', { name: `فتح ${name}`, exact: true })).toBeVisible();
@@ -49,7 +50,7 @@ test('live department assignment, teacher login and global number uniqueness sha
   await page.locator('.dashboard-sidebar').getByRole('button', { name: 'إدارة النظام', exact: true }).click();
   await expect(page).toHaveURL(/\/management$/);
 
-  await loginAs(page, '14830', rolePassword, 'dashboard');
+  await loginAs(page, 'a', 'b', 'dashboard');
   await expect(page.locator('.department-context')).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'إدارة النظام', exact: true })).toHaveCount(0);
   const headers = await apiHeaders(page);
@@ -58,7 +59,7 @@ test('live department assignment, teacher login and global number uniqueness sha
   const managerUser = (await managerSession.json()).user;
   expect(managerUser).toMatchObject({ departmentName: name, role: 'admin', roleLabel: 'مدير التدريب' });
   expect(managerUser.departmentId).toBeTruthy();
-  const teacher = await page.request.post(`${apiOrigin}/api/students`, { headers, data: { name: 'معلم الإدارة الجديدة', loginId: '0924', branchId: 'male', password: studentPassword, passwordConfirmation: studentPassword } });
+  const teacher = await page.request.post(`${apiOrigin}/api/students`, { headers, data: { name: 'معلم الإدارة الجديدة', loginId: 'س', branchId: 'male', password: teacherPassword, passwordConfirmation: teacherPassword } });
   expect(teacher.status(), await teacher.text()).toBe(201);
   const courseTitle = `دورة الإدارة المستقلة ${info.project.name}`;
   const course = await page.request.post(`${apiOrigin}/api/dashboard/courses`, { headers, data: { title: courseTitle, isActive: true } });
@@ -67,7 +68,7 @@ test('live department assignment, teacher login and global number uniqueness sha
   expect(denied.status()).toBe(403);
   await screenshot(page, `${info.project.name}-live-department-manager.png`);
 
-  await loginAs(page, '0924', studentPassword, 'student');
+  await loginAs(page, 'س', teacherPassword, 'student');
   await expect(page.locator('.student-page')).toBeVisible();
   await expect(page.locator('.department-context')).toHaveCount(0);
   const teacherSession = await page.request.get(`${apiOrigin}/api/auth/session`, { headers: await apiHeaders(page) });
@@ -76,7 +77,7 @@ test('live department assignment, teacher login and global number uniqueness sha
   const snapshot = await page.request.get(`${apiOrigin}/api/dashboard/snapshot`, { headers: await apiHeaders(page) });
   expect(snapshot.ok()).toBe(true);
   const studentData = await snapshot.json();
-  expect(studentData.students.map(student => student.loginId)).toEqual(['0924']);
+  expect(studentData.students.map(student => student.loginId)).toEqual(['س']);
   expect(studentData.courses.some(course => course.title === courseTitle)).toBe(true);
   await expect(page.locator('.student-page .dashboard-topbar__name')).toHaveText('معلم الإدارة الجديدة');
   await expect(page.locator('.student-page .dashboard-loader-shell')).toHaveCount(0);
@@ -85,16 +86,16 @@ test('live department assignment, teacher login and global number uniqueness sha
 
   await loginAs(page, adminLogin, adminPassword, 'dashboard');
   const defaultHeaders = await apiHeaders(page);
-  const duplicate = await page.request.post(`${apiOrigin}/api/students`, { headers: defaultHeaders, data: { name: 'محاولة تكرار رقم الدخول', loginId: '0924', branchId: 'male', password: studentPassword, passwordConfirmation: studentPassword } });
+  const duplicate = await page.request.post(`${apiOrigin}/api/students`, { headers: defaultHeaders, data: { name: 'محاولة تكرار رقم الدخول', loginId: 'س', branchId: 'male', password: teacherPassword, passwordConfirmation: teacherPassword } });
   expect(duplicate.status()).toBe(422);
   const defaultSnapshot = await page.request.get(`${apiOrigin}/api/dashboard/snapshot`, { headers: defaultHeaders });
   const defaultData = await defaultSnapshot.json();
   expect(defaultData.courses.some(course => course.title === courseTitle)).toBe(false);
-  expect(defaultData.students.some(student => student.loginId === '0924')).toBe(false);
+  expect(defaultData.students.some(student => student.loginId === 'س')).toBe(false);
   await loginAs(page, 'e2e-general-manager', rolePassword, 'management');
   if (page.viewportSize().width <= 1024) await page.getByRole('button', { name: 'فتح القائمة', exact: true }).click();
   await page.getByRole('navigation', { name: 'أقسام إدارة النظام' }).getByRole('button', { name: 'الأرشيف المركزي', exact: true }).click();
-  await page.getByLabel('الاسم أو رقم الدخول').fill('0924');
+  await page.getByLabel('الاسم أو رقم الدخول').fill('س');
   await page.getByRole('button', { name: 'بحث', exact: true }).click();
   await expect(page.getByText('معلم الإدارة الجديدة', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'عرض سجل معلم الإدارة الجديدة', exact: true }).click();

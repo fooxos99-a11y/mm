@@ -6,11 +6,11 @@ import {
   passwordMeetsPolicy,
 } from '../src/utils/passwordPolicy.mjs';
 
-test('password policy accepts exactly eight decimal digits including leading zeros', () => {
-  for (const password of ['01234567', '87654321', '٠١٢٣٤٥٦٧']) {
+test('password policy accepts short numbers, letters and symbols without an eight-character restriction', () => {
+  for (const password of ['0', '1', '12', 'a', 'ab', 'ع', 'سع', '!', 'a !', ' a ', '01234567', '٠١٢٣٤٥٦٧', '123456789', 'كلمة-مرور-2026', 'ع'.repeat(255)]) {
     assert.equal(passwordMeetsPolicy(password), true);
   }
-  for (const password of [undefined, '', '1234567', '123456789', 'abcd1234', 'abcdefgh', '1234 678', '1234567\n', '12345678\n', 'كلمة-مرور-2026']) {
+  for (const password of [undefined, null, '', ' ', '\n', 'a'.repeat(256)]) {
     assert.equal(passwordMeetsPolicy(password), false);
   }
 });
@@ -18,4 +18,7 @@ test('password policy accepts exactly eight decimal digits including leading zer
 test('password confirmation must match a policy-compliant password', () => {
   assert.equal(passwordConfirmationIsValid('01234567', '01234567'), true);
   assert.equal(passwordConfirmationIsValid('01234567', '12345678'), false);
+  assert.equal(passwordConfirmationIsValid('a', 'a'), true);
+  assert.equal(passwordConfirmationIsValid('1', '2'), false);
+  assert.equal(passwordConfirmationIsValid('', ''), false);
 });

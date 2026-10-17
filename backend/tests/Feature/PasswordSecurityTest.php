@@ -78,7 +78,7 @@ class PasswordSecurityTest extends TestCase
         $this->assertTrue(Hash::check('01234567', (string) $user->fresh()->password));
     }
 
-    public function test_password_change_rejects_letters_even_with_eight_characters(): void
+    public function test_password_change_accepts_a_single_letter_and_preserves_login_validation(): void
     {
         $user = User::factory()->create([
             'password' => Hash::make('Current-password-2026'),
@@ -87,11 +87,16 @@ class PasswordSecurityTest extends TestCase
         $this->withToken($user->createToken('current')->plainTextToken)
             ->putJson('/api/auth/password', [
                 'currentPassword' => 'Current-password-2026',
-                'password' => 'short123',
-                'passwordConfirmation' => 'short123',
+                'password' => 'a',
+                'passwordConfirmation' => 'a',
             ])
-            ->assertUnprocessable()
-            ->assertJsonValidationErrors(['password']);
+            ->assertOk();
+
+        $this->assertTrue(Hash::check('a', (string) $user->fresh()->password));
+        $this->postJson('/api/auth/login', ['login_code' => $user->login_code, 'password' => 'wrong'])
+            ->assertUnprocessable()->assertJsonValidationErrors('login_code');
+        $this->postJson('/api/auth/login', ['login_code' => $user->login_code, 'password' => 'a'])
+            ->assertOk()->assertJsonPath('user.id', $user->id);
     }
 
     public function test_student_cannot_change_their_own_password(): void

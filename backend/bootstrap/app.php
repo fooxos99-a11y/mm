@@ -33,6 +33,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ['prefix' => 'api', 'middleware' => ['api', 'auth:sanctum']],
     )
     ->withMiddleware(function (Middleware $middleware) use ($isApiRequest): void {
+        $middleware->trimStrings(except: ['currentPassword', 'passwordConfirmation', 'managerPassword']);
         $middleware->append(AddSecurityHeaders::class);
         $middleware->append(SanitizeRichTextInput::class);
         $middleware->statefulApi();
