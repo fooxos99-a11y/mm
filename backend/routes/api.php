@@ -251,15 +251,17 @@ Route::middleware(['auth:sanctum', 'password.changed'])->group(function () {
             Route::delete('{student}', [StudentController::class, 'destroy'])
                 ->middleware('dashboard.access:student-delete');
         });
-        Route::get('by-login/{loginCode}/assigned-reciter', [ReciterController::class, 'assignedToStudent']);
+        Route::get('by-login/{loginCode}/assigned-reciter', [ReciterController::class, 'assignedToStudent'])
+            ->where('loginCode', '.+');
         Route::put('{student}/parts/{partNumber}', [StudentController::class, 'togglePart']);
     });
 
     Route::prefix('reciters')->group(function () {
         Route::post('/', [ReciterController::class, 'store'])
             ->middleware(['can:access-dashboard', 'dashboard.access:reciter-store']);
-        Route::get('by-login/{loginCode}', [ReciterController::class, 'show']);
+        Route::get('by-login/{loginCode}', [ReciterController::class, 'show'])->where('loginCode', '.+');
         Route::delete('by-login/{loginCode}', [ReciterController::class, 'destroy'])
+            ->where('loginCode', '.+')
             ->middleware(['can:access-dashboard', 'dashboard.access:reciter-delete']);
     });
 });
