@@ -99,7 +99,7 @@ class LoginCodeAuthenticationTest extends TestCase
             ->assertJsonPath('user.loginCode', '1234');
     }
 
-    public function test_student_can_be_created_without_password_then_receive_a_secure_password(): void
+    public function test_student_can_be_created_without_password_then_receive_a_short_password(): void
     {
         Sanctum::actingAs(User::query()->create([
             'full_name' => 'Admin User',
@@ -120,14 +120,16 @@ class LoginCodeAuthenticationTest extends TestCase
 
         $this->putJson('/api/students/'.$studentId, [
             'password' => '7',
-            'passwordConfirmation' => '7',
+            'passwordConfirmation' => '8',
         ])->assertUnprocessable();
 
         $this->putJson('/api/students/'.$studentId, [
-            'password' => '12342026',
-            'passwordConfirmation' => '12342026',
+            'password' => '7',
+            'passwordConfirmation' => '7',
         ])->assertOk();
 
-        $this->assertTrue(Hash::check('12342026', $user->fresh()->password));
+        $this->assertTrue(Hash::check('7', $user->fresh()->password));
+        $this->postJson('/api/auth/login', ['login_code' => 'A123', 'password' => '7'])
+            ->assertOk()->assertJsonPath('user.role', 'student');
     }
 }
