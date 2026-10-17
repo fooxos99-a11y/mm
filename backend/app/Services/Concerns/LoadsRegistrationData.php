@@ -6,7 +6,6 @@ use App\Models\Branch;
 use App\Models\RegistrationRequest;
 use App\Support\DepartmentContext;
 use App\Support\DepartmentData as DB;
-use Illuminate\Support\Facades\DB as GlobalDB;
 
 trait LoadsRegistrationData
 {
@@ -14,10 +13,6 @@ trait LoadsRegistrationData
     {
         return [
             'departmentId' => DepartmentContext::id(),
-            'departments' => GlobalDB::table('departments')->where('is_active', true)->orderBy('name')
-                ->get(['id', 'name'])->map(fn ($department): array => [
-                    'id' => $department->id, 'name' => $department->name,
-                ])->all(),
             'isOpen' => $this->isRegistrationOpen(),
             'fields' => $this->registrationFormService->load(),
             'fixedLabels' => $this->registrationFormService->loadFixedLabels(),
@@ -59,6 +54,7 @@ trait LoadsRegistrationData
         }
 
         return [
+            'departmentId' => DepartmentContext::id(),
             'isOpen' => $this->isRegistrationOpen(),
             'registrationUrl' => $origin.'/registration?departmentId='.rawurlencode((string) DepartmentContext::id()),
             'fields' => $this->registrationFormService->load(),

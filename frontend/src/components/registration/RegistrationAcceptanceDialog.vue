@@ -98,7 +98,6 @@
 
         <div class="registration-acceptance__credentials">
           <h3>بيانات الدخول</h3>
-          <p>يقبل النظام أي قيمة تحددها، ومنها رمز من 3 أرقام، ولن يُطلب من الطالب تغييره عند أول دخول.</p>
           <div class="registration-acceptance__grid">
             <div class="registration-acceptance__field">
               <label for="registration-acceptance-login-code">رقم الدخول</label>
@@ -140,7 +139,7 @@
           native-type="submit"
           :loading="loading"
         >
-          قبول وإنشاء الحساب
+          قبول
         </AppButton>
       </AppDialogFooter>
     </form>

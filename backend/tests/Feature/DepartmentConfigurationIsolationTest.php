@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Department;
 use App\Models\User;
 use App\Services\DepartmentManagementService;
 use App\Services\RegistrationService;
@@ -61,6 +62,7 @@ final class DepartmentConfigurationIsolationTest extends TestCase
         }
         Sanctum::actingAs($firstManager);
         $this->getJson('/api/dashboard/registration')->assertOk()->assertJsonCount(1, 'requests')
+            ->assertJsonPath('departmentId', $first)
             ->assertJsonPath('requests.0.id', $requests[$first])->assertJsonPath('fields.0.label', 'FIRST_FORM')
             ->assertJsonPath('registrationUrl', config('app.frontend_url').'/registration?departmentId='.$first);
         $this->postJson('/api/dashboard/registration-requests/'.$requests[$second].'/reject', ['reason' => 'محاولة من إدارة أخرى'])
@@ -71,6 +73,42 @@ final class DepartmentConfigurationIsolationTest extends TestCase
         $this->getJson('/api/dashboard/registration')->assertOk()->assertJsonPath('isOpen', true)
             ->assertJsonPath('fields.0.label', 'SECOND_FORM')->assertJsonPath('requests.0.id', $requests[$second]);
         $this->withHeader('X-Department-Id', $first)->getJson('/api/dashboard/registration')->assertForbidden();
+    }
+
+    public function test_public_registration_uses_its_link_instead_of_the_logged_in_department(): void
+    {
+        [$target] = $this->department('88123460');
+        DepartmentContext::run($target, function (): void {
+            app(RegistrationService::class)->updateRegistrationSettings(true);
+            app(RegistrationService::class)->updateRegistrationFormFields([
+                ['id' => 'target', 'label' => 'سؤال الإدارة المستهدفة', 'type' => 'text', 'required' => true],
+            ]);
+        });
+        Sanctum::actingAs(User::factory()->create(['role' => 'admin']));
+        $this->getJson('/api/public/registration?departmentId='.$target)->assertOk()
+            ->assertJsonPath('departmentId', $target)->assertJsonPath('fields.0.id', 'target')
+            ->assertJsonMissingPath('departments');
+        $request = $this->postJson('/api/public/registration-requests', [
+            'departmentId' => $target, 'name' => 'متقدم من رابط الإدارة', 'phone' => '0501234567',
+            'gender' => 'male', 'answers' => ['target' => 'إجابة خاصة بالإدارة'],
+        ])->assertCreated();
+        $this->assertDatabaseHas('registration_requests', ['id' => $request->json('id'), 'department_id' => $target]);
+        $this->getJson('/api/dashboard/registration')->assertOk()->assertJsonCount(0, 'requests');
+        $this->getJson('/api/public/registration')->assertOk()->assertJsonPath('departmentId', DepartmentContext::DEFAULT_ID);
+        $this->withHeader('X-Department-Id', $target)->getJson('/api/dashboard/registration')->assertForbidden();
+    }
+
+    public function test_invalid_and_inactive_registration_links_never_fall_back_to_another_department(): void
+    {
+        [$inactive] = $this->department('88123461');
+        Department::query()->whereKey($inactive)->update(['is_active' => false]);
+        foreach (['0', (string) Str::uuid(), $inactive, ['invalid']] as $id) {
+            $this->getJson('/api/public/registration?'.http_build_query(['departmentId' => $id]))->assertNotFound();
+            $this->postJson('/api/public/registration-requests', [
+                'departmentId' => $id, 'name' => 'طلب برابط غير متاح', 'phone' => '0501234567', 'gender' => 'male',
+            ])->assertNotFound();
+        }
+        $this->assertDatabaseCount('registration_requests', 0);
     }
 
     public function test_courses_pre_post_and_final_questions_and_task_templates_are_private_to_their_department(): void

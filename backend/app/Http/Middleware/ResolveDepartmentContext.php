@@ -18,6 +18,15 @@ final class ResolveDepartmentContext
             $user = $request->user('sanctum') ?: $request->user();
             $management = $request->is('api/management/*', '*/api/management/*');
             $identity = $request->is('api/auth/*', '*/api/auth/*');
+            if ($request->is('api/public/registration', '*/api/public/registration',
+                'api/public/registration-requests', '*/api/public/registration-requests')) {
+                $id = $request->input('departmentId') ?? DepartmentContext::DEFAULT_ID;
+                abort_unless(is_string($id) && $id !== '', 404, 'رابط التسجيل غير متاح.');
+                DepartmentContext::set($id);
+                $this->assertActive($id);
+
+                return $next($request);
+            }
             if ($request->is('api/public/departments', '*/api/public/departments')) {
                 DepartmentContext::set(null);
 

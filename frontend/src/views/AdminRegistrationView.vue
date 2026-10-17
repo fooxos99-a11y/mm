@@ -43,6 +43,7 @@
         </AppButton>
         <AppButton
           variant="secondary"
+          :disabled="loading || !registrationUrl"
           @click="copyRegistrationLink"
         >
           نسخ الرابط

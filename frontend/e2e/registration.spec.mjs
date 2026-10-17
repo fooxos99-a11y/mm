@@ -84,6 +84,7 @@ test('public registration persists a complete request', async ({ page }, testInf
   const requestRow = page.locator('.registration-admin__request-row').filter({ hasText: 'مستخدم اختبار متكامل' });
   await requestRow.getByRole('button', { name: 'قبول', exact: true }).click();
   await expect(page.locator('.registration-acceptance')).toBeVisible();
+  await expect(page.getByText('يقبل النظام أي قيمة تحددها', { exact: false })).toHaveCount(0);
   await page.locator('.registration-acceptance__credentials input[type="text"]').fill(loginCode);
   await page.locator('.registration-acceptance__credentials input[type="password"]').fill(newAccountPassword);
 
@@ -92,7 +93,7 @@ test('public registration persists a complete request', async ({ page }, testInf
       && candidate.url().endsWith('/accept')
       && candidate.request().method() === 'POST'
   ));
-  await page.getByRole('button', { name: 'قبول وإنشاء الحساب', exact: true }).click();
+  await page.locator('.registration-acceptance').getByRole('button', { name: 'قبول', exact: true }).click();
   expect((await acceptResponsePromise).status()).toBe(200);
   await expect(page.locator('.registration-acceptance')).not.toBeVisible();
 

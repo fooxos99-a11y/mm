@@ -101,6 +101,7 @@
       <AppButton
         variant="secondary"
         class="dashboard-topbar__action dashboard-topbar__action--ghost"
+        :disabled="registrationState.loading"
         @click="$emit('copy-registration-link')"
       >
         نسخ الرابط

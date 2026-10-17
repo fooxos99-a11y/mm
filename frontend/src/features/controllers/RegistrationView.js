@@ -5,7 +5,7 @@ import {
   AppTextField,
 } from '../../components/ui';
 import { normalizeFixedFieldLabels } from '../registration/registrationFieldLabels.mjs';
-import { fetchPublicDepartments, fetchPublicRegistrationStatus, submitPublicRegistrationRequest } from '../../services/registrationApi';
+import { fetchPublicRegistrationStatus, submitPublicRegistrationRequest } from '../../services/registrationApi';
 
 const REGISTRATION_STATES = Object.freeze({
   LOADING: 'loading',
@@ -28,7 +28,6 @@ export default {
       submitting: false,
       registrationState: REGISTRATION_STATES.LOADING,
       loadError: '',
-      departments: [],
       departmentId: '',
       statusGeneration: 0,
       registrationFields: [],
@@ -48,38 +47,33 @@ export default {
   created() {
     this.initializeRegistration();
   },
-  computed: {
-    departmentOptions() { return this.departments.map(department => ({ label: department.name, value: department.id })); },
+  watch: {
+    '$route.query.departmentId': 'initializeRegistration',
   },
   methods: {
     async initializeRegistration() {
-      try {
-        const payload = await fetchPublicDepartments();
-        this.departments = payload?.departments || payload || [];
-        const requested = String(this.$route.query.departmentId || '');
-        const requestedDepartment = this.departments.find(item => String(item.id) === requested);
-        if (requested && !requestedDepartment) {
-          this.departmentId = '';
-          this.loadError = 'الإدارة المطلوبة غير متاحة. اختر إدارة أخرى.';
-          this.registrationState = REGISTRATION_STATES.ERROR;
-          return;
-        }
-        this.departmentId = requestedDepartment?.id || (this.departments.length === 1 ? this.departments[0].id : '');
-        await this.loadStatus();
-      } catch (error) {
-        this.loadError = error?.response?.data?.message || 'تعذر تحميل الإدارات.';
+      const requested = this.$route.query.departmentId;
+      this.form = { name: '', gender: '', phone: '', answers: {} };
+      this.registrationFields = [];
+      this.submitting = false;
+      if (requested !== undefined && (typeof requested !== 'string' || !requested.trim())) {
+        this.statusGeneration += 1;
+        this.loadError = 'رابط التسجيل غير صالح.';
         this.registrationState = REGISTRATION_STATES.ERROR;
+        return;
       }
+      this.departmentId = requested || '';
+      await this.loadStatus();
     },
     async loadStatus() {
       const generation = ++this.statusGeneration;
-      if (!this.departmentId) { this.registrationState = 'choose'; return; }
       this.registrationState = REGISTRATION_STATES.LOADING;
       this.loadError = '';
 
       try {
         const payload = await fetchPublicRegistrationStatus(this.departmentId);
         if (generation !== this.statusGeneration) return;
+        this.departmentId = payload?.departmentId || this.departmentId;
         this.registrationState = payload?.isOpen
           ? REGISTRATION_STATES.OPEN
           : REGISTRATION_STATES.CLOSED;
@@ -101,9 +95,11 @@ export default {
       }
 
       this.submitting = true;
+      const generation = this.statusGeneration;
 
       try {
         await submitPublicRegistrationRequest({ ...this.form, departmentId: this.departmentId });
+        if (generation !== this.statusGeneration) return;
         this.$toast.success('أُرسل الطلب. سيحدد مسؤول الإدارة بيانات الدخول عند القبول.');
         this.registrationState = REGISTRATION_STATES.SUCCESS;
         this.form = {
@@ -113,6 +109,7 @@ export default {
           answers: this.createEmptyAnswers(),
         };
       } catch (error) {
+        if (generation !== this.statusGeneration) return;
         const message = error?.response?.data?.errors?.phone?.[0]
           || error?.response?.data?.errors?.age?.[0]
           || error?.response?.data?.errors?.answers?.[0]
@@ -121,7 +118,7 @@ export default {
           || 'تعذر إرسال طلب التسجيل';
         this.$toast.error(message);
       } finally {
-        this.submitting = false;
+        if (generation === this.statusGeneration) this.submitting = false;
       }
     },
     createEmptyAnswers() {

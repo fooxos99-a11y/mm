@@ -104,9 +104,13 @@ export default {
       try {
         const payload = await fetchRegistrationDashboardData();
         this.isOpen = Boolean(payload?.isOpen);
-        this.registrationUrl = typeof window !== 'undefined'
-          ? `${window.location.origin}/registration`
-          : (payload?.registrationUrl || '');
+        this.registrationUrl = payload?.registrationUrl || '';
+        if (typeof window !== 'undefined') {
+          const departmentId = payload?.departmentId || new URL(this.registrationUrl, window.location.origin).searchParams.get('departmentId');
+          this.registrationUrl = departmentId
+            ? new URL(this.$router.resolve({ name: 'registration', query: { departmentId } }).href, window.location.origin).href
+            : '';
+        }
         this.registrationFields = Array.isArray(payload?.fields) ? payload.fields : [];
         this.fixedLabels = normalizeFixedFieldLabels(payload?.fixedLabels);
         this.requests = Array.isArray(payload?.requests) ? payload.requests : [];
