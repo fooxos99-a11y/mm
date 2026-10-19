@@ -119,10 +119,49 @@ test('general manager creates a department and its responsible account in one so
   expect(runtimeErrors).toEqual([]);
 });
 
+for (const serverFails of [false, true]) test(`system manager logs out through the profile menu (${serverFails ? 'server unavailable' : 'success'})`, async ({ page }, info) => {
+  await mockSystem(page);
+  await page.goto('management');
+  await expect(page.getByRole('heading', { name: 'ملخص النظام', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'عرض الإدارات', exact: true })).toHaveCount(0);
+  const profile = page.getByRole('button', { name: `قائمة حساب ${systemUser.name}`, exact: true });
+  const logout = page.getByRole('button', { name: 'تسجيل الخروج', exact: true });
+  await expect(profile).toBeVisible();
+  await expect(profile.locator('svg path').first()).toHaveAttribute('d', /^M/);
+  expect((await profile.boundingBox()).height).toBeGreaterThanOrEqual(44);
+  expect((await profile.boundingBox()).width).toBeGreaterThanOrEqual(44);
+  await expect(logout).toHaveCount(0);
+  await profile.click();
+  await expect(logout).toBeVisible();
+  await expect(logout.locator('svg path')).toHaveAttribute('d', /^M/);
+  await expect.poll(async () => (await logout.boundingBox())?.height || 0).toBeGreaterThanOrEqual(44);
+  await expectNoOverflow(page);
+  const artifactDirectory = path.resolve('../.deploy/departments');
+  mkdirSync(artifactDirectory, { recursive: true });
+  await page.screenshot({ path: path.join(artifactDirectory, `${info.project.name}-profile-menu.png`), fullPage: true });
+  await page.keyboard.press('Escape');
+  await expect(logout).toBeHidden();
+  await profile.press('Enter');
+  await expect(logout).toBeVisible();
+  await page.getByRole('heading', { name: 'ملخص النظام', exact: true }).click();
+  await expect(logout).toBeHidden();
+  if (serverFails) await page.route('**/api/auth/logout', route => route.fulfill({ status: 503, json: {} }));
+  await profile.click();
+  await logout.click();
+  await expect(page).toHaveURL(/\/login$/);
+  await expect(profile).toHaveCount(0);
+  if (!serverFails) {
+    await page.goto('management');
+    await expect(page).toHaveURL(/\/login\?redirect=/);
+  }
+});
+
 test('general manager enters department context and returns to central management', async ({ page }) => {
   const state = await mockSystem(page);
   await page.goto('management');
-  await page.getByRole('button', { name: 'عرض الإدارات', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'عرض الإدارات', exact: true })).toHaveCount(0);
+  if (page.viewportSize().width <= 1024) await page.getByRole('button', { name: 'فتح القائمة', exact: true }).click();
+  await page.getByRole('navigation', { name: 'أقسام إدارة النظام' }).getByRole('button', { name: 'الإدارات', exact: true }).click();
   await page.getByRole('button', { name: 'فتح الإدارة الحالية', exact: true }).click();
   await expect(page).toHaveURL(/\/dashboard$/);
   await expect(page.locator('.department-context')).toHaveCount(0);

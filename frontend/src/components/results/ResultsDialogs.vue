@@ -66,12 +66,12 @@
             الدرجة: {{ selectedRow.scoreLabel }}. أُدخلت يدويًا دون إجابات.
           </p>
           <article
-            v-for="detail in detailCards"
+            v-for="detail in (resultOpen ? detailCards : [])"
             :key="detail.key"
             class="results-answer-card"
           >
             <div
-              v-if="detail.prompt && !(taskSection && detail.prompt === 'إرفاق ملف المهمة الأدائية')"
+              v-if="detail.prompt && !detail.studentAnswerHtml && !(taskSection && detail.prompt === 'إرفاق ملف المهمة الأدائية')"
               class="results-answer-card__question"
             >
               {{ detail.index }}. {{ detail.prompt }}
@@ -95,22 +95,11 @@
             >
               {{ detail.statusText }}
             </div>
-            <div
+            <DocumentAnswerPreview
               v-if="detail.studentAnswerHtml"
-              class="results-answer-card__document"
-            >
-              <div
-                v-if="!taskSection"
-                class="results-answer-card__answer-label results-answer-card__answer-label--student"
-              >
-                إجابة المعلم
-              </div>
-              <RichTextDocumentView
-                :value="detail.studentAnswerHtml"
-                compact
-                min-height="0"
-              />
-            </div>
+              :value="detail.studentAnswerHtml"
+              :file-name="`إجابة ${selectedRow.name || 'المعلم'} - ${sectionLabel || 'المهمة'}.pdf`"
+            />
             <div
               v-else-if="detail.answerText || !detail.attachment"
               class="results-answer-card__line results-answer-card__line--student"
@@ -225,13 +214,13 @@
 </template>
 
 <script>
-import RichTextDocumentView from '../RichTextDocumentView.vue';
+import DocumentAnswerPreview from './DocumentAnswerPreview.vue';
 import { AppActionBar, AppButton, AppDialog, AppDialogBody, AppDialogHeader } from '../ui';
 import AttachmentContent from '../tasks/AttachmentContent.vue';
 
 export default {
   name: 'ResultsDialogs',
-  components: { AppActionBar, AppButton, AppDialog, AppDialogBody, AppDialogHeader, RichTextDocumentView, AttachmentContent },
+  components: { AppActionBar, AppButton, AppDialog, AppDialogBody, AppDialogHeader, DocumentAnswerPreview, AttachmentContent },
   props: {
     resultOpen: Boolean,
     deleteOpen: Boolean,

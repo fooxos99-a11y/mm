@@ -45,7 +45,10 @@
             :key="detail.key"
             class="results-answer-card"
           >
-            <div class="results-answer-card__question">
+            <div
+              v-if="!detail.studentAnswerHtml"
+              class="results-answer-card__question"
+            >
               {{ detail.index }}. {{ detail.prompt }}
               <span class="results-answer-card__points">الدرجة: {{ detail.points }}</span>
             </div>
@@ -55,18 +58,12 @@
             >
               الإجابة الصحيحة: {{ detail.correctAnswer }}
             </div>
-            <div
+            <DocumentAnswerPreview
               v-if="detail.studentAnswerHtml"
-              class="results-answer-card__document"
-            >
-              <div class="results-answer-card__answer-label results-answer-card__answer-label--student">
-                إجابتك
-              </div>
-              <RichTextDocumentView
-                :value="detail.studentAnswerHtml"
-                min-height="420px"
-              />
-            </div>
+              :value="detail.studentAnswerHtml"
+              :file-name="`إجابتي - ${title}.pdf`"
+              label="إجابتك"
+            />
             <div
               v-else
               class="results-answer-card__line results-answer-card__line--student"
@@ -88,12 +85,12 @@
 </template>
 
 <script>
-import RichTextDocumentView from '../RichTextDocumentView.vue';
+import DocumentAnswerPreview from '../results/DocumentAnswerPreview.vue';
 import { AppRawButton } from '../ui';
 
 export default {
   name: 'StudentResultEntry',
-  components: { AppRawButton, RichTextDocumentView },
+  components: { AppRawButton, DocumentAnswerPreview },
   props: {
     details: { type: Array, default: () => [] },
     expanded: { type: Boolean, default: false },

@@ -3,7 +3,7 @@ import { accountEditorErrors } from './accountEditorModel.mjs';
 export const DASHBOARD_ACCOUNT_ROLE_OPTIONS = Object.freeze([
   { label: 'مشرف المعلمين', value: 'male_manager' },
   { label: 'مشرفة المعلمات', value: 'female_manager' },
-  { label: 'مسؤول الإدارة', value: 'admin' },
+  { label: 'مدير عام', value: 'admin' },
 ]);
 
 const ROLE_LABELS = Object.freeze(Object.fromEntries(

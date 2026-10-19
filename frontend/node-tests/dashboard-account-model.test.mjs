@@ -34,6 +34,6 @@ test('dashboard account validation applies identity role and password rules', ()
 });
 
 test('dashboard account role labels are centralized with a safe fallback', () => {
-  assert.equal(resolveDashboardAccountRoleLabel('admin'), 'مسؤول الإدارة');
+  assert.equal(resolveDashboardAccountRoleLabel('admin'), 'مدير عام');
   assert.equal(resolveDashboardAccountRoleLabel('custom'), 'custom');
 });

@@ -21,6 +21,8 @@
     "axios": "^1.20.0",
     "chart.js": "^4.5.0",
     "exceljs": "^4.4.0",
+    "html2canvas": "1.4.1",
+    "jspdf": "4.2.1",
     "laravel-echo": "^1.17.1",
     "momars-workspace": "file:..",
     "pusher-js": "^8.6.0",

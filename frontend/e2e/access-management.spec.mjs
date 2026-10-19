@@ -29,6 +29,9 @@ test('supervision has only accounts and history with persistent role filters', a
   await openAccess(page);
   await expect(page.locator('#permissions-search, #dashboard-account-search, #dashboard-account-status')).toHaveCount(0);
   await expect(page.locator('.permissions-admin input[type="checkbox"]')).toHaveCount(0);
+  await choose(page, 'permissions-manager-role', 'مدير عام');
+  await expect(page).toHaveURL(/supervisionRole=admin/);
+  await expect(page.locator('.permissions-admin .dashboard-accounts-panel tbody')).toContainText('مدير عام');
   await choose(page, 'permissions-manager-role', 'مشرفة المعلمات');
   await expect(page).toHaveURL(/supervisionRole=female_manager/);
   await page.reload();
@@ -51,6 +54,9 @@ test('supervision supports validated create edit delete and visible audit histor
   await expect(create).toBeVisible();
   const add = create.getByRole('button', { name: 'إضافة', exact: true });
   await expect(add).toBeDisabled();
+  await create.locator('.app-select').filter({ has: page.locator('#dashboard-account-role') }).locator('.v-field').click();
+  await selectOption(page, 'مدير عام', { exact: true });
+  await expect(create.locator('#dashboard-account-role')).toHaveValue('مدير عام');
   await create.locator('#dashboard-account-name').fill('حساب تجربة الواجهة');
   await create.locator('#dashboard-account-login-code').fill('ui-access-account');
   await create.locator('#dashboard-account-password').fill('short');
@@ -65,6 +71,7 @@ test('supervision supports validated create edit delete and visible audit histor
   await page.unroute('**/api/dashboard/accounts');
   await add.click(); await expect(create).toBeHidden();
   let row = page.locator('.permissions-admin .dashboard-accounts-panel tbody tr').filter({ hasText: 'حساب تجربة الواجهة' });
+  await expect(row).toContainText('مدير عام');
   await row.getByRole('button', { name: 'تعديل حساب حساب تجربة الواجهة', exact: true }).click();
   const edit = page.getByRole('dialog', { name: 'تعديل الحساب الإشرافي', exact: true });
   const save = edit.getByRole('button', { name: 'حفظ', exact: true });

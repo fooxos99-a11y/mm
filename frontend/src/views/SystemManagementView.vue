@@ -19,17 +19,12 @@
         title="إدارة النظام"
         :admin-name="currentUser?.name"
         :menu-open="menuOpen"
+        show-account-menu
+        :signing-out="signingOut"
         @toggle-menu="menuOpen = !menuOpen"
+        @sign-out="signOut"
       >
         <AppActionBar class="dashboard-topbar__actions">
-          <AppButton
-            variant="secondary"
-            class="dashboard-topbar__action"
-            :loading="signingOut"
-            @click="signOut"
-          >
-            تسجيل الخروج
-          </AppButton>
           <AppButton
             v-if="['overview', 'departments'].includes(activeSection)"
             variant="primary"
@@ -60,12 +55,6 @@
         >
           <div class="system-management__card-heading">
             <h2>ملخص النظام</h2>
-            <AppButton
-              variant="secondary"
-              @click="selectSection('departments')"
-            >
-              عرض الإدارات
-            </AppButton>
           </div>
           <dl
             class="system-management__totals"

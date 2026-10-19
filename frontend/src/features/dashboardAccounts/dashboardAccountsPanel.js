@@ -1,4 +1,3 @@
-import { mapState } from 'vuex';
 import { AppActionBar, AppButton, AppFilterField, AppFilterToolbar, AppPagination, AppSelect, AppTable } from '../../components/ui';
 import DashboardAccountEditor from '../../components/dashboard/DashboardAccountEditor.vue';
 import DashboardAccountConfirmation from '../../components/dashboard/DashboardAccountConfirmation.vue';
@@ -20,8 +19,8 @@ export default {
     columns: [{ key: 'name', label: 'الحساب' }, { key: 'role', label: 'نوع المسؤول' }, { key: 'status', label: 'الحالة' }, { key: 'activity', label: 'النشاط' }, { key: 'actions', label: 'الإجراءات' }],
     sortOptions: [{ value: 'newest', label: 'الأحدث أولًا' }, { value: 'oldest', label: 'الأقدم أولًا' }, { value: 'name', label: 'الاسم' }] }),
   computed: {
-    ...mapState(['currentUser']), busy() { return this.loading || this.submitting || this.confirming; },
-    roles() { return DASHBOARD_ACCOUNT_ROLE_OPTIONS.map(role => ({ ...role, label: role.value === 'admin' ? this.currentUser?.roleLabel || role.label : role.label })); },
+    busy() { return this.loading || this.submitting || this.confirming; },
+    roles() { return DASHBOARD_ACCOUNT_ROLE_OPTIONS; },
     roleOptions() { return [{ value: 'all', label: 'جميع الأنواع' }, ...this.roles]; },
     changed() { return accountEditorChanged(this.form, this.baseline); },
     valid() { return Object.keys(accountEditorErrors(this.form, Boolean(this.editingAccount))).length === 0; },

@@ -45,6 +45,7 @@ test('view-only access requires explicit granular grants and admin access stays 
 
 test('access history formats booleans roles missing logins and date values without exposing credentials', () => {
   assert.equal(accessValue(true), 'مفعّل'); assert.equal(accessValue(false), 'معطّل');
+  assert.equal(accessValue('admin'), 'مدير عام');
   assert.equal(accessValue('female_manager'), 'مشرفة المعلمات'); assert.equal(accessValue('note'), 'note');
   assert.equal(accessValue(null), ''); assert.equal(accessDate(null), 'غير مسجّل');
   assert.ok(accessDate('2026-10-19T00:00:00Z').length > 8);
