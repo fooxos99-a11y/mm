@@ -40,6 +40,8 @@ test('overview matches Nukhba indicator sizing and keeps a usable narrow sidebar
   else await opener.click();
   const sidebar = page.locator('dialog.dashboard-sidebar[open]');
   await expect(sidebar).toBeVisible();
+  await expect.poll(() => sidebar.evaluate(element => element.getAnimations({ subtree: true })
+    .filter(animation => animation.playState === 'running').length)).toBe(0);
   const bounds = await sidebar.boundingBox();
   expect(bounds.width).toBeLessThanOrEqual(260);
   expect(bounds.width).toBeLessThan(page.viewportSize().width - 50);

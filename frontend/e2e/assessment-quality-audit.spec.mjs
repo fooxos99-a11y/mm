@@ -227,6 +227,10 @@ test('independent audit: forty questions and thirty long-name teachers preserve 
   expect(await page.locator('.assessment-editor-question input[type=number]').evaluateAll(inputs => inputs.reduce((sum, input) => sum + Number(input.value), 0))).toBe(80);
   const last = page.locator(`#assessment-question-${questions[39].id}-prompt`);
   await page.locator('.assessment-editor-header .v-field').click();
+  const questionMenu = page.getByRole('listbox').filter({ visible: true });
+  await expect(questionMenu).toBeVisible();
+  await questionMenu.hover();
+  await page.mouse.wheel(0, 5000);
   await selectOption(page, 'السؤال 40', { exact: true });
   await expect(last).toBeFocused();
   const focus = await last.evaluate(input => {

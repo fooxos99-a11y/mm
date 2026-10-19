@@ -28,3 +28,6 @@
   .system-management__row-actions { width: 100%; max-width: none; }
   .system-management__card-heading { flex-wrap: wrap; }
 }
+@media (max-width: 360px) {
+  .system-management__row-actions { --app-button-padding-inline: var(--app-space-2); }
+}

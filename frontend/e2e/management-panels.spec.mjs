@@ -60,9 +60,12 @@ test('management panels remain usable across the viewport matrix', async ({ page
 
   await page.goto('dashboard?panel=settings&settingsItem=permissions');
   await expect(page.locator('.permissions-admin')).toBeVisible();
-  const permissionRow = page.locator('.permissions-admin__permission-row').first();
-  await expect(permissionRow).toBeVisible();
-  expect((await permissionRow.boundingBox())?.height).toBeGreaterThanOrEqual(44);
+  await expect(page.locator('.permissions-admin input[type="checkbox"]')).toHaveCount(0);
+  const accountRow = page.locator('.dashboard-accounts-panel tbody tr').first();
+  await expect(accountRow).toBeVisible();
+  const editAccount = accountRow.getByRole('button', { name: /تعديل حساب/ });
+  await expect(editAccount).toBeVisible();
+  expect((await editAccount.boundingBox())?.height).toBeGreaterThanOrEqual(44);
   await expectNoOverflow(page);
 
   await page.goto('dashboard?panel=settings&settingsItem=home');
