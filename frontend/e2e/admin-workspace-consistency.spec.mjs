@@ -74,7 +74,7 @@ test('administrative pages select available defaults and share card and field ge
   await page.goto('dashboard?panel=courses');
   for (const mode of ['التحضير', 'المؤشرات']) {
     await choose(page, 'assessment-toolbar-mode', mode);
-    const boxes = await page.locator('.app-filter-toolbar .v-field').evaluateAll(fields => fields.map(field => {
+    const boxes = await page.locator('.app-filter-toolbar .v-field:visible').evaluateAll(fields => fields.map(field => {
       const rect = field.getBoundingClientRect(); return { y: rect.y, height: rect.height };
     }));
     expect(boxes).toHaveLength(3);
@@ -140,13 +140,11 @@ test('directory, notifications and settings share the same card and populated se
     ['courses', 'assessment-toolbar-course', null],
     ['users', 'people-branch-filter', 'معلمين'],
     ['notifications', 'notification-prep-branch', 'كل الفروع'],
-    ['settings&settingsItem=archive', 'archive-record-filter', archive.id],
-    ['settings&settingsItem=permissions', 'permissions-manager-role', 'male_manager'],
+    ['settings&settingsItem=archive', 'archive-record-filter', `${archive.name} — الإدارة الحالية`],
+    ['settings&settingsItem=permissions', 'permissions-manager-role', 'جميع الأنواع'],
   ]) {
     await page.goto(`dashboard?panel=${panel}`);
-    const control = page.locator(`#${id}`);
-    if (panel.startsWith('settings')) await expect(control).toHaveValue(value);
-    else await expect(selectedText(page, id)).toHaveText(value || /\S/);
+    await expect(selectedText(page, id)).toHaveText(value || /\S/);
     const card = page.locator('.admin-workspace-card').first();
     await expect(card).toBeVisible();
     await page.evaluate(() => document.fonts.ready);

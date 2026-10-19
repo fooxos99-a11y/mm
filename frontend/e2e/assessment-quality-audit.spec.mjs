@@ -192,12 +192,19 @@ test('independent audit: forty questions and thirty long-name teachers preserve 
   const roster = (await api('GET', '/dashboard/snapshot')).students.filter(student => student.branchId === 'male');
   await page.goto(`dashboard?panel=courses&courseId=${course.id}`);
   await expect(page.locator('.assessment-attendance__row')).toHaveCount(roster.length);
-  const fields = page.locator('.assessment-toolbar .app-filter-field');
+  const fields = page.locator('.assessment-toolbar .app-filter-field:visible');
+  await expect(fields).toHaveCount(3);
   if (page.viewportSize().width >= 360) {
-    const first = await fields.nth(0).boundingBox();
-    const second = await fields.nth(1).boundingBox();
-    expect(Math.abs(first.y + first.height - second.y - second.height)).toBeLessThanOrEqual(1);
-    expect(Math.min(first.y + first.height, second.y + second.height) - Math.max(first.y, second.y)).toBeGreaterThan(0);
+    const courseField = await fields.nth(0).boundingBox();
+    const branchField = await fields.nth(1).boundingBox();
+    const typeField = await fields.nth(2).boundingBox();
+    expect(Math.abs(branchField.y + branchField.height - typeField.y - typeField.height)).toBeLessThanOrEqual(1);
+    expect(Math.min(branchField.y + branchField.height, typeField.y + typeField.height) - Math.max(branchField.y, typeField.y)).toBeGreaterThan(0);
+    if (page.viewportSize().width < 768) {
+      expect(courseField.y + courseField.height).toBeLessThanOrEqual(branchField.y);
+    } else {
+      expect(Math.abs(courseField.y + courseField.height - branchField.y - branchField.height)).toBeLessThanOrEqual(1);
+    }
   }
   await expect(page.locator('.dashboard-topbar')).toBeVisible();
   await expect(page.locator('.dashboard-topbar__label')).toHaveText('مرحبًا');
@@ -341,7 +348,8 @@ test('compact task description, link and inline catalog actions preserve real va
   await description.fill(text);
   await link.fill('https://example.com/task-video');
   const box = await description.boundingBox();
-  expect((await link.boundingBox()).y).toBeGreaterThan(box.y + box.height);
+  const linkBox = await link.boundingBox();
+  expect(linkBox.y + linkBox.height).toBeLessThanOrEqual(box.y);
   expect(await description.evaluate(input => input.scrollHeight <= input.clientHeight + 1)).toBe(true);
   const saved = page.waitForResponse(response => response.url().endsWith(`/courses/${task.id}/questions/sync`) && response.request().method() === 'PUT');
   await page.getByRole('button', { name: 'حفظ', exact: true }).click();

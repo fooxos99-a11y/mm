@@ -65,7 +65,7 @@ export default {
       this.overviewLoading = false;
       this.overviewError = '';
     },
-    overviewDepartmentId() { if (!this.loading && this.activeSection === 'indicators') this.loadOverview(); },
+    overviewDepartmentId() { if (!this.loading && resolveManagementSection(this.$route.query.section) === 'indicators') this.loadOverview(); },
     indicatorAnimationSignature: { immediate: true, handler() { this.$nextTick(() => this.restartIndicatorAnimation()); } },
   },
   created() { this.load(); },
