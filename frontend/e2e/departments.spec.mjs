@@ -224,11 +224,17 @@ test('system workspace has one summary, shared metric sizes, persistent sections
   await expect(page).toHaveURL(/section=departments/);
   await page.reload();
   await expect(page.getByRole('button', { name: 'فتح الإدارة الحالية', exact: true })).toBeVisible();
+  await page.evaluate(() => document.fonts.ready);
   const openBox = await page.getByRole('button', { name: 'فتح الإدارة الحالية', exact: true }).boundingBox();
   const editBox = await page.getByRole('button', { name: 'تعديل الإدارة الحالية', exact: true }).boundingBox();
   expect(openBox.height).toBeGreaterThanOrEqual(48);
   expect(openBox.height).toBe(editBox.height);
   expect(openBox.x + openBox.width).toBeLessThanOrEqual(editBox.x);
+  expect(await page.getByRole('button', { name: 'فتح الإدارة الحالية', exact: true }).evaluate(button => {
+    const control = button.getBoundingClientRect();
+    const text = button.querySelector('.app-button__content').getBoundingClientRect();
+    return text.left >= control.left && text.right <= control.right;
+  })).toBe(true);
   await expect(page.locator('.system-management__summary')).toHaveCount(0);
   await section('المؤشرات الإجمالية');
   await expect(page).toHaveURL(/section=indicators/);

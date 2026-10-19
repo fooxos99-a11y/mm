@@ -30,4 +30,6 @@
 }
 @media (max-width: 360px) {
   .system-management__row-actions { --app-button-padding-inline: var(--app-space-2); }
+  .system-management__row-actions :deep(.app-action-bar__primary) { flex: 1.4 1 0; }
+  .system-management__row-actions :deep(.app-action-bar__group > .app-button) { white-space: nowrap; }
 }
