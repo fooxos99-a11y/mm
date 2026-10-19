@@ -2,6 +2,7 @@
 
 namespace App\Services\Concerns;
 
+use App\Services\BranchCourseState;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
@@ -85,6 +86,9 @@ trait CourseManagementSupport
 
     private function resolveAssessmentTargetBranches(object $course, string $assessmentType, array $windows): array
     {
+        if ($branch = app(BranchCourseState::class)->managedBranch()) {
+            return [$branch];
+        }
         $globalWindow = data_get($windows, "global.$assessmentType");
 
         if ($this->assessmentWindowHasValue($globalWindow)) {
@@ -181,6 +185,22 @@ trait CourseManagementSupport
         return $branchCode;
     }
 
+    private function notifyUpdatedBranchAssessmentWindows(object $previous, object $next, string $branch): void
+    {
+        $before = $this->decodeJsonObject($previous->assessment_windows, []);
+        $after = $this->decodeJsonObject($next->assessment_windows, []);
+        foreach (['pre', 'post'] as $type) {
+            $oldWindow = data_get($before, "$branch.$type") ?? data_get($before, "global.$type");
+            $newWindow = data_get($after, "$branch.$type") ?? data_get($after, "global.$type");
+            if (! $next->is_active || ! $next->{'is_'.$type.'_enabled'} || ! $next->{$branch.'_'.$type.'_enabled'}
+                || $oldWindow === $newWindow || ! $this->assessmentWindowHasValue($newWindow)) {
+                continue;
+            }
+            $this->dispatchAssessmentOpenNotification($next, $type,
+                $this->decodeJsonObject($next->assessment_notification_templates, []), $after);
+        }
+    }
+
     private function hasAssessmentWindowOpened(array $previousWindows, array $nextWindows, string $assessmentType): bool
     {
         foreach (['global', 'male', 'female'] as $scope) {
@@ -201,7 +221,7 @@ trait CourseManagementSupport
             'id' => $course->id,
             'title' => $course->title,
             'entityType' => $course->entity_type === 'task' ? 'task' : 'course',
-            'isActive' => (bool) $course->is_active,
+            'isActive' => app(BranchCourseState::class)->isActive($course),
             'isPreEnabled' => (bool) $course->is_pre_enabled,
             'isPostEnabled' => (bool) $course->is_post_enabled,
             'isTasksEnabled' => (bool) $course->is_tasks_enabled,

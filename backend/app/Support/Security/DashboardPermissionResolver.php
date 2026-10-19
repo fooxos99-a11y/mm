@@ -16,14 +16,19 @@ final class DashboardPermissionResolver
         'completion-update' => ['edit_completion_requirements'],
         'completion-view' => ['page_completion_requirements'],
         'final-exam' => ['page_final_exam'],
+        'final-exam-edit' => ['edit_final_questions'],
+        'final-exam-open' => ['open_final_exam'],
         'materials' => ['page_materials'],
+        'materials-manage' => ['manage_materials'],
         'notifications' => ['page_notifications'],
+        'notifications-manage' => ['manage_notifications'],
         'reciter-delete' => ['delete_reciter'],
         'registration-accept' => ['add_student'],
         'registration-update' => ['edit_student'],
         'registration-view' => ['page_registration'],
         'results' => ['page_results'],
         'satisfaction' => ['page_satisfaction'],
+        'satisfaction-edit' => ['edit_satisfaction_questions'],
         'student-add' => ['add_student'],
         'student-delete' => ['delete_student'],
         'student-edit' => ['edit_student'],
@@ -36,7 +41,7 @@ final class DashboardPermissionResolver
      */
     public function resolve(Request $request, string $capability): ?array
     {
-        if ($capability === 'admin') {
+        if (in_array($capability, ['admin', 'archive-read', 'archive-manage'], true)) {
             return $this->result(adminOnly: true);
         }
 

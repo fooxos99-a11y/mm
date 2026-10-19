@@ -206,20 +206,21 @@ test('independent audit: forty questions and thirty long-name teachers preserve 
   await expect(page.getByText('المحضّرون:', { exact: false })).toHaveCount(0);
   await expect(page.locator('.assessment-attendance__login')).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'حفظ التحضير', exact: true })).toHaveCount(0);
-  const everyone = page.getByRole('button', { name: 'تحديد حضور الجميع', exact: true });
+  const everyone = page.getByRole('button', { name: 'تحضير الكل', exact: true });
   await everyone.focus();
   const attendanceSaved = page.waitForResponse(response => response.url().endsWith('/dashboard/manual-attendance') && response.request().method() === 'POST');
   await page.keyboard.press('Enter');
   expect((await attendanceSaved).status()).toBe(204);
   await expect(page.locator('.assessment-attendance__footer')).toHaveCount(0);
   await page.reload();
-  await expect(page.locator('.attendance-toggle[aria-pressed=true]')).toHaveCount(roster.length);
+  await expect(page.locator('.assessment-attendance__row .attendance-toggle[aria-pressed=true]')).toHaveCount(roster.length);
   await inspect(page, info, 'bulk-attendance');
   await select(page, 'assessment-toolbar-mode', 'الاختبار القبلي');
   await expect(page.locator('.assessment-inline-list__item')).toHaveCount(40);
   expect(await page.locator('.assessment-editor-question input[type=number]').evaluateAll(inputs => inputs.reduce((sum, input) => sum + Number(input.value), 0))).toBe(80);
   const last = page.locator(`#assessment-question-${questions[39].id}-prompt`);
-  await page.getByRole('combobox', { name: 'الانتقال إلى سؤال', exact: true }).selectOption(await last.getAttribute('id'));
+  await page.locator('.assessment-editor-header .v-field').click();
+  await selectOption(page, 'السؤال 40', { exact: true });
   await expect(last).toBeFocused();
   const focus = await last.evaluate(input => {
     const control = input.closest('.app-field__control');
@@ -244,7 +245,7 @@ test('independent audit: forty questions and thirty long-name teachers preserve 
   await expect(answer).toHaveAttribute('aria-pressed', 'true');
   await page.getByRole('button', { name: 'حذف السؤال 1', exact: true }).click();
   const saved = page.waitForResponse(response => response.url().endsWith(`/courses/${course.id}/questions/sync`) && response.request().method() === 'PUT');
-  await page.getByRole('button', { name: 'حفظ الأسئلة', exact: true }).click();
+  await page.getByRole('button', { name: 'حفظ', exact: true }).click();
   expect((await saved).status()).toBe(200);
   await expect(page.locator('.assessment-editor-header__dirty')).toHaveCount(0);
   await expect(page.locator('.assessment-inline-list__item')).toHaveCount(39);
@@ -319,7 +320,7 @@ test('independent audit: loading, snapshot failure, recovery and an empty branch
   await select(page, 'assessment-attendance-branch', 'معلمات');
   await expect(page.getByRole('heading', { name: 'لا يوجد معلمون في هذا الفرع', exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: 'حفظ التحضير', exact: true })).toHaveCount(0);
-  await expect(page.getByRole('button', { name: 'تحديد حضور الجميع', exact: true })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'تحضير الكل', exact: true })).toBeDisabled();
   await select(page, 'assessment-toolbar-mode', 'المؤشرات');
   await select(page, 'assessment-indicators-branch', 'معلمات');
   await expect(page.getByRole('heading', { name: 'لا يوجد معلمون في الفرع المحدد', exact: true })).toBeVisible();

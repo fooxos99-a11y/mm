@@ -162,7 +162,7 @@ class DashboardStudentOperationsTest extends CoreDataApiTestCase
             'role' => 'male_manager',
             'key' => 'transfer_reciter_student',
             'isEnabled' => true,
-        ])->assertNoContent();
+        ])->assertStatus(410);
 
         $this->getJson('/api/dashboard/role-permissions')
             ->assertOk()

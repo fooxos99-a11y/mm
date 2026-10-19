@@ -7,13 +7,14 @@ import HomeProgramStructureSettings from '../../components/home/HomeProgramStruc
 import HomeRequirementsSettings from '../../components/home/HomeRequirementsSettings.vue';
 import HomeScheduleSettings from '../../components/home/HomeScheduleSettings.vue';
 import HomeSettingsDeleteDialog from '../../components/home/HomeSettingsDeleteDialog.vue';
-import { AppButton } from '../../components/ui';
+import { AppActionBar, AppButton } from '../../components/ui';
 import { updatePractitionerPageContent } from '../../services/api';
 import { clonePractitionerPageContent } from '../../utils/practitionerPageContent';
 
 export default {
   name: 'AdminHomePageSettingsView',
   components: {
+    AppActionBar,
     AppButton,
     HomeAboutSettings,
     HomeFooterSettings,

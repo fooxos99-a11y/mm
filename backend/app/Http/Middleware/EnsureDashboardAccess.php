@@ -36,7 +36,7 @@ class EnsureDashboardAccess
         $user = $request->user();
         $role = DepartmentContext::effectiveRole($user?->role ?? '');
 
-        $this->assertDepartmentResources($request);
+        $this->assertDepartmentResources($request, $capability);
 
         if ($role === 'admin') {
             return $next($request);
@@ -72,7 +72,7 @@ class EnsureDashboardAccess
         ], Response::HTTP_FORBIDDEN);
     }
 
-    private function assertDepartmentResources(Request $request): void
+    private function assertDepartmentResources(Request $request, string $capability): void
     {
         $path = $request->path();
         $resources = [
@@ -84,6 +84,10 @@ class EnsureDashboardAccess
             'submissionId' => str_contains($path, 'final-exam') ? 'final_exam_submissions' : 'course_submissions',
         ];
         foreach ($resources as $parameter => $table) {
+            if ($parameter === 'archiveId' && ($capability === 'archive-read'
+                || ($capability === 'archive-manage' && $request->user()?->role === 'super_admin'))) {
+                continue;
+            }
             $id = $request->route($parameter);
             if (is_string($id) && DB::table($table)->where('id', $id)
                 ->where(fn ($query) => $query->where('department_id', '!=', DepartmentContext::id())->orWhereNull('department_id'))
@@ -111,8 +115,17 @@ class EnsureDashboardAccess
 
         foreach (['branchAvailability', 'assessmentWindows'] as $branchScopedInput) {
             $branchPayload = $request->input($branchScopedInput);
-            if (is_array($branchPayload) && array_key_exists($otherBranch, $branchPayload)) {
+            if (is_array($branchPayload) && (array_key_exists($otherBranch, $branchPayload) || array_key_exists('global', $branchPayload))) {
                 return false;
+            }
+        }
+
+        foreach (['loginId', 'loginCode'] as $loginField) {
+            if ($request->filled($loginField)) {
+                $target = Student::query()->with('branch')->where('login_code', (string) $request->input($loginField))->first();
+                if ($target && $target->branch?->code !== $managedBranch) {
+                    return false;
+                }
             }
         }
 

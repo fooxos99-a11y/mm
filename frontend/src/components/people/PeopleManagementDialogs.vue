@@ -196,6 +196,14 @@
         <AppDialogFooter class="people-dialog__actions">
           <AppButton
             variant="secondary"
+            class="people-dialog__cancel"
+            :disabled="manageSubmitting"
+            @click="$emit('manage-close')"
+          >
+            إلغاء
+          </AppButton>
+          <AppButton
+            variant="primary"
             class="people-dialog__submit people-dialog__submit--manage"
             :disabled="!canManageSelected || manageSubmitting"
             @click="$emit('manage-edit')"
@@ -209,14 +217,6 @@
             @click="$emit('manage-delete')"
           >
             {{ manageSubmitting ? 'جارٍ الحذف...' : 'حذف' }}
-          </AppButton>
-          <AppButton
-            variant="secondary"
-            class="people-dialog__cancel"
-            :disabled="manageSubmitting"
-            @click="$emit('manage-close')"
-          >
-            إلغاء
           </AppButton>
         </AppDialogFooter>
       </div>

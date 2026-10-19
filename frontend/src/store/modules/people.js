@@ -3,7 +3,6 @@ import {
   deleteReciter as deleteReciterRequest,
   deleteStudent as deleteStudentRequest,
   saveReciter as saveReciterRequest,
-  setRolePermission as setRolePermissionRequest,
   updateStudent as updateStudentRequest,
 } from '../../services/api';
 import {
@@ -45,9 +44,5 @@ export const peopleActions = {
   async deleteReciter({ dispatch }, loginCode) {
     await deleteReciterRequest(loginCode);
     await dispatch('refreshDashboardSnapshot').catch(() => {});
-  },
-  async setRolePermission({ dispatch }, payload) {
-    await setRolePermissionRequest(payload);
-    await dispatch('refreshDashboardSnapshot');
   },
 };

@@ -3,7 +3,7 @@ import test from 'node:test';
 import { appIconPaths, resolveAppIconPath, vuetifyControlIconAliases } from '../src/plugins/icons.js';
 
 test('registers every application icon as an SVG path', () => {
-  assert.equal(Object.keys(appIconPaths).length, 68);
+  assert.equal(Object.keys(appIconPaths).length, 69);
 
   for (const [name, path] of Object.entries(appIconPaths)) {
     assert.match(name, /^mdi-[a-z0-9-]+$/);
@@ -13,6 +13,7 @@ test('registers every application icon as an SVG path', () => {
 
 test('resolves registered icons and accepts raw SVG paths', () => {
   assert.equal(resolveAppIconPath('mdi-menu'), appIconPaths['mdi-menu']);
+  assert.ok(resolveAppIconPath('mdi-dots-vertical'));
 
   const rawPath = 'M1 2L3 4Z';
   assert.equal(resolveAppIconPath(rawPath), rawPath);

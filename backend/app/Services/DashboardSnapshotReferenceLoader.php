@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\Branch;
 use App\Models\TrainingMaterial;
-use App\Support\DepartmentData as DB;
 use Illuminate\Support\Collection;
 
 class DashboardSnapshotReferenceLoader
@@ -30,7 +29,7 @@ class DashboardSnapshotReferenceLoader
 
         return [
             'branches' => Branch::query()->orderBy('created_at')->get(),
-            'rolePermissions' => DB::table('role_permissions')->get(),
+            'rolePermissions' => collect(),
             'trainingMaterials' => $trainingMaterialsQuery->get(),
         ];
     }

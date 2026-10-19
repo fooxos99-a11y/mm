@@ -44,6 +44,8 @@ trait SerializesTrainingMaterials
             'id' => $material->id,
             'title' => $material->title,
             'description' => $material->description ?? '',
+            'canManage' => $this->currentActorRole() === 'admin'
+                || ($this->managedBranchCode() !== null && $material->target_branch_code === $this->managedBranchCode()),
             'targetBranchId' => $material->target_branch_code ?: null,
             'targetBranchLabel' => $material->target_branch_code === 'supervision'
                 ? 'الإشراف'

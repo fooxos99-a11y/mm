@@ -4,6 +4,7 @@
     :class="{ 'communications-page--embedded': embedded }"
   >
     <NotificationPrepPanel
+      :read-only="!canManageNotifications"
       :message="notificationForm.message"
       :branch-id="notificationForm.targetBranchId"
       :branch-options="branchOptions"

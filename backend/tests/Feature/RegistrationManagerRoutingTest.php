@@ -51,9 +51,10 @@ class RegistrationManagerRoutingTest extends CoreDataApiTestCase
             foreach ($requests[$gender] as $request) {
                 $this->postJson("/api/dashboard/registration-requests/{$request->id}/reject")->assertOk();
             }
+            $beforeLegacyFlag = $this->getJson('/api/dashboard/registration')->assertOk()->json('requests');
             DB::table('role_permissions')->where('role', $role)->where('permission_key', 'page_registration')
                 ->update(['is_enabled' => false]);
-            $this->getJson('/api/dashboard/registration')->assertForbidden();
+            $this->getJson('/api/dashboard/registration')->assertOk()->assertJsonPath('requests', $beforeLegacyFlag);
         }
     }
 }

@@ -108,27 +108,27 @@ Route::middleware(['auth:sanctum', 'password.changed'])->group(function () {
             Route::post('assessment-import', [CourseAssessmentController::class, 'import'])
                 ->middleware('dashboard.access:assessment-import');
             Route::post('satisfaction-questions', [SatisfactionController::class, 'storeQuestion'])
-                ->middleware('dashboard.access:satisfaction');
+                ->middleware('dashboard.access:satisfaction-edit');
             Route::delete('satisfaction-questions/{questionId}', [SatisfactionController::class, 'destroyQuestion'])
-                ->middleware('dashboard.access:satisfaction');
+                ->middleware('dashboard.access:satisfaction-edit');
             Route::post('satisfaction-responses', [SatisfactionController::class, 'storeResponses'])
                 ->middleware('dashboard.access:satisfaction');
             Route::post('final-exam/questions', [FinalExamController::class, 'storeQuestion'])
-                ->middleware('dashboard.access:final-exam');
+                ->middleware('dashboard.access:final-exam-edit');
             Route::put('final-exam/questions/{questionId}', [FinalExamController::class, 'updateQuestion'])
-                ->middleware('dashboard.access:final-exam');
+                ->middleware('dashboard.access:final-exam-edit');
             Route::delete('final-exam/questions/{questionId}', [FinalExamController::class, 'destroyQuestion'])
-                ->middleware('dashboard.access:final-exam');
+                ->middleware('dashboard.access:final-exam-edit');
             Route::put('final-exam/settings/{branchCode}', [FinalExamController::class, 'updateSetting'])
-                ->middleware('dashboard.access:final-exam');
+                ->middleware('dashboard.access:final-exam-open');
             Route::put(
                 'final-exam/settings/{branchCode}/notification-template',
                 [FinalExamController::class, 'updateNotificationTemplate']
-            )->middleware('dashboard.access:final-exam');
+            )->middleware('dashboard.access:final-exam-open');
             Route::post('final-exam/submissions', [FinalExamController::class, 'storeSubmission'])
                 ->middleware('dashboard.access:final-exam');
             Route::post('final-exam/questions/copy', [FinalExamController::class, 'copyQuestions'])
-                ->middleware('dashboard.access:final-exam');
+                ->middleware('dashboard.access:final-exam-edit');
             Route::put(
                 'final-exam/submissions/{submissionId}/manual-score',
                 [FinalExamController::class, 'updateScore']
@@ -173,6 +173,8 @@ Route::middleware(['auth:sanctum', 'password.changed'])->group(function () {
                 ->middleware('dashboard.access:course-question');
             Route::get('accounts', [DashboardAccountController::class, 'index'])->middleware('dashboard.access:admin');
             Route::post('accounts', [DashboardAccountController::class, 'store'])->middleware('dashboard.access:admin');
+            Route::put('accounts/{accountId}', [DashboardAccountController::class, 'update'])->middleware('dashboard.access:admin');
+            Route::get('access-history', [DashboardAccountController::class, 'history'])->middleware('dashboard.access:admin');
             Route::delete('accounts/{accountId}', [DashboardAccountController::class, 'destroy'])
                 ->middleware('dashboard.access:admin');
             Route::post('transfer-student', [StudentController::class, 'transfer'])
@@ -180,23 +182,25 @@ Route::middleware(['auth:sanctum', 'password.changed'])->group(function () {
             Route::get('notifications', [NotificationController::class, 'index'])
                 ->middleware('dashboard.access:notifications');
             Route::post('notifications', [NotificationController::class, 'store'])
-                ->middleware('dashboard.access:notifications');
+                ->middleware('dashboard.access:notifications-manage');
             Route::delete('notifications/{notificationId}', [NotificationController::class, 'destroy'])
-                ->middleware('dashboard.access:notifications');
+                ->middleware('dashboard.access:notifications-manage');
             Route::get('training-materials', [TrainingMaterialController::class, 'index'])
                 ->middleware('dashboard.access:materials');
             Route::post('training-materials', [TrainingMaterialController::class, 'store'])
-                ->middleware('dashboard.access:materials');
+                ->middleware('dashboard.access:materials-manage');
             Route::put('training-materials/{materialId}', [TrainingMaterialController::class, 'update'])
-                ->middleware('dashboard.access:materials');
+                ->middleware('dashboard.access:materials-manage');
             Route::delete('training-materials/{materialId}', [TrainingMaterialController::class, 'destroy'])
-                ->middleware('dashboard.access:materials');
+                ->middleware('dashboard.access:materials-manage');
             Route::put('home-page-content', [PageContentController::class, 'updateHome'])
                 ->middleware('dashboard.access:admin');
             Route::put('practitioner-page-content', [PageContentController::class, 'updatePractitioner'])
                 ->middleware('dashboard.access:admin');
             Route::get('role-permissions', [RolePermissionController::class, 'index'])
                 ->middleware('dashboard.access:admin');
+            Route::get('role-permissions/editor', [RolePermissionController::class, 'editor'])->middleware('dashboard.access:admin');
+            Route::put('role-permissions/batch', [RolePermissionController::class, 'save'])->middleware('dashboard.access:admin');
             Route::put('role-permissions', [RolePermissionController::class, 'update'])
                 ->middleware('dashboard.access:admin');
             Route::get('registration', [RegistrationController::class, 'index'])
@@ -226,18 +230,18 @@ Route::middleware(['auth:sanctum', 'password.changed'])->group(function () {
                 [CompletionRequirementsController::class, 'reopen']
             )->middleware('dashboard.access:completion-close');
 
-            Route::get('archives', [ArchiveController::class, 'index'])->middleware('dashboard.access:admin');
+            Route::get('archives', [ArchiveController::class, 'index'])->middleware('dashboard.access:archive-read');
             Route::post('archives', [ArchiveController::class, 'store'])->middleware('dashboard.access:admin');
             Route::get('archives/search/students', [ArchiveController::class, 'searchStudents'])
-                ->middleware('dashboard.access:admin');
+                ->middleware('dashboard.access:archive-read');
             Route::get('archives/{archiveId}', [ArchiveController::class, 'show'])
-                ->middleware('dashboard.access:admin');
+                ->middleware('dashboard.access:archive-read');
             Route::delete('archives/{archiveId}', [ArchiveController::class, 'destroy'])
-                ->middleware('dashboard.access:admin');
+                ->middleware('dashboard.access:archive-manage');
             Route::get('archives/{archiveId}/students/{studentId}', [ArchiveController::class, 'studentDetail'])
-                ->middleware('dashboard.access:admin');
+                ->middleware('dashboard.access:archive-read');
             Route::post('archives/{archiveId}/students', [ArchiveController::class, 'assignStudent'])
-                ->middleware('dashboard.access:admin');
+                ->middleware('dashboard.access:archive-manage');
             Route::post('archives/archive-all', [ArchiveController::class, 'archiveAll'])
                 ->middleware('dashboard.access:admin');
         });

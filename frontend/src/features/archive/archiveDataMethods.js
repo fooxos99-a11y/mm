@@ -8,6 +8,7 @@ import {
   removeArchive,
   searchArchivedStudents as searchStudents,
 } from '../../services/archiveService';
+import { archiveCountErrors } from './archiveCounts.mjs';
 
 export default {
   notifySuccess(message) {
@@ -35,20 +36,22 @@ export default {
       return;
     }
 
+    const archiveId = this.selectedArchiveId;
     this.loading = true;
+    this.archiveData = null;
     this.clearArchivedStudentDetail();
     try {
-      const response = await getArchive(this.selectedArchiveId);
-      this.archiveData = response.data;
+      const response = await getArchive(archiveId);
+      if (this.selectedArchiveId === archiveId) this.archiveData = response.data;
     } catch {
-      this.notifyError('تعذر تحميل بيانات الأرشيف.');
+      if (this.selectedArchiveId === archiveId) this.notifyError('تعذر تحميل بيانات الأرشيف.');
     } finally {
-      this.loading = false;
+      if (this.selectedArchiveId === archiveId) this.loading = false;
     }
   },
   async confirmDeleteArchive() {
     const archive = this.pendingDeleteArchive;
-    if (!archive || this.deletingArchiveId) return;
+    if (archive?.can_manage !== true || this.deletingArchiveId) return;
 
     this.deletingArchiveId = archive.id;
     try {
@@ -106,26 +109,35 @@ export default {
     }
   },
   async createArchive() {
-    if (!this.newArchiveName.trim()) return;
+    if (this.saving) return;
+    this.createArchiveErrors = archiveCountErrors(this.newArchiveCounts);
+    if (!this.newArchiveName.trim()) this.createArchiveErrors.name = 'أدخل اسم الأرشيف.';
+    if (Object.keys(this.createArchiveErrors).length) return;
 
     this.saving = true;
     try {
-      await persistArchive({
-        name: this.newArchiveName,
-        courses_count: Math.max(0, Number(this.newArchiveCoursesCount) || 0),
+      const response = await persistArchive({
+        name: this.newArchiveName.trim(),
+        ...Object.fromEntries(Object.entries(this.newArchiveCounts).map(([key, value]) => [key, Number(value)])),
         batch_type: this.newArchiveBatchType,
       });
       await this.fetchArchives();
+      if (response.data?.id) {
+        this.selectedArchiveId = response.data.id;
+        await this.fetchArchiveData();
+      }
       this.closeCreateDialog();
       this.notifySuccess('تم إنشاء الأرشيف بنجاح.');
     } catch (error) {
+      this.createArchiveErrors = Object.fromEntries(Object.entries(error?.response?.data?.errors || {})
+        .map(([key, messages]) => [key, Array.isArray(messages) ? messages[0] : String(messages)]));
       this.notifyError(error?.response?.data?.message || 'حدث خطأ أثناء إنشاء الأرشيف.');
     } finally {
       this.saving = false;
     }
   },
   async archiveStudent() {
-    if (!this.selectedArchiveId || !this.manualStudentName.trim()) return;
+    if (this.selectedArchive?.can_manage !== true || !this.manualStudentName.trim() || this.saving) return;
 
     this.saving = true;
     try {
@@ -133,8 +145,8 @@ export default {
       this.closeAddStudentDialog();
       await this.fetchArchiveData();
       this.notifySuccess('تمت إضافة الطالب إلى الأرشيف.');
-    } catch {
-      this.notifyError('تعذر نقل الطالب إلى الأرشيف.');
+    } catch (error) {
+      this.notifyError(error?.response?.data?.message || 'تعذر نقل الطالب إلى الأرشيف.');
     } finally {
       this.saving = false;
     }

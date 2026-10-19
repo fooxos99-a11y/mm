@@ -74,18 +74,8 @@ trait BuildsDashboardSnapshots
             $visibleBranchCodes,
         );
         $notifications = collect($this->loadNotifications($includeAll));
-        $currentRolePermissions = $rolePermissions
-            ->where('role', $currentRole)
-            ->pluck('is_enabled', 'permission_key');
-        $canViewCourseAnswerKeys = $currentRole === 'admin'
-            || (in_array($currentRole, ['male_manager', 'female_manager'], true)
-                && collect(['edit_pre_questions', 'edit_post_questions', 'edit_tasks'])
-                    ->contains(
-                        fn (string $permission): bool => (bool) ($currentRolePermissions[$permission] ?? false)
-                    ));
-        $canViewFinalExamAnswerKeys = $currentRole === 'admin'
-            || (in_array($currentRole, ['male_manager', 'female_manager'], true)
-                && (bool) ($currentRolePermissions['page_final_exam'] ?? false));
+        $canViewCourseAnswerKeys = in_array($currentRole, ['admin', 'male_manager', 'female_manager'], true);
+        $canViewFinalExamAnswerKeys = $canViewCourseAnswerKeys;
 
         if ($managedBranchId !== '') {
             $students = $students->filter(

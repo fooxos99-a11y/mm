@@ -27,7 +27,7 @@
 
         <section class="settings-admin__content">
           <template v-if="selectedItem && selectedPanelComponent">
-            <div
+            <AppActionBar
               v-if="selectedItemActions.length"
               class="settings-admin__actions settings-admin__actions--panel"
             >
@@ -39,14 +39,13 @@
               >
                 {{ action.label }}
               </AppButton>
-            </div>
+            </AppActionBar>
 
             <div class="settings-admin__panel-shell">
               <component
                 :is="selectedPanelComponent"
                 ref="selectedPanel"
                 v-bind="selectedPanelProps"
-                @permissions-topbar-state="$emit('permissions-topbar-state', $event)"
                 @registration-topbar-state="$emit('registration-topbar-state', $event)"
               />
             </div>
@@ -58,7 +57,7 @@
 </template>
 
 <script>
-import { AppButton } from '../components/ui';
+import { AppActionBar, AppButton } from '../components/ui';
 import AdminArchiveView from './AdminArchiveView.vue';
 import AdminHomePageSettingsView from './AdminHomePageSettingsView.vue';
 import AdminPeopleView from './AdminPeopleView.vue';
@@ -69,6 +68,7 @@ import AdminTemplatesView from './AdminTemplatesView.vue';
 export default {
   name: 'AdminSettingsView',
   components: {
+    AppActionBar,
     AppButton,
     AdminArchiveView,
     AdminHomePageSettingsView,
@@ -95,7 +95,7 @@ export default {
       default: () => [],
     },
   },
-  emits: ['permissions-topbar-state', 'registration-topbar-state'],
+  emits: ['registration-topbar-state'],
   data() {
     return {
       selectedItemId: '',
@@ -164,6 +164,7 @@ export default {
     },
   },
   methods: {
+    confirmDiscardChanges() { return this.$refs.selectedPanel?.confirmDiscardChanges?.() ?? Promise.resolve(true); },
     openCreateDialog() {
       this.$refs.selectedPanel?.openCreateDialog?.();
     },
@@ -179,10 +180,8 @@ export default {
     openFieldsDialog() {
       this.$refs.selectedPanel?.openFieldsDialog?.();
     },
-    togglePermissionsWorkspaceSection() {
-      this.$refs.selectedPanel?.toggleTopbarSection?.();
-    },
-    handleItemClick(item) {
+    async handleItemClick(item) {
+      if (item.id !== this.selectedItemId && !await this.confirmDiscardChanges()) return;
       this.selectedItemId = item.id;
     },
     runSelectedItemAction(actionId) {

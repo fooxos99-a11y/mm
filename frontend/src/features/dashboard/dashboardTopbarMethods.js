@@ -40,6 +40,9 @@ export default {
   },
   async openSettingsItem(itemId) {
     if (!this.settingsItems.some((item) => item.id === itemId)) return;
+    if (this.activeMenu === 'settings' && this.selectedSettingsItemId !== itemId
+      && this.$refs.workspacePanel?.confirmDiscardChanges
+      && !(await this.$refs.workspacePanel.confirmDiscardChanges())) return;
     this.selectedSettingsItemId = itemId;
     this.settingsMenuOpen = true;
     await this.openPanel('settings');
@@ -68,11 +71,5 @@ export default {
   },
   handleRegistrationTopbarState(payload) {
     this.registrationTopbarState = { isOpen: !!payload?.isOpen, loading: !!payload?.loading };
-  },
-  handlePermissionsTopbarState(payload) {
-    this.permissionsTopbarState = {
-      isAdmin: !!payload?.isAdmin,
-      activeSection: payload?.activeSection || 'permissions',
-    };
   },
 };

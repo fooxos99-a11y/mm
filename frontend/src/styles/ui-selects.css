@@ -10,14 +10,14 @@
   --app-select-min-height: var(--app-control-height);
 }
 
-.app-select,
+.v-select,
 .app-text-field {
   min-width: 0;
   max-width: 100%;
   font-family: var(--app-font-family);
 }
 
-:is(.app-select, .app-text-field) .v-field {
+:is(.v-select, .app-text-field) .v-field {
   --v-input-control-height: var(--app-control-height);
   border-radius: var(--app-radius-control);
   background: var(--app-surface);
@@ -25,56 +25,56 @@
   transition: box-shadow 0.18s ease;
 }
 
-:is(.app-select, .app-text-field) .v-field__input {
+:is(.v-select, .app-text-field) .v-field__input {
   min-height: var(--app-control-height);
   font-size: var(--app-font-base);
   font-weight: 500;
   line-height: 1.5;
 }
 
-:is(.app-select, .app-text-field) .v-field__outline {
+:is(.v-select, .app-text-field) .v-field__outline {
   --v-field-border-opacity: 1;
   color: var(--app-border);
 }
 
-:is(.app-select, .app-text-field) .v-field--focused {
+:is(.v-select, .app-text-field) .v-field--focused {
   box-shadow: var(--app-focus-shadow);
 }
 
-:is(.app-select, .app-text-field) .v-field--focused .v-field__outline {
+:is(.v-select, .app-text-field) .v-field--focused .v-field__outline {
   color: var(--app-primary);
 }
 
-:is(.app-select, .app-text-field) .v-field--error .v-field__outline {
+:is(.v-select, .app-text-field) .v-field--error .v-field__outline {
   color: var(--app-danger);
 }
 
-:is(.app-select, .app-text-field) .v-field--error.v-field--focused {
+:is(.v-select, .app-text-field) .v-field--error.v-field--focused {
   box-shadow: 0 0 0 3px rgba(209, 67, 67, 0.16);
 }
 
-:is(.app-select, .app-text-field) .v-label {
+:is(.v-select, .app-text-field) .v-label {
   opacity: 1;
   color: var(--app-text-muted);
   font-family: var(--app-font-family);
 }
 
-:is(.app-select, .app-text-field) .v-input__details {
+:is(.v-select, .app-text-field) .v-input__details {
   font-size: var(--app-font-sm);
   line-height: 1.5;
 }
 
-:is(.app-select, .app-text-field).v-input--disabled .v-field {
+:is(.v-select, .app-text-field).v-input--disabled .v-field {
   background: var(--app-background);
   box-shadow: none;
 }
 
-.app-select .v-select__selection {
+.v-select .v-select__selection {
   min-width: 0;
   max-width: 100%;
 }
 
-.app-select .v-select__selection-text {
+.v-select .v-select__selection-text {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -91,8 +91,6 @@
   overflow-x: hidden !important;
   overflow-y: auto !important;
   overscroll-behavior: contain;
-  scrollbar-color: var(--app-text-muted) transparent;
-  scrollbar-width: thin;
   -webkit-overflow-scrolling: touch;
   touch-action: pan-y pinch-zoom;
   z-index: 4000 !important;

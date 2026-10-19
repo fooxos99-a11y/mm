@@ -44,14 +44,14 @@
       <HomeFooterSettings :form="form" />
     </div>
 
-    <div class="home-page-settings__footer">
+    <AppActionBar class="home-page-settings__footer">
       <AppButton
         :loading="saving"
         @click="saveContent"
       >
         حفظ نصوص رخصة ممارس
       </AppButton>
-    </div>
+    </AppActionBar>
 
     <HomeSettingsDeleteDialog
       :value="deleteDialogOpen"

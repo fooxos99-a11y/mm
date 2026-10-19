@@ -1,30 +1,13 @@
 <template>
-  <header
-    class="dashboard-topbar"
+  <AppWorkspaceTopbar
+    :admin-name="adminName"
+    :menu-open="menuOpen"
     :class="{
       'dashboard-topbar--assessment': ['courses', 'tasks', 'finalexam'].includes(activeMenu),
     }"
+    @toggle-menu="$emit('toggle-menu')"
   >
-    <div class="dashboard-topbar__mobile">
-      <AppIconButton
-        variant="plain"
-        class="dashboard-icon-button"
-        aria-label="فتح القائمة"
-        @click="$emit('toggle-menu')"
-      >
-        <v-icon>{{ menuOpen ? 'mdi-close' : 'mdi-menu' }}</v-icon>
-      </AppIconButton>
-    </div>
-    <div class="dashboard-topbar__welcome">
-      <div class="dashboard-topbar__label">
-        مرحبًا
-      </div>
-      <div class="dashboard-topbar__name">
-        {{ adminName }}
-      </div>
-    </div>
-
-    <div
+    <AppActionBar
       v-if="activeMenu === 'completion'"
       class="dashboard-topbar__actions"
     >
@@ -38,43 +21,29 @@
       </AppButton>
       <AppButton
         v-if="completionState.canCloseResults"
-        :variant="completionState.isClosed ? 'secondary' : 'primary'"
+        variant="primary"
         class="dashboard-topbar__action"
         @click="$emit('open-completion-close')"
       >
         {{ completionState.isClosed ? 'إعادة فتح النتائج' : 'إغلاق واعتماد النتائج' }}
       </AppButton>
-    </div>
+    </AppActionBar>
 
-    <div
-      v-if="activeMenu === 'settings' && selectedSetting === 'permissions' && permissionsState.isAdmin"
-      class="dashboard-topbar__actions"
-    >
-      <AppChoiceButton
-        variant="soft"
-        :active="true"
-        class="dashboard-topbar__action dashboard-topbar__action--choice"
-        @click="$emit('toggle-permissions')"
-      >
-        {{ permissionsState.activeSection === 'supervision' ? 'الصلاحيات' : 'الإشراف' }}
-      </AppChoiceButton>
-    </div>
-
-    <div
+    <AppActionBar
       v-if="activeMenu === 'satisfaction' || (activeMenu === 'users' && canCreateUsers)"
       class="dashboard-topbar__actions"
     >
       <AppButton
         variant="primary"
         class="dashboard-topbar__action"
-        :disabled="activeMenu === 'users' && panelLoading"
+        :disabled="(activeMenu === 'users' && panelLoading) || (activeMenu === 'satisfaction' && !canEditSatisfaction)"
         @click="$emit(activeMenu === 'users' ? 'add-user' : 'add-satisfaction')"
       >
         إضافة
       </AppButton>
-    </div>
+    </AppActionBar>
 
-    <div
+    <AppActionBar
       v-if="activeMenu === 'settings' && selectedSetting === 'archive'"
       class="dashboard-topbar__actions"
     >
@@ -92,9 +61,9 @@
       >
         إضافة
       </AppButton>
-    </div>
+    </AppActionBar>
 
-    <div
+    <AppActionBar
       v-if="activeMenu === 'settings' && selectedSetting === 'registration'"
       class="dashboard-topbar__actions"
     >
@@ -114,14 +83,14 @@
         بيانات التسجيل
       </AppButton>
       <AppButton
-        :variant="registrationState.isOpen ? 'secondary' : 'success'"
+        variant="primary"
         class="dashboard-topbar__action"
         :loading="registrationState.loading"
         @click="$emit('toggle-registration')"
       >
         {{ registrationState.isOpen ? 'إغلاق التسجيل' : 'فتح التسجيل' }}
       </AppButton>
-    </div>
+    </AppActionBar>
 
     <div
       v-if="showCountdown || showAssessmentAction || activeMenu === 'finalexam'"
@@ -143,7 +112,7 @@
           <span class="dashboard-topbar__timer-label">{{ timer.label }}</span>
         </div>
       </div>
-      <div
+      <AppActionBar
         v-if="showAssessmentAction"
         class="dashboard-topbar__actions"
       >
@@ -154,14 +123,15 @@
         >
           {{ assessmentState.label }}
         </AppButton>
-      </div>
-      <div
+      </AppActionBar>
+      <AppActionBar
         v-if="activeMenu === 'finalexam'"
         class="dashboard-topbar__actions"
       >
         <AppButton
           variant="primary"
           class="dashboard-topbar__action"
+          :disabled="!canOpenFinalExam"
           @click="$emit('toggle-final-exam')"
         >
           {{ finalExamState.isEnabled ? 'إيقاف الاختبار' : 'بدء' }}
@@ -169,14 +139,15 @@
         <AppButton
           variant="secondary"
           class="dashboard-topbar__action dashboard-topbar__action--ghost"
+          :disabled="!canEditFinalExam"
           @click="$emit('copy-final-exam')"
         >
           نسخ
         </AppButton>
-      </div>
+      </AppActionBar>
     </div>
 
-    <div
+    <AppActionBar
       v-if="activeMenu === 'overview' && overviewActions.length"
       id="quick-links"
       class="dashboard-topbar__actions dashboard-topbar__actions--overview"
@@ -194,20 +165,24 @@
         </v-icon>
         <span>{{ action.label }}</span>
       </AppButton>
-    </div>
-  </header>
+    </AppActionBar>
+  </AppWorkspaceTopbar>
 </template>
 
 <script>
-import { AppButton, AppChoiceButton, AppIconButton } from '../ui';
+import { AppActionBar, AppButton } from '../ui';
+import AppWorkspaceTopbar from '../ui/AppWorkspaceTopbar.vue';
 
 export default {
   name: 'DashboardTopbar',
-  components: { AppButton, AppChoiceButton, AppIconButton },
+  components: { AppActionBar, AppButton, AppWorkspaceTopbar },
   props: {
     activeMenu: { type: String, required: true },
     adminName: { type: String, default: '' },
     canCreateUsers: { type: Boolean, default: false },
+    canEditSatisfaction: { type: Boolean, default: true },
+    canEditFinalExam: { type: Boolean, default: true },
+    canOpenFinalExam: { type: Boolean, default: true },
     assessmentState: { type: Object, required: true },
     completionState: { type: Object, required: true },
     countdownItems: { type: Array, default: () => [] },
@@ -216,7 +191,6 @@ export default {
     overviewActions: { type: Array, default: () => [] },
     overviewDialogLoading: { type: Boolean, default: false },
     panelLoading: { type: Boolean, default: false },
-    permissionsState: { type: Object, required: true },
     registrationState: { type: Object, required: true },
     selectedSetting: { type: String, default: '' },
     showAssessmentAction: { type: Boolean, default: false },
@@ -226,7 +200,6 @@ export default {
     'toggle-menu',
     'open-completion-settings',
     'open-completion-close',
-    'toggle-permissions',
     'add-satisfaction',
     'add-user',
     'archive-all',
@@ -244,7 +217,7 @@ export default {
 
 <style scoped>
 .dashboard-topbar.dashboard-topbar--assessment { flex-wrap: wrap; gap: 12px; padding: 12px 16px; border-radius: var(--app-radius-card); }
-.dashboard-topbar.dashboard-topbar--assessment { min-height: 72px; }
+.dashboard-topbar.dashboard-topbar--assessment { min-height: calc(var(--app-control-height) + 26px); }
 .dashboard-topbar__assessment-controls { display: flex; align-items: center; gap: 12px; min-width: 0; }
 .dashboard-topbar .dashboard-topbar__assessment-controls .dashboard-topbar__timer-list { display: grid; gap: 4px; min-width: 0; }
 .dashboard-topbar .dashboard-topbar__assessment-controls .dashboard-topbar__timer { justify-content: space-between; min-height: 32px; padding: 4px 8px; font-size: .8rem; border-radius: 8px; }

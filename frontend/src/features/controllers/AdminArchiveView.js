@@ -5,6 +5,7 @@ import computed from '../archive/archiveComputed';
 import dataMethods from '../archive/archiveDataMethods';
 import dialogMethods from '../archive/archiveDialogMethods';
 import presentationMethods from '../archive/archivePresentation';
+import { emptyArchiveCounts } from '../archive/archiveCounts.mjs';
 
 export default {
   name: 'AdminArchiveView',
@@ -28,7 +29,8 @@ export default {
       pendingDeleteArchive: null,
       createDialog: false,
       newArchiveName: '',
-      newArchiveCoursesCount: 0,
+      newArchiveCounts: emptyArchiveCounts(),
+      createArchiveErrors: {},
       newArchiveBatchType: 'all',
       archiveAllDialog: false,
       archiveAllName: '',

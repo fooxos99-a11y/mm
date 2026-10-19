@@ -23,7 +23,7 @@ class DashboardSecurityBoundaryTest extends TestCase
         app(DashboardCommunicationService::class)->clearCaches();
     }
 
-    public function test_open_pre_exam_permission_does_not_allow_question_editing(): void
+    public function test_supervisor_can_edit_shared_questions_without_manual_grants(): void
     {
         $this->actAsMaleManager(['open_pre_exam']);
         $courseId = (string) Str::uuid();
@@ -35,51 +35,29 @@ class DashboardSecurityBoundaryTest extends TestCase
 
         $this->postJson("/api/dashboard/courses/{$courseId}/questions", [
             'assessmentType' => 'pre',
-            'prompt' => 'Unauthorized question',
+            'prompt' => 'Shared question',
             'type' => 'text',
             'allowFile' => false,
             'points' => 1,
             'correctAnswer' => '',
-        ])->assertForbidden();
+        ])->assertCreated();
 
-        $this->assertDatabaseMissing('course_questions', [
+        $this->assertDatabaseHas('course_questions', [
             'course_id' => $courseId,
-            'prompt' => 'Unauthorized question',
+            'prompt' => 'Shared question',
         ]);
     }
 
-    public function test_single_edit_permission_does_not_allow_shared_course_mutations(): void
+    public function test_supervisor_can_manage_shared_content_and_deactivate_only_its_branch(): void
     {
-        $this->actAsMaleManager(['edit_pre_questions']);
-        $courseId = (string) Str::uuid();
-        DB::table('courses')->insert([
-            'id' => $courseId,
-            'title' => 'Shared course',
-            'entity_type' => 'course',
-            'is_active' => true,
-            'created_at' => now(),
-        ]);
-
-        $this->postJson('/api/dashboard/courses', [
-            'title' => 'Unauthorized course',
-            'entityType' => 'course',
-        ])->assertForbidden();
-        $this->putJson("/api/dashboard/courses/{$courseId}", [
-            'title' => 'Tampered shared course',
-        ])->assertForbidden();
-        $this->deleteJson("/api/dashboard/courses/{$courseId}")
-            ->assertForbidden();
-        $this->putJson('/api/dashboard/courses/sort-order', [
-            'orderedIds' => [$courseId],
-        ])->assertForbidden();
-        $this->postJson('/api/dashboard/courses/deactivate-all')
-            ->assertForbidden();
-
-        $this->assertDatabaseHas('courses', [
-            'id' => $courseId,
-            'title' => 'Shared course',
-            'is_active' => true,
-        ]);
+        $this->actAsMaleManager([]);
+        $course = $this->postJson('/api/dashboard/courses', ['title' => 'Shared course', 'entityType' => 'course'])->assertCreated()->json();
+        $this->putJson('/api/dashboard/courses/'.$course['id'], ['title' => 'Updated shared course'])->assertNoContent();
+        $this->putJson('/api/dashboard/courses/sort-order', ['orderedIds' => [$course['id']]])->assertNoContent();
+        $this->postJson('/api/dashboard/courses/deactivate-all')->assertNoContent();
+        $this->assertDatabaseHas('courses', ['id' => $course['id'], 'title' => 'Updated shared course']);
+        $this->deleteJson('/api/dashboard/courses/'.$course['id'])->assertNoContent();
+        $this->assertDatabaseMissing('courses', ['id' => $course['id']]);
     }
 
     public function test_male_manager_cannot_change_female_course_settings_and_partial_updates_preserve_them(): void

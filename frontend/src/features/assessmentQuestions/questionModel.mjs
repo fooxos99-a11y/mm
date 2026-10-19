@@ -53,6 +53,17 @@ export const hasQuestionDraftChanges = (question, draft) => {
   return JSON.stringify(normalize(createQuestionDraft(question))) !== JSON.stringify(normalize(draft))
 }
 
+export const hasQuestionFormContent = form => Boolean(
+  String(form.prompt || '').trim() || String(form.correctAnswer || '').trim()
+  || (form.options || []).some(option => String(option).trim())
+  || Number(form.points ?? 1) !== 1,
+)
+
+export const hasQuestionSetChanges = ({ questions = [], drafts = {}, forms = [], deletedIds = [] } = {}) => (
+  deletedIds.length > 0 || forms.some(hasQuestionFormContent)
+  || questions.some(question => drafts[question.id] && hasQuestionDraftChanges(question, drafts[question.id]))
+)
+
 export const validateQuestionDraft = (draft, { requireCorrectForTypes = ['multiple'] } = {}) => {
   const prompt = String(draft?.prompt || '').trim()
   const options = draft?.type === 'multiple'

@@ -34,7 +34,7 @@
         </h1>
       </div>
 
-      <div class="registration-admin__hero-actions">
+      <AppActionBar class="registration-admin__hero-actions">
         <AppButton
           variant="secondary"
           @click="openFieldsDialog"
@@ -57,7 +57,7 @@
         >
           فتح الرابط
         </AppButton>
-      </div>
+      </AppActionBar>
     </section>
 
     <section class="registration-admin__requests-card">
@@ -170,7 +170,7 @@
             </template>
           </div>
 
-          <div
+          <AppActionBar
             v-if="request.status === 'pending'"
             class="registration-admin__request-actions"
             @click.stop
@@ -192,7 +192,7 @@
             >
               قبول
             </AppButton>
-          </div>
+          </AppActionBar>
         </article>
       </div>
     </section>

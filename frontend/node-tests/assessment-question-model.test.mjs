@@ -6,6 +6,8 @@ import {
   createEmptyQuestionForm,
   createQuestionDraft,
   hasQuestionDraftChanges,
+  hasQuestionFormContent,
+  hasQuestionSetChanges,
   isCorrectQuestionOption,
   mapImportedQuestionToForm,
   normalizeAssessmentAnswer,
@@ -31,6 +33,25 @@ test('question factories isolate mutable option arrays and normalize persisted d
 test('answer normalization handles Arabic variants labels and punctuation', () => {
   assert.equal(normalizeAssessmentAnswer('أ) مَدْرَسَة؟'), 'مدرسه')
   assert.equal(normalizeAssessmentAnswer('  إجابة.  '), 'اجابه')
+})
+
+test('save detects content edits and deletions, and ignores empty or reverted drafts', () => {
+  assert.equal(hasQuestionSetChanges(), false)
+  assert.equal(hasQuestionFormContent({}), false)
+  assert.equal(hasQuestionFormContent(createEmptyQuestionForm()), false)
+  for (const patch of [{ prompt: 'سؤال' }, { options: ['أ', ''] }, { correctAnswer: 'أ' }, { points: 0 }]) {
+    assert.equal(hasQuestionFormContent({ ...createEmptyQuestionForm(), ...patch }), true)
+  }
+  const question = { id: 'q', prompt: 'المحفوظ', type: 'text', points: 1 }
+  const state = { questions: [question], drafts: { q: createQuestionDraft(question) }, forms: [createEmptyQuestionForm()] }
+  assert.equal(hasQuestionSetChanges(state), false)
+  assert.equal(hasQuestionSetChanges({ questions: [question] }), false)
+  state.drafts.q.prompt = 'تعديل'
+  assert.equal(hasQuestionSetChanges(state), true)
+  state.drafts.q.prompt = 'المحفوظ'
+  assert.equal(hasQuestionSetChanges(state), false)
+  assert.equal(hasQuestionSetChanges({ ...state, deletedIds: ['q'] }), true)
+  assert.equal(hasQuestionSetChanges({ ...state, forms: [{ ...createEmptyQuestionForm(), prompt: 'جديد' }] }), true)
 })
 
 test('saved true/false questions retain their options and correct answer when edited', () => {

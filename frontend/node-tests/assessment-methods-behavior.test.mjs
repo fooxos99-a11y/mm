@@ -5,6 +5,7 @@ import assessmentCourseDialogMethods from '../src/features/assessment/assessment
 import assessmentManageDialogMethods from '../src/features/assessment/assessmentManageDialogMethods.js';
 import assessmentActionsComputed from '../src/features/assessment/adminAssessmentActionsComputed.js';
 import assessmentQuestionFormMethods from '../src/features/assessment/assessmentQuestionFormMethods.js';
+import assessmentIndicatorMethods from '../src/features/assessment/assessmentIndicatorMethods.js';
 import { buildProgramIndicators } from '../src/utils/programIndicators.js';
 
 test('assessment management choices reflect the active branches', () => {
@@ -38,6 +39,20 @@ test('assessment action type follows task and embedded contexts', () => {
     embedded: false,
     assessmentType: 'pre',
   }, 'invalid'), 'pre');
+});
+
+test('supervisors see only their own assessment status, timers and management choices', () => {
+  const course = { isActive: true, isPreEnabled: true, branchAvailability: {
+    male: { pre: true }, female: { pre: true },
+  }, assessmentWindows: { male: { pre: '2030-01-01' }, female: { pre: '2030-02-01' } } };
+  for (const branch of ['male', 'female']) {
+    const context = { managedBranchId: branch, isWindowActive: () => true, assessmentEnabledKey: () => 'isPreEnabled' };
+    context.isAssessmentBranchActive = (...args) => assessmentIndicatorMethods.isAssessmentBranchActive.call(context, ...args);
+    assert.equal(context.isAssessmentBranchActive(course, 'pre', branch), true);
+    assert.equal(context.isAssessmentBranchActive(course, 'pre', branch === 'male' ? 'female' : 'male'), false);
+    assert.deepEqual(assessmentManageDialogMethods.getAssessmentManageOptions.call(context, course, 'pre'), [{ value: `close_${branch}`, label: 'إغلاق الاختبار' }]);
+    assert.equal(context.isAssessmentBranchActive({ ...course, isActive: false }, 'pre', branch), false);
+  }
 });
 
 test('visible attendance toggling preserves hidden selections', () => {

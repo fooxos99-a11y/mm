@@ -3,6 +3,7 @@ import {
   AppButton, AppCard, AppFilterField, AppFilterToolbar, AppDialog, AppDialogBody, AppDialogFooter, AppDialogHeader, AppIconButton, AppSelect, AppTextField,
 } from '../../components/ui';
 import { useIndicatorAnimation } from '../../composables/useIndicatorAnimation';
+import { canUseDashboardPermission } from '../permissions/permissionAccess.mjs';
 
 const buildIndicatorValue = (isRating, average, textCount) => {
   if (!isRating) {
@@ -56,7 +57,8 @@ export default {
     };
   },
   computed: {
-    ...mapState(['dashboardSnapshot', 'dashboardError']),
+    ...mapState(['dashboardSnapshot', 'dashboardError', 'currentUser']),
+    canEditQuestions() { return canUseDashboardPermission(this.currentUser, this.dashboardSnapshot, 'edit_satisfaction_questions'); },
     availableCourseOptions() {
       return [...((this.dashboardSnapshot?.courses || []).filter((course) => course.entityType !== 'task'))]
         .sort((left, right) => (left.sortOrder || 0) - (right.sortOrder || 0))
@@ -200,6 +202,7 @@ export default {
       this.selectedCourseId = this.availableCourseOptions[0]?.value || '';
     },
     openAddDialog() {
+      if (!this.canEditQuestions) return;
       this.questionDraft = {
         prompt: '',
         type: 'rating',

@@ -85,12 +85,21 @@
 }
 
 .assessment-page .assessment-task-toolbar .assessment-toolbar--embedded {
-  grid-template-columns: minmax(0, 1fr) clamp(88px, 22%, 140px);
-  align-items: start;
+  --app-filter-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: var(--app-filter-columns);
+  align-items: end;
   gap: 12px;
   margin-bottom: 0;
   padding-bottom: 0;
   border-bottom: 0;
+}
+
+.assessment-page .assessment-task-toolbar--document .assessment-toolbar--embedded {
+  --app-filter-columns: repeat(2, minmax(0, 1fr)) 96px;
+}
+
+.assessment-page .assessment-task-toolbar .assessment-toolbar--embedded > .app-filter-field {
+  grid-column: auto;
 }
 
 .assessment-page .assessment-task-toolbar .assessment-toolbar__field:only-child {
@@ -145,6 +154,10 @@
 }
 
 @media (max-width: 599px) {
+  .assessment-page .assessment-task-toolbar--document .assessment-toolbar--embedded {
+    --app-filter-columns: repeat(2, minmax(0, 1fr)) 72px;
+    gap: 8px;
+  }
   .assessment-page .assessment-card:has(> .assessment-task-toolbar) {
     padding: 12px;
   }

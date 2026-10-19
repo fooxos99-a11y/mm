@@ -15,3 +15,7 @@ export const createDashboardAccount = async (payload) => {
 export const deleteDashboardAccount = async (accountId) => {
   await apiClient.delete(`/dashboard/accounts/${encodeURIComponent(accountId)}`);
 };
+
+export const updateDashboardAccount = async (accountId, payload) => (
+  await apiClient.put(`/dashboard/accounts/${encodeURIComponent(accountId)}`, payload)
+).data;

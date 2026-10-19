@@ -6,33 +6,31 @@
     >
       الدفعة
     </label>
-    <AppNativeSelect
+    <AppSelect
       :id="fieldId"
       :value="value"
+      :items="options"
+      item-text="label"
+      item-value="value"
+      :hide-details="!error"
+      :error-messages="error"
       class="archive-dialog__select"
       @input="$emit('input', $event)"
-    >
-      <option
-        v-for="option in options"
-        :key="option.value"
-        :value="option.value"
-      >
-        {{ option.label }}
-      </option>
-    </AppNativeSelect>
+    />
   </div>
 </template>
 
 <script>
-import { AppNativeSelect } from '../ui';
+import { AppSelect } from '../ui';
 
 export default {
   name: 'BatchTypeField',
-  components: { AppNativeSelect },
+  components: { AppSelect },
   props: {
     value: { type: String, required: true },
     options: { type: Array, required: true },
     fieldId: { type: String, default: 'archive-batch-type' },
+    error: { type: String, default: '' },
   },
   emits: ['input'],
 };

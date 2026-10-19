@@ -77,7 +77,7 @@ class DashboardShellTest extends TestCase
             ->assertJsonPath('overviewIndicators.all.5.meta', '1 من 2');
     }
 
-    public function test_managers_only_receive_their_branch_and_overview_requires_permission(): void
+    public function test_managers_always_receive_only_their_branch_regardless_of_legacy_permissions(): void
     {
         $this->student('female');
         Sanctum::actingAs(User::factory()->create(['role' => 'male_manager']));
@@ -90,7 +90,7 @@ class DashboardShellTest extends TestCase
             ->where('role', 'male_manager')
             ->where('permission_key', 'page_overview')
             ->update(['is_enabled' => false]);
-        $this->getJson('/api/dashboard/shell')->assertOk()->assertJsonCount(0, 'overviewIndicators');
+        $this->getJson('/api/dashboard/shell')->assertOk()->assertJsonCount(1, 'overviewIndicators')->assertJsonPath('rolePermissions.male_manager.page_overview', true);
         Sanctum::actingAs(User::factory()->create(['role' => 'student']));
         $this->getJson('/api/dashboard/shell')->assertForbidden();
     }

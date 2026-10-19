@@ -56,7 +56,7 @@ test('management dashboard has round indicators and automatically browses curren
   page.on('pageerror', error => errors.push(error.message));
   const state = await setup(page);
   await page.goto('management');
-  await expect(page.getByRole('heading', { name: 'إدارة النظام', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'ملخص النظام', exact: true })).toBeVisible();
   const rings = page.locator('.system-management__indicators .dashboard-indicator-ring');
   await expect(rings).toHaveCount(6);
   for (const ring of await rings.all()) {

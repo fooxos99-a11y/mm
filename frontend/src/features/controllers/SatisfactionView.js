@@ -1,11 +1,12 @@
 import { mapActions, mapState } from 'vuex';
-import { AppButton } from '../../components/ui';
+import { AppActionBar, AppButton } from '../../components/ui';
 import { fetchDashboardSnapshot, submitPublicSatisfactionResponses } from '../../services/api';
 import { recoverSavedSubmission } from '../assessmentQuestions/submissionState.mjs';
 
 export default {
   name: 'SatisfactionView',
   components: {
+    AppActionBar,
     AppButton,
   },
   data() {

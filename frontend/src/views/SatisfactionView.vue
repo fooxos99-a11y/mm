@@ -146,7 +146,7 @@
             />
           </article>
 
-          <div class="assessment-submit-row">
+          <AppActionBar class="assessment-submit-row">
             <AppButton
               variant="primary"
               class="assessment-submit-button"
@@ -156,7 +156,7 @@
             >
               إرسال الاستبيان
             </AppButton>
-          </div>
+          </AppActionBar>
         </template>
       </v-card>
     </v-container>

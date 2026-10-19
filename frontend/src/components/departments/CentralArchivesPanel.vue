@@ -1,22 +1,42 @@
 <template>
-  <AppCard title="الأرشيف المركزي">
-    <div class="central-archives__filters">
-      <AppSelect
-        v-model="departmentId"
+  <AppCard class="admin-workspace-card central-archives">
+    <div class="central-archives__heading">
+      <h2>الأرشيف المركزي</h2>
+    </div>
+    <AppFilterToolbar
+      :columns="3"
+      class="central-archives__filters"
+    >
+      <AppFilterField
+        for-id="management-record-department"
         label="الإدارة"
-        :items="departmentOptions"
-        item-text="label"
-        item-value="value"
-        @update:model-value="resetRecords"
-      />
-      <AppSelect
-        v-model="batch"
+      >
+        <AppSelect
+          id="management-record-department"
+          v-model="departmentId"
+          aria-labelledby="management-record-department-label"
+          :items="departmentOptions"
+          item-text="label"
+          item-value="value"
+          hide-details
+          @update:model-value="resetRecords"
+        />
+      </AppFilterField>
+      <AppFilterField
+        for-id="management-record-batch"
         label="الدفعة"
-        :items="archiveOptions"
-        item-text="label"
-        item-value="value"
-        @update:model-value="resetRecords"
-      />
+      >
+        <AppSelect
+          id="management-record-batch"
+          v-model="batch"
+          aria-labelledby="management-record-batch-label"
+          :items="archiveOptions"
+          item-text="label"
+          item-value="value"
+          hide-details
+          @update:model-value="resetRecords"
+        />
+      </AppFilterField>
       <form
         class="central-archives__search"
         @submit.prevent="search"
@@ -35,7 +55,7 @@
           بحث
         </AppButton>
       </form>
-    </div>
+    </AppFilterToolbar>
     <p
       v-if="catalogError"
       role="alert"
@@ -110,13 +130,13 @@
   </AppCard>
 </template>
 <script>
-import { AppButton, AppCard, AppErrorState, AppInput, AppPagination, AppSelect, AppTable } from '../ui';
+import { AppButton, AppCard, AppErrorState, AppFilterField, AppFilterToolbar, AppInput, AppPagination, AppSelect, AppTable } from '../ui';
 import ArchivedStudentDetailDialog from '../archive/ArchivedStudentDetailDialog.vue';
 import presentation from '../../features/archive/archivePresentation';
 import { fetchManagementArchives, fetchManagementRecords, fetchManagementArchivedStudent, fetchManagementCurrentStudent } from '../../services/managementApi';
 export default {
   name: 'CentralArchivesPanel',
-  components: { AppButton, AppCard, AppErrorState, AppInput, AppPagination, AppSelect, AppTable, ArchivedStudentDetailDialog },
+  components: { AppButton, AppCard, AppErrorState, AppFilterField, AppFilterToolbar, AppInput, AppPagination, AppSelect, AppTable, ArchivedStudentDetailDialog },
   props: { departments: { type: Array, default: () => [] } },
   data: () => ({
     departmentId: '', batch: 'current', archives: [], students: [], name: '', appliedSearch: '', page: 1,
@@ -174,13 +194,15 @@ export default {
 };
 </script>
 <style scoped>
-.central-archives__filters { display: grid; gap: 14px; margin-block-end: 18px; }
-.central-archives__search { display: grid; gap: 10px; align-items: start; }
-.central-archives__summary { padding-block: 0 16px; color: #536b7b; font-size: .85rem; }
-.central-archives__batch { display: inline-block; border-radius: 6px; padding: 4px 9px; background: #f1f4f6; color: #536b7b; font-size: .8rem; }
-.central-archives__batch.is-current { background: #eaf5f8; color: #1c718a; }
-.central-archives__notice { color: #8c6340; }
-@media (min-width: 768px) { .central-archives__filters { grid-template-columns: 1fr 1fr 2fr; } .central-archives__search { grid-template-columns: minmax(0, 1fr) auto; } }
+.central-archives__heading { margin-bottom: var(--app-space-6); padding-bottom: var(--app-space-4); border-bottom: 1px solid var(--app-border); }
+.central-archives__heading h2 { margin: 0; color: var(--app-ui-text); font-size: var(--app-font-sm); font-weight: var(--app-weight-label); line-height: 1.5; }
+.central-archives__search { display: grid; min-width: 0; gap: var(--app-space-3); align-items: end; }
+.central-archives__summary { padding-bottom: var(--app-space-4); color: var(--app-text-muted); font-size: var(--app-font-sm); }
+.central-archives__batch { display: inline-block; border-radius: var(--app-radius-control); padding: 4px 9px; background: var(--app-primary-soft); color: var(--app-text-muted); font-size: var(--app-font-sm); }
+.central-archives__batch.is-current { color: var(--app-primary); }
+.central-archives__notice { color: var(--app-danger); }
+@media (min-width: 768px) { .central-archives__filters { --app-filter-columns: 1fr 1fr 2fr; } .central-archives__search { grid-template-columns: minmax(0, 1fr) auto; } }
+@media (max-width: 767px) { .central-archives__filters { --app-filter-columns: minmax(0, 1fr); } }
 </style>
 <style>
 @import "../../styles/views/admin-archive.css";

@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Archive;
 
 use App\Http\Requests\DashboardFormRequest;
+use App\Models\Archive;
 use App\Support\DepartmentContext;
 use Illuminate\Validation\Rule;
 
@@ -12,8 +13,8 @@ class StoreArchiveRequest extends DashboardFormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255', Rule::unique('archives', 'name')->where('department_id', DepartmentContext::id())],
-            'courses_count' => ['required', 'integer', 'min:0', 'max:1000000'],
             'batch_type' => ['required', 'in:male,female,all'],
+            ...array_fill_keys(Archive::COUNT_FIELDS, ['sometimes', 'integer', 'min:0', 'max:1000000']),
         ];
     }
 }

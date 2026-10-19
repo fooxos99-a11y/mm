@@ -6,6 +6,7 @@
     :menu-props="resolvedMenuProps"
     :class="['app-select', $attrs.class]"
     @update:model-value="updateValue"
+    @keydown.esc.capture="closeMenu"
   >
     <template
       v-if="$slots['item-actions']"

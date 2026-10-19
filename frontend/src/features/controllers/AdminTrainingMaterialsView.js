@@ -14,6 +14,7 @@ import {
 import TrainingMaterialsList from '../../components/TrainingMaterialsList.vue';
 import { createTrainingMaterial, deleteTrainingMaterial, updateTrainingMaterial } from '../../services/api';
 import computed from '../training-materials/adminTrainingMaterialsComputed';
+import { canUseDashboardPermission } from '../permissions/permissionAccess.mjs';
 import {
   ADD_MATERIAL_OPTION_VALUE,
   ALL_MATERIALS_OPTION_VALUE,
@@ -61,7 +62,8 @@ export default {
     };
   },
   computed: {
-    ...mapState(['dashboardSnapshot']),
+    ...mapState(['dashboardSnapshot', 'currentUser']),
+    canManageMaterials() { return canUseDashboardPermission(this.currentUser, this.dashboardSnapshot, 'manage_materials'); },
     ...computed,
   },
   watch: {
@@ -95,7 +97,7 @@ export default {
       this.dialogOpen = true;
     },
     openEditDialog(material = this.selectedMaterial) {
-      if (!material) {
+      if (!material || material.canManage === false) {
         return;
       }
 
@@ -207,7 +209,7 @@ export default {
     resetForm() {
       this.form = {
         title: '',
-        branchId: 'all',
+        branchId: { male_manager: 'male', female_manager: 'female' }[this.currentUser?.role] || 'all',
         description: '',
         attachments: [createAttachmentDraft()],
       };

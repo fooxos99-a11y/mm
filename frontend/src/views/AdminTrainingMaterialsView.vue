@@ -39,8 +39,8 @@
       v-if="hasMaterials"
       :materials="displayedMaterials"
       preview-in-dialog
-      show-edit
-      show-delete
+      :show-edit="canManageMaterials"
+      :show-delete="canManageMaterials"
       :deleting-id="deletingId"
       empty-title="لا توجد بيانات لعرضها."
       empty-description=""

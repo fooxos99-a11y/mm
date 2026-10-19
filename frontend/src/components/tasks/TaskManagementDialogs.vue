@@ -91,19 +91,15 @@
       <DialogShell title="فتح المهمة الأدائية">
         <template v-if="!managedBranchId">
           <label for="task-availability-branch">الفرع</label>
-          <AppNativeSelect
+          <AppSelect
             id="task-availability-branch"
             :value="availabilityBranch"
+            :items="[{ value: 'all', label: 'الكل' }, { value: 'male', label: 'معلمين' }, { value: 'female', label: 'معلمات' }]"
+            item-text="label"
+            item-value="value"
+            hide-details
             @input="$emit('update:availability-branch', $event)"
-          >
-            <option value="all">
-              الكل
-            </option><option value="male">
-              معلمين
-            </option><option value="female">
-              معلمات
-            </option>
-          </AppNativeSelect>
+          />
         </template>
         <AppDurationHoursField
           id="task-availability-hours"
@@ -142,19 +138,15 @@
     >
       <DialogShell title="إدارة حالة المهمة الأدائية">
         <label for="task-manage-choice">الإجراء</label>
-        <AppNativeSelect
+        <AppSelect
           id="task-manage-choice"
           :value="manageChoice"
+          :items="manageOptions"
+          item-text="label"
+          item-value="value"
+          hide-details
           @input="$emit('update:manage-choice', $event)"
-        >
-          <option
-            v-for="option in manageOptions"
-            :key="option.value"
-            :value="option.value"
-          >
-            {{ option.label }}
-          </option>
-        </AppNativeSelect>
+        />
         <template #actions>
           <AppButton
             variant="secondary"
@@ -205,11 +197,11 @@
 
 <script>
 import DialogShell from '../ui/DialogShell.vue';
-import { AppButton, AppDialog, AppDurationHoursField, AppNativeSelect } from '../ui';
+import { AppButton, AppDialog, AppDurationHoursField, AppSelect } from '../ui';
 
 export default {
   name: 'TaskManagementDialogs',
-  components: { AppButton, AppDialog, AppDurationHoursField, AppNativeSelect, DialogShell },
+  components: { AppButton, AppDialog, AppDurationHoursField, AppSelect, DialogShell },
   props: {
     saveTemplateOpen: { type: Boolean, default: false }, createSubmitting: { type: Boolean, default: false },
     renameOpen: { type: Boolean, default: false }, renameTitle: { type: String, default: '' }, renameSubmitting: { type: Boolean, default: false },

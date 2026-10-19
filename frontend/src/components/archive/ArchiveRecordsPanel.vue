@@ -9,40 +9,16 @@
         label="الأرشيف"
       >
         <div class="admin-archive-view__select-row">
-          <AppNativeSelect
+          <AppSelect
             id="archive-record-filter"
             :value="archiveId || ''"
+            :items="archiveOptions"
+            item-text="display_name"
+            item-value="id"
+            hide-details
             class="admin-archive-view__select"
             @input="handleArchiveChange"
-          >
-            <option value="">
-              اختر الدفعة أو الأرشيف
-            </option>
-            <option
-              v-for="archive in archives"
-              :key="archive.id"
-              :value="archive.id"
-            >
-              {{ archive.name }}
-            </option>
-          </AppNativeSelect>
-          <AppButton
-            v-if="selectedArchive"
-            type="button"
-            class="admin-archive-view__select-option-delete"
-            variant="danger"
-            :loading="deletingArchiveId === selectedArchive.id"
-            :aria-label="`حذف الأرشيف ${selectedArchive.name}`"
-            @click="$emit('delete-archive', selectedArchive)"
-          >
-            <v-icon
-              size="20"
-              aria-hidden="true"
-            >
-              mdi-delete-outline
-            </v-icon>
-            <span>حذف الأرشيف نهائيًا</span>
-          </AppButton>
+          />
         </div>
       </AppFilterField>
 
@@ -110,18 +86,38 @@
         </v-data-table>
       </div>
     </div>
+    <AppActionBar
+      v-if="selectedArchive?.can_manage === true"
+      class="admin-archive-view__footer"
+    >
+      <AppButton
+        variant="danger"
+        :disabled="Boolean(deletingArchiveId)"
+        :aria-label="`حذف الأرشيف ${selectedArchive.name}`"
+        @click="$emit('delete-archive', selectedArchive)"
+      >
+        <v-icon
+          size="20"
+          aria-hidden="true"
+        >
+          mdi-delete-outline
+        </v-icon>
+        حذف الأرشيف نهائيًا
+      </AppButton>
+    </AppActionBar>
   </AppCard>
 </template>
 
 <script>
-import { AppButton, AppCard, AppFilterField, AppFilterToolbar, AppNativeSelect, AppRawButton } from '../ui';
+import { AppButton, AppCard, AppFilterField, AppFilterToolbar, AppActionBar, AppSelect, AppRawButton } from '../ui';
 
 export default {
   name: 'ArchiveRecordsPanel',
-  components: { AppButton, AppCard, AppFilterField, AppFilterToolbar, AppNativeSelect, AppRawButton },
+  components: { AppButton, AppCard, AppFilterField, AppFilterToolbar, AppActionBar, AppSelect, AppRawButton },
   props: {
     archiveId: { type: String, default: null },
     archives: { type: Array, required: true },
+    archiveDetail: { type: Object, default: null },
     deletingArchiveId: { type: String, default: '' },
     searchQuery: { type: String, default: '' },
     showWorkspace: { type: Boolean, default: false },
@@ -141,8 +137,15 @@ export default {
     'archive-change',
   ],
   computed: {
+    archiveOptions() {
+      return [{ id: '', display_name: 'اختر الدفعة أو الأرشيف' }, ...this.archives.map(archive => ({
+        ...archive,
+        display_name: archive.department_name ? `${archive.name} — ${archive.department_name}` : archive.name,
+      }))];
+    },
     selectedArchive() {
-      return this.archives.find((archive) => archive.id === this.archiveId) || null;
+      return this.archiveDetail?.id === this.archiveId ? this.archiveDetail
+        : this.archives.find((archive) => archive.id === this.archiveId) || null;
     },
   },
   methods: {

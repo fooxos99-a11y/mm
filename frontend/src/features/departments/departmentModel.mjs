@@ -16,3 +16,30 @@ export const departmentFormIsValid = (form, originalLoginCode = '') => Boolean(
   && String(form?.managerLoginCode || '').trim()
   && (originalLoginCode === String(form?.managerLoginCode).trim() || passwordMeetsPolicy(form?.managerPassword)),
 );
+
+const normalizedDepartmentForm = (form = {}) => ({
+  name: String(form.name || '').trim(),
+  managerTitle: String(form.managerTitle || '').trim(),
+  managerLoginCode: String(form.managerLoginCode || '').trim(),
+  isActive: form.isActive !== false,
+});
+
+export const departmentFormHasChanges = (form, original) => Boolean(original
+  && JSON.stringify(normalizedDepartmentForm(form)) !== JSON.stringify(normalizedDepartmentForm(original)));
+
+export const managementNavigation = Object.freeze([
+  { id: 'overview', label: 'نظرة عامة', icon: 'mdi-view-dashboard-outline' },
+  { id: 'departments', label: 'الإدارات', icon: 'mdi-bookshelf' },
+  { id: 'indicators', label: 'المؤشرات الإجمالية', icon: 'mdi-chart-box-outline' },
+  { id: 'archives', label: 'الأرشيف المركزي', icon: 'mdi-archive-outline' },
+]);
+
+export const resolveManagementSection = (section) => (
+  managementNavigation.some(item => item.id === section) ? section : 'overview'
+);
+
+export const managementSectionQuery = (query, section) => {
+  const next = { ...query, section: resolveManagementSection(section) };
+  if (next.section !== 'indicators') delete next.departmentId;
+  return next;
+};

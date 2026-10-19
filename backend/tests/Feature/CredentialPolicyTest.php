@@ -41,7 +41,8 @@ class CredentialPolicyTest extends TestCase
             $this->assertTrue(Validator::make(['password' => ' ', 'passwordConfirmation' => ' '], $rules)->fails());
         }
         foreach (['0', '1', '12', 'a', 'ab', 'ع', 'سع', '!', 'a !', ' a ', '01234567', '٠١٢٣٤٥٦٧', '123456789'] as $password) {
-            $this->assertTrue(Validator::make([
+            $expected = $request !== StoreDashboardAccountRequest::class || mb_strlen($password) >= 8;
+            $this->assertSame($expected, Validator::make([
                 'password' => $password, 'passwordConfirmation' => $password,
             ], $rules)->passes());
         }

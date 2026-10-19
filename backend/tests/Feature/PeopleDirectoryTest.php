@@ -40,10 +40,10 @@ class PeopleDirectoryTest extends TestCase
         $this->getJson('/api/dashboard/people')->assertJsonMissing(['id' => $female->id]);
     }
 
-    public function test_directory_requires_the_page_permission(): void
+    public function test_directory_is_automatic_for_supervisors_and_forbidden_for_students(): void
     {
         $this->actAs('male_manager', false);
-        $this->getJson('/api/dashboard/people')->assertForbidden();
+        $this->getJson('/api/dashboard/people')->assertOk();
         $this->actAs('student');
         $this->getJson('/api/dashboard/people')->assertForbidden();
     }

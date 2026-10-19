@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\User;
 use App\Support\DepartmentContext;
 use App\Support\DepartmentData as DB;
+use App\Support\Security\PermissionCatalog;
 
 class DashboardShellService
 {
@@ -18,8 +19,7 @@ class DashboardShellService
             'admin' => ['male', 'female'], 'male_manager' => ['male'], 'female_manager' => ['female'],
             default => abort(403),
         };
-        $permissions = DB::table('role_permissions')->where('role', DepartmentContext::effectiveRole((string) $user->role))->get()
-            ->mapWithKeys(fn ($item) => [$item->permission_key => (bool) $item->is_enabled])->all();
+        $permissions = PermissionCatalog::forRole(DepartmentContext::effectiveRole((string) $user->role));
         $indicators = [];
         if (DepartmentContext::effectiveRole((string) $user->role) === 'admin' || ($permissions['page_overview'] ?? false)) {
             $all = [];

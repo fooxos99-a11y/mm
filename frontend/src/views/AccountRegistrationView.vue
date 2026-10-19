@@ -49,32 +49,34 @@
         >
           {{ error }}
         </p>
-        <AppButton
-          native-type="submit"
-          variant="primary"
-          :loading="saving"
-        >
-          إنشاء الحساب
-        </AppButton>
-        <AppButton
-          variant="secondary"
-          :to="{ name: 'system-management' }"
-          :disabled="saving"
-        >
-          العودة إلى إدارة النظام
-        </AppButton>
+        <AppActionBar>
+          <AppButton
+            native-type="submit"
+            variant="primary"
+            :loading="saving"
+          >
+            إنشاء الحساب
+          </AppButton>
+          <AppButton
+            variant="secondary"
+            :to="{ name: 'system-management' }"
+            :disabled="saving"
+          >
+            العودة إلى إدارة النظام
+          </AppButton>
+        </AppActionBar>
       </form>
     </AppCard>
   </main>
 </template>
 
 <script>
-import { AppButton, AppCard, AppInput, AppPasswordField } from '../components/ui';
+import { AppActionBar, AppButton, AppCard, AppInput, AppPasswordField } from '../components/ui';
 import { registerAccount } from '../services/authApi';
 import { PASSWORD_REQUIREMENTS_TEXT, passwordConfirmationIsValid } from '../utils/passwordPolicy.mjs';
 export default {
   name: 'AccountRegistrationView',
-  components: { AppButton, AppCard, AppInput, AppPasswordField },
+  components: { AppActionBar, AppButton, AppCard, AppInput, AppPasswordField },
   data: () => ({ form: { name: '', loginCode: '', password: '', passwordConfirmation: '' }, saving: false, error: '', errors: {}, passwordHint: PASSWORD_REQUIREMENTS_TEXT }),
   methods: {
     async submit() {

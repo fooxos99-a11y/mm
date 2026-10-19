@@ -38,7 +38,7 @@ for (const assessmentType of ['pre', 'post', 'tasks']) {
     // A successful save must publish server IDs even if dashboard refresh is unavailable.
     await page.route('**/api/dashboard/snapshot**', route => route.abort());
     const save = page.waitForResponse(item => item.url().endsWith(`/courses/${course.id}/questions/sync`));
-    await page.getByRole('button', { name: 'حفظ الأسئلة', exact: true }).click();
+    await page.getByRole('button', { name: 'حفظ', exact: true }).click();
     expect((await save).status()).toBe(200);
     const saved = page.locator('.assessment-inline-list__item');
     await expect(saved).toHaveCount(3);
@@ -47,7 +47,7 @@ for (const assessmentType of ['pre', 'post', 'tasks']) {
       await saved.nth(index).locator('textarea[placeholder="اكتب السؤال"]').fill(`تعديل ${type}`);
     }
     const edit = page.waitForResponse(item => item.url().endsWith(`/courses/${course.id}/questions/sync`));
-    await page.getByRole('button', { name: 'حفظ الأسئلة', exact: true }).click();
+    await page.getByRole('button', { name: 'حفظ', exact: true }).click();
     expect((await edit).status()).toBe(200);
     await expect(saved.nth(0).locator('textarea[placeholder="اكتب السؤال"]')).toHaveValue('تعديل خيارات');
     await page.unroute('**/api/dashboard/snapshot**');
@@ -93,12 +93,12 @@ test('final exam saves and edits all question types without losing true/false op
       await route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ message: 'Save interrupted' }) });
     } else await route.continue();
   });
-  await page.getByRole('button', { name: 'حفظ الأسئلة', exact: true }).click();
+  await page.getByRole('button', { name: 'حفظ', exact: true }).click();
   await expect(page.locator('.assessment-inline-builder .assessment-editor-question')).toHaveCount(2);
   await expect.poll(() => page.locator('.assessment-inline-list__item textarea[placeholder="اكتب السؤال"]')
     .evaluateAll(inputs => inputs.map(input => input.value))).toContain(prompts[0]);
   await page.unroute('**/api/dashboard/final-exam/questions');
-  await page.getByRole('button', { name: 'حفظ الأسئلة', exact: true }).click();
+  await page.getByRole('button', { name: 'حفظ', exact: true }).click();
   await expect(page.locator('.assessment-inline-builder .assessment-editor-question')).toHaveCount(0);
   const cards = page.locator('.assessment-inline-list__item');
   const values = () => cards.locator('textarea[placeholder="اكتب السؤال"]').evaluateAll(inputs => inputs.map(input => input.value));
@@ -114,7 +114,7 @@ test('final exam saves and edits all question types without losing true/false op
     const prompt = await input.inputValue();
     if (prompts.includes(prompt)) await input.fill(`تعديل ${prompt}`);
   }
-  await page.getByRole('button', { name: 'حفظ الأسئلة', exact: true }).click();
+  await page.getByRole('button', { name: 'حفظ', exact: true }).click();
   await expect.poll(() => edited.length).toBe(3);
   expect(edited).toEqual([204, 204, 204]);
   await page.unroute('**/api/dashboard/snapshot**');

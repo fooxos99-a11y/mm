@@ -38,6 +38,48 @@
   --app-shadow-card: 0 2px 8px rgba(23, 57, 75, 0.04);
   --app-shadow-overlay: 0 8px 32px rgba(23, 57, 75, 0.12);
   --app-focus-shadow: 0 0 0 3px rgba(29, 106, 133, 0.2);
+  --app-scrollbar-size: 4px;
+  --app-scrollbar-thumb: color-mix(in srgb, var(--app-primary) 42%, transparent);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--app-scrollbar-thumb) transparent;
+}
+
+@supports selector(::-webkit-scrollbar) {
+  * {
+    scrollbar-width: auto;
+    scrollbar-color: auto;
+  }
+
+  ::-webkit-scrollbar {
+    width: var(--app-scrollbar-size);
+    height: var(--app-scrollbar-size);
+  }
+
+  ::-webkit-scrollbar-track,
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: var(--app-scrollbar-thumb);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--app-primary);
+  }
+
+  ::-webkit-scrollbar-button {
+    display: none;
+  }
+}
+
+@media (forced-colors: active) {
+  * { scrollbar-color: auto; }
+  ::-webkit-scrollbar-thumb { background: CanvasText; }
 }
 
 html,

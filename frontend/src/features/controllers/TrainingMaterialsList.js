@@ -1,5 +1,5 @@
 import { fetchTrainingMaterialAttachment } from '../../services/api';
-import { AppButton, AppRawButton } from '../../components/ui';
+import { AppActionBar, AppButton, AppRawButton } from '../../components/ui';
 import {
   resolveTrainingMaterialFileName,
   resolveTrainingMaterialPreviewKind,
@@ -9,6 +9,7 @@ import {
 export default {
   name: 'TrainingMaterialsList',
   components: {
+    AppActionBar,
     AppButton,
     AppRawButton,
   },

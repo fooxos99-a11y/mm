@@ -36,6 +36,6 @@ class SnapshotCompletenessTest extends TestCase
         Sanctum::actingAs(User::factory()->create(['role' => 'male_manager']));
         $this->getJson('/api/dashboard/snapshot')->assertOk()
             ->assertJsonCount(1001, 'students')->assertJsonCount(1001, 'courses.0.preQuestions')
-            ->assertJsonMissing(['id' => $femaleId])->assertJsonPath('courses.0.preQuestions.1000.correctAnswer', '');
+            ->assertJsonMissing(['id' => $femaleId])->assertJsonPath('courses.0.preQuestions.1000.correctAnswer', 'A');
     }
 }

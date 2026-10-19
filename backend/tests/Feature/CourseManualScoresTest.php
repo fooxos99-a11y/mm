@@ -135,7 +135,8 @@ class CourseManualScoresTest extends TestCase
         $this->save([$this->grade($male, 10)], 'tasks')->assertUnprocessable();
         DB::table('role_permissions')->where('role', 'male_manager')->where('permission_key', 'page_results')
             ->update(['is_enabled' => false]);
-        $this->save([$this->grade($male, 8, $this->entry($male)->version)])->assertForbidden();
+        $this->save([$this->grade($male, 8, $this->entry($male)->version)])->assertOk();
+        $this->assertEquals(8, $this->entry($male)->score);
         $this->acting('student');
         $this->save([$this->grade($male, 9)])->assertForbidden();
         $this->acting('female_manager');

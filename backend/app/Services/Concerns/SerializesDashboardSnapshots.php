@@ -6,8 +6,10 @@ use App\Models\Branch;
 use App\Models\Reciter;
 use App\Models\Student;
 use App\Models\TrainingMaterial;
+use App\Services\BranchCourseState;
 use App\Support\DepartmentContext;
 use App\Support\DepartmentData as DB;
+use App\Support\Security\PermissionCatalog;
 use Illuminate\Support\Collection;
 
 trait SerializesDashboardSnapshots
@@ -76,7 +78,7 @@ trait SerializesDashboardSnapshots
                     'id' => $course->id,
                     'title' => $course->title,
                     'entityType' => $course->entity_type === 'task' ? 'task' : 'course',
-                    'isActive' => (bool) $course->is_active,
+                    'isActive' => app(BranchCourseState::class)->isActive($course),
                     'isPreEnabled' => (bool) $course->is_pre_enabled,
                     'isPostEnabled' => (bool) $course->is_post_enabled,
                     'isTasksEnabled' => (bool) $course->is_tasks_enabled,
@@ -251,12 +253,18 @@ trait SerializesDashboardSnapshots
                 ->all(),
             'homePageContent' => $this->pageContentService->loadHomePageContent(),
             'practitionerPageContent' => $this->pageContentService->loadPractitionerPageContent(),
-            'rolePermissions' => $rolePermissions
-                ->groupBy('role')
-                ->map(fn (Collection $items) => $items
-                    ->mapWithKeys(fn ($item) => [$item->permission_key => (bool) $item->is_enabled])
-                    ->all())
-                ->all(),
+            'rolePermissions' => $this->automaticSnapshotPermissions(),
         ];
+    }
+
+    private function automaticSnapshotPermissions(): array
+    {
+        $role = DepartmentContext::effectiveRole((string) ((auth('sanctum')->user() ?: auth()->user())?->role ?? ''));
+        if ($role === 'admin') {
+            return $this->loadRolePermissions();
+        }
+
+        return in_array($role, ['male_manager', 'female_manager'], true)
+            ? [$role => PermissionCatalog::forRole($role)] : [];
     }
 }

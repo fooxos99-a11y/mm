@@ -63,7 +63,7 @@
       </div>
     </FinalExamQuestionCard>
 
-    <div class="assessment-submit-row">
+    <AppActionBar class="assessment-submit-row">
       <AppButton
         variant="primary"
         class="assessment-submit-button"
@@ -73,18 +73,18 @@
       >
         إرسال
       </AppButton>
-    </div>
+    </AppActionBar>
   </section>
 </template>
 
 <script>
-import { AppButton } from '../ui';
+import { AppActionBar, AppButton } from '../ui';
 import AssessmentQuestionAnswer from '../assessment/AssessmentQuestionAnswer.vue';
 import FinalExamQuestionCard from './FinalExamQuestionCard.vue';
 
 export default {
   name: 'FinalExamAttemptPanel',
-  components: { AppButton, AssessmentQuestionAnswer, FinalExamQuestionCard },
+  components: { AppActionBar, AppButton, AssessmentQuestionAnswer, FinalExamQuestionCard },
   props: {
     questions: { type: Array, default: () => [] },
     answers: { type: Object, default: () => ({}) },

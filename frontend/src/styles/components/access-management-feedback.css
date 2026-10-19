@@ -1,0 +1,3 @@
+.permissions-admin__scope { margin: 0 0 16px; color: var(--app-text-muted); font-size: var(--app-font-sm); }
+.permissions-admin__error { padding: 12px; margin-bottom: 16px; background: var(--app-danger-soft); color: var(--app-danger); border: 1px solid var(--app-danger); border-radius: var(--app-radius-control); }
+.permissions-admin__error p { margin: 0 0 8px; }

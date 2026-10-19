@@ -14,12 +14,19 @@
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
   touch-action: pan-y pinch-zoom;
+  transition: none;
   padding: 16px 12px;
   padding-bottom: max(28px, env(safe-area-inset-bottom));
 }
 .dashboard-page .dashboard-sidebar.dashboard-sidebar--mobile:not([open]),
 .student-page .dashboard-sidebar.dashboard-sidebar--mobile:not([open]) { display: none; }
-.dashboard-sidebar--mobile::backdrop { background: rgba(15, 23, 42, 0.24); }
+.dashboard-sidebar--mobile::backdrop {
+  background: rgba(15, 23, 42, 0.24);
+  opacity: 1;
+  transition: opacity 240ms ease;
+}
+.dashboard-sidebar--mobile.dashboard-sidebar--closing::backdrop { opacity: 0; }
+@starting-style { .dashboard-sidebar--mobile::backdrop { opacity: 0; } }
 .dashboard-sidebar--mobile > * { flex-shrink: 0; }
 .dashboard-sidebar--mobile .mobile-sidebar-close {
   position: sticky;
@@ -32,3 +39,4 @@
   font-size: 1.5rem;
 }
 .dashboard-sidebar--mobile:focus { outline: none; }
+@media (prefers-reduced-motion: reduce) { .dashboard-sidebar--mobile::backdrop { transition: none; } }

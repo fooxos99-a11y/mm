@@ -7,7 +7,7 @@
         aria-label="فتح القائمة"
         @click="$emit('toggle-menu')"
       >
-        <v-icon>{{ menuOpen ? 'mdi-close' : 'mdi-menu' }}</v-icon>
+        <v-icon>mdi-menu</v-icon>
       </AppIconButton>
     </div>
     <div class="dashboard-topbar__welcome">

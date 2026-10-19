@@ -108,23 +108,14 @@
             </div>
             <div>
               <label :for="fieldId(formIndex, 'answer')">الإجابة الصحيحة</label>
-              <AppNativeSelect
+              <AppSelect
                 v-if="form.type !== 'text'"
                 :id="fieldId(formIndex, 'answer')"
                 :value="form.correctAnswer || (form.type === 'truefalse' ? 'صح' : '')"
-                @change="updateForm(formIndex, { correctAnswer: $event.target.value })"
-              >
-                <option value="">
-                  اختر
-                </option>
-                <option
-                  v-for="answer in availableAnswers(form)"
-                  :key="answer"
-                  :value="answer"
-                >
-                  {{ answer }}
-                </option>
-              </AppNativeSelect>
+                :items="[{ title: 'اختر', value: '' }, ...availableAnswers(form).map(answer => ({ title: answer, value: answer }))]"
+                hide-details
+                @input="updateForm(formIndex, { correctAnswer: $event })"
+              />
               <input
                 v-else
                 :id="fieldId(formIndex, 'answer')"
@@ -136,18 +127,13 @@
             </div>
             <div>
               <label :for="fieldId(formIndex, 'file')">إرفاق ملف</label>
-              <AppNativeSelect
+              <AppSelect
                 :id="fieldId(formIndex, 'file')"
                 :value="form.allowFile"
-                @change="updateForm(formIndex, { allowFile: $event.target.value })"
-              >
-                <option value="yes">
-                  يسمح
-                </option>
-                <option value="no">
-                  لا يسمح
-                </option>
-              </AppNativeSelect>
+                :items="[{ title: 'يسمح', value: 'yes' }, { title: 'لا يسمح', value: 'no' }]"
+                hide-details
+                @input="updateForm(formIndex, { allowFile: $event })"
+              />
             </div>
           </div>
 
@@ -188,14 +174,14 @@
 <script>
 import {
   AppButton, AppChoiceButton, AppDialog, AppDialogBody, AppDialogFooter,
-  AppDialogHeader, AppIconButton, AppNativeSelect,
+  AppDialogHeader, AppIconButton, AppSelect,
 } from '../ui';
 
 export default {
   name: 'TaskQuestionDialog',
   components: {
     AppButton, AppChoiceButton, AppDialog, AppDialogBody, AppDialogFooter,
-    AppDialogHeader, AppIconButton, AppNativeSelect,
+    AppDialogHeader, AppIconButton, AppSelect,
   },
   props: {
     value: { type: Boolean, default: false },

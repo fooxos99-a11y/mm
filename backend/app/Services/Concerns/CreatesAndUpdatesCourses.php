@@ -2,6 +2,7 @@
 
 namespace App\Services\Concerns;
 
+use App\Services\BranchCourseState;
 use App\Support\DepartmentData as DB;
 use Illuminate\Validation\ValidationException;
 
@@ -32,7 +33,11 @@ trait CreatesAndUpdatesCourses
             $options
         ): void {
             if ($isActive && $entityType !== 'task') {
-                DB::table('courses')->update(['is_active' => false]);
+                if (app(BranchCourseState::class)->managedBranch()) {
+                    app(BranchCourseState::class)->closeOthers($courseId, $entityType);
+                } else {
+                    DB::table('courses')->update(['is_active' => false]);
+                }
             }
 
             DB::table('courses')->insert([
@@ -49,12 +54,12 @@ trait CreatesAndUpdatesCourses
                 'is_pre_enabled' => true,
                 'is_post_enabled' => true,
                 'is_tasks_enabled' => false,
-                'male_pre_enabled' => true,
-                'female_pre_enabled' => true,
-                'male_post_enabled' => true,
-                'female_post_enabled' => true,
-                'male_tasks_enabled' => true,
-                'female_tasks_enabled' => true,
+                'male_pre_enabled' => app(BranchCourseState::class)->managedBranch() !== 'female',
+                'female_pre_enabled' => app(BranchCourseState::class)->managedBranch() !== 'male',
+                'male_post_enabled' => app(BranchCourseState::class)->managedBranch() !== 'female',
+                'female_post_enabled' => app(BranchCourseState::class)->managedBranch() !== 'male',
+                'male_tasks_enabled' => app(BranchCourseState::class)->managedBranch() !== 'female',
+                'female_tasks_enabled' => app(BranchCourseState::class)->managedBranch() !== 'male',
                 'assessment_windows' => json_encode(
                     ['global' => [], 'male' => [], 'female' => []],
                     JSON_UNESCAPED_UNICODE
@@ -110,6 +115,13 @@ trait CreatesAndUpdatesCourses
                 'courseId' => 'لا يمكن تغيير محتوى الدورة أو المهمة بعد وجود إجابات محفوظة.',
             ]);
         }
+
+        $managedBranch = app(BranchCourseState::class)->managedBranch();
+        $previousBranchCourse = $course;
+        $wasBranchTaskEnabled = $managedBranch && (bool) $course->is_active && (bool) $course->is_tasks_enabled && (bool) $course->{$managedBranch.'_tasks_enabled'};
+        $updates = app(BranchCourseState::class)->apply($courseId, $updates);
+        $course = DB::table('courses')->where('id', $courseId)->first();
+        $branchTaskOpened = $managedBranch && ! $wasBranchTaskEnabled && (bool) $course->is_tasks_enabled && (bool) $course->{$managedBranch.'_tasks_enabled'};
 
         $payload = [];
         $wasTasksEnabled = (bool) $course->is_tasks_enabled;
@@ -262,7 +274,12 @@ trait CreatesAndUpdatesCourses
             }
         });
 
-        if ($tasksJustOpened) {
+        if ($managedBranch) {
+            $this->notifyUpdatedBranchAssessmentWindows($previousBranchCourse,
+                DB::table('courses')->where('id', $courseId)->first(), $managedBranch);
+        }
+
+        if ($tasksJustOpened || $branchTaskOpened) {
             $nextCourse = DB::table('courses')->where('id', $courseId)->first();
             $nextWindows = $this->decodeJsonObject(
                 $nextCourse?->assessment_windows,
@@ -278,6 +295,11 @@ trait CreatesAndUpdatesCourses
 
     private function closeOtherOpenedTaskCourses(string $activeTaskId): void
     {
+        if (app(BranchCourseState::class)->managedBranch()) {
+            app(BranchCourseState::class)->closeOthers($activeTaskId, 'task');
+
+            return;
+        }
         DB::table('courses')
             ->where('entity_type', 'task')
             ->where('id', '!=', $activeTaskId)

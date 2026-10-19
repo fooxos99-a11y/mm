@@ -8,6 +8,8 @@ import { finalExamBranchMethods } from './finalExamBranchMethods';
 import { finalExamIndicatorMethods } from './finalExamIndicatorMethods';
 import { finalExamQuestionMethods } from './finalExamQuestionMethods';
 import { createFinalExamState } from './finalExamViewModel.mjs';
+import { hasQuestionSetChanges } from '../assessmentQuestions/questionModel.mjs';
+import { canUseDashboardPermission } from '../permissions/permissionAccess.mjs';
 
 export default {
   name: 'AdminFinalExamView',
@@ -18,6 +20,8 @@ export default {
   props: { embedded: { type: Boolean, default: false } },
   data: createFinalExamState,
   computed: {
+    canEditQuestions() { return canUseDashboardPermission(this.currentUser, this.dashboardSnapshot, 'edit_final_questions'); },
+    canOpenExam() { return canUseDashboardPermission(this.currentUser, this.dashboardSnapshot, 'open_final_exam'); },
     ...mapState(['dashboardSnapshot', 'dashboardError', 'currentUser']),
     managedBranchId() {
       if (this.currentUser?.role === 'male_manager') return 'male';
@@ -37,6 +41,10 @@ export default {
       return (this.dashboardSnapshot?.finalExamQuestions || []).filter(question => question.branchCode === targetBranch);
     },
     visibleBranchQuestions() { return this.branchQuestions.filter(question => !this.pendingDeletedQuestionIds.includes(question.id)); },
+    hasQuestionChanges() {
+      return hasQuestionSetChanges({ questions: this.visibleBranchQuestions, drafts: this.questionDrafts,
+        forms: this.questionForms, deletedIds: this.pendingDeletedQuestionIds });
+    },
     currentBranchLabel() {
       return this.branchOptions.find(branch => branch.value === (this.managedBranchId || this.selectedBranch))?.label || 'هذا الفرع';
     },

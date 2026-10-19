@@ -156,7 +156,7 @@
               </div>
             </div>
 
-            <div class="registration-entry__actions">
+            <AppActionBar class="registration-entry__actions">
               <AppButton
                 variant="primary"
                 :loading="submitting"
@@ -164,7 +164,7 @@
               >
                 إرسال الطلب
               </AppButton>
-            </div>
+            </AppActionBar>
           </form>
         </v-card>
       </div>

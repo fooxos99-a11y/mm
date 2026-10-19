@@ -181,7 +181,7 @@
             إلغاء
           </AppButton>
           <AppButton
-            :variant="payload.settings.isClosed ? 'secondary' : 'primary'"
+            variant="primary"
             :loading="closing"
             @click="toggleResultsState"
           >

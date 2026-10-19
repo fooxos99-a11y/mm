@@ -45,6 +45,7 @@ class AuthController extends Controller
         }
 
         RateLimiter::clear($rateLimitKey);
+        $user->forceFill(['last_login_at' => now()])->saveQuietly();
         DepartmentContext::set($user->role === 'super_admin' ? null : $user->department_id);
 
         $payload = [

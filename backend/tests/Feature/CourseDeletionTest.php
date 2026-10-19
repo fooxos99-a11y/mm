@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Student;
 use App\Models\User;
 use App\Services\CourseManagementService;
 use Illuminate\Database\Events\QueryExecuted;
@@ -162,7 +163,7 @@ class CourseDeletionTest extends TestCase
         $this->assertHistoryExists($target);
     }
 
-    public function test_partial_exam_permissions_cannot_delete_a_course_and_its_post_results(): void
+    public function test_supervisor_cannot_delete_history_without_a_known_branch_owner(): void
     {
         $target = $this->createHistory('course');
         Sanctum::actingAs(User::factory()->create(['role' => 'male_manager']));
@@ -185,15 +186,12 @@ class CourseDeletionTest extends TestCase
     }
 
     #[DataProvider('entities')]
-    public function test_manager_with_required_permissions_can_delete_saved_history(string $type, ?string $mode): void
+    public function test_manager_can_delete_own_branch_history_without_manual_grants(string $type, ?string $mode): void
     {
         $target = $this->createHistory($type, $mode);
         Sanctum::actingAs(User::factory()->create(['role' => 'male_manager']));
-        foreach ($type === 'task' ? ['edit_tasks'] : ['edit_pre_questions', 'edit_post_questions'] as $permission) {
-            DB::table('role_permissions')->insert([
-                'role' => 'male_manager', 'permission_key' => $permission, 'is_enabled' => true,
-            ]);
-        }
+        Student::query()->create(['full_name' => 'Own branch student', 'login_code' => $target['id'],
+            'branch_id' => DB::table('branches')->where('code', 'male')->value('id')]);
         $this->deleteJson('/api/dashboard/courses/'.$target['id'])->assertNoContent();
         $this->assertDatabaseMissing('courses', ['id' => $target['id']]);
     }

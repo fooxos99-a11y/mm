@@ -1,20 +1,16 @@
 <template>
-  <div
+  <AppActionBar
     class="app-dialog-footer"
-    :class="{ 'app-dialog-footer--stack': stack }"
   >
     <slot />
-  </div>
+  </AppActionBar>
 </template>
 
 <script>
+import AppActionBar from './AppActionBar.vue';
+
 export default {
   name: 'AppDialogFooter',
-  props: {
-    stack: {
-      type: Boolean,
-      default: false,
-    },
-  },
+  components: { AppActionBar },
 };
 </script>

@@ -46,6 +46,11 @@ test('remaining dashboard panels expose usable controls and dialogs', async ({ p
   await page.goto('dashboard?panel=satisfaction');
   await page.getByRole('button', { name: 'إضافة', exact: true }).click();
   await expect(page.locator('.satisfaction-admin__dialog')).toBeVisible();
+  await page.locator('.satisfaction-admin__dialog .app-select .v-field').first().click();
+  await expect(page.locator('.satisfaction-admin__dialog .app-dropdown-menu').filter({ visible: true })).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.locator('.satisfaction-admin__dialog')).toBeVisible();
+  await expect(page.locator('.satisfaction-admin__dialog .app-dropdown-menu').filter({ visible: true })).toHaveCount(0);
   const requiredSwitch = page.getByRole('checkbox', { name: 'سؤال إلزامي' });
   await requiredSwitch.check();
   await expect(requiredSwitch).toBeChecked();
@@ -107,10 +112,13 @@ test('remaining dashboard panels expose usable controls and dialogs', async ({ p
   await page.getByRole('button', { name: 'إلغاء', exact: true }).click();
 
   await page.goto('dashboard?panel=settings&settingsItem=permissions');
-  await page.getByRole('button', { name: 'الإشراف', exact: true }).click();
+  await page.locator('.permissions-admin .app-select').filter({ has: page.locator('#permissions-section') }).locator('.v-field').click();
+  await selectOption(page, 'الحسابات الإشرافية', { exact: true });
   await expect(page.locator('.dashboard-accounts-panel:visible').first()).toBeVisible();
-  await page.getByRole('button', { name: 'الصلاحيات', exact: true }).click();
-  await expect(page.locator('.permissions-admin__permission-row').first()).toBeVisible();
+  await page.locator('.permissions-admin .app-select').filter({ has: page.locator('#permissions-section') }).locator('.v-field').click();
+  await selectOption(page, 'سجل التغييرات', { exact: true });
+  await expect(page.getByRole('heading', { name: 'سجل التغييرات', exact: true })).toBeVisible();
+  await expect(page.locator('#permissions-search')).toHaveCount(0);
 
   await expectNoOverflow(page);
   expect(browserErrors).toEqual([]);

@@ -3,7 +3,7 @@
     :is="mobile ? 'dialog' : 'aside'"
     ref="panel"
     class="dashboard-sidebar"
-    :class="{ 'dashboard-sidebar--mobile': mobile, 'dashboard-sidebar--open': mobile && open }"
+    :class="{ 'dashboard-sidebar--mobile': mobile, 'dashboard-sidebar--open': mobile && open, 'dashboard-sidebar--closing': mobile && !open }"
     :aria-label="label"
     @cancel.prevent="requestClose"
     @close="handleClose"
@@ -16,7 +16,9 @@
       aria-label="إغلاق القائمة"
       @click="requestClose"
     >
-      <span aria-hidden="true">×</span>
+      <v-icon aria-hidden="true">
+        mdi-menu
+      </v-icon>
     </AppIconButton>
     <slot />
   </component>
@@ -37,32 +39,54 @@ let releaseLock;
 let stopViewport;
 let opener;
 let disposed = false;
+let motion;
+let syncVersion = 0;
 
 function requestClose() { emit('close'); }
-function handleClose() { if (mobile.value && props.open) requestClose(); }
+function handleClose() { if (mobile.value && props.open && !panel.value?.open) requestClose(); }
 function handleBackdrop(event) {
   if (!mobile.value || event.target !== panel.value) return;
   const rect = panel.value.getBoundingClientRect();
   if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) requestClose();
 }
 async function sync() {
+  const version = ++syncVersion;
   await nextTick();
-  if (disposed || !panel.value) return;
+  if (disposed || version !== syncVersion || !panel.value) return;
+  const element = panel.value;
+  const from = motion ? getComputedStyle(element).transform : null;
+  motion?.cancel(); motion = undefined;
   stopViewport?.();
-  stopViewport = observeOverlayViewport(panel.value);
+  stopViewport = observeOverlayViewport(element);
   if (mobile.value && props.open) {
-    if (!panel.value.open) {
+    const wasOpen = element.open;
+    if (!wasOpen) {
       opener = document.activeElement;
       releaseLock = lockPageScroll();
-      panel.value.showModal();
-      if (!opener?.matches(':focus-visible')) panel.value.focus({ preventScroll: true });
+      element.showModal();
+      if (!opener?.matches(':focus-visible')) element.focus({ preventScroll: true });
     }
+    if (!wasOpen || from) await animatePanel(element, from || 'translateX(100%)', 'translateX(0)');
   } else {
+    if (mobile.value && element.open) {
+      await animatePanel(element, from || 'translateX(0)', 'translateX(100%)');
+      if (disposed || version !== syncVersion) return;
+    }
+    if (element.open) element.close();
     releaseLock?.(); releaseLock = undefined;
-    if (panel.value.open) panel.value.close();
     if (mobile.value && opener?.isConnected) opener.focus({ preventScroll: true });
     opener = undefined;
   }
+}
+async function animatePanel(element, from, to) {
+  if (!element.animate || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const animation = element.animate([{ transform: from }, { transform: to }], {
+    duration: 240, easing: 'cubic-bezier(.22, 1, .36, 1)', fill: 'forwards',
+  });
+  motion = animation;
+  try { await animation.finished; }
+  catch (error) { if (error.name !== 'AbortError') throw error; }
+  if (motion === animation) { motion = undefined; animation.cancel(); }
 }
 function resize(event) {
   mobile.value = event.matches;
@@ -76,6 +100,8 @@ onMounted(() => {
 });
 onBeforeUnmount(() => {
   disposed = true;
+  syncVersion++;
+  motion?.cancel();
   media?.removeEventListener('change', resize);
   stopViewport?.();
   releaseLock?.();

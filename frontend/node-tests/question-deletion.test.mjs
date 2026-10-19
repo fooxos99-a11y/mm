@@ -17,9 +17,18 @@ const { finalExamQuestionMethods: finalSave } = await import(`data:text/javascri
 const toast = { success() {}, error() {} }
 const question = { id: 'kept', prompt: 'Keep', type: 'text', points: 1 }
 
+test('question save handlers do not send a request when the editor is unchanged', async () => {
+  const context = { selectedCourse: { id: 'course' }, hasAssessmentChanges: false, hasQuestionChanges: false,
+    syncCourseQuestions() { assert.fail('unchanged course was sent') },
+    updateFinalExamQuestion() { assert.fail('unchanged final exam was sent') } }
+  await courseSave.handleSaveAllQuestions.call(context)
+  await finalSave.handleSaveAllQuestions.call(context)
+})
+
 test('course deletion sends no updates for unchanged remaining questions and accepts an empty set', async () => {
   let payload
   const context = {
+    hasAssessmentChanges: true,
     selectedCourse: { id: 'course' }, isSaving: false, visibleSelectedQuestions: [question],
     questionForms: [], questionErrors: [], questionDrafts: { kept: createQuestionDraft(question) },
     questionDraftErrors: {}, pendingDeletedQuestionIds: ['removed'], detailAssessmentType: 'post',
@@ -38,6 +47,7 @@ test('course deletion sends no updates for unchanged remaining questions and acc
 test('final exam deletion works repeatedly without blank forms or unchanged updates', async () => {
   const deleted = []
   const context = {
+    hasQuestionChanges: true,
     ...createFinalExamState(),
     isSaving: false, visibleBranchQuestions: [question], questionForms: [], questionDrafts: { kept: createQuestionDraft(question) },
     questionDraftErrors: {}, questionErrors: [], pendingDeletedQuestionIds: ['one'],
@@ -63,6 +73,7 @@ test('final exam deletion works repeatedly without blank forms or unchanged upda
 test('final exam retry does not resend a completed deletion after a later request fails', async () => {
   const deleted = []
   const context = {
+    hasQuestionChanges: true,
     isSaving: false, visibleBranchQuestions: [], questionForms: [], questionDraftErrors: {},
     pendingDeletedQuestionIds: ['one', 'two'], $toast: toast,
     deleteFinalExamQuestion: async id => {
@@ -78,6 +89,7 @@ test('final exam retry does not resend a completed deletion after a later reques
 test('legacy incomplete unchanged questions cannot block deletion in either editor', async () => {
   const legacy = { id: 'legacy', type: 'multiple', prompt: 'Legacy', options: [], points: 1, correctAnswer: '' }
   const context = {
+    hasAssessmentChanges: true, hasQuestionChanges: true,
     selectedCourse: { id: 'course' }, visibleSelectedQuestions: [legacy], visibleBranchQuestions: [legacy],
     questionForms: [], questionDraftErrors: {}, questionDrafts: { legacy: createQuestionDraft(legacy) },
     pendingDeletedQuestionIds: ['deleted'], detailAssessmentType: 'pre', isSaving: false,

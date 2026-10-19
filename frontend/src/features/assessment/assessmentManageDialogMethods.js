@@ -1,5 +1,11 @@
 export default {
   getAssessmentManageOptions(course, type) {
+    if (this.managedBranchId) {
+      const branch = this.managedBranchId;
+      const active = this.isAssessmentBranchActive(course, type, branch);
+      const label = type === 'tasks' ? 'المهمة' : 'الاختبار';
+      return [{ value: `${active ? 'close' : 'open'}_${branch}`, label: `${active ? 'إغلاق' : 'فتح'} ${label}` }];
+    }
     const maleActive = this.isAssessmentBranchActive(course, type, 'male');
     const femaleActive = this.isAssessmentBranchActive(course, type, 'female');
 

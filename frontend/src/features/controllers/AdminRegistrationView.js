@@ -1,8 +1,5 @@
 import { mapState } from 'vuex';
-import {
-  AppButton,
-  AppRawButton,
-} from '../../components/ui';
+import { AppActionBar, AppButton, AppRawButton } from '../../components/ui';
 import RegistrationFieldsDialog from '../../components/RegistrationFieldsDialog.vue';
 import RegistrationAcceptanceDialog from '../../components/registration/RegistrationAcceptanceDialog.vue';
 import {
@@ -18,6 +15,7 @@ import { normalizeFixedFieldLabels } from '../registration/registrationFieldLabe
 export default {
   name: 'AdminRegistrationView',
   components: {
+    AppActionBar,
     AppButton,
     AppRawButton,
     RegistrationFieldsDialog,

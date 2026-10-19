@@ -2,13 +2,15 @@
 
 namespace App\Services;
 
+use App\Models\Archive;
 use App\Models\Department;
 use App\Support\DepartmentContext;
+use Closure;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
-/** Central directory reads are only exposed by the general-manager route group. */
+/** Central live records are for the general manager; archive reads are also shared by department admins. */
 final class DepartmentDirectoryService
 {
     public function __construct(
@@ -36,7 +38,13 @@ final class DepartmentDirectoryService
     {
         $archives = DB::table('archives')->join('departments', 'departments.id', '=', 'archives.department_id')
             ->when($departmentId, fn ($query, $id) => $query->where('departments.id', $id))
-            ->orderByDesc('archives.created_at')->get(['archives.*', 'departments.name as departmentName']);
+            ->orderByDesc('archives.created_at')->get(['archives.*', 'departments.name as departmentName'])
+            ->map(function ($archive) {
+                $archive->department_name = $archive->departmentName;
+                $archive->can_manage = $this->canManageArchive($archive->department_id);
+
+                return $archive;
+            });
         $students = [];
         if (filled($search)) {
             $students = $this->archivedStudents($departmentId)
@@ -50,7 +58,10 @@ final class DepartmentDirectoryService
 
     public function archive(string $archiveId): array
     {
-        return DepartmentContext::run($this->archiveDepartment($archiveId), fn () => $this->archives->show($archiveId));
+        $result = $this->inArchiveDepartment($archiveId, fn () => $this->archives->show($archiveId));
+        $result['archive'] = $this->archiveForResponse($result['archive']);
+
+        return $result;
     }
 
     public function records(array $filters): array
@@ -102,16 +113,55 @@ final class DepartmentDirectoryService
     public function searchStudents(string $name, ?string $departmentId = null): Collection
     {
         return $this->archivedStudents($departmentId)
+            ->leftJoin('branches', 'branches.id', '=', 'students.branch_id')
+            ->leftJoin('student_completion_results', function ($join): void {
+                $join->on('student_completion_results.student_id', '=', 'students.id')
+                    ->on('student_completion_results.department_id', '=', 'students.department_id');
+            })
             ->where('students.full_name', 'like', '%'.$name.'%')->orderBy('students.full_name')->limit(100)
             ->get(['students.id', 'students.full_name', 'students.archive_id', 'students.created_at',
-                'students.archived_login_code as login_code', 'students.department_id as departmentId',
-                'archives.name as archive_name', 'departments.name as departmentName']);
+                'students.login_code', 'students.archived_login_code', 'students.department_id as departmentId',
+                'archives.name as archive_name', 'departments.name as departmentName',
+                'branches.code as branch_code', 'branches.name as branch_name',
+                'student_completion_results.status as completionStatus'])
+            ->map(function ($student) {
+                $student->login_code = $student->archived_login_code ?: $student->login_code;
+                $student->department_name = $student->departmentName;
+                $student->branch = $student->branch_code ? ['id' => $student->branch_code, 'name' => $student->branch_name] : null;
+                unset($student->archived_login_code, $student->branch_code, $student->branch_name);
+
+                return $student;
+            });
     }
 
     public function student(string $archiveId, string $studentId): array
     {
-        return DepartmentContext::run($this->archiveDepartment($archiveId),
+        return $this->inArchiveDepartment($archiveId,
             fn () => $this->studentDetails->get($archiveId, $studentId));
+    }
+
+    public function archiveForResponse(Archive $archive): Archive
+    {
+        $archive->setAttribute('department_name', DB::table('departments')->where('id', $archive->department_id)->value('name'));
+        $archive->setAttribute('can_manage', $this->canManageArchive($archive->department_id));
+
+        return $archive;
+    }
+
+    public function inArchiveDepartment(string $archiveId, Closure $callback, bool $manage = false): mixed
+    {
+        $departmentId = $this->archiveDepartment($archiveId);
+        abort_if($manage && ! $this->canManageArchive($departmentId), 404);
+
+        return DepartmentContext::run($departmentId, $callback);
+    }
+
+    private function canManageArchive(string $departmentId): bool
+    {
+        $user = request()->user();
+
+        return $user?->role === 'super_admin'
+            || ($user?->role === 'admin' && $user->department_id === $departmentId);
     }
 
     private function archiveDepartment(string $archiveId): string

@@ -8,8 +8,3 @@ export const createNotification = async (payload) => {
 export const deleteNotification = (notificationId) => apiClient.delete(
   `/dashboard/notifications/${notificationId}`,
 );
-
-export const setRolePermission = ({ role, key, isEnabled }) => apiClient.put(
-  '/dashboard/role-permissions',
-  { role, key, isEnabled },
-);

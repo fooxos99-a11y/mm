@@ -1,7 +1,9 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
-import { PERMISSION_GROUPS, PERMISSION_ROLES } from '../src/features/permissions/permissionGroups.js';
+const catalog = JSON.parse(await readFile(new URL('../../backend/resources/permissions/catalog.json', import.meta.url), 'utf8'));
+const PERMISSION_GROUPS = catalog.groups;
+const PERMISSION_ROLES = catalog.roles;
 
 const source = (path) => readFile(new URL(path, import.meta.url), 'utf8');
 
@@ -9,18 +11,20 @@ test('permission definitions remain centralized and unique', () => {
   const keys = PERMISSION_GROUPS.flatMap((group) => group.permissions.map((permission) => permission.key));
 
   assert.equal(PERMISSION_ROLES.length, 2);
-  assert.equal(keys.length, 26);
+  assert.equal(keys.length, 31);
   assert.equal(new Set(keys).size, keys.length);
 });
 
-test('permissions view delegates the matrix and keeps styles external', async () => {
+test('supervision delegates account management without exposing a manual permission editor', async () => {
   const [view, controller] = await Promise.all([
     source('../src/views/AdminPermissionsView.vue'),
     source('../src/features/permissions/adminPermissionsView.js'),
   ]);
 
-  assert.match(view, /<PermissionsMatrixPanel/);
-  assert.match(controller, /PermissionsMatrixPanel/);
+  assert.match(view, /<DashboardAccountsPanel/);
+  assert.doesNotMatch(view, /PermissionsMatrixPanel|permissions-search|permissions-status/);
+  assert.match(controller, /DashboardAccountsPanel/);
+  assert.doesNotMatch(controller, /loadPermissions|savePermissions/);
   assert.equal(view.includes('<v-switch'), false);
   assert.equal(view.includes('<style scoped>'), false);
 });

@@ -231,7 +231,7 @@
                 </article>
               </template>
 
-              <div
+              <AppActionBar
                 v-if="canSubmit"
                 class="assessment-submit-row"
               >
@@ -244,7 +244,7 @@
                 >
                   إرسال
                 </AppButton>
-              </div>
+              </AppActionBar>
             </template>
           </template>
         </v-card>

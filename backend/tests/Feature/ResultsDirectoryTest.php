@@ -92,8 +92,9 @@ class ResultsDirectoryTest extends TestCase
             ->where('role', 'male_manager')
             ->where('permission_key', 'page_results')
             ->update(['is_enabled' => false]);
-        $this->getJson('/api/dashboard/results/catalog')->assertForbidden();
-        $this->getJson('/api/dashboard/results?branchCode=male&assessmentType=final')->assertForbidden();
+        $this->getJson('/api/dashboard/results/catalog')->assertOk();
+        $this->getJson('/api/dashboard/results?branchCode=male&assessmentType=final')->assertOk();
+        $this->getJson('/api/dashboard/results?branchCode=female&assessmentType=final')->assertForbidden();
         $this->acting('student');
         $this->getJson('/api/dashboard/results/catalog')->assertForbidden();
     }

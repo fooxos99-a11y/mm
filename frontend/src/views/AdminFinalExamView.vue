@@ -149,7 +149,7 @@
           :drafts="questionDrafts"
           :errors="questionDraftErrors"
           empty-text="لا توجد أسئلة بعد."
-          can-edit
+          :can-edit="canEditQuestions"
           :saving="isSaving"
           @remove="removeQuestion"
           @update-draft="updateQuestionDraft"
@@ -160,9 +160,11 @@
         />
 
         <AssessmentQuestionBuilder
+          v-if="canEditQuestions"
           :forms="questionForms"
           :errors="questionErrors"
           :existing-count="visibleBranchQuestions.length"
+          :has-changes="hasQuestionChanges"
           :saving="isSaving"
           @update-form="updateQuestionForm"
           @clear-error="clearQuestionError"

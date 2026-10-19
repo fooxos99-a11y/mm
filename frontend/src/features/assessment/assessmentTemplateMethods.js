@@ -13,7 +13,7 @@ export default {
       };
     },
     async saveTemplate() {
-      if (!this.selectedCourse) {
+      if (!this.selectedCourse || this.templateSaving || !this.hasAssessmentChanges) {
         return;
       }
 

@@ -27,26 +27,26 @@
           />
         </div>
       </div>
-      <div
+      <AppActionBar
         v-if="canEdit"
         class="assessment-template-actions"
       >
         <AppButton
           variant="primary"
           :loading="templateSaving"
-          :disabled="templateSaving"
+          :disabled="templateSaving || !hasChanges"
           @click="$emit('save-template')"
         >
           {{ templateSaving ? 'جارٍ الحفظ...' : 'حفظ' }}
         </AppButton>
-      </div>
+      </AppActionBar>
     </AppCard>
   </section>
 </template>
 
 <script>
 import { defineAsyncComponent } from 'vue';
-import { AppButton, AppCard } from '../ui';
+import { AppActionBar, AppButton, AppCard } from '../ui';
 import AssessmentCourseToolbar from './AssessmentCourseToolbar.vue';
 
 const RichTextEditor = defineAsyncComponent(() => import(
@@ -55,12 +55,13 @@ const RichTextEditor = defineAsyncComponent(() => import(
 
 export default {
   name: 'AssessmentDocumentWorkspace',
-  components: { AppButton, AppCard, AssessmentCourseToolbar, RichTextEditor },
+  components: { AppActionBar, AppButton, AppCard, AssessmentCourseToolbar, RichTextEditor },
   props: {
     toolbarProps: { type: Object, required: true },
     templateDraft: { type: String, default: '' },
     templateSaving: { type: Boolean, default: false },
     canEdit: { type: Boolean, default: false },
+    hasChanges: { type: Boolean, default: false },
   },
   emits: [
     'update:course-value',

@@ -13,6 +13,14 @@
   display: none;
 }
 
+.rich-text-editor__toolbar-actions {
+  display: contents;
+}
+
+.rich-text-editor__toolbar :deep(.rich-text-editor__toolbar-actions.ql-toolbar.ql-snow) {
+  display: contents;
+}
+
 .rich-text-editor__toolbar :deep(.ql-toolbar.ql-snow),
 .rich-text-editor__toolbar {
   display: flex;
@@ -58,8 +66,17 @@
   height: 20px;
 }
 
-.rich-text-editor__toolbar :deep(select.ql-font) {
-  display: none !important;
+.rich-text-editor__toolbar .rich-text-editor__font-select {
+  width: 190px;
+  max-width: 100%;
+  align-self: start;
+}
+
+@media (max-width: 640px) {
+  .rich-text-editor__toolbar .rich-text-editor__font-select {
+    grid-column: span 2;
+    width: 100%;
+  }
 }
 
 .rich-text-editor__toolbar :deep(select.ql-table) {

@@ -76,23 +76,10 @@
   gap: 8px;
 }
 
-.admin-archive-view__select-option {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  width: 100%;
-}
-
-.admin-archive-view__select-option-label {
-  min-width: 0;
-  flex: 1;
-}
-
-.admin-archive-view__select-option-delete {
-  flex: 0 0 auto;
-  min-height: 48px;
-  white-space: nowrap;
+.admin-archive-view__footer {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--app-border);
 }
 
 .admin-archive-view__search-row {
@@ -459,12 +446,4 @@
     width: 100%;
   }
 
-  .admin-archive-view__select-row {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .admin-archive-view__select-option-delete {
-    width: 100%;
-  }
 }

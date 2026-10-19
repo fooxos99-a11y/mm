@@ -259,33 +259,10 @@
   border-top: var(--app-dialog-divider);
 }
 
-.app-dialog-footer > .app-button,
-.app-dialog-footer > .assessment-primary-button,
-.app-dialog-footer > .assessment-secondary-button,
-.app-dialog-footer > a.app-button,
-.app-dialog-footer > button.app-button {
-  flex: 1 1 0;
-  min-width: 112px;
-  max-width: 168px;
-}
-
-.app-dialog-footer--stack {
-  flex-direction: column;
-  align-items: stretch;
-}
-
 @media (max-width: 960px) {
   .modal {
     width: calc(100% - 16px);
     padding: 8px;
-  }
-
-  .app-dialog-footer > .app-button,
-  .app-dialog-footer > .assessment-primary-button,
-  .app-dialog-footer > .assessment-secondary-button,
-  .app-dialog-footer > a.app-button,
-  .app-dialog-footer > button.app-button {
-    max-width: none;
   }
 
   .app-dialog__footer,

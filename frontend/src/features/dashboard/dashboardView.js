@@ -69,7 +69,6 @@ export default {
       },
       assessmentSelections: { courses: {}, tasks: {} },
       registrationTopbarState: { isOpen: false, loading: false },
-      permissionsTopbarState: { isAdmin: false, activeSection: 'permissions' },
       completionTopbarState: { canEditSettings: false, canCloseResults: false, isClosed: false },
       currentTimestamp: Date.now(),
       dashboardClockIntervalId: null,

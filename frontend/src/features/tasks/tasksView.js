@@ -1,6 +1,6 @@
 import { defineAsyncComponent } from 'vue';
 import AttachmentPreviewDialog from '../../components/tasks/AttachmentPreviewDialog.vue';
-import { AppButton } from '../../components/ui';
+import { AppActionBar, AppButton } from '../../components/ui';
 import AssessmentQuestionAnswer from '../../components/assessment/AssessmentQuestionAnswer.vue';
 import taskMethods from './tasksViewMethods';
 import { resolveTaskResource } from './taskResource.mjs';
@@ -11,6 +11,7 @@ const RichTextEditor = defineAsyncComponent(() => import(
 export default {
   name: 'TasksView',
   components: {
+    AppActionBar,
     AttachmentPreviewDialog,
     AppButton,
     AssessmentQuestionAnswer,

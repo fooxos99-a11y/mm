@@ -1,7 +1,8 @@
 import { CREATE_COURSE_OPTION } from './adminAssessmentConfig';
+import { hasQuestionSetChanges } from '../assessmentQuestions/questionModel.mjs';
+import { stripRichTextMarkup } from '../../utils/documentContent';
 
-const normalizedQuestionType = (type) => (type === 'text' ? 'text' : 'multiple');
-const normalizedOptions = (options) => (options || []).map((option) => String(option).trim()).filter(Boolean);
+const comparableTaskTemplate = value => stripRichTextMarkup(value) || /<(?:img|table|hr)\b/i.test(value) ? value : '';
 
 // Vue merges these members into the component, so `this` is the component instance.
 export default /** @type {Record<string, any>} */ ({
@@ -125,20 +126,16 @@ export default /** @type {Record<string, any>} */ ({
       return this.selectedQuestions.filter((question) => !this.pendingDeletedQuestionIds.includes(question.id));
     },
     hasUnsavedAssessmentChanges() {
-      if (this.questionForms.length || this.pendingDeletedQuestionIds.length) return true;
-
-      const questionChanged = this.visibleSelectedQuestions.some((question) => {
-        const draft = this.questionDrafts[question.id];
-        if (!draft) return false;
-
-        return String(draft.prompt || '').trim() !== String(question.prompt || '').trim()
-          || normalizedQuestionType(draft.type) !== normalizedQuestionType(question.type)
-          || JSON.stringify(normalizedOptions(draft.options)) !== JSON.stringify(normalizedOptions(question.options))
-          || Number(draft.points) !== Number(question.points)
-          || String(draft.correctAnswer || '').trim() !== String(question.correctAnswer || '').trim();
+      return Boolean(this.questionForms.length || this.hasAssessmentChanges);
+    },
+    hasAssessmentChanges() {
+      if (!this.selectedCourse) return false;
+      const questionChanged = hasQuestionSetChanges({
+        questions: this.visibleSelectedQuestions, drafts: this.questionDrafts,
+        forms: this.questionForms, deletedIds: this.pendingDeletedQuestionIds,
       });
 
-      if (questionChanged || !this.isTasksPage || !this.selectedCourse) return questionChanged;
+      if (questionChanged || !this.isTasksPage) return questionChanged;
 
       const metadataChanged = this.normalizeTaskVideoUrl() !== String(this.selectedCourse.youtubeUrl || '').trim()
         || this.normalizeTaskDescription() !== String(this.selectedCourse.taskDescription || '').trim();
@@ -147,7 +144,7 @@ export default /** @type {Record<string, any>} */ ({
 
       const attachmentQuestion = this.selectedQuestions.find((question) => question.allowFile) || this.selectedQuestions[0];
       return metadataChanged
-        || this.normalizeTaskTemplateContent() !== String(this.selectedCourse.taskTemplateContent || '')
+        || comparableTaskTemplate(this.normalizeTaskTemplateContent()) !== comparableTaskTemplate(String(this.selectedCourse.taskTemplateContent || ''))
         || Number(this.taskPointsDraft) !== Number(attachmentQuestion?.points ?? 1);
     },
     submissions() {

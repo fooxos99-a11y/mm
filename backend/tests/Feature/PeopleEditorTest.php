@@ -51,7 +51,7 @@ class PeopleEditorTest extends TestCase
             ->assertOk()->assertJsonPath('data.0.value', $reciter->id);
     }
 
-    public function test_manager_scope_and_page_permission_apply_to_options_and_details(): void
+    public function test_automatic_manager_access_retains_branch_scope_for_options_and_details(): void
     {
         $male = $this->student('male', 'visible');
         $female = $this->student('female', 'hidden');
@@ -64,8 +64,9 @@ class PeopleEditorTest extends TestCase
             ->where('role', 'male_manager')
             ->where('permission_key', 'page_users')
             ->update(['is_enabled' => false]);
-        $this->getJson('/api/dashboard/people/options')->assertForbidden();
-        $this->getJson('/api/dashboard/people/student/'.$male->id)->assertForbidden();
+        $this->getJson('/api/dashboard/people/options')->assertOk();
+        $this->getJson('/api/dashboard/people/student/'.$male->id)->assertOk();
+        $this->getJson('/api/dashboard/people/student/'.$female->id)->assertNotFound();
         $this->acting('student');
         $this->getJson('/api/dashboard/people/options')->assertForbidden();
     }

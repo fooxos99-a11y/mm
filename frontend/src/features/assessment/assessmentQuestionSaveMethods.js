@@ -2,7 +2,7 @@ import { hasQuestionDraftChanges } from '../assessmentQuestions/questionModel.mj
 
 export default {
   async handleSaveAllQuestions() {
-    if (!this.selectedCourse || this.isSaving) {
+    if (!this.selectedCourse || this.isSaving || !this.hasAssessmentChanges) {
       return;
     }
 

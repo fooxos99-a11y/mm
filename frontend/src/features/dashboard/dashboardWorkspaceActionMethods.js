@@ -33,11 +33,6 @@ export default {
       this.$refs.workspacePanel?.toggleRegistration?.();
     }
   },
-  togglePermissionsWorkspaceSection() {
-    if (this.activeMenu === 'settings' && this.selectedSettingsItemId === 'permissions') {
-      this.$refs.workspacePanel?.togglePermissionsWorkspaceSection?.();
-    }
-  },
   openCompletionRequirementsDialog() {
     if (this.activeMenu === 'completion') this.$refs.workspacePanel?.openRequirementsDialog?.();
   },

@@ -25,8 +25,11 @@
         @remove-option="$emit('remove-option', index, $event)"
       />
     </div>
-    <div class="assessment-inline-builder__actions">
-      <v-menu location="bottom start">
+    <AppActionBar class="assessment-inline-builder__actions">
+      <v-menu
+        location="bottom start"
+        content-class="app-dropdown-menu"
+      >
         <template #activator="{ props }">
           <AppButton
             variant="secondary"
@@ -75,22 +78,23 @@
       <AppButton
         variant="primary"
         :loading="saving"
-        :disabled="saving"
+        :disabled="saving || !hasChanges"
         @click="$emit('save')"
       >
-        {{ saving ? 'جارٍ الحفظ...' : 'حفظ الأسئلة' }}
+        {{ saving ? 'جارٍ الحفظ...' : 'حفظ' }}
       </AppButton>
-    </div>
+    </AppActionBar>
   </div>
 </template>
 
 <script>
-import { AppButton } from '../ui';
+import { AppActionBar, AppButton } from '../ui';
 import AssessmentEditorQuestion from './AssessmentEditorQuestion.vue';
+import { hasQuestionFormContent } from '../../features/assessmentQuestions/questionModel.mjs';
 
 export default {
   name: 'AssessmentQuestionBuilder',
-  components: { AppButton, AssessmentEditorQuestion },
+  components: { AppActionBar, AppButton, AssessmentEditorQuestion },
   props: {
     forms: { type: Array, default: () => [] },
     errors: { type: Array, default: () => [] },
@@ -100,6 +104,7 @@ export default {
     isDocumentMode: { type: Boolean, default: false },
     allowOptionRemoval: { type: Boolean, default: false },
     saving: { type: Boolean, default: false },
+    hasChanges: { type: Boolean, default: false },
   },
   emits: ['remove-form', 'prompt-paste', 'select-correct', 'option-change', 'option-paste', 'add-option', 'remove-option', 'add-question', 'save', 'update-form', 'clear-error'],
   computed: {
@@ -108,9 +113,7 @@ export default {
   methods: {
     canRemoveForm(form) {
       return this.existingCount > 0 || this.forms.length > 1
-        || Boolean(String(form.prompt || '').trim() || String(form.correctAnswer || '').trim())
-        || (form.options || []).some(option => String(option).trim())
-        || Number(form.points ?? 1) !== 1;
+        || hasQuestionFormContent(form);
     },
     updateForm(index, patch) {
       this.$emit('update-form', index, patch);
@@ -125,7 +128,7 @@ export default {
 .assessment-inline-builder__list { display: grid; gap: 16px; }
 .assessment-inline-builder__actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
 .assessment-inline-builder__actions > .app-button { flex: 1 1 120px; }
-.assessment-inline-builder__menu { display: grid; min-width: 180px; padding: 4px; border: 1px solid var(--app-border); border-radius: var(--app-radius-card); background: var(--app-surface); box-shadow: var(--app-shadow-overlay); }
+.assessment-inline-builder__menu { display: grid; min-width: 180px; padding: var(--app-space-1); background: var(--app-surface); }
 .assessment-inline-builder__actions .assessment-inline-builder__add { width: auto; height: auto; min-height: 48px; min-width: 0; padding: 8px 16px; border: 1px solid var(--app-border); border-radius: 8px; background: var(--app-surface); }
-.assessment-inline-builder__menu .assessment-inline-builder__menu-item { min-height: 48px; padding: 8px 16px; text-align: start; justify-content: start; }
+.assessment-inline-builder__menu .assessment-inline-builder__menu-item { min-height: var(--app-control-height); padding: 8px 16px; border-radius: var(--app-radius-control); text-align: start; justify-content: start; }
 </style>

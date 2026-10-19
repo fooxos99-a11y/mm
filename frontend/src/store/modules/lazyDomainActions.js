@@ -35,7 +35,6 @@ export const lazyDomainActions = {
   ...actionMap(people, 'peopleActions', [
     'fetchDashboardAccounts', 'createDashboardAccount', 'deleteDashboardAccount',
     'addStudent', 'updateStudent', 'deleteStudent', 'saveReciter', 'deleteReciter',
-    'setRolePermission',
   ]),
   ...actionMap(communications, 'communicationActions', [
     'addNotification', 'deleteNotification',

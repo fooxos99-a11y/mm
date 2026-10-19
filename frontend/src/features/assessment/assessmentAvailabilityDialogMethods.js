@@ -3,9 +3,10 @@ export default {
     const resolvedType = this.resolveActionAssessmentType(type);
     const resolvedCourseId = this.resolveDialogCourseId(courseId);
     const course = this.filteredCourses.find((item) => item.id === resolvedCourseId) || this.selectedCourse;
-    const currentWindow = branch === 'all'
+    const targetBranch = this.managedBranchId || branch;
+    const currentWindow = targetBranch === 'all'
       ? this.getWindowMeta(course?.assessmentWindows?.global?.[resolvedType])
-      : this.getWindowMeta(course?.assessmentWindows?.[branch]?.[resolvedType]);
+      : this.getWindowMeta(course?.assessmentWindows?.[targetBranch]?.[resolvedType]);
 
     this.assessmentAvailabilityCourseId = course?.id || resolvedCourseId;
     this.assessmentAvailabilityType = resolvedType;

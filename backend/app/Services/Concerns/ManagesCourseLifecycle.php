@@ -2,6 +2,7 @@
 
 namespace App\Services\Concerns;
 
+use App\Services\BranchCourseState;
 use App\Support\DepartmentData as DB;
 use Illuminate\Validation\ValidationException;
 
@@ -13,6 +14,8 @@ trait ManagesCourseLifecycle
             if (! DB::table('courses')->where('id', $courseId)->lockForUpdate()->first()) {
                 return;
             }
+
+            app(BranchCourseState::class)->assertCanDeleteCourse($courseId);
 
             $submissionIds = DB::table('course_submissions')->where('course_id', $courseId)->select('id');
             $answers = DB::table('course_submission_answers')->whereIn('submission_id', $submissionIds);
@@ -44,6 +47,21 @@ trait ManagesCourseLifecycle
 
     public function activateCourse(string $courseId, ?array $settings = null): void
     {
+        if (app(BranchCourseState::class)->managedBranch()) {
+            $previous = DB::table('courses')->where('id', $courseId)->first();
+            app(BranchCourseState::class)->activate($courseId, $settings);
+            $fresh = DB::table('courses')->where('id', $courseId)->first();
+            $branch = app(BranchCourseState::class)->managedBranch();
+            foreach (['pre', 'post'] as $type) {
+                if (($settings[$type] ?? false) && ! ((bool) ($previous->is_active ?? false)
+                    && (bool) ($previous->{'is_'.$type.'_enabled'} ?? false) && (bool) ($previous->{$branch.'_'.$type.'_enabled'} ?? false))) {
+                    $this->dispatchAssessmentOpenNotification($fresh, $type,
+                        $this->decodeJsonObject($fresh->assessment_notification_templates, []), $this->decodeJsonObject($fresh->assessment_windows, []));
+                }
+            }
+
+            return;
+        }
         $course = DB::table('courses')->where('id', $courseId)->first();
 
         if (! $course) {
@@ -98,6 +116,11 @@ trait ManagesCourseLifecycle
 
     public function deactivateAllCourses(): void
     {
+        if (app(BranchCourseState::class)->managedBranch()) {
+            app(BranchCourseState::class)->closeOthers(null);
+
+            return;
+        }
         DB::table('courses')->update(['is_active' => false]);
     }
 

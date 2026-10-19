@@ -18,7 +18,7 @@ final class DepartmentData
         'push_subscriptions', 'archives', 'registration_settings', 'registration_requests',
         'app_settings', 'completion_requirement_settings', 'student_completion_results',
         'course_score_settings', 'course_manual_scores', 'course_score_history',
-        'training_materials', 'editor_assets', 'media',
+        'training_materials', 'editor_assets', 'media', 'dashboard_access_events',
     ];
 
     public static function table($table, $as = null): DepartmentQueryBuilder

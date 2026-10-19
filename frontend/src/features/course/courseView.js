@@ -1,5 +1,5 @@
 import AttachmentPreviewDialog from '../../components/tasks/AttachmentPreviewDialog.vue';
-import { AppButton } from '../../components/ui';
+import { AppActionBar, AppButton } from '../../components/ui';
 import AssessmentQuestionAnswer from '../../components/assessment/AssessmentQuestionAnswer.vue';
 import { ASSESSMENT_LABELS } from './courseViewConfig';
 import courseMethods from './courseViewMethods';
@@ -18,6 +18,7 @@ const isAssessmentEnabledBySettings = (course, assessmentType, branchId) => {
 export default /** @type {Record<string, any>} */ ({
   name: 'CourseView',
   components: {
+    AppActionBar,
     AttachmentPreviewDialog,
     AppButton,
     AssessmentQuestionAnswer,

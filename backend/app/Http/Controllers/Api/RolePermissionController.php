@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\CoreData\SetRolePermissionRequest;
 use App\Services\CoreDataService;
 use Illuminate\Http\JsonResponse;
 
@@ -18,11 +17,18 @@ class RolePermissionController extends Controller
         return response()->json($this->coreDataService->loadRolePermissions());
     }
 
-    public function update(SetRolePermissionRequest $request): JsonResponse
+    public function editor(): JsonResponse
     {
-        $data = $request->validated();
-        $this->coreDataService->setRolePermission($data['role'], $data['key'], $data['isEnabled']);
+        abort(410, 'استُبدلت الصلاحيات اليدوية بصلاحيات تلقائية لكل فرع.');
+    }
 
-        return response()->json(status: 204);
+    public function save(): JsonResponse
+    {
+        abort(410, 'استُبدلت الصلاحيات اليدوية بصلاحيات تلقائية لكل فرع.');
+    }
+
+    public function update(): JsonResponse
+    {
+        abort(410, 'استُبدلت الصلاحيات اليدوية بصلاحيات تلقائية لكل فرع.');
     }
 }

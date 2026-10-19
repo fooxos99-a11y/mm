@@ -25,7 +25,7 @@ class AssessmentSnapshotRoundTripTest extends TestCase
         ]));
     }
 
-    public function test_dashboard_snapshot_exposes_flat_question_snapshots_and_hides_keys_without_permission(): void
+    public function test_dashboard_snapshot_exposes_historic_answer_keys_to_automatic_supervisors(): void
     {
         $this->seedAssessmentHistory();
 
@@ -56,8 +56,8 @@ class AssessmentSnapshotRoundTripTest extends TestCase
 
         $managerSnapshot = $this->getJson('/api/dashboard/snapshot')->assertOk();
 
-        $this->assertSame('', $managerSnapshot->json('submissions.0.answers.0.correctAnswer'));
-        $this->assertSame('', $managerSnapshot->json('finalExamSubmissions.0.answers.0.correctAnswer'));
+        $this->assertSame('Old A', $managerSnapshot->json('submissions.0.answers.0.correctAnswer'));
+        $this->assertSame('Historic correct', $managerSnapshot->json('finalExamSubmissions.0.answers.0.correctAnswer'));
         $this->assertSame('Historic course prompt', $managerSnapshot->json('submissions.0.answers.0.prompt'));
         $this->assertSame(6, $managerSnapshot->json('finalExamSubmissions.0.answers.0.points'));
     }

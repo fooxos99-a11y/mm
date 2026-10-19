@@ -18,7 +18,7 @@
       <p class="home-page-settings__confirm-text">
         سيتم حذف هذا المربع نهائيًا من الواجهة.
       </p>
-      <div class="home-page-settings__confirm-actions">
+      <AppActionBar class="home-page-settings__confirm-actions">
         <AppButton
           variant="secondary"
           :disabled="loading"
@@ -33,17 +33,17 @@
         >
           حذف
         </AppButton>
-      </div>
+      </AppActionBar>
     </div>
   </v-dialog>
 </template>
 
 <script>
-import { AppButton } from '../ui';
+import { AppActionBar, AppButton } from '../ui';
 
 export default {
   name: 'HomeSettingsDeleteDialog',
-  components: { AppButton },
+  components: { AppActionBar, AppButton },
   props: {
     value: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },

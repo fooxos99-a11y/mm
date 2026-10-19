@@ -1,7 +1,7 @@
 <template>
   <AppCard class="prep-card admin-workspace-card">
     <AssessmentCourseToolbar
-      :columns="managedBranchId ? 2 : 3"
+      :columns="3"
       :course-value="courseValue"
       :course-options="courseOptions"
       :course-placeholder="coursePlaceholder"

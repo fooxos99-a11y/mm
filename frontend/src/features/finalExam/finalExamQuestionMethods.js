@@ -196,7 +196,7 @@ export const finalExamQuestionMethods = {
       }
     },
     async handleSaveAllQuestions() {
-      if (this.isSaving) {
+      if (this.isSaving || !this.hasQuestionChanges) {
         return;
       }
 

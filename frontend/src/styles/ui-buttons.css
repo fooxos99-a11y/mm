@@ -166,7 +166,7 @@ button.assessment-secondary-button {
 .assessment-primary-button--danger:disabled {
   background: #8abdcf;
   border-color: rgba(27, 31, 35, 0.1);
-  color: #254c5a;
+  color: #fff;
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
@@ -394,6 +394,10 @@ button.assessment-secondary-button {
   cursor: not-allowed;
   box-shadow: none;
 }
+
+.app-button--primary:is(:disabled, [aria-disabled="true"]),
+.assessment-primary-button:disabled,
+.assessment-primary-button--danger:disabled { opacity: 1; }
 
 .app-choice-button--active:hover {
   background: var(--app-primary-dark);

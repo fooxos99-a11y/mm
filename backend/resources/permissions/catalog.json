@@ -1,0 +1,220 @@
+{
+  "roles": [
+    {
+      "value": "male_manager",
+      "label": "مشرف المعلمين"
+    },
+    {
+      "value": "female_manager",
+      "label": "مشرفة المعلمات"
+    }
+  ],
+  "groups": [
+    {
+      "label": "الرئيسية",
+      "permissions": [
+        {
+          "key": "page_overview",
+          "label": "عرض الرئيسية"
+        }
+      ]
+    },
+    {
+      "label": "الدورات",
+      "permissions": [
+        {
+          "key": "page_courses",
+          "label": "عرض الدورات"
+        },
+        {
+          "key": "edit_pre_questions",
+          "label": "تعديل أسئلة الاختبار القبلي",
+          "parent": "page_courses"
+        },
+        {
+          "key": "edit_post_questions",
+          "label": "تعديل أسئلة الاختبار البعدي",
+          "parent": "page_courses"
+        },
+        {
+          "key": "open_pre_exam",
+          "label": "فتح الاختبار القبلي",
+          "parent": "page_courses"
+        },
+        {
+          "key": "open_post_exam",
+          "label": "فتح الاختبار البعدي",
+          "parent": "page_courses"
+        }
+      ]
+    },
+    {
+      "label": "المهام الأدائية",
+      "permissions": [
+        {
+          "key": "page_tasks",
+          "label": "عرض المهام الأدائية"
+        },
+        {
+          "key": "edit_tasks",
+          "label": "إدارة المهام الأدائية",
+          "parent": "page_tasks"
+        }
+      ]
+    },
+    {
+      "label": "الاختبار النهائي",
+      "permissions": [
+        {
+          "key": "page_final_exam",
+          "label": "عرض الاختبار النهائي"
+        },
+        {
+          "key": "edit_final_questions",
+          "label": "تعديل أسئلة الاختبار النهائي",
+          "parent": "page_final_exam",
+          "inherit": "page_final_exam"
+        },
+        {
+          "key": "open_final_exam",
+          "label": "فتح الاختبار النهائي وإغلاقه",
+          "parent": "page_final_exam",
+          "inherit": "page_final_exam"
+        }
+      ]
+    },
+    {
+      "label": "استبيان الرضا",
+      "permissions": [
+        {
+          "key": "page_satisfaction",
+          "label": "عرض استبيان الرضا"
+        },
+        {
+          "key": "edit_satisfaction_questions",
+          "label": "إدارة أسئلة الاستبيان",
+          "parent": "page_satisfaction",
+          "inherit": "page_satisfaction"
+        }
+      ]
+    },
+    {
+      "label": "المستخدمون",
+      "permissions": [
+        {
+          "key": "page_users",
+          "label": "عرض المستخدمين"
+        },
+        {
+          "key": "add_student",
+          "label": "إضافة طالب",
+          "description": "تستخدم أيضًا لقبول طلبات التسجيل."
+        },
+        {
+          "key": "edit_student",
+          "label": "تعديل بيانات طالب",
+          "description": "تستخدم أيضًا لإدارة بيانات التسجيل."
+        },
+        {
+          "key": "delete_student",
+          "label": "حذف طالب"
+        }
+      ]
+    },
+    {
+      "label": "الإقراء",
+      "permissions": [
+        {
+          "key": "add_reciter",
+          "label": "إضافة مقرئ"
+        },
+        {
+          "key": "edit_reciter",
+          "label": "تعديل بيانات مقرئ"
+        },
+        {
+          "key": "delete_reciter",
+          "label": "حذف مقرئ"
+        },
+        {
+          "key": "transfer_reciter_student",
+          "label": "نقل الطالب المرتبط بمقرئ"
+        }
+      ]
+    },
+    {
+      "label": "الإشعارات",
+      "permissions": [
+        {
+          "key": "page_notifications",
+          "label": "عرض الإشعارات"
+        },
+        {
+          "key": "manage_notifications",
+          "label": "إرسال الإشعارات وحذفها",
+          "parent": "page_notifications",
+          "inherit": "page_notifications"
+        }
+      ]
+    },
+    {
+      "label": "المواد التدريبية",
+      "permissions": [
+        {
+          "key": "page_materials",
+          "label": "عرض المواد التدريبية"
+        },
+        {
+          "key": "manage_materials",
+          "label": "إضافة المواد وتعديلها وحذفها",
+          "parent": "page_materials",
+          "inherit": "page_materials"
+        }
+      ]
+    },
+    {
+      "label": "النتائج",
+      "permissions": [
+        {
+          "key": "page_results",
+          "label": "عرض النتائج وتقييم الإجابات",
+          "description": "يشمل التقييم اليدوي لإجابات الطلاب."
+        }
+      ]
+    },
+    {
+      "label": "متطلبات الاجتياز",
+      "permissions": [
+        {
+          "key": "page_completion_requirements",
+          "label": "عرض متطلبات الاجتياز"
+        },
+        {
+          "key": "edit_completion_requirements",
+          "label": "تعديل قيم المتطلبات",
+          "parent": "page_completion_requirements"
+        },
+        {
+          "key": "close_completion_results",
+          "label": "إغلاق النتائج وإعادة فتحها",
+          "parent": "page_completion_requirements"
+        }
+      ]
+    },
+    {
+      "label": "التسجيل والأرشيف",
+      "permissions": [
+        {
+          "key": "page_registration",
+          "label": "عرض التسجيل"
+        },
+        {
+          "key": "page_archive",
+          "label": "الأرشيف",
+          "description": "متاح لمسؤولي الإدارة فقط.",
+          "readOnly": true
+        }
+      ]
+    }
+  ]
+}

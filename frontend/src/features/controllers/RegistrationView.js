@@ -1,9 +1,4 @@
-import {
-  AppButton,
-  AppErrorState,
-  AppSelect,
-  AppTextField,
-} from '../../components/ui';
+import { AppActionBar, AppButton, AppErrorState, AppSelect, AppTextField } from '../../components/ui';
 import { normalizeFixedFieldLabels } from '../registration/registrationFieldLabels.mjs';
 import { fetchPublicRegistrationStatus, submitPublicRegistrationRequest } from '../../services/registrationApi';
 
@@ -18,6 +13,7 @@ const REGISTRATION_STATES = Object.freeze({
 export default {
   name: 'RegistrationView',
   components: {
+    AppActionBar,
     AppButton,
     AppErrorState,
     AppSelect,

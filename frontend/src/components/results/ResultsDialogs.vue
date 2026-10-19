@@ -204,7 +204,7 @@
         <p class="results-delete-dialog__text">
           ستُحذف الأسئلة والإجابات والنتائج والمرفقات المرتبطة نهائيًا. لا يمكن التراجع.
         </p>
-        <div class="results-delete-dialog__actions">
+        <AppActionBar class="results-delete-dialog__actions">
           <AppButton
             variant="secondary"
             @click="$emit('close-delete')"
@@ -218,7 +218,7 @@
           >
             {{ deleting ? 'جارٍ الحذف...' : 'حذف' }}
           </AppButton>
-        </div>
+        </AppActionBar>
       </div>
     </AppDialog>
   </div>
@@ -226,12 +226,12 @@
 
 <script>
 import RichTextDocumentView from '../RichTextDocumentView.vue';
-import { AppButton, AppDialog, AppDialogBody, AppDialogHeader } from '../ui';
+import { AppActionBar, AppButton, AppDialog, AppDialogBody, AppDialogHeader } from '../ui';
 import AttachmentContent from '../tasks/AttachmentContent.vue';
 
 export default {
   name: 'ResultsDialogs',
-  components: { AppButton, AppDialog, AppDialogBody, AppDialogHeader, RichTextDocumentView, AttachmentContent },
+  components: { AppActionBar, AppButton, AppDialog, AppDialogBody, AppDialogHeader, RichTextDocumentView, AttachmentContent },
   props: {
     resultOpen: Boolean,
     deleteOpen: Boolean,

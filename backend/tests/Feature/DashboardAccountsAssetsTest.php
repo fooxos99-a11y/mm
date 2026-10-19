@@ -48,7 +48,7 @@ class DashboardAccountsAssetsTest extends CoreDataApiTestCase
             ->assertJsonMissing(['loginCode' => '5001']);
     }
 
-    public function test_dashboard_accounts_accept_short_credentials_without_forcing_a_change(): void
+    public function test_dashboard_accounts_keep_short_login_codes_but_require_eight_character_passwords(): void
     {
         $this->postJson('/api/dashboard/accounts', [
             'name' => 'Admin1',
@@ -64,6 +64,10 @@ class DashboardAccountsAssetsTest extends CoreDataApiTestCase
             'loginCode' => 'a',
             'role' => 'male_manager',
             'password' => '1',
+        ])->assertUnprocessable()->assertJsonValidationErrors(['password']);
+
+        $this->postJson('/api/dashboard/accounts', [
+            'name' => 'Admin1', 'loginCode' => 'a', 'role' => 'male_manager', 'password' => '12345678',
         ])->assertCreated();
 
         $this->assertDatabaseHas('users', [

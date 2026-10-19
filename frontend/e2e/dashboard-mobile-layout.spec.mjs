@@ -14,7 +14,7 @@ const api = async (page, context, method, route, data) => {
   return response.status() === 204 ? null : response.json();
 };
 
-test('overview keeps three compact indicators per mobile row and a usable narrow sidebar', async ({ page }, info) => {
+test('overview matches Nukhba indicator sizing and keeps a usable narrow sidebar', async ({ page }, info) => {
   await login(page);
   const cards = page.locator('.dashboard-indicator-card');
   await expect(cards).toHaveCount(6);
@@ -25,8 +25,9 @@ test('overview keeps three compact indicators per mobile row and a usable narrow
     const boxes = await cards.evaluateAll(items => items.map(item => {
       const rect = item.getBoundingClientRect(); return { x: rect.x, y: Math.round(rect.y), width: rect.width };
     }));
-    expect(new Set(boxes.slice(0, 3).map(box => box.y)).size).toBe(1);
-    expect(boxes[3].y).toBeGreaterThan(boxes[0].y);
+    const columns = page.viewportSize().width < 768 ? 2 : 3;
+    expect(new Set(boxes.slice(0, columns).map(box => box.y)).size).toBe(1);
+    expect(boxes[columns].y).toBeGreaterThan(boxes[0].y);
     const label = cards.first().locator('.dashboard-indicator-card__label');
     expect(await label.evaluate(element => element.scrollWidth - element.clientWidth)).toBeLessThanOrEqual(1);
   }

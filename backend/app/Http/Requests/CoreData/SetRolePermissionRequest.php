@@ -3,6 +3,8 @@
 namespace App\Http\Requests\CoreData;
 
 use App\Http\Requests\DashboardFormRequest;
+use App\Support\Security\PermissionCatalog;
+use Illuminate\Validation\Rule;
 
 class SetRolePermissionRequest extends DashboardFormRequest
 {
@@ -10,7 +12,7 @@ class SetRolePermissionRequest extends DashboardFormRequest
     {
         return [
             'role' => ['required', 'string', 'in:male_manager,female_manager'],
-            'key' => ['required', 'string', 'max:100'],
+            'key' => ['required', 'string', Rule::in(array_keys(PermissionCatalog::entries()))],
             'isEnabled' => ['required', 'boolean'],
         ];
     }

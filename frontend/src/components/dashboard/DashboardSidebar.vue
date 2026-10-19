@@ -1,7 +1,7 @@
 <template>
   <AppMobileSidebar
     :open="open"
-    label="قائمة لوحة التحكم"
+    :label="label"
     @close="$emit('close')"
   >
     <router-link
@@ -14,10 +14,13 @@
         class="dashboard-sidebar__logo"
       >
       <div class="dashboard-sidebar__title">
-        لوحة التحكم
+        {{ title }}
       </div>
     </router-link>
-    <nav class="dashboard-nav">
+    <nav
+      class="dashboard-nav"
+      :aria-label="navigationLabel"
+    >
       <template
         v-for="item in items"
         :key="item.id"
@@ -34,6 +37,7 @@
             class="dashboard-nav__item"
             :class="{ 'dashboard-nav__item--active': isActive(item) }"
             :disabled="loading"
+            :aria-current="isActive(item) ? 'page' : undefined"
             @click="$emit('select', item)"
           >
             <span class="dashboard-nav__copy">
@@ -95,6 +99,9 @@ export default {
     selectedSetting: { type: String, default: '' },
     activeMenu: { type: String, default: '' },
     isActive: { type: Function, required: true },
+    title: { type: String, default: 'لوحة التحكم' },
+    label: { type: String, default: 'قائمة لوحة التحكم' },
+    navigationLabel: { type: String, default: 'أقسام لوحة التحكم' },
   },
   emits: ['close', 'select', 'select-setting'],
 };

@@ -1,3 +1,5 @@
+import { emptyArchiveCounts } from './archiveCounts.mjs';
+
 export default {
   openCreateDialog() {
     this.createDialog = true;
@@ -24,7 +26,8 @@ export default {
   closeCreateDialog() {
     this.createDialog = false;
     this.newArchiveName = '';
-    this.newArchiveCoursesCount = 0;
+    this.newArchiveCounts = emptyArchiveCounts();
+    this.createArchiveErrors = {};
     this.newArchiveBatchType = 'all';
   },
   closeArchiveAllDialog() {
@@ -37,7 +40,7 @@ export default {
     this.manualStudentName = '';
   },
   deleteArchive(archive) {
-    if (!archive || this.deletingArchiveId) return;
+    if (archive?.can_manage !== true || this.deletingArchiveId) return;
 
     this.pendingDeleteArchive = archive;
     this.deleteArchiveDialog = true;
@@ -47,5 +50,22 @@ export default {
 
     this.deleteArchiveDialog = false;
     this.pendingDeleteArchive = null;
+  },
+  updateArchiveName(value) {
+    this.newArchiveName = value;
+    this.clearCreateArchiveError('name');
+  },
+  updateArchiveCount(key, value) {
+    this.newArchiveCounts = { ...this.newArchiveCounts, [key]: value };
+    this.clearCreateArchiveError(key);
+  },
+  updateArchiveBatchType(value) {
+    this.newArchiveBatchType = value;
+    this.clearCreateArchiveError('batch_type');
+  },
+  clearCreateArchiveError(key) {
+    const errors = { ...this.createArchiveErrors };
+    delete errors[key];
+    this.createArchiveErrors = errors;
   },
 };

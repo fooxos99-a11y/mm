@@ -1,5 +1,11 @@
 <template>
   <div class="prep-layout communications-page__prep-shell">
+    <p
+      v-if="readOnly"
+      role="status"
+    >
+      لديك صلاحية العرض فقط. إرسال الإشعارات يحتاج صلاحية الإدارة.
+    </p>
     <AppCard
       tag="section"
       class="prep-card communications-page__prep-card admin-workspace-card"
@@ -11,6 +17,7 @@
         >
           <AppTextField
             id="notification-prep-message"
+            :disabled="readOnly || submitting"
             :value="message"
             dense
             outlined
@@ -27,6 +34,7 @@
         >
           <AppSelect
             id="notification-prep-branch"
+            :disabled="readOnly || submitting"
             :value="branchId"
             aria-label="الفرع"
             :items="branchOptions"
@@ -49,7 +57,7 @@
             'attendance-toggle--active': allSelected,
             'attendance-toggle--partial': selectedCount > 0 && !allSelected,
           }"
-          :disabled="!students.length || submitting"
+          :disabled="readOnly || !students.length || submitting"
           :aria-pressed="selectedCount > 0 && !allSelected ? 'mixed' : allSelected"
           :aria-label="allSelected ? 'إلغاء تحديد الكل' : 'تحديد الكل'"
           :title="allSelected ? 'إلغاء تحديد الكل' : 'تحديد الكل'"
@@ -91,7 +99,7 @@
                   type="button"
                   class="attendance-toggle"
                   :class="{ 'attendance-toggle--active': selectedIds.includes(student.value) }"
-                  :disabled="submitting"
+                  :disabled="readOnly || submitting"
                   :aria-pressed="selectedIds.includes(student.value)"
                   :aria-label="selectedIds.includes(student.value) ? `إلغاء تحديد ${student.label}` : `تحديد ${student.label}`"
                   @click.prevent="$emit('toggle-student', student.value)"
@@ -107,28 +115,28 @@
         </table>
       </div>
 
-      <div class="communications-page__prep-actions">
+      <AppActionBar class="communications-page__prep-actions">
         <AppButton
           variant="primary"
           :loading="submitting"
+          :disabled="readOnly || submitting || !message.trim()"
           @click="$emit('submit')"
         >
           {{ submitting ? 'جارٍ الإرسال...' : 'إرسال' }}
         </AppButton>
-      </div>
+      </AppActionBar>
     </AppCard>
   </div>
 </template>
 
 <script>
-import {
-  AppButton, AppCard, AppFilterField, AppFilterToolbar, AppRawButton, AppSelect, AppTextField,
-} from '../ui';
+import { AppActionBar, AppButton, AppCard, AppFilterField, AppFilterToolbar, AppRawButton, AppSelect, AppTextField } from '../ui';
 
 export default {
   name: 'NotificationPrepPanel',
-  components: { AppButton, AppCard, AppFilterField, AppFilterToolbar, AppRawButton, AppSelect, AppTextField },
+  components: { AppActionBar, AppButton, AppCard, AppFilterField, AppFilterToolbar, AppRawButton, AppSelect, AppTextField },
   props: {
+    readOnly: Boolean,
     allSelected: { type: Boolean, default: false },
     branchId: { type: String, default: null },
     branchOptions: { type: Array, default: () => [] },

@@ -131,7 +131,7 @@ test('admin critical data workflows persist through the browser API session', as
     assessment: 201,
     finalQuestion: 201,
     finalSetting: 204,
-    permission: 204,
+    permission: 410,
     removedBackup: 404,
     removedActivityLog: 404,
     snapshot: 200,

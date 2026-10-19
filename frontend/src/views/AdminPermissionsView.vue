@@ -3,64 +3,100 @@
     class="permissions-admin"
     :class="{ 'permissions-admin--embedded': embedded }"
   >
-    <v-container
-      class="permissions-admin__container"
-      :class="{ 'py-8 py-md-10': !embedded }"
+    <AppCard
+      tag="article"
+      class="permissions-admin__card admin-workspace-card"
     >
-      <div
-        v-if="dashboardError"
-        class="permissions-admin__alert permissions-admin__alert--error"
-      >
-        {{ dashboardError }}
-      </div>
-
-      <section class="permissions-admin__panel">
-        <AppCard
-          tag="article"
-          class="permissions-admin__card admin-workspace-card"
-        >
-          <div
-            v-if="currentUser && currentUser.role === 'admin'"
-            class="permissions-admin__section-switcher"
+      <header class="permissions-admin__header">
+        <h1>الإشراف</h1>
+        <AppActionBar v-if="activeSection === 'supervision'">
+          <AppButton
+            variant="primary"
+            :disabled="accountsBusy"
+            @click="$refs.accounts.openCreateDialog()"
           >
-            <AppButton
-              variant="plain"
-              class="permissions-admin__section-chip"
-              :class="{ 'permissions-admin__section-chip--active': activeSection === 'permissions' }"
-              @click="activeSection = 'permissions'"
-            >
-              الصلاحيات
-            </AppButton>
-            <AppButton
-              variant="plain"
-              class="permissions-admin__section-chip"
-              :class="{ 'permissions-admin__section-chip--active': activeSection === 'supervision' }"
-              @click="activeSection = 'supervision'"
-            >
-              الإشراف
-            </AppButton>
-          </div>
-
-          <PermissionsMatrixPanel
-            v-if="activeSection === 'permissions'"
-            :role="selectedRole"
-            :roles="roleCards"
-            :groups="permissionGroups"
-            :saving-key="savingKey"
-            :is-enabled="isPermissionEnabled"
-            @update:role="selectedRole = $event"
-            @change="updatePermission"
+            إضافة
+          </AppButton>
+        </AppActionBar>
+      </header>
+      <AppFilterToolbar
+        :columns="2"
+        class="permissions-admin__toolbar"
+      >
+        <AppFilterField
+          for-id="permissions-section"
+          label="القسم"
+        >
+          <AppSelect
+            id="permissions-section"
+            :value="activeSection"
+            :items="sectionOptions"
+            item-text="label"
+            item-value="value"
+            :disabled="accountsBusy"
+            hide-details
+            @input="setSection"
           />
-          <AdminSupervisionView
-            v-else
-            embedded
+        </AppFilterField>
+        <AppFilterField
+          for-id="permissions-manager-role"
+          label="نوع المسؤول"
+        >
+          <AppSelect
+            id="permissions-manager-role"
+            :value="accountRole"
+            :items="roleOptions"
+            item-text="label"
+            item-value="value"
+            :disabled="accountsBusy || activeSection === 'history'"
+            hide-details
+            @input="setRole"
           />
-        </AppCard>
-      </section>
-    </v-container>
+        </AppFilterField>
+      </AppFilterToolbar>
+      <DashboardAccountsPanel
+        v-show="activeSection === 'supervision'"
+        ref="accounts"
+        embedded
+        external-filters
+        :active="activeSection === 'supervision'"
+        :role-filter="accountRole"
+        @busy-change="accountsBusy = $event"
+        @dirty-change="accountsDirty = $event"
+        @changed="loadHistory"
+      />
+      <AccessHistoryPanel
+        v-if="activeSection === 'history'"
+        :items="history"
+        :loading="historyLoading"
+        :error="historyError"
+        @reload="loadHistory"
+      />
+    </AppCard>
+    <AppDialog
+      v-model="leaveDialog"
+      :persistent="true"
+      max-width="480"
+    >
+      <DialogShell title="تعديلات غير محفوظة">
+        <p>ستفقد التعديلات التي لم تحفظها إذا غادرت الصفحة.</p>
+        <template #actions>
+          <AppButton
+            variant="secondary"
+            @click="continueEditing"
+          >
+            متابعة التعديل
+          </AppButton>
+          <AppButton
+            variant="danger"
+            @click="discardAndLeave"
+          >
+            مغادرة دون حفظ
+          </AppButton>
+        </template>
+      </DialogShell>
+    </AppDialog>
   </div>
 </template>
-
 <script src="../features/permissions/adminPermissionsView.js"></script>
-
 <style src="../styles/views/admin-permissions.css"></style>

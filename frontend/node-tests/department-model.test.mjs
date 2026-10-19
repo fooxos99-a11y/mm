@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { createDepartmentForm, departmentFormIsValid, isSystemAdministrator } from '../src/features/departments/departmentModel.mjs';
+import { createDepartmentForm, departmentFormHasChanges, departmentFormIsValid, isSystemAdministrator, managementSectionQuery, resolveManagementSection } from '../src/features/departments/departmentModel.mjs';
 import { publicDepartmentParams, setAuthenticatedDepartment } from '../src/services/departmentContext.js';
 import { resolveUserHomeLabel, resolveUserHomeRoute } from '../src/utils/authRoutes.js';
 
@@ -50,4 +50,27 @@ test('public requests use explicit or authenticated department without persisten
   assert.deepEqual(publicDepartmentParams(), { departmentId: 'selected' });
   setAuthenticatedDepartment(null);
   delete globalThis.window;
+});
+
+test('save requires an actual department or responsible account change, and reverting disables it', () => {
+  const original = createDepartmentForm({ name: 'إدارة التدريب', managerTitle: 'المدير', manager: { loginCode: '1483' } });
+  assert.equal(departmentFormHasChanges(original, original), false);
+  assert.equal(departmentFormHasChanges({ ...original, name: ' إدارة التدريب ' }, original), false);
+  for (const [key, value] of Object.entries({ name: 'إدارة أخرى', managerTitle: 'المسؤول', managerLoginCode: '1484', isActive: false })) {
+    assert.equal(departmentFormHasChanges({ ...original, [key]: value }, original), true, key);
+  }
+  assert.equal(departmentFormHasChanges({ ...original, managerPassword: 'temporary' }, original), false);
+  assert.equal(departmentFormHasChanges(original, null), false);
+  assert.equal(departmentFormHasChanges(createDepartmentForm(), createDepartmentForm()), false);
+  assert.equal(departmentFormHasChanges(original, createDepartmentForm()), true);
+});
+
+test('management navigation retains the section and clears filters outside their scope', () => {
+  for (const section of ['overview', 'departments', 'indicators', 'archives']) assert.equal(resolveManagementSection(section), section);
+  for (const section of [undefined, null, 'unknown', ['archives'], '__proto__']) assert.equal(resolveManagementSection(section), 'overview');
+  const query = { section: 'indicators', departmentId: 'd1', keep: 'yes' };
+  assert.deepEqual(managementSectionQuery(query, 'archives'), { section: 'archives', keep: 'yes' });
+  assert.deepEqual(managementSectionQuery(query, 'indicators'), query);
+  assert.equal(query.departmentId, 'd1');
+  assert.deepEqual(managementSectionQuery({}, 'unknown'), { section: 'overview' });
 });

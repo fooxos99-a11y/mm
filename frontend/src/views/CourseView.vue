@@ -242,7 +242,7 @@
               {{ satisfactionError }}
             </div>
 
-            <div
+            <AppActionBar
               v-if="canSubmitFlow && (questions.length || hasPendingPostSatisfaction)"
               class="assessment-submit-row"
             >
@@ -255,7 +255,7 @@
               >
                 إرسال
               </AppButton>
-            </div>
+            </AppActionBar>
 
             <div
               v-if="resolvedAssessmentType === 'post' && student && satisfactionQuestions.length && alreadySubmittedSatisfaction && (isAssessmentEnabled || existingSubmission)"

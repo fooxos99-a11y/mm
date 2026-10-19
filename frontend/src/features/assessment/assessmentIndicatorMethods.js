@@ -190,7 +190,8 @@ export default {
       return !Number.isFinite(opensAt) || opensAt <= this.currentTimestamp;
     },
     isAssessmentBranchActive(course, type, branchId) {
-      if (!course || !branchId) {
+      if (!course || !branchId || course.isActive === false
+        || (this.managedBranchId && this.managedBranchId !== branchId)) {
         return false;
       }
 

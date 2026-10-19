@@ -38,14 +38,16 @@ test('archive view delegates records details and operation dialogs', async () =>
 });
 
 test('people and archive controls keep touch-friendly targets', async () => {
-  const [peopleStyles, archiveStyles, archivePanel] = await Promise.all([
+  const [peopleStyles, archiveStyles, archivePanel, buttonStyles] = await Promise.all([
     source('../src/styles/views/admin-people.css'),
     source('../src/styles/views/admin-archive.css'),
     source('../src/components/archive/ArchiveRecordsPanel.vue'),
+    source('../src/styles/ui-buttons.css'),
   ]);
 
   assert.match(peopleStyles, /\.people-card__icon-button[\s\S]*?width: 44px;[\s\S]*?height: 44px;/);
-  assert.match(archiveStyles, /\.admin-archive-view__select-option-delete[\s\S]*?min-height: 48px;/);
-  assert.match(archivePanel, /v-if="selectedArchive"[\s\S]*?حذف الأرشيف نهائيًا/);
+  assert.match(archivePanel, /class="admin-archive-view__footer"[\s\S]*?<AppButton[\s\S]*?variant="danger"/);
+  assert.match(buttonStyles, /--app-button-min-height: var\(--app-control-height\)/);
+  assert.match(buttonStyles, /min-height: var\(--app-button-min-height\)/);
   assert.match(archiveStyles, /\.admin-archive-view__search-input[\s\S]*?min-height: 48px;/);
 });

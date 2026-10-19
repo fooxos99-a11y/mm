@@ -1,4 +1,5 @@
 export { default as AppButton } from './AppButton.vue';
+export { default as AppActionBar } from './AppActionBar.vue';
 export { default as AppChoiceButton } from './AppChoiceButton.vue';
 export { default as AppDialog } from './AppDialog.vue';
 export { default as AppDialogBody } from './AppDialogBody.vue';
@@ -7,6 +8,7 @@ export { default as AppDialogHeader } from './AppDialogHeader.vue';
 export { default as DialogShell } from './DialogShell.vue';
 export { default as AppIconButton } from './AppIconButton.vue';
 export { default as AppIndicatorRing } from './AppIndicatorRing.vue';
+export { default as AppIndicatorCard } from './AppIndicatorCard.vue';
 export { default as AppNativeSelect } from './AppNativeSelect.vue';
 export { default as AppSelect } from './AppSelect.vue';
 export { default as AppCard } from './AppCard.vue';

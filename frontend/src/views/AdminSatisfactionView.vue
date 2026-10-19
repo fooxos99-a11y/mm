@@ -58,6 +58,7 @@
                 class="satisfaction-admin__metric-card assessment-score-indicator"
               >
                 <AppIconButton
+                  v-if="canEditQuestions"
                   variant="plain"
                   :label="`حذف سؤال ${indicatorCard.prompt}`"
                   class="satisfaction-admin__delete-indicator"

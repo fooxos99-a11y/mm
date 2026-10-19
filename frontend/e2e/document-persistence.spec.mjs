@@ -128,10 +128,15 @@ test('document toolbar exposes Arabic names for formatting and font choices', as
   await page.locator('.assessment-select:visible').first().locator('.v-field').click();
   await selectOption(page, 'أدوات محرر وورد', { exact: true });
   await expect(page.locator('.ql-editor')).toBeVisible();
+  await expect(page.locator('.rich-text-editor__font-select .v-field')).toHaveCSS('height', '48px');
   expect((await new AxeBuilder({ page }).include('.rich-text-editor').analyze()).violations).toEqual([]);
   const toolbar = page.locator('.rich-text-editor__toolbar');
-  await toolbar.getByRole('button', { name: 'اختيار الخط', exact: true }).click();
-  await expect(toolbar.getByRole('button', { name: 'العربي التقليدي', exact: true })).toBeVisible();
-  await toolbar.getByRole('button', { name: 'العربي التقليدي', exact: true }).click();
+  const editor = page.locator('.ql-editor');
+  await editor.fill('نص لتجربة تغيير الخط');
+  await editor.press('ControlOrMeta+A');
+  await toolbar.locator('.rich-text-editor__font-select .v-field').click();
+  await expect(page.getByRole('option', { name: 'العربي التقليدي', exact: true })).toBeVisible();
+  await selectOption(page, 'العربي التقليدي', { exact: true });
+  await expect(editor.locator('.ql-font-traditional-arabic')).toHaveText('نص لتجربة تغيير الخط');
   expect((await new AxeBuilder({ page }).include('.rich-text-editor').analyze()).violations).toEqual([]);
 });

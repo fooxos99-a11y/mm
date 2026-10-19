@@ -1,58 +1,30 @@
-.system-management { min-height: 100dvh; background: #f3f7fa; color: #153b4e; }
-.system-management :deep(.dashboard-sidebar) { position: fixed; inset-block: 0; inset-inline-start: 0; z-index: 40; display: flex; flex-direction: column; width: 248px; padding: 30px 18px 22px; background: #0c3547; color: #fff; border: 0; }
-.system-management__brand { display: flex; align-items: center; gap: 12px; padding: 0 10px 32px; color: #fff; text-decoration: none; font-size: 1.55rem; font-weight: 800; }
-.system-management__brand small { display: block; margin-top: 3px; color: #bad5e0; font-size: .8rem; font-weight: 500; }
-.system-management__brand-mark { display: grid; place-items: center; width: 44px; height: 44px; background: #ffffff14; border: 1px solid #ffffff1c; border-radius: 13px; }
-.system-management__navigation { display: grid; gap: 8px; }
-.system-management__navigation :deep(.app-button) { justify-content: flex-start; min-height: 48px; padding: 12px 14px; border-radius: 10px; color: #cadce4; }
-.system-management__navigation :deep(.app-button__content) { display: flex; gap: 12px; align-items: center; }
-.system-management__navigation :deep(.app-button:hover), .system-management__navigation :deep(.is-active) { color: #fff; background: #ffffff14; }
-.system-management__navigation :deep(.is-active) { box-shadow: inset -3px 0 #62cfda; }
-.system-management__sidebar-account { display: flex; gap: 10px; align-items: center; margin-top: auto; padding: 20px 8px 0; border-top: 1px solid #ffffff1c; overflow-wrap: anywhere; }
-.system-management__sidebar-account strong { font-size: .85rem; }
-.system-management__sidebar-account small { display: block; margin-top: 4px; color: #bad5e0; font-size: .75rem; }
-.system-management__avatar { display: grid; place-items: center; flex: 0 0 38px; height: 38px; border-radius: 50%; background: #1c566b; font-weight: 800; }
-.system-management__main { display: grid; gap: 24px; max-width: 1720px; margin-inline-start: 248px; padding: 32px; min-width: 0; }
-.system-management__header, .system-management__actions { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
-.system-management__header { padding-block-end: 8px; }
-.system-management__header > div:first-of-type { margin-inline-end: auto; }
-.system-management__header h1 { margin: 4px 0 0; font-size: clamp(1.45rem, 2.3vw, 1.9rem); font-weight: 800; letter-spacing: -.04em; }
-.system-management__eyebrow { margin: 0; font-size: .8rem; color: #536b7b; }
-.system-management__menu-toggle { display: none; }
-.system-management__totals { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; }
-.system-management__summary-card { position: relative; min-width: 0; overflow: hidden; }
-.system-management__summary-card :deep(.app-card__body) { padding: 20px; }
-.system-management__summary-card span:first-child { font-size: .8rem; color: #536b7b; }
-.system-management__number { display: block; font-size: 2rem; line-height: 1.2; margin-block-start: 16px; color: #133c50; font-weight: 800; }
-.system-management__summary-icon { position: absolute; inset-inline-end: 15px; inset-block-end: 17px; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 10px; background: #edf5f8; color: #287a94; }
-.system-management__status { display: inline-flex; align-items: center; gap: 7px; padding: 4px 10px; border-radius: 20px; background: #edf8f2; color: #25734a; font-size: .8rem; }
+.system-management__workspace { display: grid; gap: var(--app-space-6); min-width: 0; }
+.system-management__workspace .dashboard-section { margin: 0; }
+.system-management__card-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: var(--app-space-6); padding-bottom: var(--app-space-4); border-bottom: 1px solid var(--app-border); }
+.system-management__card-heading h2 { margin: 0; color: var(--app-ui-text); font-size: var(--app-font-sm); font-weight: var(--app-weight-label); line-height: 1.5; }
+.system-management__totals { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 0; gap: 24px 16px; }
+.system-management__total { min-width: 0; text-align: center; }
+.system-management__total:last-child { grid-column: 1 / -1; }
+.system-management__total dt { color: var(--app-text-muted); font-size: var(--app-font-sm); }
+.system-management__total dd { margin: 8px 0 0; color: var(--app-primary-dark); font-size: 1.5rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.system-management__status { display: inline-flex; align-items: center; gap: 7px; padding: 4px 10px; border-radius: 20px; background: var(--app-success-soft); color: var(--app-success); font-size: var(--app-font-sm); white-space: nowrap; }
 .system-management__status::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-.system-management__status.is-paused { color: #8c6340; background: #fff6e8; }
+.system-management__status.is-paused { color: var(--app-text-muted); background: var(--app-primary-soft); }
 .system-management__manager { min-width: 0; overflow-wrap: anywhere; }
-.system-management__meta { display: block; margin-block-start: 5px; color: #536b7b; font-size: .75rem; }
-.system-management__indicators { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-block-start: 22px; }
-.system-management__indicator { display: flex; align-items: center; gap: 12px; min-width: 0; padding: 14px; background: #f7fafc; border: 1px solid #e7eff3; border-radius: 12px; }
-.system-management__indicator .dashboard-indicator-ring { width: 86px; flex: 0 0 86px; filter: none; }
-.system-management__indicator :deep(.dashboard-indicator-ring__inner) { font-size: 1.4rem; letter-spacing: -.04em; background: #fff; }
-.system-management__indicator strong { display: block; font-size: .85rem; line-height: 1.6; }
-.system-management__indicator small { display: block; margin-top: 5px; color: #536b7b; font-size: .72rem; }
-.system-management__form { display: grid; gap: 16px; }
+.system-management__meta { display: block; margin-top: 4px; color: var(--app-text-muted); font-size: var(--app-font-sm); }
+.system-management__row-actions { max-width: 248px; margin-inline-start: auto; }
+.system-management__indicator-filter { width: min(260px, 55%); flex-shrink: 0; }
+.system-management__form { display: grid; gap: var(--app-space-6); }
+.system-management__form-group { display: grid; gap: var(--app-space-4); min-width: 0; margin: 0; padding: 0; border: 0; }
+.system-management__form-group legend { margin-bottom: var(--app-space-4); color: var(--app-primary-dark); font-size: var(--app-font-sm); font-weight: var(--app-weight-label); }
 .system-management__error { margin: 0; color: var(--app-danger); }
-@media (max-width: 1250px) { .system-management__indicators { grid-template-columns: repeat(2, minmax(0, 1fr)); } .system-management__totals { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-@media (max-width: 1024px) {
-  .system-management__main { margin-inline-start: 0; padding: 24px; }
-  .system-management__menu-toggle { display: inline-flex; }
-  .system-management :deep(.dashboard-sidebar--mobile) { inset: var(--overlay-top, 0) 0 auto auto; margin: 0; width: min(280px, calc(100vw - 56px)); max-width: none; height: var(--overlay-height, 100dvh); max-height: none; overflow-y: auto; padding: 20px 16px max(24px, env(safe-area-inset-bottom)); }
-  .system-management :deep(.dashboard-sidebar--mobile:not([open])) { display: none; }
-}
+@media (min-width: 768px) { .system-management__totals { grid-template-columns: repeat(5, minmax(0, 1fr)); } .system-management__total:last-child { grid-column: auto; } }
 @media (max-width: 600px) {
-  .system-management__main { padding: 16px; gap: 18px; }
-  .system-management__header { gap: 12px; }
-  .system-management__header .system-management__actions { width: 100%; }
-  .system-management__header .system-management__actions > * { flex: 1; }
-  .system-management__totals { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-  .system-management__summary-card :deep(.app-card__body) { padding: 16px; }
-  .system-management__summary-icon { width: 26px; height: 26px; inset-inline-end: 10px; }
-  .system-management__number { font-size: 1.8rem; }
-  .system-management__indicators { grid-template-columns: minmax(0, 1fr); }
+  .system-management__workspace :deep(.app-table td) { align-items: center; }
+  .system-management__workspace :deep(.app-table td::before) { flex: 0 0 25%; }
+  .system-management__workspace :deep(td[data-label="الإجراءات"]) { display: block; }
+  .system-management__workspace :deep(td[data-label="الإجراءات"]::before) { display: none; }
+  .system-management__manager { flex: 1; }
+  .system-management__row-actions { width: 100%; max-width: none; }
+  .system-management__card-heading { flex-wrap: wrap; }
 }

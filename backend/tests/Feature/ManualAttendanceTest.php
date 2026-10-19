@@ -114,12 +114,13 @@ class ManualAttendanceTest extends TestCase
         $this->assertDatabaseCount('course_attendance', 2);
     }
 
-    public function test_manager_without_results_permission_cannot_clear_attendance(): void
+    public function test_legacy_disabled_flag_does_not_prevent_clearing_only_own_attendance(): void
     {
         $this->actAs('male_manager', false);
         $this->postJson('/api/dashboard/manual-attendance', ['courseId' => $this->courseId, 'presentStudents' => []])
-            ->assertForbidden();
-        $this->assertDatabaseCount('course_attendance', 2);
+            ->assertNoContent();
+        $this->assertDatabaseCount('course_attendance', 1);
+        $this->assertDatabaseHas('course_attendance', ['login_code' => $this->students['female']->login_code]);
     }
 
     private function actAs(string $role, bool $permitted = true): void

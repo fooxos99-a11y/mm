@@ -1,8 +1,8 @@
-import { passwordMeetsPolicy } from '../../utils/passwordPolicy.mjs';
+import { accountEditorErrors } from './accountEditorModel.mjs';
 
 export const DASHBOARD_ACCOUNT_ROLE_OPTIONS = Object.freeze([
-  { label: 'مشرف معلمين', value: 'male_manager' },
-  { label: 'مشرف معلمات', value: 'female_manager' },
+  { label: 'مشرف المعلمين', value: 'male_manager' },
+  { label: 'مشرفة المعلمات', value: 'female_manager' },
   { label: 'مسؤول الإدارة', value: 'admin' },
 ]);
 
@@ -17,11 +17,6 @@ export const createEmptyDashboardAccountForm = () => ({
   password: '',
 });
 
-export const dashboardAccountFormIsValid = (form = {}) => (
-  String(form.name || '').trim().length >= 6
-  && Boolean(String(form.loginCode || '').trim())
-  && passwordMeetsPolicy(form.password)
-  && DASHBOARD_ACCOUNT_ROLE_OPTIONS.some(({ value }) => value === form.role)
-);
+export const dashboardAccountFormIsValid = (form = {}) => Object.keys(accountEditorErrors(form)).length === 0;
 
 export const resolveDashboardAccountRoleLabel = (role) => ROLE_LABELS[role] || role;

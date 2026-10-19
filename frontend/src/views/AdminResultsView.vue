@@ -119,7 +119,7 @@
             />
           </AppFilterField>
         </AppFilterToolbar>
-        <div
+        <AppActionBar
           v-if="canEnterGrades"
           class="results-shell__actions"
         >
@@ -129,7 +129,7 @@
           >
             إدخال الدرجات
           </AppButton>
-        </div>
+        </AppActionBar>
       </AppCard>
 
       <AppCard class="results-list-shell admin-workspace-card">

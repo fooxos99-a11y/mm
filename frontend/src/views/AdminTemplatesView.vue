@@ -24,12 +24,12 @@
             class="admin-templates__label"
             for="admin-templates-pre"
           >قالب القبلي</label>
-          <v-textarea
+          <AppInput
             id="admin-templates-pre"
             v-model="templateDraft.pre"
             rows="4"
-            outlined
-            hide-details
+            multiline
+            auto-resize
             class="admin-templates__input admin-templates__input--textarea"
           />
         </div>
@@ -39,12 +39,12 @@
             class="admin-templates__label"
             for="admin-templates-post"
           >قالب البعدي</label>
-          <v-textarea
+          <AppInput
             id="admin-templates-post"
             v-model="templateDraft.post"
             rows="4"
-            outlined
-            hide-details
+            multiline
+            auto-resize
             class="admin-templates__input admin-templates__input--textarea"
           />
         </div>
@@ -54,12 +54,12 @@
             class="admin-templates__label"
             for="admin-templates-tasks"
           >قالب المهام</label>
-          <v-textarea
+          <AppInput
             id="admin-templates-tasks"
             v-model="templateDraft.tasks"
             rows="4"
-            outlined
-            hide-details
+            multiline
+            auto-resize
             class="admin-templates__input admin-templates__input--textarea"
           />
         </div>
@@ -69,18 +69,18 @@
             class="admin-templates__label"
             for="admin-templates-final-exam"
           >قالب الاختبار النهائي</label>
-          <v-textarea
+          <AppInput
             id="admin-templates-final-exam"
             v-model="templateDraft.finalExam"
             rows="4"
-            outlined
-            hide-details
+            multiline
+            auto-resize
             class="admin-templates__input admin-templates__input--textarea"
           />
         </div>
       </div>
 
-      <div class="admin-templates__actions">
+      <AppActionBar class="admin-templates__actions">
         <AppButton
           variant="primary"
           :loading="submitting"
@@ -89,19 +89,21 @@
         >
           حفظ
         </AppButton>
-      </div>
+      </AppActionBar>
     </section>
   </div>
 </template>
 
 <script>
 import { mapActions, mapState } from 'vuex';
-import { AppButton } from '../components/ui';
+import { AppActionBar, AppButton, AppInput } from '../components/ui';
 
 export default {
   name: 'AdminTemplatesView',
   components: {
+    AppActionBar,
     AppButton,
+    AppInput,
   },
   props: {
     embedded: {

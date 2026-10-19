@@ -1,5 +1,6 @@
 import { mapActions, mapState } from 'vuex';
 import NotificationPrepPanel from '../../components/communications/NotificationPrepPanel.vue';
+import { canUseDashboardPermission } from '../permissions/permissionAccess.mjs';
 
 const emptyNotification = (currentUser) => ({
   title: '',
@@ -28,6 +29,7 @@ export default {
     };
   },
   computed: {
+    canManageNotifications() { return canUseDashboardPermission(this.currentUser, this.dashboardSnapshot, 'manage_notifications'); },
     ...mapState(['dashboardSnapshot', 'currentUser']),
     notificationTargetStudents() {
       const targetBranch = this.notificationForm.targetBranchId;
@@ -66,6 +68,7 @@ export default {
         : this.notificationTargetStudents.map((student) => student.value);
     },
     async submitNotification() {
+      if (!this.canManageNotifications) return;
       if (!this.notificationForm.message) {
         this.$toast.error('أدخل نص الإشعار أولًا');
         return;

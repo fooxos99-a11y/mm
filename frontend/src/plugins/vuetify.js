@@ -5,6 +5,14 @@ import AppSvgIcon from '@/components/ui/AppSvgIcon.vue';
 import { appIconPaths, vuetifyControlIconAliases } from '@/plugins/icons';
 
 export default createVuetify({
+  defaults: {
+    VSelect: {
+      variant: 'outlined',
+      density: 'comfortable',
+      color: 'primary',
+      menuProps: { contentClass: 'app-dropdown-menu', closeOnContentClick: true },
+    },
+  },
   directives,
   icons: {
     defaultSet: 'app',

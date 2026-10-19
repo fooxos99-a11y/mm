@@ -38,8 +38,8 @@ test('live department assignment, teacher login and global number uniqueness sha
   await dialog.getByLabel('اسم الإدارة', { exact: true }).fill(name);
   await dialog.getByLabel('مسمى المسؤول').fill('مدير التدريب');
   await dialog.getByLabel('رقم الدخول', { exact: true }).fill('a');
-  await dialog.getByLabel('رمز الدخول', { exact: true }).fill('b');
-  await dialog.getByRole('button', { name: 'حفظ الإدارة' }).click();
+  await dialog.getByLabel('كلمة المرور', { exact: true }).fill('b');
+  await dialog.getByRole('button', { name: 'حفظ' }).click();
   await expect(dialog).not.toBeVisible();
   await expect(page.getByRole('button', { name: `فتح ${name}`, exact: true })).toBeVisible();
   await screenshot(page, `${info.project.name}-live-management.png`);

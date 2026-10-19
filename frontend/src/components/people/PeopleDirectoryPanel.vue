@@ -80,18 +80,18 @@
         </AppFilterField>
       </AppFilterToolbar>
 
-      <div
+      <AppActionBar
         v-if="canCreate"
         class="people-toolbar__actions"
       >
-        <AppRawButton
+        <AppButton
           type="button"
           class="people-toolbar-button people-toolbar-button--primary"
           @click="$emit('create')"
         >
           إضافة
-        </AppRawButton>
-      </div>
+        </AppButton>
+      </AppActionBar>
     </section>
 
     <section
@@ -235,11 +235,11 @@
 </template>
 
 <script>
-import { AppCard, AppFilterField, AppFilterToolbar, AppRawButton, AppSelect, AppTextField, AppPagination } from '../ui';
+import { AppActionBar, AppButton, AppCard, AppFilterField, AppFilterToolbar, AppRawButton, AppSelect, AppTextField, AppPagination } from '../ui';
 
 export default {
   name: 'PeopleDirectoryPanel',
-  components: { AppCard, AppFilterField, AppFilterToolbar, AppRawButton, AppSelect, AppTextField, AppPagination },
+  components: { AppActionBar, AppButton, AppCard, AppFilterField, AppFilterToolbar, AppRawButton, AppSelect, AppTextField, AppPagination },
   props: {
     loading: { type: Boolean, default: false },
     search: { type: String, default: '' },

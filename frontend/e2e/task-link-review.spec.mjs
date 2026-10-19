@@ -55,7 +55,7 @@ for (const mode of ['questions', 'document']) {
       await expect(page.locator('.ql-editor')).not.toContainText(link);
     }
     const saved = page.waitForResponse(response => response.url().endsWith(`/courses/${task.id}/questions/sync`) && response.request().method() === 'PUT', { timeout: 20_000 });
-    await page.getByRole('button', { name: mode === 'questions' ? 'حفظ الأسئلة' : 'حفظ', exact: true }).click();
+    await page.getByRole('button', { name: 'حفظ', exact: true }).click();
     expect((await saved).status()).toBe(200);
     await expect(page.getByText(mode === 'questions' ? 'تم حفظ الأسئلة بنجاح' : 'تم حفظ إعدادات المهمة بنجاح', { exact: true })).toBeVisible();
     await page.reload();

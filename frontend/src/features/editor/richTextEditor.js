@@ -1,5 +1,4 @@
-import AppNativeSelect from '../../components/AppNativeSelect.vue';
-import { AppRawButton } from '../../components/ui';
+import { AppRawButton, AppSelect } from '../../components/ui';
 import { TABLE_CONTEXT_ACTIONS } from './editorRuntime';
 import coreMethods from './editorCoreMethods';
 import imageMethods from './editorImageMethods';
@@ -9,7 +8,7 @@ import tableMethods from './editorTableMethods';
 
 export default {
   name: 'RichTextEditor',
-  components: { AppNativeSelect, AppRawButton },
+  components: { AppSelect, AppRawButton },
   emits: ['input'],
   props: {
     value: { type: String, default: '' },
@@ -23,6 +22,16 @@ export default {
   data() {
     return {
       editor: null,
+      selectedFont: '',
+      fontOptions: [
+        { title: 'الخط', value: '' },
+        { title: 'العربي التقليدي', value: 'traditional-arabic' },
+        { title: 'العربي المبسط', value: 'simplified-arabic' },
+        { title: 'صف الحروف العربي', value: 'arabic-typesetting' },
+        { title: 'تاهوما', value: 'tahoma' },
+        { title: 'آريال', value: 'arial' },
+        { title: 'سيغو UI', value: 'segoe-ui' },
+      ],
       isApplyingExternalValue: false,
       isUploadingImage: false,
       isDragOver: false,
@@ -83,5 +92,19 @@ export default {
     ...tableMethods,
     ...imageMethods,
     ...interactionMethods,
+    handleSelectionChange(range) {
+      tableMethods.handleSelectionChange.call(this, range);
+      if (range && this.editor) {
+        const font = this.editor.getFormat(range).font;
+        this.selectedFont = typeof font === 'string' ? font : '';
+      }
+    },
+    applyEditorFont(value) {
+      if (!this.editor || this.disabled) return;
+      this.restoreLastSelection();
+      this.ensureSelectionOutsideProtected();
+      this.editor.format('font', value || false, 'user');
+      this.selectedFont = value;
+    },
   },
 };

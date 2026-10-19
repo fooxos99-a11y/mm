@@ -6,7 +6,7 @@ import { acknowledgeSubmission, hasQuestionAnswer, recoverSavedSubmission } from
 const loadMethods = async (path, dependencies = '') => {
   const source = await readFile(new URL(path, import.meta.url), 'utf8');
   const withoutImports = source.replace(/^import[\s\S]*?;\r?\n/gm, '');
-  const shared = `const acknowledgeSubmission = ${acknowledgeSubmission};\nconst hasQuestionAnswer = ${hasQuestionAnswer};\nconst recoverSavedSubmission = ${recoverSavedSubmission};\n`;
+  const shared = `const AppActionBar = {};\nconst acknowledgeSubmission = ${acknowledgeSubmission};\nconst hasQuestionAnswer = ${hasQuestionAnswer};\nconst recoverSavedSubmission = ${recoverSavedSubmission};\n`;
   const module = await import(`data:text/javascript;base64,${Buffer.from(shared + dependencies + withoutImports).toString('base64')}`);
   return module.default || module.finalExamQuestionMethods;
 };
@@ -84,7 +84,7 @@ for (const method of ['handleSaveAllQuestions', 'submitQuestions']) {
     const saved = [];
     let failSecond = true;
     const forms = ['one', 'two'].map(prompt => ({ prompt, type: 'text', options: [], points: '1', correctAnswer: '' }));
-    const context = { ...finalQuestionMethods, questionForms: forms, questionErrors: ['', ''], selectedBranch: 'female',
+    const context = { ...finalQuestionMethods, hasQuestionChanges: true, questionForms: forms, questionErrors: ['', ''], selectedBranch: 'female',
       visibleBranchQuestions: [], questionDrafts: {}, questionDraftErrors: {}, pendingDeletedQuestionIds: [],
       validateQuestionDraft: () => '', $toast: { success() {}, error() {} },
       handleCreateQuestionDialogChange() { this.questionForms = []; },

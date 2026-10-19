@@ -9,43 +9,41 @@
       <div class="archive-dialog">
         <AppDialogHeader title="إضافة أرشيف جديد" />
         <AppDialogBody>
-          <div class="archive-dialog__field">
-            <label
-              for="archive-create-name"
-              class="archive-dialog__label"
-            >اسم الأرشيف</label>
-            <input
-              id="archive-create-name"
-              :value="archiveName"
-              type="text"
-              class="archive-dialog__input"
-              placeholder="مثال: الدفعة الأولى"
-              @input="$emit('update:archive-name', $event.target.value.trimStart())"
-              @keyup.enter="$emit('create')"
-            >
-          </div>
-          <div class="archive-dialog__field">
-            <label
-              for="archive-create-courses-count"
-              class="archive-dialog__label"
-            >عدد الدورات</label>
-            <input
-              id="archive-create-courses-count"
-              :value="coursesCount"
+          <AppInput
+            id="archive-create-name"
+            :value="archiveName"
+            label="اسم الأرشيف"
+            :error="createErrors.name || ''"
+            maxlength="255"
+            placeholder="مثال: الدفعة الأولى"
+            :disabled="saving"
+            @input="$emit('update:archive-name', $event.trimStart())"
+            @keyup.enter="submitCreate"
+          />
+          <div class="archive-dialog__counts">
+            <AppInput
+              v-for="field in countFields"
+              :id="`archive-create-${field.key.replaceAll('_', '-')}`"
+              :key="field.key"
+              :value="counts[field.key]"
+              :label="field.label"
+              :error="countFieldError(field.key)"
               type="number"
               min="0"
+              max="1000000"
               step="1"
               inputmode="numeric"
-              class="archive-dialog__input"
               placeholder="0"
-              @input="$emit('update:courses-count', Number($event.target.value))"
-              @keyup.enter="$emit('create')"
-            >
+              :disabled="saving"
+              @input="$emit('update:count', field.key, $event)"
+              @keyup.enter="submitCreate"
+            />
           </div>
           <BatchTypeField
             field-id="archive-create-batch-type"
             :value="batchType"
             :options="batchTypeOptions"
+            :error="createErrors.batch_type || ''"
             @input="$emit('update:batch-type', $event)"
           />
         </AppDialogBody>
@@ -59,8 +57,8 @@
           <AppButton
             variant="primary"
             :loading="saving"
-            :disabled="!archiveName.trim()"
-            @click="$emit('create')"
+            :disabled="!canCreate"
+            @click="submitCreate"
           >
             إضافة
           </AppButton>
@@ -202,19 +200,21 @@
 
 <script>
 import {
-  AppButton, AppDialog, AppDialogBody, AppDialogFooter, AppDialogHeader,
+  AppButton, AppDialog, AppDialogBody, AppDialogFooter, AppDialogHeader, AppInput,
 } from '../ui';
 import BatchTypeField from './BatchTypeField.vue';
+import { archiveCountError, archiveCountFields, emptyArchiveCounts } from '../../features/archive/archiveCounts.mjs';
 
 export default {
   name: 'ArchiveManagementDialogs',
   components: {
-    AppButton, AppDialog, AppDialogBody, AppDialogFooter, AppDialogHeader, BatchTypeField,
+    AppButton, AppDialog, AppDialogBody, AppDialogFooter, AppDialogHeader, AppInput, BatchTypeField,
   },
   props: {
     createOpen: { type: Boolean, default: false },
     archiveName: { type: String, default: '' },
-    coursesCount: { type: Number, default: 0 },
+    counts: { type: Object, default: emptyArchiveCounts },
+    createErrors: { type: Object, default: () => ({}) },
     batchType: { type: String, required: true },
     batchTypeOptions: { type: Array, required: true },
     saving: { type: Boolean, default: false },
@@ -232,7 +232,7 @@ export default {
     'create-close',
     'update:archive-name',
     'create',
-    'update:courses-count',
+    'update:count',
     'update:batch-type',
     'update:delete-open',
     'delete-close',
@@ -247,5 +247,20 @@ export default {
     'update:student-name',
     'student-add',
   ],
+  computed: {
+    countFields: () => archiveCountFields,
+    canCreate() {
+      return Boolean(this.archiveName.trim()) && !this.saving
+        && this.countFields.every(({ key }) => !archiveCountError(this.counts[key]));
+    },
+  },
+  methods: {
+    countFieldError(key) {
+      return this.createErrors[key] || archiveCountError(this.counts[key]);
+    },
+    submitCreate() {
+      if (this.canCreate) this.$emit('create');
+    },
+  },
 };
 </script>

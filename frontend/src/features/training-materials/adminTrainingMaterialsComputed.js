@@ -23,7 +23,7 @@ export default {
         label: material.title,
         value: material.id,
       })),
-      { label: 'إضافة مادة', value: ADD_MATERIAL_OPTION_VALUE },
+      ...(this.canManageMaterials === false ? [] : [{ label: 'إضافة مادة', value: ADD_MATERIAL_OPTION_VALUE }]),
     ];
   },
   materialSelectValue: {
@@ -55,6 +55,8 @@ export default {
     return resolveDisplayedMaterials(this.trainingMaterials, this.selectedMaterialId, this.selectedMaterial);
   },
   branchOptions() {
+    const branch = { male_manager: 'male', female_manager: 'female' }[this.currentUser?.role];
+    if (branch) return (this.dashboardSnapshot?.branches || []).filter(item => item.id === branch);
     return [
       { id: 'all', label: 'كل الفروع' },
       { id: 'supervision', label: 'الإشراف' },

@@ -16,7 +16,7 @@
       >
         {{ error }}
       </p>
-      <div class="account-entry__form">
+      <AppActionBar class="account-entry__form">
         <AppButton
           variant="primary"
           :loading="loading"
@@ -30,18 +30,18 @@
         >
           تسجيل الخروج
         </AppButton>
-      </div>
+      </AppActionBar>
     </AppCard>
   </main>
 </template>
 <script>
 import { mapState } from 'vuex';
-import { AppButton, AppCard } from '../components/ui';
+import { AppActionBar, AppButton, AppCard } from '../components/ui';
 import { fetchCurrentUser } from '../services/authApi';
 import { resolveUserHomeRoute } from '../utils/authRoutes';
 export default {
   name: 'AccountAssignmentView',
-  components: { AppButton, AppCard },
+  components: { AppActionBar, AppButton, AppCard },
   data: () => ({ loading: false, error: '' }),
   computed: { ...mapState(['currentUser']) },
   methods: {

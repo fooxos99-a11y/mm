@@ -45,7 +45,7 @@ test('manager can add and save a task question from the plus menu', async ({ pag
   const form = page.locator('.assessment-editor-question').last();
   await form.locator('textarea[placeholder="اكتب السؤال"]').fill('هل تعمل إضافة المهمة؟');
   await form.getByRole('button', { name: 'تحديد الخيار 1 إجابة صحيحة' }).click();
-  await page.getByRole('button', { name: 'حفظ الأسئلة', exact: true }).click();
+  await page.getByRole('button', { name: 'حفظ', exact: true }).click();
 
   await expect.poll(() => page.locator('textarea').evaluateAll(
     (inputs, expected) => inputs.some((input) => input.value === expected),

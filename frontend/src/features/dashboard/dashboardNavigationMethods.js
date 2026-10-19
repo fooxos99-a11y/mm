@@ -83,6 +83,11 @@ export default {
 
       if (panel === 'settings' && this.selectedSettingsItemId) {
         nextQuery.settingsItem = this.selectedSettingsItemId;
+        if (this.selectedSettingsItemId === 'permissions') {
+          for (const key of ['supervisionSection', 'supervisionRole']) {
+            if (this.$route.query[key]) nextQuery[key] = this.$route.query[key];
+          }
+        }
       }
 
       if (this.hasSameRouteQuery(nextQuery)) {
@@ -100,8 +105,7 @@ export default {
       }
 
       const currentPanel = this.$refs?.workspacePanel;
-      if (['courses', 'tasks'].includes(this.activeMenu)
-        && panel !== this.activeMenu
+      if (panel !== this.activeMenu
         && currentPanel?.confirmDiscardChanges
         && !(await currentPanel.confirmDiscardChanges())) {
         return;
@@ -180,8 +184,7 @@ export default {
     async returnToSystemManagement() {
       if (!isSystemAdministrator(this.currentUser) || this.panelLoading) return;
       const currentPanel = this.$refs?.workspacePanel;
-      if (['courses', 'tasks'].includes(this.activeMenu)
-        && currentPanel?.confirmDiscardChanges
+      if (currentPanel?.confirmDiscardChanges
         && !(await currentPanel.confirmDiscardChanges())) return;
 
       this.panelLoading = true;

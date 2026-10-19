@@ -6,6 +6,7 @@ use App\Models\Archive;
 use App\Models\Branch;
 use App\Models\Student;
 use App\Models\User;
+use App\Services\ArchiveSummaryService;
 use App\Services\DashboardCommunicationService;
 use App\Support\DepartmentContext;
 use App\Support\DepartmentData as DB;
@@ -19,7 +20,7 @@ trait ArchivesActiveBatch
     {
         return Archive::create([
             'name' => trim($data['name']),
-            'courses_count' => $data['courses_count'],
+            ...array_replace(array_fill_keys(Archive::COUNT_FIELDS, 0), array_intersect_key($data, array_flip(Archive::COUNT_FIELDS))),
             'batch_type' => $data['batch_type'],
         ]);
     }
@@ -48,7 +49,11 @@ trait ArchivesActiveBatch
         $hasSubmissionScope = Schema::hasColumn('course_submissions', 'submission_uniqueness_scope');
 
         DB::transaction(function () use (&$archive, $data, $batchType, $hasSubmissionScope): void {
-            $archive = Archive::create(['name' => trim($data['name']), 'batch_type' => $batchType]);
+            $archive = Archive::create([
+                'name' => trim($data['name']),
+                'batch_type' => $batchType,
+                ...app(ArchiveSummaryService::class)->counts(null, $batchType),
+            ]);
             $archiveId = $archive->id;
             $activeStudents = DB::table('students')->whereNull('archive_id')
                 ->when(

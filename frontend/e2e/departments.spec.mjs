@@ -12,6 +12,8 @@ async function mockSystem(page, initialUser = systemUser) {
   let user = initialUser ? { ...initialUser } : null;
   const departments = initialDepartments();
   const writes = [];
+  let overviewFailure = false;
+  const indicators = progress => ['memorization', 'attendance', 'pre', 'post', 'tasks', 'completed30'].map((key, index) => ({ key, label: ['الأجزاء المقروءة', 'الحضور', 'الاختبار القبلي', 'الاختبار البعدي', 'المهام الأدائية', 'من أكملوا الأجزاء المطلوبة'][index], display: progress + '%', progress, meta: progress + ' من 100' }));
   const dashboardHeaders = [];
   await page.route('**/api/**', async route => {
     const request = route.request();
@@ -42,7 +44,10 @@ async function mockSystem(page, initialUser = systemUser) {
       const loginCode = url.searchParams.get('loginCode');
       return fulfill({ accounts: loginCode === '1483' ? [{ id: 2, name: 'مسؤول الإدارة الجديدة', loginCode, role: 'unassigned', departmentId: null }] : [{ id: 3, name: 'حساب إدارة أخرى', loginCode, role: 'admin', departmentId: 'other' }] });
     }
-    if (endpoint === '/management/overview') return fulfill({ totals: { departments: departments.length, users: 3, students: 1, courses: 2, archives: 0 } });
+    if (endpoint === '/management/overview') {
+      if (overviewFailure) return route.fulfill({ status: 503, json: { message: 'تعذر تحميل المؤشرات.' } });
+      return fulfill({ totals: { departments: departments.length, users: 3, students: 1, courses: 2, archives: 0 }, indicators: indicators(50), departments: departments.map(d => ({ id: d.id, indicators: indicators(75) })) });
+    }
     if (endpoint.startsWith('/management/archives')) return fulfill({ archives: [] });
     if (endpoint.startsWith('/dashboard')) {
       dashboardHeaders.push(request.headers());
@@ -51,7 +56,7 @@ async function mockSystem(page, initialUser = systemUser) {
     if (endpoint === '/public/departments') return fulfill({ departments });
     return fulfill({});
   });
-  return { writes, dashboardHeaders, setUser: next => { user = next; } };
+  return { writes, dashboardHeaders, setUser: next => { user = next; }, setOverviewFailure: value => { overviewFailure = value; } };
 }
 
 async function expectNoOverflow(page) {
@@ -63,10 +68,18 @@ test('general manager creates a department and its responsible account in one so
   page.on('pageerror', error => runtimeErrors.push(error.message));
   const state = await mockSystem(page);
   await page.goto('management');
-  await expect(page.getByRole('heading', { name: 'إدارة النظام', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'ملخص النظام', exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'إضافة إدارة', exact: true }).click();
   const dialog = page.getByRole('dialog');
   await expect(dialog.locator('form.app-dialog')).toHaveCSS('background-color', 'rgb(255, 255, 255)');
+  const save = dialog.getByRole('button', { name: 'حفظ', exact: true });
+  const cancel = dialog.getByRole('button', { name: 'إلغاء', exact: true });
+  await expect(save).toBeDisabled();
+  await expect(save).toHaveCSS('color', 'rgb(255, 255, 255)');
+  const saveBox = await save.boundingBox();
+  const cancelBox = await cancel.boundingBox();
+  expect(saveBox.x + saveBox.width).toBeLessThanOrEqual(cancelBox.x);
+  expect(saveBox.height).toBe(cancelBox.height);
   await expect(dialog.getByText('مثل مدير التدريب أو مدير النمو المهني')).toHaveCount(0);
   await expect(dialog.getByRole('button', { name: 'التحقق من الحساب' })).toHaveCount(0);
   const artifactDirectory = path.resolve('../.deploy/departments');
@@ -75,12 +88,12 @@ test('general manager creates a department and its responsible account in one so
   await dialog.getByLabel('اسم الإدارة', { exact: true }).fill('إدارة التدريب');
   await dialog.getByLabel('مسمى المسؤول').fill('مدير التدريب');
   await dialog.getByLabel('رقم الدخول', { exact: true }).fill('a');
-  await expect(dialog.getByRole('button', { name: 'حفظ الإدارة' })).toBeDisabled();
-  await dialog.getByLabel('رمز الدخول', { exact: true }).fill(' ');
-  await expect(dialog.getByText('أدخل رمز دخول صالحًا.')).toBeVisible();
-  await expect(dialog.getByRole('button', { name: 'حفظ الإدارة' })).toBeDisabled();
-  await dialog.getByLabel('رمز الدخول', { exact: true }).fill('1');
-  await dialog.getByRole('button', { name: 'حفظ الإدارة' }).click();
+  await expect(dialog.getByRole('button', { name: 'حفظ' })).toBeDisabled();
+  await dialog.getByLabel('كلمة المرور', { exact: true }).fill(' ');
+  await expect(dialog.getByText('أدخل كلمة مرور صالحة.')).toBeVisible();
+  await expect(dialog.getByRole('button', { name: 'حفظ' })).toBeDisabled();
+  await dialog.getByLabel('كلمة المرور', { exact: true }).fill('1');
+  await dialog.getByRole('button', { name: 'حفظ' }).click();
   await expect(dialog).not.toBeVisible();
   await expect(page.getByRole('button', { name: 'فتح إدارة التدريب', exact: true })).toBeVisible();
   expect(state.writes[0]).toMatchObject({ name: 'إدارة التدريب', managerLoginCode: 'a', managerPassword: '1', managerTitle: 'مدير التدريب', isActive: true });
@@ -88,15 +101,20 @@ test('general manager creates a department and its responsible account in one so
   await page.screenshot({ path: path.join(artifactDirectory, `${info.project.name}-management.png`), fullPage: true });
   await page.getByRole('button', { name: 'تعديل إدارة التدريب', exact: true }).click();
   await expect(dialog.getByLabel('مسمى المسؤول')).toHaveValue('مدير التدريب');
-  await expect(dialog.getByLabel('رمز الدخول', { exact: true })).toHaveCount(0);
+  await expect(dialog.getByLabel('كلمة المرور', { exact: true })).toHaveCount(0);
+  await expect(dialog.getByRole('button', { name: 'حفظ', exact: true })).toBeDisabled();
   await dialog.getByLabel('مسمى المسؤول').fill('مدير التأهيل');
-  await dialog.getByRole('button', { name: 'حفظ الإدارة' }).click();
+  await expect(dialog.getByRole('button', { name: 'حفظ', exact: true })).toBeEnabled();
+  await dialog.getByLabel('مسمى المسؤول').fill('مدير التدريب');
+  await expect(dialog.getByRole('button', { name: 'حفظ', exact: true })).toBeDisabled();
+  await dialog.getByLabel('مسمى المسؤول').fill('مدير التأهيل');
+  await dialog.getByRole('button', { name: 'حفظ' }).click();
   await expect(dialog).not.toBeVisible();
   expect(state.writes[1]).not.toHaveProperty('managerPassword');
   await page.getByRole('button', { name: 'تعديل إدارة التدريب', exact: true }).click();
   await dialog.getByLabel('رقم الدخول', { exact: true }).fill('1002');
-  await dialog.getByLabel('رمز الدخول', { exact: true }).fill('12345678');
-  await dialog.getByRole('button', { name: 'حفظ الإدارة' }).click();
+  await dialog.getByLabel('كلمة المرور', { exact: true }).fill('12345678');
+  await dialog.getByRole('button', { name: 'حفظ' }).click();
   await expect(dialog.locator('.system-management__error')).toContainText('رقم الدخول مستخدم مسبقًا.');
   expect(runtimeErrors).toEqual([]);
 });
@@ -104,6 +122,7 @@ test('general manager creates a department and its responsible account in one so
 test('general manager enters department context and returns to central management', async ({ page }) => {
   const state = await mockSystem(page);
   await page.goto('management');
+  await page.getByRole('button', { name: 'عرض الإدارات', exact: true }).click();
   await page.getByRole('button', { name: 'فتح الإدارة الحالية', exact: true }).click();
   await expect(page).toHaveURL(/\/dashboard$/);
   await expect(page.locator('.department-context')).toHaveCount(0);
@@ -112,7 +131,7 @@ test('general manager enters department context and returns to central managemen
   if (page.viewportSize().width <= 1024) await page.getByRole('button', { name: 'فتح القائمة', exact: true }).click();
   await page.locator('.dashboard-sidebar').getByRole('button', { name: 'إدارة النظام', exact: true }).click();
   await expect(page).toHaveURL(/\/management$/);
-  await expect(page.getByRole('heading', { name: 'إدارة النظام', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'ملخص النظام', exact: true })).toBeVisible();
 });
 
 test('registered accounts wait for assignment and cannot access system management', async ({ page }) => {
@@ -153,7 +172,7 @@ test('general manager alone creates responsible accounts and sees globally occup
   await page.getByLabel('رقم الدخول').fill('1484');
   await page.getByRole('button', { name: 'إنشاء الحساب', exact: true }).click();
   await expect(page).toHaveURL(/\/management$/);
-  await expect(page.getByRole('heading', { name: 'إدارة النظام', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'ملخص النظام', exact: true })).toBeVisible();
   expect(submissions[1]).toMatchObject({ loginCode: '1484', name: 'مسؤول الإدارة الجديدة' });
   await expectNoOverflow(page);
 });
@@ -180,4 +199,59 @@ test('department administrators cannot open responsible account creation', async
   await page.goto('register-account');
   await expect(page).toHaveURL(/\/dashboard$/);
   await expect(page.getByRole('heading', { name: 'إنشاء حساب مسؤول' })).toHaveCount(0);
+});
+
+
+test('system workspace has one summary, shared metric sizes, persistent sections and scoped indicator recovery', async ({ page }) => {
+  const state = await mockSystem(page);
+  const section = async name => {
+    if (page.viewportSize().width <= 1024) await page.getByRole('button', { name: 'فتح القائمة', exact: true }).click();
+    await page.getByRole('navigation', { name: 'أقسام إدارة النظام' }).getByRole('button', { name, exact: true }).click();
+  };
+  await page.goto('management');
+  await expect(page.getByRole('heading', { name: 'ملخص النظام', exact: true })).toBeVisible();
+  await expect(page.locator('.system-management__summary')).toHaveCount(1);
+  await expect(page.locator('.system-management__summary dt')).toHaveCount(5);
+  await expect(page.getByRole('table')).toHaveCount(0);
+  await expect(page.locator('.dashboard-sidebar')).toHaveCSS('background-color', 'rgb(255, 255, 255)');
+  await expect(page.locator('.system-management__indicators .app-indicator-card')).toHaveCount(6);
+  for (const ring of await page.locator('.dashboard-indicator-ring--metric').all()) {
+    const box = await ring.boundingBox();
+    expect(box.width).toBe(112);
+    expect(box.height).toBe(112);
+  }
+  await section('الإدارات');
+  await expect(page).toHaveURL(/section=departments/);
+  await page.reload();
+  await expect(page.getByRole('button', { name: 'فتح الإدارة الحالية', exact: true })).toBeVisible();
+  const openBox = await page.getByRole('button', { name: 'فتح الإدارة الحالية', exact: true }).boundingBox();
+  const editBox = await page.getByRole('button', { name: 'تعديل الإدارة الحالية', exact: true }).boundingBox();
+  expect(openBox.height).toBeGreaterThanOrEqual(48);
+  expect(openBox.height).toBe(editBox.height);
+  expect(openBox.x + openBox.width).toBeLessThanOrEqual(editBox.x);
+  await expect(page.locator('.system-management__summary')).toHaveCount(0);
+  await section('المؤشرات الإجمالية');
+  await expect(page).toHaveURL(/section=indicators/);
+  await expect(page.getByRole('button', { name: 'إضافة إدارة', exact: true })).toHaveCount(0);
+  const filter = page.locator('.app-select').filter({ has: page.getByRole('combobox', { name: 'الإدارة', exact: true }) });
+  await filter.locator('.v-field').click();
+  await page.getByRole('option', { name: 'الإدارة الحالية', exact: true }).click();
+  await expect(page).toHaveURL(/departmentId=d1/);
+  await expect(page.locator('.app-indicator-card').first()).toHaveAttribute('aria-label', /75%/);
+  await page.reload();
+  await expect(page.getByRole('combobox', { name: 'الإدارة', exact: true })).toHaveValue('الإدارة الحالية');
+  await expect(page.locator('.app-indicator-card').first()).toHaveAttribute('aria-label', /75%/);
+  state.setOverviewFailure(true);
+  await filter.locator('.v-field').click();
+  await page.getByRole('option', { name: 'جميع الإدارات', exact: true }).click();
+  await expect(page.getByText('تعذر تحميل المؤشرات.', { exact: true })).toBeVisible();
+  await expect(page.locator('.app-indicator-card')).toHaveCount(0);
+  state.setOverviewFailure(false);
+  await page.getByRole('button', { name: /إعادة المحاولة|حاول مرة أخرى/ }).click();
+  await expect(page.locator('.app-indicator-card').first()).toHaveAttribute('aria-label', /50%/);
+  await section('نظرة عامة');
+  await expect(page).not.toHaveURL(/departmentId=/);
+  await expect(page.getByRole('heading', { name: 'ملخص النظام', exact: true })).toBeVisible();
+  await expect(page.getByRole('combobox', { name: 'الإدارة', exact: true })).toHaveCount(0);
+  await expectNoOverflow(page);
 });

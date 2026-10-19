@@ -55,7 +55,7 @@ export default {
     if (this.canAccessPanel('permissions')) {
       items.push({
         id: 'permissions',
-        label: this.isAdmin ? 'الإشراف والصلاحيات' : 'الصلاحيات',
+        label: 'الإشراف',
         icon: 'mdi-shield-account-outline',
         kind: 'panel',
       });

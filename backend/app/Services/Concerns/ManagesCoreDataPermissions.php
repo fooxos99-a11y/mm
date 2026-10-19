@@ -3,7 +3,7 @@
 namespace App\Services\Concerns;
 
 use App\Models\Branch;
-use App\Support\DepartmentData as DB;
+use App\Support\Security\PermissionCatalog;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
 
@@ -13,25 +13,13 @@ trait ManagesCoreDataPermissions
 
     public function loadRolePermissions(): array
     {
-        $result = ['male_manager' => [], 'female_manager' => []];
-
-        foreach (DB::table('role_permissions')->get() as $row) {
-            if (! isset($result[$row->role])) {
-                $result[$row->role] = [];
-            }
-
-            $result[$row->role][$row->permission_key] = (bool) $row->is_enabled;
-        }
-
-        return $result;
+        return ['male_manager' => PermissionCatalog::forRole('male_manager'),
+            'female_manager' => PermissionCatalog::forRole('female_manager')];
     }
 
     public function setRolePermission(string $role, string $key, bool $isEnabled): void
     {
-        DB::table('role_permissions')->updateOrInsert(
-            ['role' => $role, 'permission_key' => $key],
-            ['is_enabled' => $isEnabled],
-        );
+        abort(410, 'صلاحيات المشرفين تلقائية بحسب الفرع، ولا تقبل التعديل اليدوي.');
     }
 
     private function resolveBranchByCode(string $branchCode): Branch

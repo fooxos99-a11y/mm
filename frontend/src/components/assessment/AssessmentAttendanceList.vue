@@ -6,12 +6,13 @@
     <div class="assessment-attendance__tools">
       <AppButton
         variant="secondary"
+        class="attendance-toggle attendance-toggle--all"
         :disabled="!canEdit || !students.length || saving"
         :aria-pressed="allChecked"
-        :aria-label="allChecked ? 'إلغاء تحديد حضور الجميع' : 'تحديد حضور الجميع'"
+        :aria-label="allChecked ? 'إلغاء تحضير الكل' : 'تحضير الكل'"
         @click="$emit('toggle-all')"
       >
-        {{ allChecked ? 'إلغاء تحضير الجميع' : 'تحضير الجميع' }}
+        {{ allChecked ? 'إلغاء تحضير الكل' : 'تحضير الكل' }}
       </AppButton>
     </div>
     <div
@@ -92,14 +93,14 @@ export default {
 .assessment-attendance { min-width: 0; }
 .assessment-attendance__tools { display: flex; justify-content: flex-end; margin-bottom: 16px; }
 .assessment-attendance__footer p { margin: 0; color: var(--app-text-muted); font-size: var(--app-font-sm); }
-.assessment-attendance__head, .assessment-attendance__row { display: grid; grid-template-columns: minmax(0, 1fr) 76px; align-items: center; gap: 12px; }
+.assessment-attendance__head, .assessment-attendance__row { display: grid; grid-template-columns: minmax(0, 1fr) 88px; align-items: center; gap: 12px; }
 .assessment-attendance__head { padding: 8px 0; color: var(--app-text-muted); font-size: 0.75rem; border-bottom: 1px solid var(--app-border); }
 .assessment-attendance__row { min-height: 64px; padding: 8px 0; border-bottom: 1px solid var(--app-border); }
 .assessment-attendance__name { min-width: 0; overflow-wrap: anywhere; color: var(--app-primary-dark); font-weight: 700; line-height: 1.5; }
 .assessment-attendance .attendance-toggle { width: auto; min-width: 0; height: auto; min-height: 44px; padding: 8px; border-radius: 8px; font-size: var(--app-font-sm); }
 .assessment-attendance .attendance-toggle--active { border-color: var(--app-primary); }
+.assessment-attendance .attendance-toggle--all { flex: 0 0 auto; }
 .assessment-attendance .attendance-toggle--active:disabled { background: var(--app-primary); color: #fff; opacity: 1; }
 .assessment-attendance__footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding-top: 16px; }
 .assessment-attendance__footer .assessment-attendance__error { color: var(--app-danger); }
-@media (min-width: 768px) { .assessment-attendance__head, .assessment-attendance__row { grid-template-columns: minmax(0, 1fr) 88px; } }
 </style>

@@ -10,7 +10,7 @@ use Laravel\Sanctum\Sanctum;
 
 class ManagerPermissionsTest extends CoreDataApiTestCase
 {
-    public function test_manager_without_student_permission_cannot_manage_students(): void
+    public function test_manager_can_manage_own_students_without_manual_permissions(): void
     {
         DB::table('role_permissions')->insert([
             'role' => 'male_manager',
@@ -24,12 +24,12 @@ class ManagerPermissionsTest extends CoreDataApiTestCase
         ]));
 
         $this->postJson('/api/students', [
-            'name' => 'Blocked Student',
+            'name' => 'Automatic Student',
             'loginId' => '8301',
             'password' => '56781234',
             'passwordConfirmation' => '56781234',
             'branchId' => 'male',
-        ])->assertForbidden();
+        ])->assertCreated();
     }
 
     public function test_manager_cannot_update_student_outside_managed_branch(): void
@@ -119,13 +119,13 @@ class ManagerPermissionsTest extends CoreDataApiTestCase
             'allowFile' => false,
             'points' => 1,
             'correctAnswer' => 'answer',
-        ])->assertForbidden();
+        ])->assertCreated();
 
         $this->postJson('/api/dashboard/satisfaction-questions', [
-            'prompt' => 'Blocked satisfaction',
+            'prompt' => 'Shared satisfaction',
             'type' => 'rating',
             'isRequired' => true,
-        ])->assertForbidden();
+        ])->assertCreated();
 
         DB::table('role_permissions')->updateOrInsert(
             ['role' => 'male_manager', 'permission_key' => 'page_final_exam'],
@@ -161,7 +161,7 @@ class ManagerPermissionsTest extends CoreDataApiTestCase
         ])->assertCreated();
     }
 
-    public function test_training_materials_require_notifications_permission(): void
+    public function test_training_materials_are_available_without_manual_permissions(): void
     {
         Sanctum::actingAs(User::factory()->create([
             'role' => 'male_manager',
@@ -174,7 +174,7 @@ class ManagerPermissionsTest extends CoreDataApiTestCase
             'is_enabled' => true,
         ]);
 
-        $this->getJson('/api/dashboard/training-materials')->assertForbidden();
+        $this->getJson('/api/dashboard/training-materials')->assertOk();
 
         DB::table('role_permissions')->where('role', 'male_manager')->delete();
         DB::table('role_permissions')->insert([
@@ -183,7 +183,7 @@ class ManagerPermissionsTest extends CoreDataApiTestCase
             'is_enabled' => true,
         ]);
 
-        $this->getJson('/api/dashboard/training-materials')->assertForbidden();
+        $this->getJson('/api/dashboard/training-materials')->assertOk();
 
         DB::table('role_permissions')->insert([
             'role' => 'male_manager',

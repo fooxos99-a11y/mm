@@ -1,8 +1,9 @@
 <template>
-  <div :class="{ 'assessment-task-toolbar': isTasksPage }">
+  <div :class="{ 'assessment-task-toolbar': isTasksPage, 'assessment-task-toolbar--document': isTasksPage && selectedCourse && isDocumentMode }">
     <AppFilterToolbar
       class="assessment-toolbar assessment-toolbar--embedded"
-      :columns="isTasksPage ? (selectedCourse && isDocumentMode ? 2 : 1) : columns"
+      :class="{ 'assessment-toolbar--courses': !isTasksPage }"
+      :columns="isTasksPage ? (selectedCourse && isDocumentMode ? 3 : 2) : columns"
     >
       <AppFilterField
         for-id="assessment-toolbar-course"
@@ -81,22 +82,27 @@
         </AppSelect>
       </AppFilterField>
 
+      <div
+        v-if="!isTasksPage"
+        class="assessment-toolbar__branch-slot"
+      >
+        <slot name="branch" />
+      </div>
       <AppFilterField
-        v-if="isTasksPage && selectedCourse && isDocumentMode"
-        for-id="assessment-task-points"
-        label="درجة المهمة"
+        v-else
+        for-id="assessment-task-video"
+        label="الرابط"
       >
         <input
-          id="assessment-task-points"
-          aria-label="درجة المهمة"
-          :value="taskPoints"
-          type="number"
-          min="0"
-          inputmode="numeric"
-          class="assessment-input assessment-input--points"
-          :disabled="!canEdit"
-          placeholder="1"
-          @input="$emit('update:task-points', $event.target.value)"
+          id="assessment-task-video"
+          aria-label="الرابط"
+          :value="taskVideoUrl"
+          type="url"
+          inputmode="url"
+          class="assessment-input"
+          :disabled="!canEdit || !selectedCourse"
+          placeholder="ألصق رابط المهمة"
+          @input="$emit('update:task-video-url', $event.target.value)"
         >
       </AppFilterField>
 
@@ -119,7 +125,24 @@
           @input="$emit('update:view-mode', $event)"
         />
       </AppFilterField>
-      <slot name="branch" />
+      <AppFilterField
+        v-if="isTasksPage && selectedCourse && isDocumentMode"
+        for-id="assessment-task-points"
+        label="درجة المهمة"
+      >
+        <input
+          id="assessment-task-points"
+          aria-label="درجة المهمة"
+          :value="taskPoints"
+          type="number"
+          min="0"
+          inputmode="numeric"
+          class="assessment-input assessment-input--points"
+          :disabled="!canEdit"
+          placeholder="1"
+          @input="$emit('update:task-points', $event.target.value)"
+        >
+      </AppFilterField>
     </AppFilterToolbar>
 
     <div
@@ -145,23 +168,6 @@
           @input="$emit('update:task-description', $event)"
         />
       </AppFilterField>
-      <AppFilterField
-        class="assessment-toolbar__field assessment-form-card__field-group assessment-form-card__field-group--compact"
-        for-id="assessment-task-video"
-        label="الرابط"
-      >
-        <input
-          id="assessment-task-video"
-          aria-label="الرابط"
-          :value="taskVideoUrl"
-          type="url"
-          inputmode="url"
-          class="assessment-input"
-          :disabled="!canEdit"
-          placeholder="ألصق رابط المهمة"
-          @input="$emit('update:task-video-url', $event.target.value)"
-        >
-      </AppFilterField>
     </div>
 
     <div
@@ -180,7 +186,7 @@ export default {
   name: 'AssessmentCourseToolbar',
   components: { AppIconButton, AppInput, AppFilterField, AppFilterToolbar, AppSelect },
   props: {
-    columns: { type: Number, default: 2 },
+    columns: { type: Number, default: 3 },
     isTasksPage: { type: Boolean, default: false },
     courseValue: { type: String, default: '' },
     courseOptions: { type: Array, required: true },
@@ -211,9 +217,9 @@ export default {
 
 <style scoped>
 .assessment-course-option-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-@media (min-width: 360px) and (max-width: 767px) {
-  .assessment-toolbar { --app-filter-columns: repeat(2, minmax(0, 1fr)); }
-  .assessment-toolbar :deep(.app-filter-field:first-child) { grid-column: auto; }
-  .assessment-toolbar :deep(.app-filter-field:nth-child(3):last-child) { grid-column: 1 / -1; }
+.assessment-toolbar__branch-slot { display: grid; min-width: 0; align-items: end; }
+@media (max-width: 767px) {
+  .assessment-toolbar--courses { --app-filter-columns: repeat(2, minmax(0, 1fr)); }
+  .assessment-toolbar--courses :deep(.app-filter-field:first-child) { grid-column: 1 / -1; }
 }
 </style>

@@ -19,6 +19,17 @@
   margin-top: 16px;
 }
 
+.archive-dialog__counts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-block: 16px;
+}
+
+.archive-dialog__counts .app-field {
+  min-width: 0;
+}
+
 .archive-dialog__label {
   color: #334155;
   font-size: 0.88rem;

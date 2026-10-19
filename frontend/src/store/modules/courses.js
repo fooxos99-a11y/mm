@@ -16,6 +16,8 @@ import {
   updateTaskTemplate as updateTaskTemplateRequest,
 } from '../../services/api';
 
+import { scopeCourseUpdates } from '../../features/assessment/scopeCourseUpdates.mjs';
+
 const reloadSnapshot = (dispatch) => dispatch('loadDashboardSnapshot');
 
 export const courseActions = {
@@ -42,8 +44,8 @@ export const courseActions = {
     await updateTaskTemplateRequest(templateId, updates);
     await reloadSnapshot(dispatch);
   },
-  async updateCourse({ dispatch }, { courseId, updates }) {
-    await updateCourseRequest(courseId, updates);
+  async updateCourse({ dispatch, state }, { courseId, updates }) {
+    await updateCourseRequest(courseId, scopeCourseUpdates(updates, state.currentUser?.role));
     await reloadSnapshot(dispatch);
   },
   async deleteCourse({ dispatch }, courseId) {

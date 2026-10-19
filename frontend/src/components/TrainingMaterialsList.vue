@@ -76,24 +76,27 @@
           </div>
         </div>
 
-        <div class="training-materials-list__preview-actions">
-          <a
+        <AppActionBar class="training-materials-list__preview-actions">
+          <AppButton
             v-if="previewAttachment?.type === 'file' && previewSource && !previewLoading && !previewError"
+            variant="primary"
             :href="previewSource"
             :download="previewFileName"
             class="training-materials-list__preview-download"
           >
-            <v-icon size="19">mdi-download-outline</v-icon>
+            <v-icon size="19">
+              mdi-download-outline
+            </v-icon>
             تنزيل الملف
-          </a>
+          </AppButton>
           <AppButton
-            variant="plain"
+            variant="secondary"
             class="training-materials-list__preview-close"
             @click="closePreviewDialog"
           >
             إغلاق
           </AppButton>
-        </div>
+        </AppActionBar>
       </v-card>
     </v-dialog>
 
@@ -136,11 +139,11 @@
           </div>
 
           <div
-            v-if="showEdit || showDelete"
+            v-if="(showEdit || showDelete) && material.canManage !== false"
             class="training-materials-list__actions"
           >
             <AppRawButton
-              v-if="showEdit"
+              v-if="showEdit && material.canManage !== false"
               type="button"
               class="training-materials-list__action-button training-materials-list__action-button--edit"
               aria-label="تعديل المادة"
@@ -151,7 +154,7 @@
               </v-icon>
             </AppRawButton>
             <AppRawButton
-              v-if="showDelete"
+              v-if="showDelete && material.canManage !== false"
               type="button"
               class="training-materials-list__action-button training-materials-list__action-button--delete"
               aria-label="حذف المادة"

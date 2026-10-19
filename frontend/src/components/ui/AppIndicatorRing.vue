@@ -1,10 +1,37 @@
 <template>
   <div
     class="dashboard-indicator-ring"
-    :class="{ 'dashboard-indicator-ring--complete': progress >= 100, 'dashboard-indicator-ring--empty': progress <= 0 }"
+    :class="{ 'dashboard-indicator-ring--metric': appearance === 'metric', 'dashboard-indicator-ring--complete': progress >= 100, 'dashboard-indicator-ring--empty': progress <= 0 }"
     :style="activeStyle"
   >
     <svg
+      v-if="appearance === 'metric'"
+      viewBox="0 0 100 100"
+      class="dashboard-indicator-ring__svg"
+      aria-hidden="true"
+    >
+      <circle
+        cx="50"
+        cy="50"
+        r="42"
+        fill="none"
+        :stroke="`color-mix(in oklab, ${color} 14%, white)`"
+        stroke-width="11"
+      />
+      <circle
+        cx="50"
+        cy="50"
+        r="42"
+        fill="none"
+        :stroke="color"
+        stroke-width="11"
+        stroke-linecap="round"
+        :stroke-dasharray="metricCircumference"
+        :stroke-dashoffset="metricCircumference * (1 - normalizedProgress / 100)"
+      />
+    </svg>
+    <svg
+      v-else
       viewBox="0 0 200 200"
       class="dashboard-indicator-ring__svg"
       aria-hidden="true"
@@ -45,7 +72,10 @@
         r="78"
       />
     </svg>
-    <div class="dashboard-indicator-ring__inner">
+    <div
+      class="dashboard-indicator-ring__inner"
+      :dir="appearance === 'metric' ? 'ltr' : undefined"
+    >
       {{ display }}
     </div>
   </div>
@@ -53,8 +83,16 @@
 <script>
 export default {
   name: 'AppIndicatorRing',
-  props: { progress: { type: Number, default: 0 }, display: { type: [String, Number], required: true }, ringStyle: { type: Object, default: null } },
+  props: {
+    progress: { type: Number, default: 0 },
+    display: { type: [String, Number], required: true },
+    ringStyle: { type: Object, default: null },
+    appearance: { type: String, default: 'default' },
+    color: { type: String, default: '#0d9488' },
+  },
   computed: {
+    metricCircumference() { return 2 * Math.PI * 42; },
+    normalizedProgress() { return Number.isFinite(this.progress) ? Math.min(100, Math.max(0, this.progress)) : 0; },
     gradientId() { return `app-indicator-gradient-${this.$.uid}`; },
     activeStyle() {
       if (this.ringStyle) return this.ringStyle;
