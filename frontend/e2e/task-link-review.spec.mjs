@@ -2,6 +2,7 @@ import { expect, test } from './support/isolatedTest.mjs';
 import { login, selectOption } from './support/gesture-helpers.mjs';
 import { studentPassword } from './support/credentials.mjs';
 import { expectDialogContained } from './support/dialogGeometry.mjs';
+import { readFileSync } from 'node:fs';
 
 test.use({ actionTimeout: 20_000 });
 
@@ -125,9 +126,27 @@ for (const mode of ['questions', 'document']) {
     if (info.project.use.hasTouch) await eye.tap();
     else await eye.click();
     const dialog = page.getByRole('dialog').filter({ has: page.locator('.results-answer-card') });
-    await expect(dialog.getByRole('button', { name: 'تحميل PDF' })).toHaveCount(0);
+    const expectAnswerPreview = async () => {
+      if (mode === 'document') {
+        const preview = dialog.getByRole('region', { name: 'إجابة المعلم بصيغة PDF', exact: true });
+        await expect(preview.getByRole('link', { name: 'تحميل PDF', exact: true })).toBeVisible({ timeout: 60_000 });
+        await expect(preview.locator('.document-answer-preview__text')).toContainText(answer);
+        await expect(preview.locator('figure')).toHaveCount(1);
+        await expect.poll(() => preview.locator('figure img').evaluate(image => image.naturalWidth)).toBeGreaterThan(0);
+      } else {
+        await expect(dialog.getByRole('link', { name: 'تحميل PDF', exact: true })).toHaveCount(0);
+        await expect(dialog.locator('.results-answer-card__line--student')).toContainText(answer);
+      }
+    };
+    await expectAnswerPreview();
     await expectDialogContained(dialog);
-    await expect(dialog.locator(mode === 'document' ? '.rich-text-document-view' : '.results-answer-card__line--student')).toContainText(answer);
+    if (mode === 'document') {
+      const download = page.waitForEvent('download');
+      await dialog.getByRole('link', { name: 'تحميل PDF', exact: true }).click();
+      const file = await download;
+      expect(file.suggestedFilename()).toContain(name);
+      expect(readFileSync(await file.path()).subarray(0, 5).toString()).toBe('%PDF-');
+    }
     await dialog.getByLabel('درجة الإجابة', { exact: true }).fill('4');
     const scored = page.waitForResponse(response => response.url().includes('/answers/') && response.url().endsWith('/manual-score') && response.request().method() === 'PUT');
     await dialog.getByRole('button', { name: 'حفظ الدرجة', exact: true }).click();
@@ -139,8 +158,13 @@ for (const mode of ['questions', 'document']) {
     await selectOption(page, title, { exact: true });
     await eye.click();
     await expect(dialog.getByLabel('درجة الإجابة', { exact: true })).toHaveValue('4');
+    await expectAnswerPreview();
     await expect(dialog.locator('.results-answer-card')).toContainText(answer);
-    if (mode === 'document') await expect(dialog.locator('.rich-text-document-view strong')).toContainText(answer);
+    if (mode === 'document') {
+      const results = await api('GET', `/dashboard/results?${new URLSearchParams({ courseId: task.id, assessmentType: 'tasks', branchCode: 'male', page: '1', perPage: '20', state: 'all' })}`);
+      const submission = results.submissions.find(item => item.loginId === loginId);
+      expect(submission.answers[0].value).toContain(`<strong>${answer}</strong>`);
+    }
     await expectDialogContained(dialog);
     if (mode === 'document') await expect(dialog.locator('.results-answer-card__question')).toHaveCount(0);
     await page.screenshot({ path: info.outputPath(`${mode}-saved-answer.png`) });
