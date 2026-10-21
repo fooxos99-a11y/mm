@@ -10,9 +10,9 @@ final class RichTextSanitizer
 {
     /** @var array<string, true> */
     private const ALLOWED_TAGS = [
-        'a' => true, 'blockquote' => true, 'br' => true, 'code' => true, 'del' => true,
+        'a' => true, 'b' => true, 'blockquote' => true, 'br' => true, 'code' => true, 'del' => true,
         'div' => true, 'em' => true, 'h1' => true, 'h2' => true, 'h3' => true,
-        'h4' => true, 'h5' => true, 'h6' => true, 'hr' => true, 'img' => true,
+        'h4' => true, 'h5' => true, 'h6' => true, 'hr' => true, 'i' => true, 'img' => true,
         'li' => true, 'ol' => true, 'p' => true, 'pre' => true, 's' => true,
         'span' => true, 'strong' => true, 'sub' => true, 'sup' => true, 'table' => true,
         'tbody' => true, 'td' => true, 'tfoot' => true, 'th' => true, 'thead' => true,
@@ -30,6 +30,7 @@ final class RichTextSanitizer
     private const ATTRIBUTES = [
         '*' => ['class' => true, 'dir' => true, 'style' => true],
         'a' => ['href' => true, 'rel' => true, 'target' => true],
+        'li' => ['data-list' => true],
         'img' => [
             'alt' => true, 'data-height-px' => true, 'data-width-px' => true,
             'data-x' => true, 'data-y' => true, 'draggable' => true, 'height' => true,
@@ -155,7 +156,9 @@ final class RichTextSanitizer
                 continue;
             }
 
-            if ($name === 'style') {
+            if ($name === 'data-list' && ! in_array($value, ['ordered', 'bullet', 'checked', 'unchecked'], true)) {
+                $element->removeAttribute($name);
+            } elseif ($name === 'style') {
                 $safeStyle = $this->sanitizeStyle($value);
                 $safeStyle === ''
                     ? $element->removeAttribute($name)

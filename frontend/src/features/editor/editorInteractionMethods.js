@@ -269,7 +269,7 @@ export default {
 
       this.editor.root.removeEventListener('click', this.handleEditorClick);
       this.editor.root.removeEventListener('pointerdown', this.handleEditorPointerDown);
-      this.editor.root.removeEventListener('paste', this.handleEditorPaste);
+      this.editor.root.removeEventListener('paste', this.handleEditorPaste, true);
       this.editor.root.removeEventListener('contextmenu', this.handleTableContextMenu);
       this.$refs.toolbar?.removeEventListener('pointerdown', this.toolbarPointerDownListener, true);
       this.editor.off('text-change', this.handleEditorTextChange);

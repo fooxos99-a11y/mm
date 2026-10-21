@@ -34,6 +34,7 @@ export const hasMeaningfulDocumentContent = (value) => stripRichTextMarkup(value
 
 const ALLOWED_TAGS = new Set([
   'a',
+  'b',
   'blockquote',
   'br',
   'code',
@@ -47,6 +48,7 @@ const ALLOWED_TAGS = new Set([
   'h5',
   'h6',
   'hr',
+  'i',
   'img',
   'li',
   'ol',
@@ -70,6 +72,7 @@ const ALLOWED_TAGS = new Set([
 
 const ALLOWED_ATTRIBUTES = {
   a: new Set(['href', 'target', 'rel']),
+  li: new Set(['data-list']),
   img: new Set(['src', 'alt', 'style', 'data-width-px', 'data-height-px', 'data-x', 'data-y', 'width', 'height', 'draggable']),
   table: new Set(['style', 'table_id']),
   tr: new Set(['style', 'row_id']),
@@ -79,6 +82,7 @@ const ALLOWED_ATTRIBUTES = {
 };
 
 const SAFE_URL_PATTERN = /^(https?:|mailto:|tel:)/i;
+const DISCARD_CONTENT_TAGS = new Set(['script', 'style', 'template', 'noscript', 'iframe', 'object', 'embed', 'head', 'title']);
 const SAFE_DATA_IMAGE_URL_PATTERN = /^data:image\/(?:png|jpe?g|gif|webp);base64,[A-Z0-9+/=\s]+$/i;
 const UNSAFE_STYLE_VALUE_PATTERN = /(expression\s*\(|javascript:|vbscript:|data:text\/html|url\s*\()/i;
 const ALLOWED_STYLE_PROPERTIES = new Set([
@@ -173,6 +177,10 @@ const sanitizeNodeTree = (node, documentRef) => {
 
   const tagName = node.tagName.toLowerCase();
 
+  if (DISCARD_CONTENT_TAGS.has(tagName)) {
+    return null;
+  }
+
   if (!ALLOWED_TAGS.has(tagName)) {
     const fragment = documentRef.createDocumentFragment();
     Array.from(node.childNodes || []).forEach((childNode) => {
@@ -195,6 +203,10 @@ const sanitizeNodeTree = (node, documentRef) => {
     const attributeValue = attribute.value || '';
 
     if (!allowedAttributes.has(attributeName)) {
+      return;
+    }
+
+    if (attributeName === 'data-list' && !['ordered', 'bullet', 'checked', 'unchecked'].includes(attributeValue)) {
       return;
     }
 

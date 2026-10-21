@@ -3,6 +3,7 @@ import { TABLE_CONTEXT_ACTIONS } from './editorRuntime';
 import coreMethods from './editorCoreMethods';
 import imageMethods from './editorImageMethods';
 import insertMethods from './editorInsertMethods';
+import clipboardMethods from './editorClipboardMethods';
 import interactionMethods from './editorInteractionMethods';
 import tableMethods from './editorTableMethods';
 
@@ -70,7 +71,7 @@ export default {
     value(nextValue) {
       if (!this.editor || this.isApplyingExternalValue) return;
       const sanitizedValue = this.sanitizeEditorHtml(nextValue || '');
-      if (this.editor.root.innerHTML === sanitizedValue) return;
+      if (this.sanitizeEditorHtml(this.editor.root.innerHTML) === sanitizedValue) return;
       this.isApplyingExternalValue = true;
       this.setEditorHtml(sanitizedValue);
       this.$nextTick(() => { this.isApplyingExternalValue = false; });
@@ -89,6 +90,7 @@ export default {
   methods: {
     ...coreMethods,
     ...insertMethods,
+    ...clipboardMethods,
     ...tableMethods,
     ...imageMethods,
     ...interactionMethods,

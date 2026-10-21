@@ -49,7 +49,8 @@ export default {
       this.toolbarPointerDownListener = (event) => this.handleToolbarPointerDown(event);
       this.editor.root.addEventListener('click', this.handleEditorClick);
       this.editor.root.addEventListener('pointerdown', this.handleEditorPointerDown);
-      this.editor.root.addEventListener('paste', this.handleEditorPaste);
+      // Handle the clipboard before Quill's built-in listener can insert it again.
+      this.editor.root.addEventListener('paste', this.handleEditorPaste, true);
       this.editor.root.addEventListener('contextmenu', this.handleTableContextMenu);
       this.$refs.toolbar?.addEventListener('pointerdown', this.toolbarPointerDownListener, true);
       window.addEventListener('resize', this.handleViewportChange);

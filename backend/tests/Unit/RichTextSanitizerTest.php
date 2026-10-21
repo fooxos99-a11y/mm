@@ -46,4 +46,22 @@ class RichTextSanitizerTest extends TestCase
 
         $this->assertSame($once, $sanitizer->sanitize($once));
     }
+
+    public function test_it_keeps_clipboard_emphasis_and_list_types_without_untrusted_attributes(): void
+    {
+        $sanitizer = new RichTextSanitizer;
+        $sanitized = $sanitizer->sanitize(
+            '<p><b>عريض</b><i>مائل</i></p><ol>'
+            .'<li data-list="ordered" onclick="unsafe()">مرقم</li>'
+            .'<li data-list="bullet" data-payload="unsafe">نقطي</li>'
+            .'<li data-list="invalid">نص</li></ol>',
+        );
+
+        $this->assertStringContainsString('<b>عريض</b><i>مائل</i>', $sanitized);
+        $this->assertStringContainsString('<li data-list="ordered">مرقم</li>', $sanitized);
+        $this->assertStringContainsString('<li data-list="bullet">نقطي</li>', $sanitized);
+        $this->assertStringContainsString('<li>نص</li>', $sanitized);
+        $this->assertStringNotContainsString('unsafe', $sanitized);
+        $this->assertSame($sanitized, $sanitizer->sanitize($sanitized));
+    }
 }
