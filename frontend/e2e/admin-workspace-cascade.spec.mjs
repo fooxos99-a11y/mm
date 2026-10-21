@@ -7,16 +7,21 @@ test('shared workspace geometry survives different lazy stylesheet arrival order
     await page.goto(`dashboard?panel=${panel}`);
     const card = page.locator('.admin-workspace-card').first();
     await expect(card).toBeVisible();
-    await page.evaluate(async () => {
+    const moved = await page.evaluate(async () => {
       await document.fonts.ready;
-      // Lazy components can load their legacy rules after the shared dashboard rules.
-      const links = [...document.querySelectorAll('link[rel="stylesheet"]')];
+      // Delay legacy panel styles, preserving the base/responsive dependency order.
+      const links = [...document.querySelectorAll('link[rel="stylesheet"]')].filter(link =>
+        /\/(?:Admin[^/]+|CompletionRequirementsPanel)-[^/]+\.css(?:\?|$)/.test(link.href));
       links.reverse().forEach((link) => document.head.appendChild(link));
+      return links.length;
     });
-    const box = await card.boundingBox();
-    const header = await page.locator('.dashboard-topbar').boundingBox();
-    expect(Math.abs(box.x - header.x), `${panel} horizontal alignment`).toBeLessThanOrEqual(1);
-    expect(Math.abs(box.width - header.width), `${panel} card width`).toBeLessThanOrEqual(1);
-    expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
+    expect(moved, `${panel} legacy styles were delayed`).toBeGreaterThan(0);
+    // Reinserted styles settle asynchronously; measure both boxes in the same frame.
+    await expect.poll(() => card.evaluate(element => {
+      const box = element.getBoundingClientRect();
+      const header = document.querySelector('.dashboard-topbar').getBoundingClientRect();
+      return Math.max(Math.abs(box.x - header.x), Math.abs(box.width - header.width),
+        document.documentElement.scrollWidth - innerWidth);
+    }), { message: `${panel} aligned card without horizontal overflow` }).toBeLessThanOrEqual(1);
   }
 });
