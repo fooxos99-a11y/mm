@@ -19,7 +19,7 @@ export const requiredCheckStates = (runs, checks, sha) => {
 };
 
 export const waitForCommitChecks = async ({
-  repo, sha, token, timeoutMs = 12 * 60_000, pollMs = 15_000,
+  repo, sha, token, timeoutMs = 25 * 60_000, pollMs = 15_000,
   fetcher = fetch, now = Date.now, pause = delay, log = console.log,
 }) => {
   if (!/^[\w.-]+\/[\w.-]+$/.test(repo || '') || !/^[a-f\d]{40}$/i.test(sha || '') || !token) {

@@ -107,8 +107,8 @@ test('clipboard keeps complete Arabic text, Word formatting, replacement, undo a
   expect(errors).toEqual([]);
 });
 
-test('image clipboard uploads once, preserves mixed text and respects student image locks', async ({ page, context }, info) => {
-  const { editor, api, task, save, errors } = await openDocument(page, context, 'لصق النص مع الصور');
+test('image clipboard uploads once, preserves mixed text and saves the result', async ({ page, context }) => {
+  const { editor, select, save, errors } = await openDocument(page, context, 'لصق النص مع الصور');
   let imageRequests = 0;
   page.on('request', (request) => { if (request.method() === 'POST' && request.url().endsWith('/editor-images')) imageRequests += 1; });
   await editor.click();
@@ -122,14 +122,30 @@ test('image clipboard uploads once, preserves mixed text and respects student im
   await expect(editor.locator('img')).toHaveCount(1);
   expect(imageRequests).toBe(1);
   await save();
+  await select();
+  await expect(editor.locator('img')).toHaveAttribute('src', originalImage);
+  await expect(editor).toContainText('النص الكامل مع صورة مرافقة');
+  expect(errors).toEqual([]);
+});
 
+test('student clipboard keeps locked template images while replacing text and submitting', async ({ page, context }, info) => {
+  const { editor, api, task, errors } = await openDocument(page, context, 'صور قالب الطالب');
+  const originalImage = `data:image/png;base64,${png}`;
+  await api('PUT', `/dashboard/courses/${task.id}`, {
+    taskTemplateContent: `<p><img src="${originalImage}"></p><p>قالب محفوظ للطالب</p>`,
+    isTasksEnabled: true,
+  });
+  let imageRequests = 0;
+  page.on('request', (request) => { if (request.method() === 'POST' && request.url().endsWith('/editor-images')) imageRequests += 1; });
   const loginId = `87${String(info.project.use.viewport.width).padStart(8, '0')}`;
   await api('POST', '/students', { name: 'طالب اختبار اللصق', loginId, branchId: 'male', password: studentPassword, passwordConfirmation: studentPassword });
-  await api('PUT', `/dashboard/courses/${task.id}`, { isTasksEnabled: true });
   await page.goto('about:blank');
   await context.clearCookies();
   await login(page, loginId, studentPassword);
   await page.goto(`tasks?taskId=${task.id}`);
+  await expect(editor.locator('img')).toHaveAttribute('src', originalImage);
+  await editor.press('ControlOrMeta+A');
+  await editor.press('Backspace');
   await expect(editor.locator('img')).toHaveAttribute('src', originalImage);
   await editor.click();
   await editor.press('ControlOrMeta+End');
@@ -142,7 +158,7 @@ test('image clipboard uploads once, preserves mixed text and respects student im
   await expect(editor.locator('img')).toHaveAttribute('src', originalImage);
   await paste(editor, { image: true });
   await expect(editor.locator('img')).toHaveCount(1);
-  expect(imageRequests).toBe(1);
+  expect(imageRequests).toBe(0);
   const sent = page.waitForResponse((response) => response.url().endsWith('/public/assessment-submissions') && response.request().method() === 'POST');
   await page.getByRole('button', { name: 'إرسال', exact: true }).click();
   expect((await sent).status()).toBe(201);

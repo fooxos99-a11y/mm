@@ -101,13 +101,18 @@ export default {
       imageElement.dataset.y = String(normalizedMetrics.translateY);
     },
     refreshEditorImages() {
-      if (!this.editor?.root) {
+      if (!this.editor?.root?.querySelector('img')) {
         return;
       }
 
+      // Preserve any pending user input before applying display-only image changes.
+      this.editor.update(Quill.sources.USER);
       this.editor.root.querySelectorAll('img').forEach((imageElement) => {
         this.prepareImageElement(imageElement);
       });
+      // Consume layout mutations as metadata, before the observer treats them as a
+      // user edit and locked-image protection restores the previous dimensions.
+      this.editor.update(Quill.sources.SILENT);
     },
     persistImageMetrics(imageElement = this.selectedImage) {
       if (!this.editor || !imageElement) {

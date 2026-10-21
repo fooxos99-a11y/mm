@@ -1,16 +1,17 @@
-.dashboard-page .dashboard-workspace-panel--standard {
+/* These shared rules must win when legacy panel styles arrive in a later lazy chunk. */
+.dashboard-page .dashboard-workspace-panel.dashboard-workspace-panel--standard {
   border: 0;
   background: transparent;
   box-shadow: none;
   overflow: visible;
 }
 
-.dashboard-page .dashboard-workspace-panel--standard :is(.assessment-page__container, .tasks-page__container, .final-exam-page__container, .satisfaction-admin__container, .permissions-admin__container, .settings-admin__container, .people-page) {
+.dashboard-page .dashboard-workspace-panel.dashboard-workspace-panel--standard :is(.assessment-page__container, .tasks-page__container, .final-exam-page__container, .satisfaction-admin__container, .permissions-admin__container, .settings-admin__container, .people-page) {
   max-width: none;
   padding: 0 !important;
 }
 
-.dashboard-page .dashboard-workspace-panel .admin-workspace-card {
+.dashboard-page .dashboard-workspace-panel.dashboard-workspace-panel--standard .admin-workspace-card {
   min-width: 0;
   margin: 0;
   padding: 0;
@@ -20,8 +21,8 @@
   box-shadow: var(--app-shadow-card);
 }
 
-.dashboard-page .admin-workspace-card > .app-card__body { min-width: 0; padding: var(--app-space-4); }
-.dashboard-page .dashboard-workspace-panel .admin-workspace-card .app-filter-toolbar {
+.dashboard-page .dashboard-workspace-panel--standard .admin-workspace-card > .app-card__body { min-width: 0; padding: var(--app-space-4); }
+.dashboard-page .dashboard-workspace-panel--standard .admin-workspace-card .app-filter-toolbar {
   display: grid;
   grid-template-columns: var(--app-filter-columns);
   align-items: end;
@@ -38,6 +39,8 @@
   width: 100%;
   min-width: 0;
   min-height: var(--app-control-height);
+  height: var(--app-control-height);
+  box-sizing: border-box;
   border: 1px solid var(--app-border);
   border-radius: var(--app-radius-control);
   padding: var(--app-space-2) var(--app-space-4);
@@ -55,7 +58,7 @@
 .dashboard-page .assessment-form-card__label-row { min-height: 44px; }
 
 @media (min-width: 768px) {
-  .dashboard-page .admin-workspace-card > .app-card__body { padding: var(--app-space-6); }
+  .dashboard-page .dashboard-workspace-panel--standard .admin-workspace-card > .app-card__body { padding: var(--app-space-6); }
 }
 
 @media (max-width: 767px) {
