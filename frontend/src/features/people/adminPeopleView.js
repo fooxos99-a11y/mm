@@ -2,6 +2,7 @@ import { mapActions, mapState } from 'vuex';
 import PeopleDirectoryPanel from '../../components/people/PeopleDirectoryPanel.vue';
 import PeopleEditorDialog from '../../components/people/PeopleEditorDialog.vue';
 import PeopleManagementDialogs from '../../components/people/PeopleManagementDialogs.vue';
+import PeopleImportPreview from '../../components/people/PeopleImportPreview.vue';
 import {
   createEmptyReciterForm as emptyReciterForm,
   createEmptyStudentForm as emptyStudentForm,
@@ -20,6 +21,7 @@ export default {
     PeopleDirectoryPanel,
     PeopleEditorDialog,
     PeopleManagementDialogs,
+    PeopleImportPreview,
   },
   props: { embedded: { type: Boolean, default: false } },
   data() {
@@ -70,6 +72,9 @@ export default {
         { label: 'الأقل إنجازًا', value: 'lowest-progress' },
       ],
       bulkImporting: false,
+      bulkImportPreview: null,
+      bulkImportPayload: null,
+      bulkImportError: '',
       bulkFilePickerOpen: false,
       bulkFilePickerResetTimer: null,
       dialogErrors: [],

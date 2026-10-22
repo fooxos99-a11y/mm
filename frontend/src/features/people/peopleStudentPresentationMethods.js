@@ -3,7 +3,7 @@ export default {
     if (!profile) return [];
 
     return [
-      profile.loginCode ? { label: 'رقم الهوية', value: profile.loginCode } : null,
+      profile.loginCode ? { label: 'رقم الدخول', value: profile.loginCode } : null,
       profile.phone ? { label: 'رقم الجوال', value: profile.phone } : null,
       profile.gender ? { label: 'الجنس', value: profile.gender === 'female' ? 'أنثى' : 'ذكر' } : null,
       ...((profile.answers || []).filter((answer) => answer?.label)),

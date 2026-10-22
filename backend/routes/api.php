@@ -22,6 +22,8 @@ use App\Http\Controllers\Api\RolePermissionController;
 use App\Http\Controllers\Api\SatisfactionController;
 use App\Http\Controllers\Api\SnapshotController;
 use App\Http\Controllers\Api\StudentController;
+use App\Http\Controllers\Api\StudentImportController;
+use App\Http\Controllers\Api\StudentInitialPasswordController;
 use App\Http\Controllers\Api\TaskTemplateController;
 use App\Http\Controllers\Api\TrainingMaterialController;
 use App\Http\Controllers\ArchiveController;
@@ -250,6 +252,12 @@ Route::middleware(['auth:sanctum', 'password.changed'])->group(function () {
     Route::prefix('students')->group(function () {
         Route::get('me/indicators', [StudentController::class, 'indicators']);
         Route::middleware('can:access-dashboard')->group(function () {
+            Route::post('import/preview', [StudentImportController::class, 'preview'])
+                ->middleware('dashboard.access:student-add');
+            Route::post('import', [StudentImportController::class, 'store'])
+                ->middleware('dashboard.access:student-add');
+            Route::post('{student}/initial-password', StudentInitialPasswordController::class)
+                ->middleware(['dashboard.access:admin', 'throttle:30,1']);
             Route::post('/', [StudentController::class, 'store'])->middleware('dashboard.access:student-add');
             Route::put('{student}', [StudentController::class, 'update'])->middleware('dashboard.access:student-edit');
             Route::delete('{student}', [StudentController::class, 'destroy'])

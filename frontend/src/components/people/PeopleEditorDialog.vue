@@ -177,6 +177,11 @@
           />
         </div>
 
+        <StudentInitialPassword
+          v-if="value && editing && entityType === 'student' && studentId && canRevealInitialPassword"
+          :key="studentId"
+          :student-id="studentId"
+        />
         <div
           class="people-dialog__field"
         >
@@ -266,6 +271,7 @@
 
 <script>
 import PeopleRemotePicker from './PeopleRemotePicker.vue';
+import StudentInitialPassword from './StudentInitialPassword.vue';
 import {
   AppButton, AppDialog, AppDialogBody, AppDialogFooter, AppDialogHeader,
   AppPasswordField, AppSelect, AppTextField,
@@ -275,6 +281,7 @@ export default {
   name: 'PeopleEditorDialog',
   components: {
     PeopleRemotePicker,
+    StudentInitialPassword,
     AppButton, AppDialog, AppDialogBody, AppDialogFooter, AppDialogHeader,
     AppPasswordField, AppSelect, AppTextField,
   },
@@ -300,6 +307,8 @@ export default {
     linkedStudentIds: { type: Array, default: () => [] },
     loginCode: { type: String, default: '' },
     password: { type: String, default: '' },
+    studentId: { type: String, default: '' },
+    canRevealInitialPassword: Boolean,
     passwordConfirmation: { type: String, default: '' },
     registrationRows: { type: Array, default: () => [] },
     errors: { type: Array, default: () => [] },

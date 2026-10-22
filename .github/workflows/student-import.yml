@@ -1,0 +1,57 @@
+name: Private student batch
+
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        type: choice
+        options: [inspect, preview, apply, verify]
+        required: true
+      department_id:
+        type: string
+      department_name:
+        type: string
+      expected_students:
+        type: string
+      expected_count:
+        type: string
+        default: '138'
+      batch_id:
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  batch:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment: production
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      - name: Configure verified SSH
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" | tr -d '\r' > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+      - name: Operate private batch
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_ROOT: ${{ secrets.DEPLOY_ROOT }}
+          STUDENT_BATCH: ${{ secrets.MOMARS_STUDENT_BATCH_GZIP }}
+          OPERATION: ${{ inputs.operation }}
+          DEPARTMENT_ID: ${{ inputs.department_id }}
+          DEPARTMENT_NAME: ${{ inputs.department_name }}
+          EXPECTED_STUDENTS: ${{ inputs.expected_students }}
+          EXPECTED_COUNT: ${{ inputs.expected_count }}
+          BATCH_ID: ${{ inputs.batch_id }}
+        run: bash scripts/run-student-import.sh

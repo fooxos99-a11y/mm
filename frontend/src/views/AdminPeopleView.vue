@@ -90,6 +90,13 @@
       @manage-close="closeManageDialog"
     />
 
+    <PeopleImportPreview
+      :preview="bulkImportPreview"
+      :busy="bulkImporting"
+      :error="bulkImportError"
+      @close="closeBulkImportPreview"
+      @confirm="confirmBulkImport"
+    />
     <PeopleEditorDialog
       ref="peopleEditorDialog"
       :value="dialogOpen"
@@ -114,6 +121,8 @@
       :login-code="activeLoginCode"
       :password="activePassword"
       :password-confirmation="activePasswordConfirmation"
+      :student-id="isEditing && dialogEntityType === 'student' ? editingTargetId : ''"
+      :can-reveal-initial-password="isAdmin"
       :registration-rows="registrationProfileRows((editingStudentRecord || {}).registrationProfile)"
       :errors="dialogErrors"
       :submitting="dialogSubmitting || dialogDataLoading"

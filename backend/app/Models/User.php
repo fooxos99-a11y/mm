@@ -42,6 +42,9 @@ class User extends Authenticatable
         });
 
         static::updated(function (User $user): void {
+            if ($user->wasChanged(['password', 'department_id', 'role']) && Schema::hasTable('student_initial_credentials')) {
+                DB::table('student_initial_credentials')->where('user_id', $user->getKey())->delete();
+            }
             if ($user->wasChanged('department_id') && $user->department_id !== null
                 && Schema::hasColumn('reserved_login_codes', 'department_id')) {
                 // An initially unassigned account acquires its origin once; history never moves.
