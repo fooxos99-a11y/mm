@@ -29,11 +29,13 @@ class ReciterController extends Controller
             $data['branchId'],
             $data['linkedStudentIds'] ?? [],
             filled($data['password'] ?? null) ? Hash::make($data['password']) : null,
+            array_intersect_key($data, ['phone' => true]),
         );
 
         return response()->json([
             'id' => $reciter->id,
             'name' => $reciter->full_name,
+            'phone' => $reciter->phone,
             'loginCode' => $reciter->user?->login_code,
             'branchId' => $reciter->branch?->code,
             'studentIds' => $reciter->students->pluck('id')->all(),

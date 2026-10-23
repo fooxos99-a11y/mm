@@ -17,6 +17,7 @@ export const createEmptyStudentForm = () => ({
 
 export const createEmptyReciterForm = () => ({
   name: '',
+  phone: '',
   loginCode: '',
   password: '',
   passwordConfirmation: '',

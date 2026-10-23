@@ -79,6 +79,7 @@ export default {
       await this.saveReciter({
         currentLoginCode: this.isEditing ? this.editingReciterRecord.loginCode : null,
         name: this.reciterForm.name,
+        phone: this.reciterForm.phone,
         loginCode: this.reciterForm.loginCode,
         password: this.reciterForm.password || undefined,
         passwordConfirmation: this.reciterForm.password ? this.reciterForm.passwordConfirmation : undefined,

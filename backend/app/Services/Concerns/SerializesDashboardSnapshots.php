@@ -52,6 +52,7 @@ trait SerializesDashboardSnapshots
             'reciters' => $reciters->map(fn (Reciter $reciter) => [
                 'id' => $reciter->id,
                 'name' => $reciter->full_name ?: ($reciter->user?->full_name ?? ''),
+                'phone' => $reciter->phone,
                 'loginCode' => $reciter->user?->login_code ?? '',
                 'branchId' => $reciter->branch?->code ?? 'male',
                 'studentIds' => $reciter->students->pluck('id')->values()->all(),

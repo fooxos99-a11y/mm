@@ -8,6 +8,29 @@
   -webkit-overflow-scrolling: touch;
 }
 
+.student-reciter-phone {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 16px;
+  direction: rtl;
+}
+
+.student-reciter-phone a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: inherit;
+  text-decoration: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.student-reciter-phone a:hover,
+.student-reciter-phone a:focus-visible {
+  text-decoration: underline;
+}
+
 .student-page .dashboard-sidebar {
   position: fixed;
   top: 0;

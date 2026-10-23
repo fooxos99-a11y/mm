@@ -25,6 +25,7 @@ class Reciter extends Model
 
     protected $fillable = [
         'full_name',
+        'phone',
         'user_id',
         'branch_id',
         'created_at',

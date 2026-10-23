@@ -209,6 +209,7 @@ trait ManagesStudents
         return [
             'id' => $reciter->id,
             'name' => $reciter->full_name ?: ($reciter->user?->full_name ?? ''),
+            'phone' => $reciter->phone,
             'loginCode' => $reciter->user?->login_code ?? '',
         ];
     }

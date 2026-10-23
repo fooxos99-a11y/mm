@@ -159,6 +159,31 @@
           />
         </div>
 
+        <div
+          v-if="entityType === 'reciter'"
+          class="people-dialog__field"
+        >
+          <label
+            class="people-dialog__label"
+            for="people-editor-phone"
+          >رقم الجوال (اختياري)</label>
+          <AppTextField
+            id="people-editor-phone"
+            :value="phone"
+            aria-label="رقم الجوال (اختياري)"
+            type="tel"
+            inputmode="tel"
+            autocomplete="tel"
+            dir="ltr"
+            maxlength="30"
+            dense
+            outlined
+            hide-details
+            class="people-dialog__input"
+            @input="$emit('update:phone', $event)"
+          />
+        </div>
+
         <div class="people-dialog__field">
           <label
             class="people-dialog__label"
@@ -306,6 +331,7 @@ export default {
     linkedStudents: { type: Array, default: () => [] },
     linkedStudentIds: { type: Array, default: () => [] },
     loginCode: { type: String, default: '' },
+    phone: { type: String, default: '' },
     password: { type: String, default: '' },
     studentId: { type: String, default: '' },
     canRevealInitialPassword: Boolean,
@@ -326,6 +352,7 @@ export default {
     'update:branch-id',
     'update:entity-type',
     'update:login-code',
+    'update:phone',
     'update:name',
     'update:password',
     'update:password-confirmation',

@@ -131,6 +131,16 @@
           class="dashboard-section"
         >
           <div class="dashboard-card student-parts-card student-parts-card--minimal">
+            <p
+              v-if="assignedReciter?.phone"
+              class="student-reciter-phone"
+            >
+              رقم جوال المقرئ:
+              <a
+                :href="`tel:${assignedReciter.phone}`"
+                dir="ltr"
+              >{{ assignedReciter.phone }}</a>
+            </p>
             <div class="student-parts-grid">
               <div
                 v-for="part in allParts"

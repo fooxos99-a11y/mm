@@ -43,6 +43,7 @@ export default {
 
       this.reciterForm = {
         name: reciter.name,
+        phone: reciter.phone || '',
         loginCode: reciter.loginCode || '',
         branchId: reciter.branchId,
         studentIds: [...(reciter.studentIds || [])],

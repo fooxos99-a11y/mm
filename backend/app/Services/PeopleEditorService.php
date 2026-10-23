@@ -60,6 +60,7 @@ class PeopleEditorService
         $record = ['id' => $person->id, 'name' => $person->full_name, 'branchId' => $person->branch->code];
         if ($type === 'reciter') {
             return [...$record, 'loginCode' => $person->user?->login_code,
+                'phone' => $person->phone,
                 'studentIds' => $person->students()->whereNull('students.archive_id')->pluck('students.id')->all()];
         }
 

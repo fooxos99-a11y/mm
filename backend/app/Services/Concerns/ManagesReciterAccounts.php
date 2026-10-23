@@ -20,7 +20,8 @@ trait ManagesReciterAccounts
         string $loginCode,
         string $branchCode,
         array $linkedStudentIds = [],
-        ?string $passwordHash = null
+        ?string $passwordHash = null,
+        array $updates = [],
     ): Reciter {
         $name = trim($name);
         $loginCode = trim($loginCode);
@@ -37,7 +38,8 @@ trait ManagesReciterAccounts
             $loginCode,
             $branch,
             $linkedStudentIds,
-            $passwordHash
+            $passwordHash,
+            $updates,
         ): Reciter {
             $currentUser = $currentLoginCode === ''
                 ? null
@@ -80,6 +82,9 @@ trait ManagesReciterAccounts
             }
 
             $reciter = Reciter::query()->firstOrNew(['user_id' => $user->id]);
+            if (array_key_exists('phone', $updates)) {
+                $reciter->phone = $updates['phone'];
+            }
             $reciter->fill([
                 'full_name' => $name,
                 'user_id' => $user->id,
@@ -96,8 +101,11 @@ trait ManagesReciterAccounts
             if (count(array_unique($linkedStudentIds)) !== count($validatedStudentIds)) {
                 throw ValidationException::withMessages(['studentIds' => 'اختر معلمين من فرع المقرئ وإدارته.']);
             }
-            DB::table('reciter_students')->where('reciter_id', $reciter->id)->delete();
-            foreach ($validatedStudentIds as $studentId) {
+            DB::table('reciter_students')->where('reciter_id', $reciter->id)
+                ->whereNotIn('student_id', $validatedStudentIds)->delete();
+            $existingStudentIds = DB::table('reciter_students')->where('reciter_id', $reciter->id)
+                ->pluck('student_id')->all();
+            foreach (array_diff($validatedStudentIds, $existingStudentIds) as $studentId) {
                 DB::table('reciter_students')->insert([
                     'reciter_id' => $reciter->id, 'student_id' => $studentId, 'created_at' => now(),
                 ]);

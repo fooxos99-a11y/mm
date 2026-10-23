@@ -55,6 +55,7 @@ class PeopleDirectoryPresenter
         return [
             'id' => $reciter->id, 'cardKey' => 'reciter:'.$reciter->id,
             'name' => $reciter->full_name ?: $reciter->user?->full_name,
+            'phone' => $reciter->phone,
             'loginId' => $reciter->user?->login_code ?: 'بدون رقم', 'loginCode' => $reciter->user?->login_code,
             'branchId' => $reciter->branch->code, 'studentIds' => $reciter->students->pluck('id')->all(),
             'linkedStudentNames' => $reciter->students->pluck('full_name')->sort()->implode('، ') ?: 'لا يوجد',
