@@ -141,6 +141,12 @@ jobs:
       - run: composer install --working-dir=../backend --no-interaction --prefer-dist --no-progress --no-ansi
       - run: cp ../backend/.env.example ../backend/.env
       - run: php ../backend/artisan key:generate
+      - name: Use Ubuntu mirror for browser dependencies
+        run: |
+          for source in /etc/apt/sources.list /etc/apt/sources.list.d/*.sources /etc/apt/sources.list.d/*.list; do
+            [[ -f "$source" ]] || continue
+            sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu|https://archive.ubuntu.com/ubuntu|g' "$source"
+          done
       - run: ./node_modules/.bin/playwright install --with-deps chromium
       - run: npm run build
       - run: npm run test:e2e:dist -- --project=${{ matrix.project }}
