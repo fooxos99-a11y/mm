@@ -64,6 +64,7 @@
 </template>
 
 <script>
+import { mergeProps } from 'vue';
 import { normalizeVuetifyFieldAttrs } from './vuetifyFieldAttrs';
 import { normalizeSelectItemSlotProps } from './selectSlotProps.mjs';
 
@@ -117,21 +118,18 @@ export default {
     resolvedMenuProps() {
       const globalMenuProps = this.$dropdownMenuProps || {};
 
-      if (typeof this.menuProps === 'string') {
-        return {
-          ...globalMenuProps,
-          attach: this.menuAttachTarget,
-          contentClass: mergeContentClass(globalMenuProps.contentClass, this.menuProps),
-        };
-      }
-
-      const localMenuProps = this.menuProps || {};
+      const localMenuProps = typeof this.menuProps === 'string'
+        ? { contentClass: this.menuProps }
+        : (this.menuProps || {});
 
       return {
         ...globalMenuProps,
         ...localMenuProps,
         attach: localMenuProps.attach !== undefined ? localMenuProps.attach : this.menuAttachTarget,
         contentClass: mergeContentClass(globalMenuProps.contentClass, localMenuProps.contentClass),
+        contentProps: mergeProps(globalMenuProps.contentProps || {}, localMenuProps.contentProps || {}, {
+          onKeydownCapture: this.handleMenuKeydown,
+        }),
       };
     },
   },
@@ -167,6 +165,10 @@ export default {
       event?.preventDefault();
       event?.stopPropagation();
       field.menu = false;
+      field.focus();
+    },
+    handleMenuKeydown(event) {
+      if (event.key === 'Escape') this.closeMenu(event);
     },
     normalizedScopedSlotProps(slotName, slotProps) {
       return slotName === 'item' ? normalizeSelectItemSlotProps(slotProps) : slotProps;
@@ -180,7 +182,8 @@ export default {
       const modal = this.$el?.closest('.modal');
 
       if (modal) {
-        return this.$el;
+        // Keep the menu in the native dialog's top layer, outside clipped form bodies.
+        return modal;
       }
 
       return false;

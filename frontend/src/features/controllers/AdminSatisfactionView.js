@@ -1,6 +1,6 @@
 import { mapActions, mapState } from 'vuex';
 import {
-  AppButton, AppCard, AppFilterField, AppFilterToolbar, AppDialog, AppDialogBody, AppDialogFooter, AppDialogHeader, AppIconButton, AppSelect, AppTextField,
+  AppButton, AppCard, AppFilterField, AppFilterToolbar, AppDialog, AppDialogBody, AppDialogFooter, AppDialogHeader, AppIconButton, AppIndicatorCard, AppSelect, AppTextField,
 } from '../../components/ui';
 import { useIndicatorAnimation } from '../../composables/useIndicatorAnimation';
 import { canUseDashboardPermission } from '../permissions/permissionAccess.mjs';
@@ -30,6 +30,7 @@ export default {
     AppDialogHeader,
     AppDialogFooter,
     AppIconButton,
+    AppIndicatorCard,
     AppTextField,
   },
   setup() {
@@ -185,12 +186,6 @@ export default {
   },
   methods: {
     ...mapActions(['addSatisfactionQuestion', 'deleteSatisfactionQuestion']),
-    indicatorRingStyle(progress) {
-      const normalized = this.animatedIndicatorPercent(progress);
-      return {
-        background: `conic-gradient(#156c82 0 ${normalized}%, #e9f2f5 ${normalized}% 100%)`,
-      };
-    },
     getQuestionKey(question) {
       return `${question.prompt}::${question.type}`;
     },

@@ -40,7 +40,7 @@
       />
       <div
         v-else
-        class="dashboard-indicators-grid dashboard-indicators-grid--metrics"
+        class="dashboard-indicators-grid dashboard-indicators-grid--metrics app-indicator-grid"
       >
         <AppIndicatorCard
           v-for="indicator in indicators"
@@ -106,15 +106,4 @@ export default {
   flex-shrink: 0;
 }
 
-.dashboard-page .dashboard-indicators-grid.dashboard-indicators-grid--metrics {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-}
-
-@media (min-width: 768px) {
-  .dashboard-page .dashboard-indicators-grid.dashboard-indicators-grid--metrics {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
 </style>

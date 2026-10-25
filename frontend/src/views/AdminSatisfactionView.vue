@@ -50,42 +50,34 @@
             </div>
             <div
               v-else
-              class="satisfaction-admin__metrics-grid"
+              class="satisfaction-admin__metrics-grid dashboard-indicators-grid app-indicator-grid"
             >
-              <article
+              <AppIndicatorCard
                 v-for="indicatorCard in indicatorCards"
                 :key="indicatorCard.id"
-                class="satisfaction-admin__metric-card assessment-score-indicator"
+                class="satisfaction-admin__metric-card"
+                :label="indicatorCard.prompt"
+                :display="indicatorCard.display"
+                :animated-value="animatedIndicatorDisplay(indicatorCard.display)"
+                :progress="animatedIndicatorPercent(indicatorCard.progress)"
+                :meta="indicatorCard.meta"
+                show-meta
               >
-                <AppIconButton
-                  v-if="canEditQuestions"
-                  variant="plain"
-                  :label="`حذف سؤال ${indicatorCard.prompt}`"
-                  class="satisfaction-admin__delete-indicator"
-                  :disabled="deletingQuestionKey === indicatorCard.questionKey"
-                  @click="deleteQuestionFromIndicator(indicatorCard)"
-                >
-                  <v-icon small>
-                    mdi-close
-                  </v-icon>
-                </AppIconButton>
-                <div
-                  class="assessment-score-indicator__ring"
-                  :style="indicatorRingStyle(indicatorCard.progress)"
-                >
-                  <div class="assessment-score-indicator__ring-core">
-                    {{ animatedIndicatorDisplay(indicatorCard.display) }}
-                  </div>
-                </div>
-                <div class="assessment-score-indicator__text">
-                  <div class="assessment-score-indicator__subtitle satisfaction-admin__metric-title">
-                    {{ indicatorCard.prompt }}
-                  </div>
-                  <div class="assessment-score-indicator__sublabel">
-                    {{ indicatorCard.meta }}
-                  </div>
-                </div>
-              </article>
+                <template #actions>
+                  <AppIconButton
+                    v-if="canEditQuestions"
+                    variant="plain"
+                    :label="`حذف سؤال ${indicatorCard.prompt}`"
+                    class="satisfaction-admin__delete-indicator"
+                    :disabled="deletingQuestionKey === indicatorCard.questionKey"
+                    @click="deleteQuestionFromIndicator(indicatorCard)"
+                  >
+                    <v-icon small>
+                      mdi-close
+                    </v-icon>
+                  </AppIconButton>
+                </template>
+              </AppIndicatorCard>
             </div>
           </section>
         </template>

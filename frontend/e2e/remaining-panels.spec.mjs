@@ -47,10 +47,10 @@ test('remaining dashboard panels expose usable controls and dialogs', async ({ p
   await page.getByRole('button', { name: 'إضافة', exact: true }).click();
   await expect(page.locator('.satisfaction-admin__dialog')).toBeVisible();
   await page.locator('.satisfaction-admin__dialog .app-select .v-field').first().click();
-  await expect(page.locator('.satisfaction-admin__dialog .app-dropdown-menu').filter({ visible: true })).toBeVisible();
+  await expect(page.locator('.modal[open] > .v-overlay-container .app-dropdown-menu').filter({ visible: true })).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(page.locator('.satisfaction-admin__dialog')).toBeVisible();
-  await expect(page.locator('.satisfaction-admin__dialog .app-dropdown-menu').filter({ visible: true })).toHaveCount(0);
+  await expect(page.locator('.modal[open] > .v-overlay-container .app-dropdown-menu').filter({ visible: true })).toHaveCount(0);
   const requiredSwitch = page.getByRole('checkbox', { name: 'سؤال إلزامي' });
   await requiredSwitch.check();
   await expect(requiredSwitch).toBeChecked();

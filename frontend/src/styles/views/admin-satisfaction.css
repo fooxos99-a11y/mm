@@ -32,35 +32,16 @@
   margin-top: 0;
 }
 
-.satisfaction-admin__metrics-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 18px;
-}
-
-.satisfaction-admin__metric-title {
-  line-height: 1.8;
-}
-
-.satisfaction-admin__metric-card {
-  position: relative;
-  padding: 24px 20px 20px;
-  border: 1px solid rgba(214, 229, 238, 0.9);
-  border-radius: 24px;
-  background: #fff;
-  box-shadow: 0 12px 34px rgba(15, 23, 42, 0.04);
-}
-
 .satisfaction-admin__delete-indicator {
   position: absolute;
-  top: 14px;
-  right: 14px;
+  top: 4px;
+  inset-inline-end: 4px;
   z-index: 2;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: 44px;
+  height: 44px;
   padding: 0;
   border: 0;
   background: transparent;
@@ -204,7 +185,4 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .satisfaction-admin__metrics-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
 }

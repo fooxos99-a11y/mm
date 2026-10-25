@@ -1,9 +1,11 @@
 <template>
   <div
     class="dashboard-indicator-card app-indicator-card"
+    :class="{ 'app-indicator-card--actions': !!$slots.actions }"
     role="group"
     :aria-label="`${label}: ${display}، ${meta}`"
   >
+    <slot name="actions" />
     <AppIndicatorRing
       appearance="metric"
       :progress="progress"
@@ -12,6 +14,12 @@
     />
     <div class="dashboard-indicator-card__label">
       {{ label }}
+    </div>
+    <div
+      v-if="showMeta && meta"
+      class="app-indicator-card__meta"
+    >
+      {{ meta }}
     </div>
   </div>
 </template>
@@ -27,6 +35,7 @@ export default {
     display: { type: [String, Number], required: true },
     animatedValue: { type: [String, Number], required: true },
     meta: { type: String, default: '' },
+    showMeta: { type: Boolean, default: false },
     progress: { type: Number, default: 0 },
     color: { type: String, default: '#0d9488' },
   },
@@ -50,7 +59,8 @@ export default {
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
-.dashboard-page .dashboard-indicator-card.app-indicator-card {
+.dashboard-indicator-card.app-indicator-card {
+  position: relative;
   box-sizing: border-box;
   display: flex;
   min-width: 0;
@@ -70,14 +80,14 @@ export default {
   font-family: 'Cairo Indicators', sans-serif;
 }
 
-.dashboard-page .app-indicator-card :deep(.dashboard-indicator-ring--metric) {
+.app-indicator-card :deep(.dashboard-indicator-ring--metric) {
   width: 112px;
   height: 112px;
   flex-shrink: 0;
   filter: none;
 }
 
-.dashboard-page .app-indicator-card :deep(.dashboard-indicator-ring__inner) {
+.app-indicator-card :deep(.dashboard-indicator-ring__inner) {
   width: 100%;
   height: 100%;
   background: transparent;
@@ -90,7 +100,8 @@ export default {
   letter-spacing: normal;
 }
 
-.dashboard-page .dashboard-indicator-card.app-indicator-card .dashboard-indicator-card__label {
+.dashboard-page .dashboard-indicator-card.app-indicator-card .dashboard-indicator-card__label,
+.dashboard-indicator-card.app-indicator-card .dashboard-indicator-card__label {
   max-width: 100%;
   margin: 0;
   color: inherit;
@@ -100,4 +111,17 @@ export default {
   white-space: normal;
   overflow-wrap: anywhere;
 }
+
+.app-indicator-card__meta {
+  color: var(--app-text-muted);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 18px;
+}
+
+.dashboard-indicator-card.app-indicator-card--actions {
+  padding-block-start: 48px;
+  justify-content: flex-start;
+}
 </style>
+<style src="../../styles/indicator-grid.css"></style>

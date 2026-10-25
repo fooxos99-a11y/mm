@@ -4,6 +4,80 @@ import { login } from './support/gesture-helpers.mjs';
 
 test.use({ screenshot: 'off', actionTimeout: 20_000 });
 
+test('survey indicators share the overview layout and keep long questions and response counts readable', async ({ page, context }, info) => {
+  await login(page);
+  const overview = page.locator('.dashboard-overview-card .app-indicator-card').first();
+  await expect(overview).toBeVisible();
+  const ringAppearance = await overview.locator('.dashboard-indicator-ring').evaluate(element => {
+    const style = getComputedStyle(element);
+    return { width: style.width, height: style.height, filter: style.filter };
+  });
+  const labelAppearance = await overview.locator('.dashboard-indicator-card__label').evaluate(element => {
+    const style = getComputedStyle(element);
+    return { font: style.fontFamily, size: style.fontSize, weight: style.fontWeight, line: style.lineHeight };
+  });
+  await page.screenshot({ path: info.outputPath('overview.png') });
+  const origin = new URL(process.env.VUE_APP_API_BASE_URL).origin;
+  const csrf = (await context.cookies(origin)).find(cookie => cookie.name === 'XSRF-TOKEN');
+  const headers = { Referer: page.url(), 'X-XSRF-TOKEN': decodeURIComponent(csrf.value) };
+  const response = await page.request.post(`${origin}/api/dashboard/courses`, {
+    headers, data: { title: 'دورة مقارنة مؤشرات الاستبيان', isActive: false },
+  });
+  expect(response.status()).toBe(201);
+  const course = await response.json();
+  const prompts = ['ما مدى رضاك عن وضوح الشرح وتنوع الأمثلة والتطبيقات العملية خلال الدورة التدريبية؟', 'تقييم المدرب', 'ملاحظاتك على الدورة'];
+  for (const [index, prompt] of prompts.entries()) {
+    const saved = await page.request.post(`${origin}/api/dashboard/satisfaction-questions`, {
+      headers, data: { prompt, type: index === 2 ? 'text' : 'rating', isRequired: false, targetScope: 'course', courseId: course.id },
+    });
+    expect(saved.status()).toBe(201);
+  }
+  await page.goto('dashboard?panel=satisfaction');
+  await page.locator('.satisfaction-admin__select .v-field').click();
+  await page.getByRole('option', { name: course.title, exact: true }).click();
+  const cards = page.locator('.satisfaction-admin__metric-card');
+  await expect(cards).toHaveCount(3);
+  const grid = page.locator('.satisfaction-admin__metrics-grid');
+  const columns = await grid.evaluate(element => getComputedStyle(element).gridTemplateColumns.split(' ').length);
+  expect(columns).toBe(page.viewportSize().width >= 768 ? 3 : 2);
+  expect(await grid.evaluate(element => getComputedStyle(element).gap)).toBe('16px');
+  for (let index = 0; index < 3; index += 1) {
+    const card = cards.nth(index);
+    const ring = card.locator('.dashboard-indicator-ring');
+    await expect(card.locator('.dashboard-indicator-card__label')).toHaveText(prompts[index]);
+    expect(await ring.evaluate(element => {
+      const style = getComputedStyle(element);
+      return { width: style.width, height: style.height, filter: style.filter };
+    })).toEqual(ringAppearance);
+    expect(await card.locator('.dashboard-indicator-card__label').evaluate(element => {
+      const style = getComputedStyle(element);
+      return { font: style.fontFamily, size: style.fontSize, weight: style.fontWeight, line: style.lineHeight };
+    })).toEqual(labelAppearance);
+    await expect(card.locator('.app-indicator-card__meta')).toHaveText('0 طالب');
+    await expect(ring.locator('.dashboard-indicator-ring__inner')).toHaveText(index === 2 ? '0' : '--');
+    const buttonBounds = await card.getByRole('button', { name: `حذف سؤال ${prompts[index]}`, exact: true }).boundingBox();
+    const ringBounds = await ring.boundingBox();
+    const cardBounds = await card.boundingBox();
+    expect(ringBounds.x).toBeGreaterThanOrEqual(cardBounds.x);
+    expect(ringBounds.x + ringBounds.width).toBeLessThanOrEqual(cardBounds.x + cardBounds.width + 1);
+    expect(buttonBounds.width).toBeGreaterThanOrEqual(44);
+    expect(buttonBounds.y + buttonBounds.height).toBeLessThanOrEqual(ringBounds.y + 1);
+    expect(await card.locator('.dashboard-indicator-card__label').evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true);
+  }
+  const first = await cards.nth(0).boundingBox();
+  const second = await cards.nth(1).boundingBox();
+  expect(first.y).toBe(second.y);
+  expect(first.x).toBeGreaterThan(second.x);
+  expect((await cards.nth(0).locator('.dashboard-indicator-ring').boundingBox()).y)
+    .toBe((await cards.nth(1).locator('.dashboard-indicator-ring').boundingBox()).y);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(page.viewportSize().width + 1);
+  await page.screenshot({ path: info.outputPath('survey-indicators.png'), fullPage: true });
+  const deleted = page.waitForResponse(result => result.request().method() === 'DELETE' && result.url().includes('/satisfaction-questions/'));
+  await cards.first().getByRole('button').click();
+  expect((await deleted).ok()).toBe(true);
+  await expect(cards).toHaveCount(2);
+});
+
 test('satisfaction includes courses with closed post tests and inherits general questions', async ({ page, context }, testInfo) => {
   await login(page);
   const apiOrigin = new URL(process.env.VUE_APP_API_BASE_URL).origin;
