@@ -1,0 +1,47 @@
+name: Configure training uploads
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+  checks: read
+
+concurrency:
+  group: configure-training-uploads-production
+  cancel-in-progress: false
+
+jobs:
+  configure:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    environment: production
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - run: python3 scripts/server/test_configure_training_uploads.py
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+      - name: Require successful Verify and SonarCloud for this commit
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/wait-for-commit-checks.mjs
+      - name: Configure SSH host verification
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" | tr -d '\r' > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+      - name: Back up, configure and validate the Momars Nginx site
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+        run: |
+          remote_script="/tmp/momars-training-uploads-${GITHUB_RUN_ID}.py"
+          trap 'ssh -o BatchMode=yes "${DEPLOY_USER}@${DEPLOY_HOST}" "rm -f -- $remote_script" >/dev/null 2>&1 || true' EXIT
+          scp scripts/server/configure-training-uploads.py "${DEPLOY_USER}@${DEPLOY_HOST}:${remote_script}"
+          ssh -o BatchMode=yes "${DEPLOY_USER}@${DEPLOY_HOST}" "python3 '$remote_script' --apply"
