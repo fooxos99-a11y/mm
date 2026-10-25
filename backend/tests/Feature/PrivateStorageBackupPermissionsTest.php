@@ -23,8 +23,8 @@ class PrivateStorageBackupPermissionsTest extends TestCase
             clearstatcache();
             $this->assertSame('private', $disk->getVisibility($file));
             $this->assertSame(0640, fileperms($disk->path($file)) & 0777);
-            $this->assertSame(02750, fileperms($disk->path($directory)) & 07777);
-            $this->assertSame(02750, fileperms($disk->path($directory.'/nested')) & 07777);
+            $this->assertSame(0750, fileperms($disk->path($directory)) & 0777);
+            $this->assertSame(0750, fileperms($disk->path($directory.'/nested')) & 0777);
             $this->assertSame(filegroup($disk->path($directory)), filegroup($disk->path($file)));
             $this->assertSame('Private upload for backup verification', $disk->get($file));
             $this->assertStringStartsWith(storage_path('app/private'), $disk->path($file));

@@ -40,7 +40,7 @@ return [
             'directory_visibility' => 'private',
             'permissions' => [
                 'file' => ['public' => 0644, 'private' => 0640],
-                'dir' => ['public' => 0755, 'private' => 02750],
+                'dir' => ['public' => 0755, 'private' => 0750],
             ],
             'serve' => true,
             'throw' => false,
