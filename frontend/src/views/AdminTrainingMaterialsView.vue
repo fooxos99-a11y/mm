@@ -118,6 +118,9 @@
               </AppRawButton>
             </div>
 
+            <p class="admin-training-materials__files-note">
+              الحد الأقصى لكل ملف: 100 ميجابايت.
+            </p>
             <div class="admin-training-materials__attachments">
               <div
                 v-for="(attachment, index) in form.attachments"

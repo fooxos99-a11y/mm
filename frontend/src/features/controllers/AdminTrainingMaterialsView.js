@@ -14,6 +14,7 @@ import {
 import TrainingMaterialsList from '../../components/TrainingMaterialsList.vue';
 import { createTrainingMaterial, deleteTrainingMaterial, updateTrainingMaterial } from '../../services/api';
 import computed from '../training-materials/adminTrainingMaterialsComputed';
+import { validateTrainingAttachmentSizes, resolveTrainingUploadError } from '../training-materials/trainingMaterialUpload.mjs';
 import { canUseDashboardPermission } from '../permissions/permissionAccess.mjs';
 import {
   ADD_MATERIAL_OPTION_VALUE,
@@ -192,19 +193,7 @@ export default {
       return /^https?:\/\//i.test(url) ? url : `https://${url}`;
     },
     resolveRequestError(error) {
-      const errors = error?.response?.data?.errors;
-
-      if (errors && typeof errors === 'object') {
-        const firstMessage = Object.values(errors).flat().find(Boolean);
-
-        if (firstMessage) {
-          return String(firstMessage);
-        }
-      }
-
-      return error?.response?.data?.message
-        || (error?.code === 'ECONNABORTED' ? 'انتهت مهلة رفع الملف. حاول مرة أخرى.' : '')
-        || 'تعذر حفظ المادة التدريبية. تأكد من البيانات وحجم الملف ثم حاول مرة أخرى.';
+      return resolveTrainingUploadError(error);
     },
     resetForm() {
       this.form = {
@@ -217,6 +206,13 @@ export default {
     async submitMaterial() {
       this.formError = '';
       const attachments = this.normalizedAttachments();
+
+      const sizeError = validateTrainingAttachmentSizes(attachments);
+      if (sizeError) {
+        this.formError = sizeError;
+        this.$toast.error(sizeError);
+        return;
+      }
 
       if (!this.form.title || !attachments.length) {
         this.formError = 'أدخل العنوان وأضف ملفًا أو رابط يوتيوب واحدًا على الأقل.';

@@ -33,6 +33,7 @@ export const createTrainingMaterial = async ({ title, description, branchId, att
   });
 
   const response = await apiClient.post('/dashboard/training-materials', formData, {
+    timeout: 600000,
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -74,6 +75,7 @@ export const updateTrainingMaterial = async (materialId, { title, description, b
   });
 
   const response = await apiClient.post(`/dashboard/training-materials/${encodeURIComponent(materialId)}`, formData, {
+    timeout: 600000,
     headers: {
       'Content-Type': 'multipart/form-data',
     },

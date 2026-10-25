@@ -13,6 +13,7 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Exceptions\PostTooLargeException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
@@ -65,6 +66,16 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) use ($isApiRequest): void {
+        $exceptions->render(function (PostTooLargeException $exception, Request $request) use ($isApiRequest) {
+            if ($isApiRequest($request) || $request->expectsJson()) {
+                return response()->json([
+                    'message' => 'حجم المرفقات مجتمعة يتجاوز حد استقبال الطلب في الخادم. قلّل عدد الملفات أو أحجامها.',
+                ], 413);
+            }
+
+            return null;
+        });
+
         $exceptions->report(function (Throwable $exception): void {
             app(OperationalMetricsService::class)->recordException($exception);
         });
