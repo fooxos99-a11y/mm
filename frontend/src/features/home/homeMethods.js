@@ -1,4 +1,4 @@
-import { resolveUserHomeRoute } from '../../utils/authRoutes';
+import { resolveLoginDestination } from '../../utils/authRoutes';
 
 const loadPublicApi = () => import(
   /* webpackChunkName: "public-api" */
@@ -273,7 +273,8 @@ export default {
     },
     syncLoginDialogFromRoute() {
       if (this.isAuthenticated) {
-        this.loginDialogOpen = false;
+        if (this.loginSubmitting) return;
+        if (this.loginDialogOpen) this.closeLoginDialog();
         this.accountMenuOpen = false;
         return;
       }
@@ -286,13 +287,15 @@ export default {
      },
      async submitLoginDialog() {
        if (!this.loginForm.loginCode || !this.loginForm.password) return;
+       this.loginSubmitting = true;
        try {
          await this.login(this.loginForm);
          this.accountMenuOpen = false;
-         this.closeLoginDialog();
-         this.$router.replace(resolveUserHomeRoute(this.currentUser)).catch(() => {});
+         const destination = resolveLoginDestination(this.$router, this.loginRedirectPath, this.currentUser);
+         this.loginDialogOpen = false;
+         await this.$router.replace(destination);
        } catch (e) {
          // Handle error automatically
-       }
+       } finally { this.loginSubmitting = false; }
      },
 };

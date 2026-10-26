@@ -122,7 +122,9 @@ test('account access remains usable and opening a program menu dismisses the acc
     loginDialog.locator('button[type="submit"]').click(),
   ]);
   expect(signedIn.status()).toBe(200);
-  await expect(loginDialog).toHaveCount(0);
+  await expect(page).toHaveURL((url) => url.pathname.endsWith('/dashboard'));
+  await expect(page.locator('.dashboard-page')).toBeVisible();
+  await page.goto('practitioner', { waitUntil: 'domcontentloaded' });
   const account = page.getByRole('button', { name: 'الحساب', exact: true });
   await account.click();
   const accountMenu = page.locator('.account-menu__panel--header');

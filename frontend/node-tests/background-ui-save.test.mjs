@@ -75,10 +75,18 @@ for (const status of [200, 503, 401]) {
       return { courses: [] };
     });
     const commits = [];
-    const state = { currentUser: { id: 'admin' }, authGeneration: 1 };
-    await dashboard.dashboardActions.loadDashboardSnapshot({ state, commit: (...args) => commits.push(args) }, { background: true });
+    const state = { currentUser: { id: 'admin' }, authGeneration: 1, authChecked: true };
+    const rechecks = [];
+    const dispatch = async (name, options) => {
+      rechecks.push([name, options]);
+      state.currentUser = null; state.authGeneration += 1;
+      return null;
+    };
+    await dashboard.dashboardActions.loadDashboardSnapshot({ state, commit: (...args) => commits.push(args), dispatch }, { background: true });
     assert.equal(commits.some(([name, value]) => name === 'setDashboardLoading' && value === true), false);
-    assert.equal(commits.some(([name]) => name === 'clearAuthState'), status === 401);
+    assert.equal(commits.some(([name]) => name === 'clearAuthState'), false);
+    assert.deepEqual(rechecks, status === 401 ? [['bootstrapAuth', { force: true }]] : []);
+    assert.equal(state.currentUser === null, status === 401);
     assert.equal(commits.some(([name]) => name === 'setDashboardError'), status === 401);
     assert.equal(commits.some(([name]) => name === 'setDashboardSnapshot'), status === 200);
   });

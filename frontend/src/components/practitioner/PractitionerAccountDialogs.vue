@@ -2,71 +2,23 @@
   <div class="practitioner-account-dialogs">
     <AppDialog
       :value="loginDialogOpen"
-      max-width="560"
+      max-width="460"
       @input="$emit('update:login-dialog-open', $event)"
-      @close="$emit('close-login')"
+      @close="loginDialogOpen && $emit('close-login')"
     >
-      <section class="login-modal__panel">
-        <div class="login-modal__brand">
-          <img
-            :src="$publicAsset('شعار-الجمعية.webp')"
-            alt="شعار الجمعية"
-            class="login-modal__logo"
-          >
-          <img
-            :src="$publicAsset('اللوقو-شفاف.webp')"
-            alt="شعار البرنامج"
-            class="login-modal__logo login-modal__logo--program"
-          >
-        </div>
-
-        <div class="login-modal__copy">
-          <h3>{{ pageContent.loginDialogTitle }}</h3>
-        </div>
-
-        <v-alert
-          v-if="authError"
-          type="error"
-          dense
-          text
-          class="login-modal__alert"
-        >
-          {{ authError }}
-        </v-alert>
-
-        <v-form
-          class="login-modal__form"
-          @submit.prevent="$emit('submit-login')"
-        >
-          <v-text-field
-            :model-value="loginForm.loginCode"
-            class="login-modal__field"
-            :label="pageContent.loginCodeLabel"
-            outlined
-            dense
-            autocomplete="username"
-            @update:model-value="updateLoginField('loginCode', String($event || '').trim())"
-          />
-          <AppPasswordField
-            :value="loginForm.password"
-            class="login-modal__field"
-            :label="pageContent.loginPasswordLabel"
-            outlined
-            dense
-            type="password"
-            autocomplete="current-password"
-            @input="updateLoginField('password', $event)"
-          />
-          <AppButton
-            native-type="submit"
-            block
-            class="login-modal__submit"
-            :loading="authLoading"
-          >
-            {{ pageContent.loginSubmitLabel }}
-          </AppButton>
-        </v-form>
-      </section>
+      <AccountLoginPanel
+        :login-code="loginForm.loginCode"
+        :password="loginForm.password"
+        dismissible
+        :title="pageContent.loginDialogTitle"
+        :code-label="pageContent.loginCodeLabel"
+        :password-label="pageContent.loginPasswordLabel"
+        :submit-label="pageContent.loginSubmitLabel"
+        @update:login-code="updateLoginField('loginCode', $event)"
+        @update:password="updateLoginField('password', $event)"
+        @submit="$emit('submit-login')"
+        @close="$emit('close-login')"
+      />
     </AppDialog>
 
     <AppDialog
@@ -111,11 +63,12 @@
 </template>
 
 <script>
-import { AppButton, AppDialog, AppPasswordField } from '../ui';
+import AccountLoginPanel from '../auth/AccountLoginPanel.vue';
+import { AppDialog } from '../ui';
 
 export default {
   name: 'PractitionerAccountDialogs',
-  components: { AppButton, AppDialog, AppPasswordField },
+  components: { AppDialog, AccountLoginPanel },
   props: {
     loginDialogOpen: { type: Boolean, default: false },
     profileDialogOpen: { type: Boolean, default: false },

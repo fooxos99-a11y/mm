@@ -289,36 +289,8 @@
     text-align: center;
   }
 }
-
-/* Modals */
-
-.home-page .login-modal__panel,
 .home-page .profile-modal__panel {
   padding: 16px;
-}
-
-.home-page .login-modal__brand {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  margin-bottom: 32px;
-}
-
-.home-page .login-modal__logo {
-  height: 48px;
-  object-fit: contain;
-}
-
-.home-page .login-modal__copy {
-  text-align: center;
-  margin-bottom: 32px;
-}
-
-.home-page .login-modal__copy h3 {
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: #2a94b2;
 }
 
 .home-page .profile-modal__card {

@@ -134,7 +134,6 @@
   .practitioner-page .start-date-card,
   .practitioner-page .duration-quick-card,
   .practitioner-page .duration-text-card,
-  .practitioner-page .login-modal__panel,
   .practitioner-page .profile-modal__panel {
     border-radius: 22px;
   }
@@ -193,10 +192,6 @@
   .practitioner-page .recitation-mechanism__bullet {
     width: 32px;
     height: 32px;
-  }
-
-  .practitioner-page .login-modal__panel {
-    padding: 26px 18px;
   }
 
   .practitioner-page .account-menu__panel {

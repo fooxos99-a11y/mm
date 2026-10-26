@@ -12,6 +12,8 @@ export {
   createAuthState,
 } from './storeState.mjs';
 
+const sessionRequests = new WeakMap();
+
 export const authActions = {
   async selectDepartmentContext({ commit }, departmentId) {
     const payload = await updateDepartmentContext(departmentId);
@@ -22,24 +24,46 @@ export const authActions = {
     commit('setDashboardError', '');
     commit('setAuthState', { user: payload.user });
   },
-  async bootstrapAuth({ state, commit }) {
-    if (state.authChecked) return;
-
+  async bootstrapAuth({ state, commit }, { force = false } = {}) {
+    if (sessionRequests.has(state)) return sessionRequests.get(state);
+    if (state.authChecked && !force) return state.currentUser;
+    const generation = state.authGeneration;
+    const isCurrent = () => state.authGeneration === generation;
     commit('setAuthLoading', true);
-    try {
-      const user = await fetchCurrentUser();
-      commit('setAuthState', { user });
-    } catch (error) {
-      if (error?.response?.status === 401) {
-        commit('clearAuthState');
+    const request = (async () => {
+      try {
+        let user;
+        // One retry for a transient failure; never reinterpret an outage as a guest session.
+        for (let attempt = 0; attempt < 2; attempt += 1) {
+          try { user = await fetchCurrentUser(); break; } catch (error) {
+            if (error?.response?.status === 401) { user = null; break; }
+            const status = error?.response?.status;
+            if (attempt === 1 || (status && status < 500 && ![408, 429].includes(status))) throw error;
+          }
+        }
+        if (!isCurrent()) return state.currentUser;
+        applyApiUserContext(user);
+        if (!user) commit('clearAuthState');
+        else {
+          if (state.currentUser?.id !== user.id) commit('setDashboardSnapshot', null);
+          commit('setAuthState', { user });
+        }
+        commit('setAuthChecked', true);
         commit('setAuthError', '');
-      } else {
-        commit('setAuthError', error?.response?.data?.message || 'تعذر التحقق من الجلسة الآن.');
+        return user;
+      } catch {
+        if (isCurrent()) {
+          commit('setAuthChecked', false);
+          commit('setAuthError', 'تعذر التحقق من الجلسة. تحقق من الاتصال وحاول مرة أخرى.');
+        }
+        return undefined;
+      } finally {
+        sessionRequests.delete(state);
+        commit('setAuthLoading', false);
       }
-    } finally {
-      commit('setAuthLoading', false);
-      commit('setAuthChecked', true);
-    }
+    })();
+    sessionRequests.set(state, request);
+    return request;
   },
   async login({ commit }, credentials) {
     commit('setAuthLoading', true);

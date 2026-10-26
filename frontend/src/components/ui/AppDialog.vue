@@ -116,6 +116,7 @@ export default {
           }
         }
         this.releaseScrollLock = lockPageScroll();
+        dialog.scrollTop = 0;
         dialog.showModal();
         return;
       }

@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import store from '../store';
-import { resolveUserHomeRoute } from '../utils/authRoutes';
+import { resolveLoginDestination, resolveUserHomeRoute } from '../utils/authRoutes';
 import {
   buildDashboardQuery,
   canAccessAdminRoute,
@@ -258,16 +258,16 @@ const scheduleDeferredAuthCheck = () => {
 const routeHasMeta = (to, key) => to.matched.some((record) => record.meta[key]);
 
 const resolveGuestOnlyTarget = (to, user) => {
-  if (typeof to.query.redirect === 'string' && to.query.redirect) {
-    return to.query.redirect;
-  }
-
-  return resolveUserHomeRoute(user);
+  return resolveLoginDestination(router, to.query.redirect, user);
 };
 
 const resolveNavigationTarget = (to) => {
   const redirectPath = resolveRedirectPath(to);
   const user = store.state.currentUser;
+  if (!store.state.authChecked) {
+    return routeHasMeta(to, 'requiresAuth')
+      ? { name: 'login', query: redirectPath ? { redirect: redirectPath } : {} } : null;
+  }
 
   if (user?.role === 'student' && !needsPasswordChange(user) && to.name === 'change-password') {
     return resolveUserHomeRoute(user);

@@ -11,6 +11,7 @@ export default function practitionerData() {
       menuClockTimer: null,
       publicAutoRefreshTimer: null,
       loginDialogOpen: false,
+      loginSubmitting: false,
       isRegistrationOpen: false,
       publicSnapshot: null,
       publicStats: null,

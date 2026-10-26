@@ -1,0 +1,42 @@
+.account-login {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(var(--overlay-height, 100dvh) - 32px);
+  overflow: hidden;
+  border: 1px solid rgba(29, 113, 138, .14);
+  border-radius: 24px;
+  background: #f7fafb;
+  box-shadow: 0 24px 60px -28px rgba(1, 27, 37, .6);
+  color: #08384a;
+  font-family: 'Tajawal', 'Segoe UI', Tahoma, Arial, sans-serif;
+}
+.account-login__header { position: relative; flex: 0 0 auto; padding: 28px 24px 12px; text-align: center; }
+.account-login__brand { display: flex; justify-content: center; align-items: center; gap: 16px; width: fit-content; margin: 0 auto 18px; }
+.account-login__brand img { height: 58px; max-width: 96px; object-fit: contain; }
+.account-login__program { filter: brightness(0) saturate(100%) invert(24%) sepia(42%) saturate(1162%) hue-rotate(149deg) brightness(92%) contrast(96%); }
+.account-login__header h1 { margin: 0; color: #08384a; font-size: clamp(1.5rem, 5vw, 2rem); font-weight: 800; line-height: 1.45; }
+.account-login__close { position: absolute; top: 8px; inset-inline-end: 8px; }
+.account-login .account-login__password-toggle { flex: 0 0 44px; width: 44px; min-width: 44px; height: 44px; }
+.account-login .app-svg-icon { width: 22px; height: 22px; }
+.account-login__body { min-height: 0; padding: 12px 24px 28px; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+.account-login__form { display: grid; gap: 20px; }
+.account-login .app-field__control { min-height: 52px; background: #fff; }
+.account-login .app-field input { font-size: 16px; min-width: 0; }
+.account-login .app-button { min-height: 50px; }
+.account-login__error { margin: 0; padding: 12px; border: 1px solid #efb7b7; border-radius: 12px; background: #fff4f4; color: #a52222; line-height: 1.7; }
+.account-login__status { text-align: center; line-height: 1.8; }
+.account-login__status p { margin: 0 0 16px; }
+@media (max-width: 480px) {
+  .account-login__header { padding-inline: 18px; }
+  .account-login__body { padding-inline: 18px; }
+}
+@media (max-height: 480px) {
+  .account-login__header { padding-top: 12px; padding-bottom: 8px; }
+  .account-login__brand { margin-bottom: 8px; }
+  .account-login__brand img { height: 36px; }
+  .account-login__header h1 { font-size: 1.3rem; }
+  .account-login__body { padding-top: 8px; padding-bottom: 16px; }
+  .account-login__form { gap: 14px; }
+}

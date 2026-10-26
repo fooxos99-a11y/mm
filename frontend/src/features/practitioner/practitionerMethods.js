@@ -1,3 +1,4 @@
+import { resolveLoginDestination } from '../../utils/authRoutes';
 import { fetchPublicSnapshot, fetchPublicStats } from '../../services/publicApi';
 import { fetchPublicRegistrationStatus } from '../../services/registrationApi';
 import { easeOutCubic } from './practitionerMeta';
@@ -27,6 +28,7 @@ export default {
       }
     },
     async refreshAvailabilitySilently() {
+      if (this.authLoading) return;
       try {
         if (this.isAuthenticated) {
           await this.loadDashboardSnapshot();
@@ -269,7 +271,8 @@ export default {
     },
     syncLoginDialogFromRoute() {
       if (this.isAuthenticated) {
-        this.loginDialogOpen = false;
+        if (this.loginSubmitting) return;
+        if (this.loginDialogOpen) this.closeLoginDialog();
         this.accountMenuOpen = false;
         return;
       }
@@ -286,14 +289,15 @@ export default {
         return;
       }
 
+      this.loginSubmitting = true;
       try {
         await this.login(this.loginForm);
-        const redirectTarget = this.loginRedirectPath || { name: 'practitioner' };
+        const redirectTarget = resolveLoginDestination(this.$router, this.loginRedirectPath, this.currentUser);
         this.accountMenuOpen = false;
-        this.closeLoginDialog();
-        this.$router.replace(redirectTarget).catch(() => {});
+        this.loginDialogOpen = false;
+        await this.$router.replace(redirectTarget);
       } catch {
         // Error text is already handled by the store.
-      }
+      } finally { this.loginSubmitting = false; }
     },
 };

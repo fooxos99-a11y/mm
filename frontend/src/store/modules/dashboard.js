@@ -19,7 +19,7 @@ export const dashboardActions = {
   refreshDashboardSnapshot({ state, dispatch }, { background = false } = {}) {
     return dispatch('loadDashboardSnapshot', { mode: state.dashboardSnapshot?.snapshotMode === 'shell' ? 'shell' : 'full', background });
   },
-  async loadDashboardSnapshot({ state, commit }, { mode = 'full', background = false } = {}) {
+  async loadDashboardSnapshot({ state, commit, dispatch }, { mode = 'full', background = false } = {}) {
     if (!state.currentUser) {
       commit('setDashboardSnapshot', null);
       commit('setDashboardError', '');
@@ -27,6 +27,7 @@ export const dashboardActions = {
     }
 
     const authGeneration = state.authGeneration;
+    const expectedUserId = state.currentUser.id;
     const requestId = (requests.get(state) || 0) + 1;
     requests.set(state, requestId);
     const isCurrent = () => state.authGeneration === authGeneration && requests.get(state) === requestId;
@@ -41,9 +42,23 @@ export const dashboardActions = {
     } catch (error) {
       if (!isCurrent()) return false;
       if (error?.response?.status === 401) {
-        commit('clearAuthState');
-        commit('setAuthChecked', true);
-        commit('setDashboardError', 'انتهت صلاحية الجلسة. سجّل الدخول مرة أخرى.');
+        const user = await dispatch('bootstrapAuth', { force: true });
+        if (requests.get(state) !== requestId) return;
+        if (user && user.id !== expectedUserId) { commit('setDashboardLoading', false); return; }
+        if (user && state.authChecked) {
+          const confirmedGeneration = state.authGeneration;
+          try {
+            const snapshot = await (mode === 'shell' ? fetchDashboardShell() : fetchDashboardSnapshot());
+            if (state.authGeneration === confirmedGeneration && requests.get(state) === requestId) commit('setDashboardSnapshot', snapshot);
+          } catch (retryError) {
+            commit('setDashboardError', retryError?.response?.status === 401
+              ? 'تعذر تحميل البيانات. أعد المحاولة.' : 'تعذر الاتصال. أعد المحاولة.');
+          }
+        } else {
+          commit('setDashboardError', state.authChecked
+            ? 'انتهت صلاحية الجلسة. سجّل الدخول مرة أخرى.' : state.authError);
+        }
+        commit('setDashboardLoading', false);
         return;
       }
       if (!background) commit('setDashboardError', error?.response?.data?.message || error?.message || 'تعذر تحميل بيانات لوحة التحكم.');

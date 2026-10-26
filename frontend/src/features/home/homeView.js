@@ -34,6 +34,7 @@ export default {
       accountMenuOpen: false,
       profileDialogOpen: false,
       loginDialogOpen: false,
+      loginSubmitting: false,
       loginRedirectPath: '',
       loginForm: { loginCode: '', password: '' },
       publicSnapshot: null,

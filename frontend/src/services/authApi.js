@@ -1,4 +1,4 @@
-import apiClient, { initializeCsrfProtection } from './httpClient';
+import apiClient, { initializeCsrfProtection, withSessionMutation } from './httpClient';
 import { setAuthenticatedDepartment } from './departmentContext';
 
 const STORAGE_NAMESPACE = process.env.VUE_APP_STORAGE_NAMESPACE || 'momars-practitioner';
@@ -38,16 +38,16 @@ export const fetchCurrentUser = async () => {
   const response = await apiClient.get('/auth/session');
 
   const user = response.data?.user || null;
-  applyApiUserContext(user);
   return user;
 };
 
 export const login = async ({ loginCode, password }) => {
-  await initializeCsrfProtection();
-
-  const response = await apiClient.post('/auth/login', {
-    login_code: loginCode,
-    password,
+  const response = await withSessionMutation(async () => {
+    await initializeCsrfProtection({ sessionMutation: true });
+    return apiClient.post('/auth/login', {
+      login_code: loginCode,
+      password,
+    }, { sessionMutation: true });
   });
 
   clearLegacyAuthStorage();
@@ -68,7 +68,7 @@ export const login = async ({ loginCode, password }) => {
 
 export const logout = async () => {
   try {
-    await apiClient.post('/auth/logout');
+    await withSessionMutation(() => apiClient.post('/auth/logout', undefined, { sessionMutation: true }));
   } finally {
     clearVolatileToken();
     clearLegacyAuthStorage();
@@ -77,9 +77,10 @@ export const logout = async () => {
 };
 
 export const updatePassword = async (payload) => {
-  await initializeCsrfProtection();
-
-  const response = await apiClient.put('/auth/password', payload);
+  const response = await withSessionMutation(async () => {
+    await initializeCsrfProtection({ sessionMutation: true });
+    return apiClient.put('/auth/password', payload, { sessionMutation: true });
+  });
 
   return response.data;
 };

@@ -43,3 +43,14 @@ export const resolveUserHomeLabel = (user) => {
 
   return 'حسابي';
 };
+
+// Only accept routes within this application, never external or recursive login URLs.
+export const resolveLoginDestination = (router, redirect, user) => {
+  if (typeof redirect === 'string' && redirect.startsWith('/')
+    && !redirect.startsWith('//') && !redirect.includes('\\') && !Array.from(redirect).some((char) => char.charCodeAt(0) < 32)) {
+    const target = router.resolve(redirect);
+    if (target.matched.length && !['login', 'not-found'].includes(target.name)
+      && target.query.login !== '1') return target.fullPath;
+  }
+  return resolveUserHomeRoute(user);
+};
