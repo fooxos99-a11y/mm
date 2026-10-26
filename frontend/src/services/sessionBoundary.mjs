@@ -3,8 +3,9 @@ export const createSessionBoundary = () => {
   const pending = new Set();
   let gate = null;
   let queue = Promise.resolve();
+  const waitUntilUnlocked = () => gate ? gate.then(waitUntilUnlocked) : Promise.resolve();
   const beforeRequest = async (config) => {
-    if (!config.sessionMutation) while (gate) await gate;
+    if (!config.sessionMutation) await waitUntilUnlocked();
     let release;
     const completion = new Promise((resolve) => { release = resolve; });
     pending.add(completion);
@@ -17,7 +18,7 @@ export const createSessionBoundary = () => {
       let unlock;
       gate = new Promise((resolve) => { unlock = resolve; });
       try {
-        await Promise.all([...pending]);
+        await Promise.all(pending);
         return await operation();
       } finally { gate = null; unlock(); }
     });

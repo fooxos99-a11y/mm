@@ -30,13 +30,12 @@
       <h1>{{ title }}</h1>
     </div>
     <div class="account-login__body">
-      <div
+      <output
         v-if="!authChecked"
         class="account-login__status"
-        role="status"
         aria-live="polite"
       >
-        <p>{{ authLoading ? 'جارٍ التحقق من الجلسة…' : authError || 'تحقق من الجلسة للمتابعة.' }}</p>
+        <span>{{ authLoading ? 'جارٍ التحقق من الجلسة…' : authError || 'تحقق من الجلسة للمتابعة.' }}</span>
         <AppButton
           v-if="!authLoading"
           block
@@ -44,7 +43,7 @@
         >
           إعادة المحاولة
         </AppButton>
-      </div>
+      </output>
       <form
         v-else
         class="account-login__form"
@@ -60,7 +59,7 @@
         <AppInput
           :value="loginCode"
           :label="codeLabel"
-          autocomplete="username"
+          :autocomplete="usernameAutocomplete"
           required
           :disabled="authLoading"
           @input="$emit('update:loginCode', String($event).trim())"
@@ -113,7 +112,7 @@ export default {
     submitLabel: { type: String, default: 'دخول' },
   },
   emits: ['update:loginCode', 'update:password', 'submit', 'close', 'restored'],
-  data: () => ({ passwordVisible: false }),
+  data: () => ({ passwordVisible: false, usernameAutocomplete: 'username' }),
   computed: { ...mapState(['authChecked', 'authLoading', 'authError']) },
   methods: {
     async retrySession() {

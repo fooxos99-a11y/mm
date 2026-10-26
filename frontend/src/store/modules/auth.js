@@ -14,6 +14,18 @@ export {
 
 const sessionRequests = new WeakMap();
 
+const fetchSessionUser = async () => {
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try { return await fetchCurrentUser(); } catch (error) {
+      const status = error?.response?.status;
+      if (status === 401) return null;
+      const retryable = !status || status >= 500 || [408, 429].includes(status);
+      if (!retryable || attempt === 1) throw error;
+    }
+  }
+};
+
+
 export const authActions = {
   async selectDepartmentContext({ commit }, departmentId) {
     const payload = await updateDepartmentContext(departmentId);
@@ -32,15 +44,7 @@ export const authActions = {
     commit('setAuthLoading', true);
     const request = (async () => {
       try {
-        let user;
-        // One retry for a transient failure; never reinterpret an outage as a guest session.
-        for (let attempt = 0; attempt < 2; attempt += 1) {
-          try { user = await fetchCurrentUser(); break; } catch (error) {
-            if (error?.response?.status === 401) { user = null; break; }
-            const status = error?.response?.status;
-            if (attempt === 1 || (status && status < 500 && ![408, 429].includes(status))) throw error;
-          }
-        }
+        const user = await fetchSessionUser();
         if (!isCurrent()) return state.currentUser;
         applyApiUserContext(user);
         if (!user) commit('clearAuthState');

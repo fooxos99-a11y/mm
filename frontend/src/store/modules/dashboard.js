@@ -8,6 +8,31 @@ export { createDashboardState, dashboardMutations } from './storeState.mjs';
 
 const requests = new WeakMap();
 
+const recoverDashboardSession = async ({ state, commit, dispatch, mode, requestId, expectedUserId }) => {
+  const user = await dispatch('bootstrapAuth', { force: true });
+  if (requests.get(state) !== requestId) return false;
+  if (!user || !state.authChecked) {
+    commit('setDashboardError', state.authChecked
+      ? 'انتهت صلاحية الجلسة. سجّل الدخول مرة أخرى.' : state.authError);
+    commit('setDashboardLoading', false);
+    return false;
+  }
+  if (user.id !== expectedUserId) { commit('setDashboardLoading', false); return false; }
+  const generation = state.authGeneration;
+  const isCurrent = () => state.authGeneration === generation && requests.get(state) === requestId;
+  try {
+    const snapshot = await (mode === 'shell' ? fetchDashboardShell() : fetchDashboardSnapshot());
+    if (isCurrent()) commit('setDashboardSnapshot', snapshot);
+    return isCurrent();
+  } catch (error) {
+    if (isCurrent()) commit('setDashboardError', error?.response?.status === 401
+      ? 'تعذر تحميل البيانات. أعد المحاولة.' : 'تعذر الاتصال. أعد المحاولة.');
+    return false;
+  } finally {
+    if (requests.get(state) === requestId) commit('setDashboardLoading', false);
+  }
+};
+
 const replaceSnapshotSection = (state, commit, key, value) => {
   commit('setDashboardSnapshot', {
     ...state.dashboardSnapshot,
@@ -42,24 +67,7 @@ export const dashboardActions = {
     } catch (error) {
       if (!isCurrent()) return false;
       if (error?.response?.status === 401) {
-        const user = await dispatch('bootstrapAuth', { force: true });
-        if (requests.get(state) !== requestId) return;
-        if (user && user.id !== expectedUserId) { commit('setDashboardLoading', false); return; }
-        if (user && state.authChecked) {
-          const confirmedGeneration = state.authGeneration;
-          try {
-            const snapshot = await (mode === 'shell' ? fetchDashboardShell() : fetchDashboardSnapshot());
-            if (state.authGeneration === confirmedGeneration && requests.get(state) === requestId) commit('setDashboardSnapshot', snapshot);
-          } catch (retryError) {
-            commit('setDashboardError', retryError?.response?.status === 401
-              ? 'تعذر تحميل البيانات. أعد المحاولة.' : 'تعذر الاتصال. أعد المحاولة.');
-          }
-        } else {
-          commit('setDashboardError', state.authChecked
-            ? 'انتهت صلاحية الجلسة. سجّل الدخول مرة أخرى.' : state.authError);
-        }
-        commit('setDashboardLoading', false);
-        return;
+        return await recoverDashboardSession({ state, commit, dispatch, mode, requestId, expectedUserId });
       }
       if (!background) commit('setDashboardError', error?.response?.data?.message || error?.message || 'تعذر تحميل بيانات لوحة التحكم.');
     } finally {

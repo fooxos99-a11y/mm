@@ -26,8 +26,8 @@
 .account-login .app-field input { font-size: 16px; min-width: 0; }
 .account-login .app-button { min-height: 50px; }
 .account-login__error { margin: 0; padding: 12px; border: 1px solid #efb7b7; border-radius: 12px; background: #fff4f4; color: #a52222; line-height: 1.7; }
-.account-login__status { text-align: center; line-height: 1.8; }
-.account-login__status p { margin: 0 0 16px; }
+.account-login__status { display: block; text-align: center; line-height: 1.8; }
+.account-login__status > span { display: block; margin: 0 0 16px; }
 @media (max-width: 480px) {
   .account-login__header { padding-inline: 18px; }
   .account-login__body { padding-inline: 18px; }
