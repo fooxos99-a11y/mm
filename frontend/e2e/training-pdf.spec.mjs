@@ -17,7 +17,8 @@ test('PDF fits width without added controls, fetches ranges on demand and keeps 
   await page.locator('.admin-training-materials__hidden-file-input').setInputFiles({ name: 'progressive.pdf', mimeType: 'application/pdf', buffer: file });
   const saved = page.waitForResponse((response) => response.url().includes('/dashboard/training-materials') && response.request().method() === 'POST');
   await dialog.getByRole('button', { name: 'إضافة المادة', exact: true }).click();
-  expect((await saved).status()).toBe(201);
+  const savedResponse = await saved;
+  expect(savedResponse.status(), await savedResponse.text()).toBe(201);
   await expect(dialog).not.toBeVisible();
   const ranges = [];
   let transferred = 0;

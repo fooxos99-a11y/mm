@@ -50,7 +50,7 @@ export default defineConfig({
   })),
   webServer: [
     {
-      command: `node ../scripts/run-php.mjs -d max_execution_time=300 -d opcache.enable_cli=1 -S 127.0.0.1:${backendPort} -t public ../frontend/e2e/support/backend-router.php`,
+      command: `node ../scripts/run-php.mjs -d max_execution_time=300 -d opcache.enable_cli=1 -d upload_max_filesize=100M -d post_max_size=110M -S 127.0.0.1:${backendPort} -t public ../frontend/e2e/support/backend-router.php`,
       cwd: backendRoot,
       // Browser tests must exercise CSRF; Laravel bypasses it in the testing environment.
       env: { APP_ENV: 'local' },
