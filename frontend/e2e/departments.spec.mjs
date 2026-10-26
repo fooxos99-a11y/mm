@@ -219,7 +219,7 @@ test('general manager alone creates responsible accounts and sees globally occup
 test('guests see a blue login logo with no responsible registration and cannot open its URL', async ({ page }, info) => {
   await mockSystem(page, null);
   await page.goto('login');
-  await expect(page.getByRole('heading', { name: 'الدخول إلى الحساب' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'تسجيل الدخول', exact: true })).toBeVisible();
   await expect(page.getByRole('link', { name: 'إنشاء حساب مسؤول' })).toHaveCount(0);
   const programLogo = page.getByRole('img', { name: 'شعار البرنامج', exact: true });
   await expect(programLogo).toHaveCSS('filter', /brightness\(0\).*invert\(0\.24\)/);

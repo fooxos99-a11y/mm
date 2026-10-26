@@ -13,10 +13,12 @@ test('shared controls support keyboard focus, password reveal and compact RTL fi
   const username = page.locator('[autocomplete=username]');
   const password = page.locator('[autocomplete=current-password]');
   await username.focus();
-  const field = username.locator('xpath=ancestor::div[contains(concat(" ",normalize-space(@class)," ")," v-field ")][1]');
-  await expect(field).toHaveClass(/v-field--focused/);
+  const field = username.locator('..');
+  await expect(username).toBeFocused();
   await expect.poll(() => field.evaluate(element => getComputedStyle(element).boxShadow)).not.toBe('none');
   expect((await field.boundingBox()).height).toBeGreaterThanOrEqual(48);
+  await page.keyboard.press('Tab');
+  await expect(password).toBeFocused();
   await password.fill('local-preview-value');
   await page.getByRole('button', { name: 'إظهار كلمة المرور', exact: true }).click();
   await expect(password).toHaveAttribute('type', 'text');
