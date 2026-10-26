@@ -120,6 +120,8 @@ jobs:
   e2e:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
+    env:
+      PLAYWRIGHT_CHANNEL: chrome
     strategy:
       fail-fast: false
       matrix:
@@ -149,6 +151,7 @@ jobs:
             [[ -f "$source" ]] || continue
             sudo sed -i -E 's|https?://azure[.]archive[.]ubuntu[.]com/ubuntu|https://archive.ubuntu.com/ubuntu|g' "$source"
           done
-      - run: ./node_modules/.bin/playwright install --with-deps chromium
+      - name: Verify preinstalled Chrome runtime
+        run: google-chrome --version
       - run: npm run build
       - run: npm run test:e2e:dist -- --project=${{ matrix.project }}
