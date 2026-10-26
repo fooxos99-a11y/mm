@@ -51,7 +51,8 @@ test('optional reciter phone saves, validates, displays and clears without chang
 
   await page.goto('about:blank');
   await page.context().clearCookies();
-  await login(page, studentLogin, studentPassword, '/student');
+  await login(page, studentLogin, studentPassword, '/practitioner');
+  await page.goto('student');
   const openParts = async () => {
     const menu = page.getByRole('button', { name: 'فتح القائمة', exact: true });
     if (info.project.use.viewport.width <= 1024) {

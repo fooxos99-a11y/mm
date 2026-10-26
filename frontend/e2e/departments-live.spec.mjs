@@ -68,7 +68,8 @@ test('live department assignment, teacher login and global number uniqueness sha
   expect(denied.status()).toBe(403);
   await screenshot(page, `${info.project.name}-live-department-manager.png`);
 
-  await loginAs(page, 'س', teacherPassword, 'student');
+  await loginAs(page, 'س', teacherPassword, 'practitioner');
+  await page.goto('student');
   await expect(page.locator('.student-page')).toBeVisible();
   await expect(page.locator('.department-context')).toHaveCount(0);
   const teacherSession = await page.request.get(`${apiOrigin}/api/auth/session`, { headers: await apiHeaders(page) });
