@@ -105,6 +105,27 @@ class TrainingPdfPreviewTest extends TestCase
         $this->assertSame('original', $media->fresh()->getCustomProperty('preview_status'));
     }
 
+    public function test_converter_warning_retries_without_decoding_source_streams(): void
+    {
+        [$media] = $this->attachment();
+        $original = TrainingPdfFixture::bytes(true);
+        file_put_contents($media->getPath(), $original);
+        preg_match('/\nstream\n(.*?)\nendstream/s', $original, $matches);
+        $probe = $media->getPath().'.probe.pdf';
+        try {
+            $process = new Process([config('training-preview.qpdf'), '--recompress-flate', $media->getPath(), $probe]);
+            $this->assertSame(3, $process->run());
+        } finally {
+            @unlink($probe);
+        }
+        $service = app(TrainingPdfPreviewService::class);
+        $service->prepare($media);
+        $this->assertSame('ready', $media->fresh()->getCustomProperty('preview_status'));
+        $this->assertSame($original, file_get_contents($media->getPath()));
+        $this->assertStringContainsString($matches[1], file_get_contents($service->path($media)));
+        $this->assertLessThan(strlen($original), filesize($service->path($media)));
+    }
+
     public function test_non_pdf_and_locked_conversion_do_not_mutate_media(): void
     {
         [$media] = $this->attachment();
