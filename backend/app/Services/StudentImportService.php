@@ -17,7 +17,8 @@ final class StudentImportService
     public function __construct(
         private readonly StudentImportValidator $validator,
         private readonly StudentAccountService $accounts,
-    ) {}
+    ) {
+    }
 
     public function preview(array $input): array
     {

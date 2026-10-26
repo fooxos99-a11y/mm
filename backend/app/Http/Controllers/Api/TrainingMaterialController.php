@@ -19,7 +19,8 @@ class TrainingMaterialController extends Controller
         private readonly TrainingMaterialAttachmentService $attachmentService,
         private readonly TrainingMaterialRequestData $requestData,
         private readonly TrainingMaterialService $trainingMaterialService,
-    ) {}
+    ) {
+    }
 
     public function index(): JsonResponse
     {
