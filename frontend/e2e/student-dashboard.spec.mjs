@@ -11,10 +11,11 @@ test('student results remain usable across the responsive viewport matrix', asyn
   await page.locator('input[autocomplete="current-password"]').fill(studentPassword);
 
   await Promise.all([
-    page.waitForURL((url) => url.pathname === '/momars/student', { timeout: 90_000 }),
+    page.waitForURL((url) => url.pathname === '/momars/practitioner', { timeout: 90_000 }),
     page.locator('form button[type="submit"]').click(),
   ]);
 
+  await page.goto('student');
   await expect(page.locator('.student-page')).toBeVisible();
   // The fixture submits the pre-test for this course, not the first seeded course.
   await page.locator('.student-overview-filter .v-field').click();

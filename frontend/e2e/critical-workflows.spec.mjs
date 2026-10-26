@@ -148,7 +148,7 @@ test('admin critical data workflows persist through the browser API session', as
   await page.locator('input[autocomplete="username"]').fill(result.loginId);
   await page.locator('input[autocomplete="current-password"]').fill(studentPassword);
   await Promise.all([
-    page.waitForURL((url) => url.pathname === '/momars/student'),
+    page.waitForURL((url) => url.pathname === '/momars/practitioner'),
     page.locator('form button[type="submit"]').click(),
   ]);
   await page.goto('final-exam', { waitUntil: 'domcontentloaded' });

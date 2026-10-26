@@ -102,9 +102,10 @@ test('public registration persists a complete request', async ({ page }, testInf
   await page.locator('input[autocomplete="username"]').fill(loginCode);
   await page.locator('input[autocomplete="current-password"]').fill(newAccountPassword);
   await Promise.all([
-    page.waitForURL((url) => url.pathname === '/momars/student'),
+    page.waitForURL((url) => url.pathname === '/momars/practitioner'),
     page.locator('form button[type="submit"]').click(),
   ]);
+  await page.goto('student');
   await expect(page.locator('.student-page')).toBeVisible();
   await expect(page).not.toHaveURL(/change-password/);
 });

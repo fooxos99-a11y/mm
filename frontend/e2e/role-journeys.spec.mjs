@@ -51,9 +51,10 @@ const login = async (page, account) => {
   await page.locator('input[autocomplete="username"]').fill(account.login);
   await page.locator('input[autocomplete="current-password"]').fill(password);
   await Promise.all([
-    page.waitForURL((url) => url.pathname === account.path),
+    page.waitForURL((url) => url.pathname === (account.login === 'e2e-student-role' ? '/momars/practitioner' : account.path)),
     page.locator('form button[type="submit"]').click(),
   ]);
+  if (account.login === 'e2e-student-role') await page.goto('student');
 };
 
 for (const account of roles) {
