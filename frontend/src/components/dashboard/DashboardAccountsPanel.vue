@@ -115,6 +115,7 @@
     <DashboardAccountEditor
       :open="editorOpen"
       :editing="Boolean(editingAccount)"
+      :account-id="editingAccount?.id || ''"
       :protected-account="Boolean(editingAccount?.isProtected)"
       :form="form"
       :roles="roles"

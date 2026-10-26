@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\DashboardDatasetController;
 use App\Http\Controllers\Api\DepartmentManagementController;
 use App\Http\Controllers\Api\EditorAssetController;
 use App\Http\Controllers\Api\FinalExamController;
+use App\Http\Controllers\Api\ManagedPasswordController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\OperationalHealthController;
 use App\Http\Controllers\Api\PageContentController;
@@ -87,6 +88,8 @@ Route::middleware(['auth:sanctum', 'password.changed'])->group(function () {
     Route::prefix('dashboard')->group(function () {
         Route::get('snapshot', [SnapshotController::class, 'snapshot']);
         Route::middleware('can:access-dashboard')->group(function () {
+            Route::post('people/{type}/{id}/password', ManagedPasswordController::class)
+                ->whereIn('type', ['student', 'reciter', 'account'])->middleware(['dashboard.access:admin', 'throttle:30,1']);
             Route::get('shell', [SnapshotController::class, 'shell']);
             Route::get('results/catalog', [ResultsDirectoryController::class, 'catalog'])
                 ->middleware('dashboard.access:results');
@@ -265,6 +268,7 @@ Route::middleware(['auth:sanctum', 'password.changed'])->group(function () {
         });
         Route::get('by-login/{loginCode}/assigned-reciter', [ReciterController::class, 'assignedToStudent'])
             ->where('loginCode', '.+');
+        Route::put('{student}/parts', [StudentController::class, 'completeParts']);
         Route::put('{student}/parts/{partNumber}', [StudentController::class, 'togglePart']);
     });
 

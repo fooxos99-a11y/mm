@@ -42,6 +42,12 @@
           @input="change('loginCode', $event)"
           @blur="touched.loginCode = true"
         />
+        <ManagedPasswordField
+          v-if="open && editing && accountId"
+          :key="accountId"
+          :person-id="accountId"
+          entity-type="account"
+        />
         <AppPasswordField
           id="dashboard-account-password"
           :value="form.password"
@@ -91,10 +97,11 @@
 </template>
 <script>
 import { AppButton, AppDialog, AppInput, AppPasswordField, AppSelect, DialogShell } from '../ui';
+import ManagedPasswordField from '../people/ManagedPasswordField.vue';
 import { ACCOUNT_PASSWORD_HINT, accountEditorErrors } from '../../features/dashboardAccounts/accountEditorModel.mjs';
 export default {
-  name: 'DashboardAccountEditor', components: { AppButton, AppDialog, AppInput, AppPasswordField, AppSelect, DialogShell },
-  props: { open: Boolean, editing: Boolean, protectedAccount: Boolean, form: { type: Object, required: true }, roles: { type: Array, required: true }, submitting: Boolean, valid: Boolean, changed: Boolean, errors: { type: Object, default: () => ({}) }, error: { type: String, default: '' } },
+  name: 'DashboardAccountEditor', components: { AppButton, AppDialog, AppInput, AppPasswordField, AppSelect, DialogShell, ManagedPasswordField },
+  props: { open: Boolean, editing: Boolean, accountId: { type: String, default: '' }, protectedAccount: Boolean, form: { type: Object, required: true }, roles: { type: Array, required: true }, submitting: Boolean, valid: Boolean, changed: Boolean, errors: { type: Object, default: () => ({}) }, error: { type: String, default: '' } },
   emits: ['change', 'cancel', 'save'], data: () => ({ touched: {}, passwordHint: ACCOUNT_PASSWORD_HINT }),
   watch: { open(value) { if (value) this.touched = {}; } },
   methods: { change(key, value) { this.$emit('change', { key, value }); }, fieldError(key) { return this.errors[key] || (this.touched[key] ? accountEditorErrors(this.form, this.editing)[key] : '') || ''; } },

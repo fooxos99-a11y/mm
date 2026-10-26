@@ -81,7 +81,7 @@ export const dashboardActions = {
     return dispatch('loadDashboardSnapshot', { mode });
   },
   initializeDashboard({ state, dispatch }) {
-    if (!state.currentUser || ['unassigned', 'super_admin'].includes(state.currentUser.role) || (state.currentUser.role !== 'student' && state.currentUser.mustChangePassword)) return Promise.resolve();
+    if (!state.currentUser || ['unassigned', 'super_admin'].includes(state.currentUser.role) || (!['student', 'trainee'].includes(state.currentUser.role) && state.currentUser.mustChangePassword)) return Promise.resolve();
     return Promise.all([
       dispatch('ensureDashboardSnapshot', {
         mode: ['admin', 'male_manager', 'female_manager'].includes(state.currentUser.role) ? 'shell' : 'full',

@@ -3,6 +3,7 @@
 namespace App\Services\Concerns;
 
 use App\Models\RegistrationRequest;
+use App\Services\ManagedPasswordService;
 use App\Support\DepartmentData as DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
@@ -78,12 +79,14 @@ trait ProcessesRegistrationRequests
         $answers = $this->registrationFormService->normalizeAnswers($data['answers'] ?? []);
         $this->assertRegistrationLoginCodeAvailable($loginCode, $registrationRequest->id);
         $branch = $this->findBranchByCode((string) $data['branchId']);
-        $passwordHash = Hash::make((string) $data['password']);
+        $password = (string) $data['password'];
+        $passwordHash = Hash::make($password);
 
         DB::transaction(function () use (
             $registrationRequest,
             $branch,
             $passwordHash,
+            $password,
             $name,
             $loginCode,
             $phone,
@@ -97,6 +100,7 @@ trait ProcessesRegistrationRequests
                 '',
                 $passwordHash,
             );
+            app(ManagedPasswordService::class)->rememberStudent($student, $password);
             $registrationRequest->forceFill([
                 'full_name' => $name,
                 'login_code' => $loginCode,

@@ -45,7 +45,11 @@ class AuthController extends Controller
         }
 
         RateLimiter::clear($rateLimitKey);
-        $user->forceFill(['last_login_at' => now()])->saveQuietly();
+        $updates = ['last_login_at' => now()];
+        if (in_array($user->role, ['student', 'trainee'], true)) {
+            $updates['must_change_password'] = false;
+        }
+        $user->forceFill($updates)->saveQuietly();
         DepartmentContext::set($user->role === 'super_admin' ? null : $user->department_id);
 
         $payload = [
@@ -105,7 +109,7 @@ class AuthController extends Controller
         $data = $request->validated();
         $user = $request->user();
 
-        if ($user?->role === 'student' && ! $user->must_change_password) {
+        if (in_array($user?->role, ['student', 'trainee'], true)) {
             return response()->json([
                 'message' => 'بيانات دخول الطالب يحددها المسؤول فقط.',
             ], Response::HTTP_FORBIDDEN);

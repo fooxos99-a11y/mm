@@ -79,6 +79,7 @@ class DashboardAccountService
             $this->validateLogin(trim($loginCode));
             $user = User::query()->create(['department_id' => DepartmentContext::id(), 'full_name' => trim($name),
                 'role' => $role, 'login_code' => trim($loginCode), 'password' => Hash::make($password), 'must_change_password' => false]);
+            app(ManagedPasswordService::class)->remember($user, $password);
             $this->history->record('إضافة حساب', $user->full_name, [['label' => 'الدور', 'after' => $role]]);
 
             return $user;
@@ -109,6 +110,7 @@ class DashboardAccountService
             }
             if ($changes !== []) {
                 $user->save();
+                app(ManagedPasswordService::class)->remember($user, $data['password'] ?? null);
                 $this->history->record('تعديل حساب', $user->full_name, $changes);
             }
 

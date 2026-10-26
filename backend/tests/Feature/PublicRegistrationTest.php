@@ -67,6 +67,8 @@ class PublicRegistrationTest extends CoreDataApiTestCase
             ->assertJsonPath('status', 'accepted');
 
         $studentId = DB::table('students')->where('login_code', '123')->value('id');
+        $this->postJson('/api/dashboard/people/student/'.$studentId.'/password')
+            ->assertOk()->assertJsonPath('password', '12340456');
 
         $this->assertDatabaseHas('registration_requests', [
             'id' => $requestId,

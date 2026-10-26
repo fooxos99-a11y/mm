@@ -2,6 +2,7 @@
   <div>
     <AppDialog
       :value="partsOpen"
+      :persistent="Boolean(savingPartKey)"
       max-width="560"
       @input="$emit('parts-toggle', $event)"
     >
@@ -25,6 +26,15 @@
             />
           </div>
 
+          <AppButton
+            v-if="canManageParts"
+            variant="secondary"
+            class="people-parts-dialog__select-all"
+            :disabled="Boolean(savingPartKey) || parts.every(isPartCompleted)"
+            @click="$emit('parts-select-all')"
+          >
+            تحديد الكل
+          </AppButton>
           <div class="people-parts-dialog__grid">
             <AppRawButton
               v-for="part in parts"
@@ -32,7 +42,7 @@
               type="button"
               class="people-parts-dialog__circle"
               :class="{ 'people-parts-dialog__circle--active': isPartCompleted(part) }"
-              :disabled="!canManageParts || savingPartKey === `${partsStudentId}:${part}`"
+              :disabled="!canManageParts || Boolean(savingPartKey)"
               :aria-pressed="isPartCompleted(part) ? 'true' : 'false'"
               @click="$emit('part-toggle', part)"
             >
@@ -278,6 +288,7 @@ export default {
     'manage-toggle',
     'part-toggle',
     'parts-close',
+    'parts-select-all',
     'parts-toggle',
     'reciter-close',
     'reciter-toggle',

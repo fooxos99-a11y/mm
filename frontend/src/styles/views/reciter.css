@@ -166,3 +166,10 @@
   }
 }
 
+.reciter-parts__select-all {
+  min-height: 44px;
+  margin-bottom: 12px;
+  padding: 0 12px;
+  font-size: 0.85rem;
+}
+

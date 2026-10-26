@@ -1,4 +1,4 @@
-import { toggleStudentPart, transferStudentToReciter } from '../../services/api';
+import { completeStudentParts, toggleStudentPart, transferStudentToReciter } from '../../services/api';
 
 export default {
   async submitManageDeleteWithSuccessFallback() {
@@ -85,6 +85,7 @@ export default {
     this.partsDialogOpen = true;
   },
   closePartsDialog() {
+    if (this.partsDialogSavingKey) return;
     this.partsDialogOpen = false;
     this.partsDialogStudentId = '';
     this.partsDialogSavingKey = '';
@@ -134,6 +135,24 @@ export default {
       this.reciterDialogSaving = false;
     }
     if (nextId) await this.refreshDashboardSnapshot({ background: true });
+  },
+  async selectAllDialogParts() {
+    const student = this.partsDialogStudent;
+    if (!student || this.partsDialogSavingKey || !this.canManageStudentParts) return;
+    const previousParts = [...this.partsDialogParts];
+    this.partsDialogSavingKey = `${student.id}:all`;
+    this.partsDialogParts = [...this.partsRange];
+    try {
+      const result = await completeStudentParts({ studentId: student.id, reciterId: student.reciterId || null });
+      this.partsDialogParts = result.completedParts;
+      this.personRecords.student[student.id] = { ...student, completedParts: [...result.completedParts] };
+      await this.refreshDashboardSnapshot();
+    } catch (error) {
+      this.partsDialogParts = previousParts;
+      this.showTimedToast('error', error?.response?.data?.message || 'تعذر حفظ الأجزاء المقروءة');
+    } finally {
+      this.partsDialogSavingKey = '';
+    }
   },
   async toggleDialogPart(partNumber) {
     const student = this.partsDialogStudent;

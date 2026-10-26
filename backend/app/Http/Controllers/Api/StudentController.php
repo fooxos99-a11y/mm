@@ -3,23 +3,25 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CoreData\CompleteStudentPartsRequest;
 use App\Http\Requests\CoreData\StoreStudentRequest;
 use App\Http\Requests\CoreData\ToggleStudentPartRequest;
 use App\Http\Requests\CoreData\TransferStudentRequest;
 use App\Http\Requests\CoreData\UpdateStudentRequest;
 use App\Models\Student;
 use App\Services\CompletionRequirementsService;
-use App\Services\CoreDataService;
+use App\Services\ManagedPeopleAccountService;
 use App\Services\ReciterAccessService;
+use App\Services\StudentPartsService;
 use App\Services\UserManagementService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 
 class StudentController extends Controller
 {
     public function __construct(
-        private readonly CoreDataService $coreDataService,
+        private readonly ManagedPeopleAccountService $accounts,
+        private readonly StudentPartsService $parts,
         private readonly CompletionRequirementsService $completionRequirementsService,
         private readonly ReciterAccessService $reciterAccessService,
         private readonly UserManagementService $userManagementService,
@@ -33,14 +35,7 @@ class StudentController extends Controller
 
     public function store(StoreStudentRequest $request): JsonResponse
     {
-        $data = $request->validated();
-        $student = $this->coreDataService->createStudent(
-            $data['name'],
-            $data['loginId'],
-            $data['branchId'],
-            $data['note'] ?? '',
-            filled($data['password'] ?? null) ? Hash::make($data['password']) : null,
-        );
+        $student = $this->accounts->createStudent($request->validated());
 
         return response()->json($this->studentData($student), 201);
     }
@@ -83,6 +78,13 @@ class StudentController extends Controller
         );
 
         return response()->json(status: 204);
+    }
+
+    public function completeParts(CompleteStudentPartsRequest $request, Student $student): JsonResponse
+    {
+        $parts = $this->parts->completeAll($request->user(), $student, $request->validated('reciterId'));
+
+        return response()->json(['completedParts' => $parts]);
     }
 
     private function studentData(Student $student): array

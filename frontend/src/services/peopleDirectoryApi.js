@@ -14,3 +14,7 @@ export const fetchPersonDetail = async (type, id) => {
   const response = await apiClient.get(`/dashboard/people/${type}/${encodeURIComponent(id)}`);
   return response.data;
 };
+
+export const revealPersonPassword = async (type, id) => (
+  await apiClient.post(`/dashboard/people/${type}/${encodeURIComponent(id)}/password`)
+).data;

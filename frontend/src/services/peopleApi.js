@@ -38,3 +38,7 @@ export const toggleStudentPart = ({ studentId, partNumber, reciterId, shouldMark
 );
 
 export const deleteReciter = (loginCode) => apiClient.delete(`/reciters/by-login/${encodeURIComponent(loginCode)}`);
+
+export const completeStudentParts = async ({ studentId, reciterId }) => (
+  await apiClient.put(`/students/${encodeURIComponent(studentId)}/parts`, { reciterId })
+).data;

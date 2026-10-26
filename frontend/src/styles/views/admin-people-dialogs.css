@@ -26,6 +26,13 @@
   justify-items: center;
 }
 
+.people-page .people-parts-dialog__select-all {
+  justify-self: start;
+  min-height: 44px;
+  padding: 0 12px;
+  font-size: 0.85rem;
+}
+
 .people-page .people-parts-dialog__circle {
   display: flex;
   align-items: center;

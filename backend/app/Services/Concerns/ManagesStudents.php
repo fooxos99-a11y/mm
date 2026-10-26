@@ -5,6 +5,7 @@ namespace App\Services\Concerns;
 use App\Models\Reciter;
 use App\Models\Student;
 use App\Models\User;
+use App\Services\ManagedPasswordService;
 use App\Support\DepartmentContext;
 use App\Support\DepartmentData as DB;
 use Illuminate\Support\Facades\DB as GlobalDB;
@@ -102,9 +103,11 @@ trait ManagesStudents
                 'department_id' => DepartmentContext::id(),
                 'full_name' => $targetName,
                 'role' => $user->exists ? $user->role : 'student',
+                'must_change_password' => false,
                 'login_code' => $targetLoginCode,
                 'password' => $passwordHash ?: ($user->password ?: Hash::make(Str::random(64))),
             ])->save();
+            app(ManagedPasswordService::class)->remember($user, $updates['password'] ?? null);
 
             if (array_key_exists('completedParts', $updates) && is_array($updates['completedParts'])) {
                 $student->parts()->delete();

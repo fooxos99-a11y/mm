@@ -86,9 +86,6 @@ final class StudentImportService
     {
         $student = $this->accounts->create($entry['name'], $entry['loginCode'], $branch, '', Hash::make($entry['password']));
         $user = User::query()->where('department_id', DepartmentContext::id())->where('login_code', $entry['loginCode'])->firstOrFail();
-        if ($entry['mustChangePassword'] ?? false) {
-            $user->forceFill(['must_change_password' => true])->save();
-        }
         DB::table('student_initial_credentials')->insert([
             'user_id' => $user->id, 'encrypted_password' => Crypt::encryptString($entry['password']), 'created_at' => now(),
         ]);

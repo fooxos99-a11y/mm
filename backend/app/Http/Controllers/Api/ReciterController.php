@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CoreData\StoreReciterRequest;
+use App\Services\ManagedPeopleAccountService;
 use App\Services\ReciterAccessService;
 use App\Services\UserManagementService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Symfony\Component\HttpFoundation\Response;
 
 class ReciterController extends Controller
@@ -16,21 +16,13 @@ class ReciterController extends Controller
     public function __construct(
         private readonly ReciterAccessService $reciterAccessService,
         private readonly UserManagementService $userManagementService,
+        private readonly ManagedPeopleAccountService $accounts,
     ) {
     }
 
     public function store(StoreReciterRequest $request): JsonResponse
     {
-        $data = $request->validated();
-        $reciter = $this->userManagementService->saveReciter(
-            $data['currentLoginCode'] ?? null,
-            $data['name'],
-            $data['loginCode'],
-            $data['branchId'],
-            $data['linkedStudentIds'] ?? [],
-            filled($data['password'] ?? null) ? Hash::make($data['password']) : null,
-            array_intersect_key($data, ['phone' => true]),
-        );
+        $reciter = $this->accounts->saveReciter($request->validated());
 
         return response()->json([
             'id' => $reciter->id,

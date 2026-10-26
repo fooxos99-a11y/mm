@@ -11,7 +11,8 @@ class EnsurePasswordChanged
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (! $request->user()?->must_change_password) {
+        if (in_array($request->user()?->role, ['student', 'trainee'], true)
+            || ! $request->user()?->must_change_password) {
             return $next($request);
         }
 

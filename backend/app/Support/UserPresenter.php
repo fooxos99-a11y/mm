@@ -16,7 +16,7 @@ final class UserPresenter
         return [
             'id' => $user->id, 'name' => $user->full_name, 'role' => $role,
             'systemRole' => $user->role, 'loginCode' => $user->login_code ?? '',
-            'mustChangePassword' => (bool) $user->must_change_password,
+            'mustChangePassword' => ! in_array($user->role, ['student', 'trainee'], true) && (bool) $user->must_change_password,
             'departmentId' => $departmentId, 'departmentName' => $department?->name,
             'roleLabel' => match ($role) {
                 'super_admin' => 'المدير العام', 'admin' => $department?->manager_title ?: 'مسؤول الإدارة',

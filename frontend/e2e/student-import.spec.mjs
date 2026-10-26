@@ -1,6 +1,6 @@
 import { test, expect } from './support/isolatedTest.mjs';
 
-test('student import previews before saving, retains source data and reveals only the unchanged initial password', async ({ page }, info) => {
+test('student import previews before saving, retains source data and displays the administrator-managed password', async ({ page }, info) => {
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   await page.goto('login');
@@ -29,8 +29,7 @@ test('student import previews before saving, retains source data and reveals onl
   const editor = page.getByRole('dialog');
   await expect(editor).toContainText('مجمع الاختبار');
   await expect(editor).toContainText('راسب');
-  await editor.getByRole('button', { name: 'إظهار كلمة المرور الأولية', exact: true }).click();
-  const initial = editor.getByRole('textbox', { name: 'كلمة المرور الأولية', exact: true });
+  const initial = editor.getByLabel('كلمة المرور الحالية', { exact: true });
   await expect(initial).toHaveValue('0700');
   await editor.screenshot({ path: info.outputPath('student-initial-password.png') });
   await editor.getByLabel('كلمة المرور الجديدة (اختياري)', { exact: true }).fill('changed-password');
@@ -38,7 +37,6 @@ test('student import previews before saving, retains source data and reveals onl
   await editor.getByRole('button', { name: 'تحديث', exact: true }).click();
   await expect(editor).toHaveCount(0);
   await page.getByRole('button', { name: 'تعديل المعلم', exact: true }).click();
-  await editor.getByRole('button', { name: 'إظهار كلمة المرور الأولية', exact: true }).click();
-  await expect(editor).toContainText('كلمة المرور الأولية غير متاحة');
+  await expect(editor.getByLabel('كلمة المرور الحالية', { exact: true })).toHaveValue('changed-password');
   expect(errors).toEqual([]);
 });

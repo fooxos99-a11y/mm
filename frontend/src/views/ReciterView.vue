@@ -86,6 +86,15 @@
                 المقروء
               </div>
 
+              <AppButton
+                variant="secondary"
+                class="reciter-parts__select-all"
+                :disabled="Boolean(savingKey) || visibleStudentParts(student).every(part => student.completedParts.includes(part))"
+                @click="selectAllParts(student)"
+              >
+                تحديد الكل
+              </AppButton>
+
               <div class="reciter-parts__grid">
                 <AppButton
                   v-for="part in visibleStudentParts(student)"
@@ -93,7 +102,7 @@
                   variant="plain"
                   class="reciter-part-circle"
                   :class="{ 'reciter-part-circle--active': student.completedParts.includes(part) }"
-                  :disabled="savingKey === `${student.id}:${part}`"
+                  :disabled="Boolean(savingKey)"
                   @click="togglePart(student, part)"
                 >
                   {{ part }}
@@ -110,7 +119,7 @@
 <script>
 import { mapActions, mapState } from 'vuex';
 import { AppButton } from '../components/ui';
-import { fetchReciterByLoginCode, toggleStudentPart } from '../services/api';
+import { completeStudentParts, fetchReciterByLoginCode, toggleStudentPart } from '../services/api';
 
 export default {
   name: 'ReciterView',
@@ -170,8 +179,24 @@ export default {
         this.loading = false;
       }
     },
+    async selectAllParts(student) {
+      if (!this.reciterAccount || this.savingKey) return;
+      this.savingKey = `${student.id}:all`;
+      const previousParts = [...student.completedParts];
+      student.completedParts = this.visibleStudentParts(student);
+      try {
+        const result = await completeStudentParts({ studentId: student.id, reciterId: this.reciterAccount.id });
+        student.completedParts = result.completedParts;
+        await this.loadDashboardSnapshot();
+      } catch (error) {
+        student.completedParts = previousParts;
+        this.loadError = error?.response?.data?.message || 'تعذر حفظ الأجزاء المقروءة.';
+      } finally {
+        this.savingKey = '';
+      }
+    },
     async togglePart(student, partNumber) {
-      if (!this.reciterAccount) {
+      if (!this.reciterAccount || this.savingKey) {
         return;
       }
 
