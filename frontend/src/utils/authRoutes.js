@@ -52,5 +52,5 @@ export const resolveLoginDestination = (router, redirect, user) => {
     if (target.matched.length && !['login', 'not-found'].includes(target.name)
       && target.query.login !== '1') return target.fullPath;
   }
-  return resolveUserHomeRoute(user);
+  return user?.role === 'student' ? { name: 'practitioner' } : resolveUserHomeRoute(user);
 };

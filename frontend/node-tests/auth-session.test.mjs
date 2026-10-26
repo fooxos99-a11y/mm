@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { readFile } from 'node:fs/promises';
 import { authMutations, createAuthState } from '../src/store/modules/storeState.mjs';
-import { resolveLoginDestination } from '../src/utils/authRoutes.js';
+import { resolveLoginDestination, resolveUserHomeRoute } from '../src/utils/authRoutes.js';
 
 const source = await readFile(new URL('../src/store/modules/auth.js', import.meta.url), 'utf8');
 const module = await import(`data:text/javascript;base64,${Buffer.from(`
@@ -63,6 +63,15 @@ test('login destinations preserve local queries and reject external and recursiv
   const account = { role: 'student' };
   assert.equal(resolveLoginDestination(router, '/student?section=parts#details', account), '/student?section=parts#details');
   for (const path of ['https://example.com', '//example.com', '/login', '/missing', '/practitioner?login=1', '/\\example.com', '/student' + String.fromCharCode(10)]) {
-    assert.deepEqual(resolveLoginDestination(router, path, account), { name: 'student' });
+    assert.deepEqual(resolveLoginDestination(router, path, account), { name: 'practitioner' });
+  }
+});
+
+test('students land on the license page after login while their account stays available', () => {
+  const router = { resolve: () => { throw new Error('No redirect should be resolved'); } };
+  assert.deepEqual(resolveLoginDestination(router, undefined, { role: 'student' }), { name: 'practitioner' });
+  assert.deepEqual(resolveUserHomeRoute({ role: 'student' }), { name: 'student' });
+  for (const [role, name] of [['admin', 'dashboard'], ['reciter', 'reciter'], ['trainee', 'trainee'], ['unassigned', 'account-assignment'], ['super_admin', 'system-management']]) {
+    assert.deepEqual(resolveLoginDestination(router, undefined, { role }), { name });
   }
 });

@@ -1,5 +1,5 @@
 import { expect, test } from './support/isolatedTest.mjs';
-import { adminLogin, adminPassword } from './support/credentials.mjs';
+import { adminLogin, adminPassword, rolePassword } from './support/credentials.mjs';
 
 const user = { id: 'session-audit', name: 'حساب فحص', role: 'student', loginCode: 'audit', departmentId: 'audit', mustChangePassword: false };
 const authState = (page) => page.evaluate(() => {
@@ -96,6 +96,23 @@ test('every login entry uses the same fields and returns to the requested page',
     await page.reload();
     await expect(page).toHaveURL(/\/dashboard\?panel=courses$/);
     await expect(page.locator('.dashboard-page')).toBeVisible();
+  }
+});
+
+test('student login defaults to the license page and honors an explicit account destination', async ({ page, context }) => {
+  for (const entry of ['practitioner?login=1', '?login=1', 'login', 'login?redirect=/student']) {
+    await context.clearCookies();
+    await page.goto(entry);
+    await page.locator('input[autocomplete="username"]').fill('e2e-student-role');
+    await page.locator('input[autocomplete="current-password"]').fill(rolePassword);
+    await page.locator('.account-login button[type="submit"]').click();
+    const target = entry.includes('redirect=') ? '/student' : '/practitioner';
+    await expect(page).toHaveURL((url) => url.pathname.endsWith(target) && !url.searchParams.has('login'));
+    await expect.poll(async () => (await authState(page)).authenticated).toBe(true);
+    await expect(page.locator('dialog[open]')).toHaveCount(0);
+    await page.reload();
+    await expect(page).toHaveURL((url) => url.pathname.endsWith(target));
+    await expect.poll(async () => (await authState(page)).authenticated).toBe(true);
   }
 });
 
