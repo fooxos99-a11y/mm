@@ -52,6 +52,7 @@ export default {
       selectedMaterialId: ALL_MATERIALS_OPTION_VALUE,
       materialSelectResetKey: 0,
       submitting: false,
+      uploadPercent: null,
       deletingId: '',
       formError: '',
       form: {
@@ -126,6 +127,7 @@ export default {
       this.dialogOpen = true;
     },
     closeDialog() {
+      if (this.submitting) return;
       this.dialogOpen = false;
       this.resetForm();
       this.dialogMode = 'create';
@@ -204,6 +206,7 @@ export default {
       };
     },
     async submitMaterial() {
+      if (this.submitting) return;
       this.formError = '';
       const attachments = this.normalizedAttachments();
 
@@ -230,6 +233,7 @@ export default {
       }
 
       this.submitting = true;
+      this.uploadPercent = null;
 
       try {
         const payload = {
@@ -237,6 +241,9 @@ export default {
           description: this.form.description,
           branchId: this.form.branchId,
           attachments,
+          onUploadProgress: ({ loaded, total }) => {
+            this.uploadPercent = total ? Math.min(100, Math.round(loaded * 100 / total)) : null;
+          },
         };
 
         const isEditMode = this.dialogMode === 'edit' && this.editingMaterialId;
@@ -251,6 +258,7 @@ export default {
         this.selectedMaterialId = isEditMode
           ? (result?.id || this.selectedMaterialId)
           : ALL_MATERIALS_OPTION_VALUE;
+        this.submitting = false;
         this.closeDialog();
         this.$toast.success(successMessage);
       } catch (error) {

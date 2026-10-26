@@ -4,6 +4,9 @@
 }
 
 .training-materials-list__preview-dialog {
+  display: flex;
+  flex-direction: column;
+  max-height: 94dvh;
   border-radius: 28px;
   overflow: hidden;
 }
@@ -38,9 +41,15 @@
 }
 
 .training-materials-list__preview-body {
+  min-height: 0;
+  overflow: auto;
   padding: 20px 24px;
   background: #f8fbfd;
 }
+
+.training-materials-list__preview-body:has(.training-pdf) { display: flex; flex-direction: column; overflow: hidden; flex: 1; }
+.training-materials-list__preview-header,
+.training-materials-list__preview-actions { flex-shrink: 0; }
 
 .training-materials-list__preview-frame,
 .training-materials-list__preview-video,
@@ -307,6 +316,9 @@
 }
 
 @media (max-width: 780px) {
+  .training-materials-list__preview-body { padding: 8px; }
+  .training-materials-list__preview-header { padding: 14px; }
+  .training-materials-list__preview-actions { padding: 10px 14px; }
   .training-materials-list__grid {
     grid-template-columns: 1fr;
   }

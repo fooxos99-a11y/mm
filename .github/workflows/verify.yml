@@ -39,6 +39,7 @@ jobs:
       - run: composer install --no-interaction --prefer-dist --no-progress --no-ansi
       - run: cp .env.example .env
       - run: php artisan key:generate
+      - run: bash ../scripts/prepare-training-pdf-runtime.sh "$GITHUB_WORKSPACE/runtime"
       - run: vendor/bin/pint --test
       - run: vendor/bin/phpunit --coverage-clover coverage.xml
       - run: php scripts/check-coverage.php coverage.xml --min=80
@@ -92,6 +93,7 @@ jobs:
       - run: composer install --no-interaction --prefer-dist --no-progress --no-ansi
       - run: cp .env.example .env
       - run: php artisan key:generate
+      - run: bash ../scripts/prepare-training-pdf-runtime.sh "$GITHUB_WORKSPACE/runtime"
       - run: php artisan test
 
   frontend:

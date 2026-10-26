@@ -46,6 +46,8 @@ jobs:
       - run: npm ci --prefix frontend --no-audit --no-fund --ignore-scripts
       - run: composer install --working-dir=backend --no-interaction --prefer-dist --no-progress --no-ansi
       - run: cp backend/.env.example backend/.env && php backend/artisan key:generate
+      - name: Prepare verified PDF runtime
+        run: bash scripts/prepare-training-pdf-runtime.sh "$PWD/runtime"
       # Pushes also wait for Verify (including browser/MySQL tests) and SonarCloud below.
       # Manual runs keep the full local release gate.
       - if: github.event_name == 'push'
@@ -56,7 +58,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: node scripts/wait-for-commit-checks.mjs
-      - name: Package immutable release
+      - name: Archive immutable release
         run: tar --exclude=release.tgz --exclude=.git --exclude=.deploy --exclude='.*-logs' --exclude=frontend/node_modules --exclude=backend/vendor --exclude=backend/storage --exclude=backend/.env -czf "$RUNNER_TEMP/release.tgz" .
       - name: Configure SSH host verification
         env:

@@ -3,8 +3,11 @@
     <v-dialog
       v-model="previewDialogOpen"
       max-width="1120"
+      :aria-label="previewAttachmentName"
     >
-      <v-card class="training-materials-list__preview-dialog">
+      <v-card
+        class="training-materials-list__preview-dialog"
+      >
         <div class="training-materials-list__preview-header">
           <div class="training-materials-list__preview-title">
             {{ previewAttachmentName }}
@@ -13,11 +16,11 @@
 
         <div
           class="training-materials-list__preview-body"
-          aria-live="polite"
         >
           <div
             v-if="previewLoading"
             class="training-materials-list__preview-status"
+            role="status"
           >
             <v-progress-circular
               indeterminate
@@ -36,6 +39,11 @@
             </v-icon>
             <span>{{ previewError }}</span>
           </div>
+          <TrainingPdfViewer
+            v-else-if="previewIsPdf && previewDialogOpen"
+            :key="previewAttachment.id || previewAttachment.url"
+            :source="previewAttachment.previewUrl || previewAttachment.url"
+          />
           <img
             v-else-if="previewKind === 'image' && previewSource"
             :src="previewSource"
@@ -78,9 +86,9 @@
 
         <AppActionBar class="training-materials-list__preview-actions">
           <AppButton
-            v-if="previewAttachment?.type === 'file' && previewSource && !previewLoading && !previewError"
+            v-if="previewAttachment?.type === 'file' && (previewSource || previewIsPdf) && !previewLoading && !previewError"
             variant="primary"
-            :href="previewSource"
+            :href="previewDownloadUrl"
             :download="previewFileName"
             class="training-materials-list__preview-download"
           >

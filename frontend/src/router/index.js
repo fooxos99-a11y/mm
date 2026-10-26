@@ -240,7 +240,7 @@ const router = createRouter({
   ],
 });
 
-const needsPasswordChange = (user) => user?.role !== 'student' && user?.mustChangePassword;
+const needsPasswordChange = (user) => Boolean(user?.mustChangePassword);
 
 const scheduleDeferredAuthCheck = () => {
   window.setTimeout(() => {
@@ -269,7 +269,7 @@ const resolveNavigationTarget = (to) => {
   const redirectPath = resolveRedirectPath(to);
   const user = store.state.currentUser;
 
-  if (user?.role === 'student' && to.name === 'change-password') {
+  if (user?.role === 'student' && !needsPasswordChange(user) && to.name === 'change-password') {
     return resolveUserHomeRoute(user);
   }
 

@@ -15,7 +15,7 @@ stamp() {
   printf '%s' "${fields[19]}"
 }
 wait_for_exit() {
-  local label="$1" process process_id expected deadline=$((SECONDS + 120))
+  local label="$1" process process_id expected deadline=$((SECONDS + 240))
   shift
   for process in "$@"; do
     process_id="${process%%:*}"

@@ -13,6 +13,12 @@
       <AppDialogBody>
         <p>الإدارة: <strong>{{ preview.departmentName }}</strong> — العدد: {{ preview.count }}</p>
         <p
+          v-if="preview.identityConflicts?.length"
+          role="alert"
+        >
+          توجد بيانات تطابق حسابات أو صفوفًا أخرى في {{ preview.identityConflicts.length }} صف. راجع المطابقة قبل إنشاء حسابات جديدة.
+        </p>
+        <p
           v-if="preview.alreadyImported"
           role="status"
         >
@@ -63,7 +69,7 @@
         <AppButton
           variant="primary"
           :loading="busy"
-          :disabled="busy || preview.alreadyImported || !!preview.conflicts.length"
+          :disabled="busy || preview.alreadyImported || !!preview.conflicts.length || !!preview.identityConflicts?.length"
           @click="$emit('confirm')"
         >
           إضافة {{ preview.count }} حسابًا

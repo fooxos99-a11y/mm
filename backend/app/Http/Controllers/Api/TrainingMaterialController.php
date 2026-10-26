@@ -8,6 +8,7 @@ use App\Http\Requests\CoreData\UpdateTrainingMaterialRequest;
 use App\Services\TrainingMaterialAttachmentService;
 use App\Services\TrainingMaterialRequestData;
 use App\Services\TrainingMaterialService;
+use App\Services\TrainingPdfPreviewService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -18,8 +19,7 @@ class TrainingMaterialController extends Controller
         private readonly TrainingMaterialAttachmentService $attachmentService,
         private readonly TrainingMaterialRequestData $requestData,
         private readonly TrainingMaterialService $trainingMaterialService,
-    ) {
-    }
+    ) {}
 
     public function index(): JsonResponse
     {
@@ -63,11 +63,23 @@ class TrainingMaterialController extends Controller
     public function attachment(Request $request, string $attachmentId): BinaryFileResponse
     {
         $media = $this->attachmentService->findAuthorized($request->user(), $attachmentId);
-
-        return response()->file($media->getPath(), [
+        $path = $media->getPath();
+        $previewPath = app(TrainingPdfPreviewService::class)->path($media);
+        if ($request->boolean('preview') && ! $request->boolean('download')
+            && $media->mime_type === 'application/pdf' && is_file($previewPath)) {
+            $path = $previewPath;
+        }
+        $response = response()->file($path, [
             'Content-Type' => $media->mime_type ?: 'application/octet-stream',
-            'Content-Disposition' => 'inline; filename="'.addslashes($media->file_name).'"',
+            'Accept-Ranges' => 'bytes',
+            'Cache-Control' => 'private, no-cache',
             'X-Content-Type-Options' => 'nosniff',
         ]);
+        $name = $media->getCustomProperty('original_client_name') ?: $media->file_name;
+        $response->setContentDisposition($request->boolean('download') ? 'attachment' : 'inline', $name);
+        $response->setEtag(hash('sha256', $media->id.':'.filesize($path).':'.filemtime($path)));
+        $response->setLastModified(\DateTimeImmutable::createFromFormat('U', (string) filemtime($path)));
+
+        return $response;
     }
 }

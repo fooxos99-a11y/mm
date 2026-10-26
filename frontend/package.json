@@ -25,6 +25,7 @@
     "jspdf": "4.2.1",
     "laravel-echo": "^1.17.1",
     "momars-workspace": "file:..",
+    "pdfjs-dist": "^6.4.299",
     "pusher-js": "^8.6.0",
     "quill": "2.0.2",
     "vue": "3.5.43",

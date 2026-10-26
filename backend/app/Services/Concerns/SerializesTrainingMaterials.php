@@ -22,6 +22,11 @@ trait SerializesTrainingMaterials
                 'originalName' => $media->getCustomProperty('original_client_name') ?: $media->file_name,
                 'mimeType' => $media->mime_type,
                 'size' => (int) $media->size,
+                'previewStatus' => $media->getCustomProperty('preview_status', 'original'),
+                'previewUrl' => request()->getSchemeAndHttpHost().$pathPrefix
+                    .'/api/training-material-attachments/'.rawurlencode($attachmentId)
+                    .'?departmentId='.rawurlencode((string) DepartmentContext::id())
+                    .($media->getCustomProperty('preview_status') === 'ready' ? '&preview=1' : ''),
                 'type' => 'file',
                 'url' => request()->getSchemeAndHttpHost().$pathPrefix
                     .'/api/training-material-attachments/'.rawurlencode($attachmentId)

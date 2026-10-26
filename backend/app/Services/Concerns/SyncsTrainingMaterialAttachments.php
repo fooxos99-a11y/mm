@@ -2,8 +2,10 @@
 
 namespace App\Services\Concerns;
 
+use App\Jobs\PrepareTrainingPdfPreview;
 use App\Models\Branch;
 use App\Models\TrainingMaterial;
+use App\Support\DepartmentContext;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
@@ -90,6 +92,13 @@ trait SyncsTrainingMaterialAttachments
                 ])
                 ->toMediaCollection('attachments', 'local');
             $keepMediaIds[] = (string) $newMedia->id;
+            if ($newMedia->mime_type === 'application/pdf') {
+                $newMedia->setCustomProperty('preview_status', 'queued')->save();
+                PrepareTrainingPdfPreview::dispatch(
+                    (int) $newMedia->id,
+                    (string) DepartmentContext::id(),
+                );
+            }
         }
 
         if ($allowExisting) {

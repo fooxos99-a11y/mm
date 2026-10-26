@@ -57,6 +57,14 @@ export default defineConfig(({ mode }) => {
       }),
     },
     build: {
+      rollupOptions: {
+        output: {
+          // Serve the module worker as JavaScript even on hosts without an
+          // explicit .mjs MIME mapping.
+          assetFileNames: ({ names }) => names.some((name) => name.includes('pdf.worker'))
+            ? 'assets/pdf.worker-[hash].js' : 'assets/[name]-[hash][extname]',
+        },
+      },
       sourcemap: false,
       chunkSizeWarningLimit: 1000,
     },

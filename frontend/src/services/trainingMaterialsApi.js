@@ -1,11 +1,12 @@
 import apiClient from './httpClient';
 
-export const fetchTrainingMaterialAttachment = (url) => apiClient.get(url, {
+export const fetchTrainingMaterialAttachment = (url, options = {}) => apiClient.get(url, {
   responseType: 'blob',
   timeout: 120000,
+  ...options,
 });
 
-export const createTrainingMaterial = async ({ title, description, branchId, attachments }) => {
+export const createTrainingMaterial = async ({ title, description, branchId, attachments, onUploadProgress }) => {
   const formData = new FormData();
 
   formData.append('title', title);
@@ -33,6 +34,7 @@ export const createTrainingMaterial = async ({ title, description, branchId, att
   });
 
   const response = await apiClient.post('/dashboard/training-materials', formData, {
+    onUploadProgress,
     timeout: 600000,
     headers: {
       'Content-Type': 'multipart/form-data',
@@ -42,7 +44,7 @@ export const createTrainingMaterial = async ({ title, description, branchId, att
   return response.data;
 };
 
-export const updateTrainingMaterial = async (materialId, { title, description, branchId, attachments }) => {
+export const updateTrainingMaterial = async (materialId, { title, description, branchId, attachments, onUploadProgress }) => {
   const formData = new FormData();
 
   formData.append('_method', 'PUT');
@@ -75,6 +77,7 @@ export const updateTrainingMaterial = async (materialId, { title, description, b
   });
 
   const response = await apiClient.post(`/dashboard/training-materials/${encodeURIComponent(materialId)}`, formData, {
+    onUploadProgress,
     timeout: 600000,
     headers: {
       'Content-Type': 'multipart/form-data',

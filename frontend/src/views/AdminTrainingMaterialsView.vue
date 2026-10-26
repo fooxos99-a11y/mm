@@ -50,6 +50,7 @@
 
     <AppDialog
       v-model="dialogOpen"
+      :persistent="submitting"
       max-width="760"
       @close="closeDialog"
     >
@@ -187,11 +188,25 @@
               </div>
             </div>
           </div>
+          <div
+            v-if="submitting"
+            class="admin-training-materials__upload-progress"
+            role="status"
+            aria-live="polite"
+          >
+            <label for="training-upload-progress">{{ uploadPercent === 100 ? 'اكتمل الرفع، جارٍ حفظ المادة…' : uploadPercent === null ? 'جارٍ رفع المرفقات…' : `جارٍ رفع المرفقات… ${uploadPercent}٪` }}</label>
+            <progress
+              id="training-upload-progress"
+              :value="uploadPercent === null ? undefined : uploadPercent"
+              max="100"
+            />
+          </div>
         </AppDialogBody>
 
         <AppDialogFooter class="admin-training-materials__dialog-footer">
           <AppButton
             variant="secondary"
+            :disabled="submitting"
             @click="closeDialog"
           >
             إلغاء

@@ -17,7 +17,7 @@ return [
     'allowed_origins' => $allowedOrigins,
     'allowed_origins_patterns' => [],
     'allowed_headers' => ['*'],
-    'exposed_headers' => [],
+    'exposed_headers' => ['Accept-Ranges', 'Content-Range', 'Content-Length', 'ETag'],
     'max_age' => 0,
     'supports_credentials' => true,
 ];

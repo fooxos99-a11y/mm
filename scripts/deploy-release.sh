@@ -97,6 +97,11 @@ ln -sfn "$shared_dir/storage" "$release_dir/backend/storage"
 
 composer --working-dir="$release_dir/backend" install --no-dev --classmap-authoritative --no-interaction --no-progress
 
+# Validate the bundled converter before maintenance or any schema work.
+if [[ -f "$release_dir/runtime/qpdf-runner" ]]; then
+  "$release_dir/runtime/qpdf-runner" --version
+fi
+
 # Shared storage includes the maintenance flag, so both releases stay closed while
 # schema and legacy file locations change. Never expose old code to a partial schema.
 if [[ ! -f "$shared_dir/storage/framework/down" ]]; then

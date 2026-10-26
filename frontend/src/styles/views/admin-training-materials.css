@@ -232,3 +232,5 @@
     width: 100%;
   }
 }
+.admin-training-materials__upload-progress { display: grid; gap: 8px; color: #14415d; padding-block: 12px; }
+.admin-training-materials__upload-progress progress { width: 100%; accent-color: #137d9e; }

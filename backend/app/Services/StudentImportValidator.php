@@ -19,6 +19,7 @@ final class StudentImportValidator
             'entries.*.name' => ['required', 'string', 'max:255'],
             'entries.*.loginCode' => ['required', 'string', 'max:255', 'distinct:strict'],
             'entries.*.password' => ['required', 'string', 'min:1', 'max:255'],
+            'entries.*.mustChangePassword' => ['sometimes', 'boolean'],
             'entries.*.sourceRow' => ['required', 'integer', 'min:1', 'distinct:strict'],
             'entries.*.sourceFields' => ['present', 'array', 'max:40'],
             'entries.*.sourceFields.*.label' => ['required', 'string', 'max:255'],

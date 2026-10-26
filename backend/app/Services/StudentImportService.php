@@ -17,8 +17,7 @@ final class StudentImportService
     public function __construct(
         private readonly StudentImportValidator $validator,
         private readonly StudentAccountService $accounts,
-    ) {
-    }
+    ) {}
 
     public function preview(array $input): array
     {
@@ -38,6 +37,7 @@ final class StudentImportService
             'batchId' => $batch?->id,
             'confirmation' => hash_hmac('sha256', $department->id.':'.$payloadHash, config('app.key')),
             'conflicts' => $batch ? [] : $this->validator->conflicts($data['entries']),
+            'identityConflicts' => $batch ? [] : app(StudentImportIdentityMatcher::class)->conflicts($data['entries']),
             'warnings' => $this->validator->warnings($data['entries']),
             'rows' => array_map(fn (array $entry): array => [
                 'sourceRow' => $entry['sourceRow'], 'name' => $entry['name'], 'loginCode' => $entry['loginCode'],
@@ -62,6 +62,9 @@ final class StudentImportService
             if ($preview['conflicts'] !== []) {
                 throw ValidationException::withMessages(['entries' => 'توجد أرقام دخول مستخدمة. لم يُضف أي حساب.']);
             }
+            if ($preview['identityConflicts'] !== []) {
+                throw ValidationException::withMessages(['entries' => 'توجد بيانات تطابق حسابات أو صفوفًا أخرى. راجع المطابقة قبل إنشاء حساب جديد.']);
+            }
             $batchId = (string) Str::uuid();
             DB::table('student_import_batches')->insert([
                 'id' => $batchId, 'department_id' => DepartmentContext::id(),
@@ -82,6 +85,9 @@ final class StudentImportService
     {
         $student = $this->accounts->create($entry['name'], $entry['loginCode'], $branch, '', Hash::make($entry['password']));
         $user = User::query()->where('department_id', DepartmentContext::id())->where('login_code', $entry['loginCode'])->firstOrFail();
+        if ($entry['mustChangePassword'] ?? false) {
+            $user->forceFill(['must_change_password' => true])->save();
+        }
         DB::table('student_initial_credentials')->insert([
             'user_id' => $user->id, 'encrypted_password' => Crypt::encryptString($entry['password']), 'created_at' => now(),
         ]);

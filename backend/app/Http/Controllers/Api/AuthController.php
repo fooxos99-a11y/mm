@@ -105,7 +105,7 @@ class AuthController extends Controller
         $data = $request->validated();
         $user = $request->user();
 
-        if ($user?->role === 'student') {
+        if ($user?->role === 'student' && ! $user->must_change_password) {
             return response()->json([
                 'message' => 'بيانات دخول الطالب يحددها المسؤول فقط.',
             ], Response::HTTP_FORBIDDEN);

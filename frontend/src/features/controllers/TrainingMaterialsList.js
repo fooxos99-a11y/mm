@@ -1,4 +1,5 @@
 import { fetchTrainingMaterialAttachment } from '../../services/api';
+import { defineAsyncComponent } from 'vue';
 import { AppActionBar, AppButton, AppRawButton } from '../../components/ui';
 import {
   resolveTrainingMaterialFileName,
@@ -12,6 +13,7 @@ export default {
     AppActionBar,
     AppButton,
     AppRawButton,
+    TrainingPdfViewer: defineAsyncComponent(() => import('../../components/materials/TrainingPdfViewer.vue')),
   },
   props: {
     materials: {
@@ -50,6 +52,8 @@ export default {
       previewObjectUrl: '',
       previewLoading: false,
       previewError: '',
+      previewRequest: 0,
+      previewAbort: null,
     };
   },
   computed: {
@@ -58,6 +62,10 @@ export default {
     },
     previewKind() {
       return resolveTrainingMaterialPreviewKind(this.previewAttachment);
+    },
+    previewIsPdf() {
+      return this.previewAttachment?.mimeType === 'application/pdf'
+        || /\.pdf$/i.test(this.previewAttachment?.originalName || this.previewAttachment?.name || '');
     },
     previewSource() {
       return resolveTrainingMaterialPreviewSource({
@@ -69,9 +77,21 @@ export default {
     previewFileName() {
       return resolveTrainingMaterialFileName(this.previewAttachment);
     },
+    previewDownloadUrl() {
+      if (!this.previewIsPdf) return this.previewSource;
+      const url = new URL(this.previewAttachment.url, window.location.href);
+      url.searchParams.set('download', '1');
+      return url.href;
+    },
   },
   beforeUnmount() {
+    this.previewAbort?.abort();
     this.releasePreviewObjectUrl();
+  },
+  watch: {
+    previewDialogOpen(open) {
+      if (!open && this.previewAttachment) this.closePreviewDialog();
+    },
   },
   methods: {
     async openPreviewDialog(attachment) {
@@ -79,18 +99,22 @@ export default {
         return;
       }
 
+      this.previewAbort?.abort();
+      const request = ++this.previewRequest;
       this.releasePreviewObjectUrl();
-      this.previewLoading = attachment.type === 'file';
       this.previewError = '';
       this.previewAttachment = attachment;
+      this.previewLoading = attachment.type === 'file' && !this.previewIsPdf;
       this.previewDialogOpen = true;
 
-      if (attachment.type !== 'file') {
+      if (attachment.type !== 'file' || this.previewIsPdf) {
         return;
       }
 
       try {
-        const response = await fetchTrainingMaterialAttachment(attachment.url);
+        this.previewAbort = new AbortController();
+        const response = await fetchTrainingMaterialAttachment(attachment.url, { signal: this.previewAbort.signal });
+        if (request !== this.previewRequest) return;
         const responseBlob = response?.data;
         if (!(responseBlob instanceof Blob)) {
           throw new TypeError('Attachment response is not a Blob.');
@@ -108,12 +132,14 @@ export default {
           url: this.previewObjectUrl,
         };
       } catch {
-        this.previewError = 'تعذر تحميل الملف. حدّث الصفحة ثم حاول مرة أخرى.';
+        if (request === this.previewRequest) this.previewError = 'تعذر تحميل الملف. حدّث الصفحة ثم حاول مرة أخرى.';
       } finally {
-        this.previewLoading = false;
+        if (request === this.previewRequest) this.previewLoading = false;
       }
     },
     closePreviewDialog() {
+      this.previewRequest++;
+      this.previewAbort?.abort();
       this.previewDialogOpen = false;
       this.previewAttachment = null;
       this.previewLoading = false;
