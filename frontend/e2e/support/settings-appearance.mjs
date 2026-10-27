@@ -29,4 +29,3 @@ export async function settingsAppearance(page, selector, actionName, headerSelec
     };
   }, { actionName, headerSelector });
 }
-
