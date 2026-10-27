@@ -66,9 +66,10 @@ class AttendanceSessionTest extends TestCase
 
     private function position(array $session): array
     {
+        $challenge = $this->postJson($this->path($session).'/challenge')->assertOk()->json('challenge');
+
         return ['latitude' => 24.7136, 'longitude' => 46.6753, 'accuracy' => 10,
-            'timestamp' => now()->getTimestampMs(),
-            'challenge' => $this->postJson($this->path($session).'/challenge')->assertOk()->json('challenge')];
+            'timestamp' => now()->getTimestampMs(), 'challenge' => $challenge];
     }
 
     public function test_settings_defaults_extraction_permissions_and_invalid_maps(): void
