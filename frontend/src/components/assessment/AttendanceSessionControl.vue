@@ -66,13 +66,13 @@
 </template>
 <script>
 import { AppButton, AppDialog, AppInput, DialogShell } from '../ui';
-import { attendanceSessions, openAttendance, closeAttendance, courseEnrollments } from '../../services/attendanceApi';
+import { attendanceSessions, openAttendance, closeAttendance } from '../../services/attendanceApi';
 export default {
   name: 'AttendanceSessionControl',
   components: { AppButton, AppDialog, AppInput, DialogShell },
   props: { course: { type: Object, required: true }, branch: { type: String, required: true }, canEdit: Boolean, saving: Boolean,
     showAction: { type: Boolean, default: true } },
-  emits: ['select', 'enrollments', 'action-state'],
+  emits: ['select', 'action-state'],
   data: () => ({ sessions: [], hours: '', dialog: false, busy: true, error: '', revision: 0 }),
   computed: {
     active() { return this.sessions.find(session => session.isOpen); },
@@ -91,12 +91,11 @@ export default {
     },
     async load() {
       const revision = ++this.revision;
-      this.busy = true; this.error = ''; this.$emit('select', { loading: true }); this.$emit('enrollments', null);
+      this.busy = true; this.error = ''; this.$emit('select', { loading: true });
       try {
-        const [sessions, roster] = await Promise.all([attendanceSessions(this.course.id), courseEnrollments(this.course.id, this.branch)]);
+        const sessions = await attendanceSessions(this.course.id);
         if (revision !== this.revision) return;
         this.sessions = sessions;
-        this.$emit('enrollments', roster.studentIds);
         this.$emit('select', this.active || sessions[0] || null);
       } catch (error) { if (revision === this.revision) this.error = error?.response?.data?.message || 'تعذر تحميل التحضير'; }
       finally { if (revision === this.revision) this.busy = false; }

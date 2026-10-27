@@ -2,6 +2,48 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import assessmentMethods from '../src/features/assessment/assessmentAttendanceMethods.js';
 import resultsMethods from '../src/features/results/adminResultsDataMethods.js';
+import assessmentComputed from '../src/features/assessment/adminAssessmentAttendanceComputed.js';
+import resultsComputed from '../src/features/results/adminResultsComputed.js';
+import { previousAttendanceRecords } from '../src/features/assessment/attendanceHistory.mjs';
+
+test('attendance history preserves old records while separating the current session, course and branch', () => {
+  const students = [{ loginId: 'male', name: 'معلم' }];
+  const records = [
+    { id: 'legacy', courseId: 'course', loginId: 'male', sessionId: null, createdAt: '2026-01-01', hours: null },
+    { id: 'current', courseId: 'course', loginId: 'male', sessionId: 'current' },
+    { id: 'other-course', courseId: 'other', loginId: 'male' },
+    { id: 'other-branch', courseId: 'course', loginId: 'female' },
+    { id: 'older-session', courseId: 'course', loginId: 'male', sessionId: 'older', createdAt: '2026-02-01', hours: 2 },
+    { id: 'same-date', courseId: 'course', loginId: 'male', createdAt: '2026-02-01' },
+    { id: 'undated', courseId: 'course', loginId: 'male' },
+    { id: 'undated2', courseId: 'course', loginId: 'male' },
+  ];
+  const original = structuredClone(records);
+  const history = previousAttendanceRecords(records, students, 'course', 'current');
+  assert.deepEqual(history.map(record => record.id), ['older-session', 'same-date', 'legacy', 'undated', 'undated2']);
+  assert.equal(history[2].hours, null);
+  assert.equal(history[0].hours, 2);
+  assert.equal(history[0].studentName, 'معلم');
+  assert.deepEqual(records, original);
+  assert.deepEqual(previousAttendanceRecords(records, students, 'course', ''), []);
+  assert.deepEqual(previousAttendanceRecords(records, students, '', 'current'), []);
+});
+
+for (const [name, computed] of [['assessment', assessmentComputed], ['results', resultsComputed]]) {
+  test(`${name} keeps the full branch roster before, during and after opening attendance`, () => {
+    const students = [{ id: 'm', branchId: 'male' }, { id: 'f', branchId: 'female' }];
+    const context = { students, attendanceBranchId: 'male', managedBranchId: '', effectiveAttendanceBranchId: 'male' };
+    for (const session of [null, { loading: true }, { id: 'session', isOpen: true }, { id: 'session', isOpen: false }]) {
+      context.selectedAttendanceSession = session;
+      assert.deepEqual(computed.attendanceStudents.call(context), [students[0]]);
+      context.managedBranchId = 'female';
+      context.effectiveAttendanceBranchId = 'female';
+      assert.deepEqual(computed.attendanceStudents.call(context), [students[1]]);
+      context.managedBranchId = '';
+      context.effectiveAttendanceBranchId = 'male';
+    }
+  });
+}
 
 for (const [name, methods] of [['assessment', assessmentMethods], ['results', resultsMethods]]) {
   test(`${name} attendance saves only the selected branch and allows clearing it`, async () => {
@@ -69,7 +111,7 @@ for (const [name, methods] of [['assessment', assessmentMethods], ['results', re
     const context = {
       students: [{ id: 'm', loginId: 'male', name: 'Male', branchId: 'male' },
         { id: 'f', loginId: 'female', name: 'Female', branchId: 'female' }],
-      attendanceChecked: ['m', 'f'], attendanceRemovedIds: [], attendanceEnrollmentIds: ['m', 'f'],
+      attendanceChecked: ['m', 'f'], attendanceRemovedIds: [],
       managedBranchId: 'male', effectiveAttendanceBranchId: 'male',
       selectedCourseId: 'course', attendanceCourseId: 'course',
       selectedAttendanceSession: { id: 'session', isOpen: true }, queueAttendanceSave() {},

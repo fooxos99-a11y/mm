@@ -1,8 +1,7 @@
 // Vue merges these members into the component, so `this` is the component instance.
 export default /** @type {Record<string, any>} */ ({
     attendanceStudents() {
-      return this.students.filter((student) => student.branchId === (this.managedBranchId || this.attendanceBranchId)
-        && (!this.selectedAttendanceSession || this.attendanceEnrollmentIds?.includes(student.id)));
+      return this.students.filter((student) => student.branchId === (this.managedBranchId || this.attendanceBranchId));
     },
     displayedAttendanceStudents() {
       return [...this.attendanceStudents]

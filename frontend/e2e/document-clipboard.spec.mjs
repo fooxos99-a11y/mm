@@ -4,6 +4,27 @@ import { studentPassword } from './support/credentials.mjs';
 
 const png = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aOuoAAAAASUVORK5CYII=';
 
+test('real typing and native copy keep the caret and do not split each letter into a line', async ({ page, context }) => {
+  const { editor, save, select, errors } = await openDocument(page, context, 'ثبات الكتابة والنسخ');
+  const text = 'كتابة عربية متصلة وواضحة';
+  await editor.click();
+  await editor.pressSequentially(text, { delay: 45 });
+  await expect(editor.locator('p')).toHaveText([text]);
+  await editor.press('ControlOrMeta+Home');
+  await editor.press('ControlOrMeta+Shift+End');
+  await editor.press('ControlOrMeta+c');
+  await editor.press('ControlOrMeta+End');
+  await editor.press('Enter');
+  await editor.press('ControlOrMeta+v');
+  await expect(editor.locator('p')).toHaveText([text, text]);
+  await editor.pressSequentially(' وتكملة بعد اللصق', { delay: 45 });
+  await expect(editor.locator('p')).toHaveText([text, `${text} وتكملة بعد اللصق`]);
+  await save();
+  await select();
+  await expect(editor.locator('p')).toHaveText([text, `${text} وتكملة بعد اللصق`]);
+  expect(errors).toEqual([]);
+});
+
 async function paste(editor, { text = '', html = '', uri = '', image = false } = {}) {
   await editor.evaluate((element, data) => {
     const clipboard = new DataTransfer();
@@ -16,6 +37,28 @@ async function paste(editor, { text = '', html = '', uri = '', image = false } =
     element.dispatchEvent(new ClipboardEvent('paste', { clipboardData: clipboard, bubbles: true, cancelable: true }));
   }, { text, html, uri, image, png });
 }
+
+test('composed Arabic input remains one line after images and formatted paste', async ({ page, context }) => {
+  const { editor, save, select, errors } = await openDocument(page, context, 'إدخال الحروف المركبة');
+  await editor.click();
+  await paste(editor, { html: `<p><img src="data:image/png;base64,${png}"></p><p><strong>بداية</strong></p>` });
+  await editor.press('ControlOrMeta+End');
+  await editor.press('Enter');
+  const client = await context.newCDPSession(page);
+  const text = 'كتابة عربية متصلة';
+  for (let end = 1; end <= text.length; end += 1) {
+    await client.send('Input.imeSetComposition', { text: text.slice(0, end), selectionStart: end, selectionEnd: end });
+  }
+  await client.send('Input.insertText', { text });
+  await expect(editor.locator('p').last()).toHaveText(text);
+  await editor.pressSequentially(' ونص إضافي', { delay: 45 });
+  await expect(editor.locator('p').last()).toHaveText(`${text} ونص إضافي`);
+  await expect(editor.locator('img')).toHaveCount(1);
+  await save();
+  await select();
+  await expect(editor.locator('p').last()).toHaveText(`${text} ونص إضافي`);
+  expect(errors).toEqual([]);
+});
 
 async function openDocument(page, context, title) {
   const errors = [];
@@ -152,6 +195,9 @@ test('student clipboard keeps locked template images while replacing text and su
   await paste(editor, { text: 'إجابة الطالب كاملة', html: `<p>إجابة الطالب كاملة<img src="data:image/png;base64,${png}"></p>`, image: true });
   await expect(editor).toContainText('إجابة الطالب كاملة');
   await expect(editor.locator('img')).toHaveCount(1);
+  await editor.press('ControlOrMeta+End');
+  await editor.pressSequentially(' وكتابة متصلة بعد اللصق', { delay: 45 });
+  await expect(editor).toContainText('إجابة الطالب كاملة وكتابة متصلة بعد اللصق');
   await editor.press('ControlOrMeta+A');
   await paste(editor, { text: 'استبدال النص مع إبقاء صورة القالب' });
   await expect(editor).toContainText('استبدال النص مع إبقاء صورة القالب');

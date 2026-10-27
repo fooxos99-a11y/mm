@@ -21,7 +21,6 @@
           :branch="managedBranchId || branchId"
           :can-edit="true"
           :saving="isSaving"
-          @enrollments="$emit('enrollments', $event)"
           @select="$emit('select-session', $event)"
         />
         <AppButton
@@ -157,17 +156,24 @@
           </tbody>
         </table>
       </div>
+      <AttendanceHistory
+        :records="attendanceRecords"
+        :students="students"
+        :course-id="courseId"
+        :session-id="selectedSession?.id || ''"
+      />
     </section>
   </div>
 </template>
 
 <script>
 import AttendanceSessionControl from '../assessment/AttendanceSessionControl.vue';
+import AttendanceHistory from '../assessment/AttendanceHistory.vue';
 import { AppButton, AppIconButton, AppRawButton, AppSelect } from '../ui';
 
 export default {
   name: 'ResultsAttendancePanel',
-  components: { AttendanceSessionControl, AppButton, AppIconButton, AppRawButton, AppSelect },
+  components: { AttendanceHistory, AttendanceSessionControl, AppButton, AppIconButton, AppRawButton, AppSelect },
   props: {
     selectedSession: { type: Object, default: null },
     embedded: { type: Boolean, default: false },
@@ -183,11 +189,11 @@ export default {
     allVisibleChecked: { type: Boolean, default: false },
     visibleCheckedCount: { type: Number, default: 0 },
     students: { type: Array, default: () => [] },
+    attendanceRecords: { type: Array, default: () => [] },
     displayedStudents: { type: Array, default: () => [] },
     checkedStudentIds: { type: Array, default: () => [] },
   },
   emits: [
-    'enrollments',
     'select-session',
     'request-course-delete',
     'toggle-student',

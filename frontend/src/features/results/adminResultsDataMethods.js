@@ -93,8 +93,7 @@ export default {
       this.isSavingAttendance = true;
       this.saveStatusText = 'جارٍ حفظ التحضير...';
       const presentStudents = this.students.filter((student) => student.branchId === this.effectiveAttendanceBranchId
-        && this.attendanceChecked.includes(student.id)
-        && (!this.selectedAttendanceSession?.id || this.attendanceEnrollmentIds?.includes(student.id)));
+        && this.attendanceChecked.includes(student.id));
       await this.setManualAttendance({
         courseId: this.attendanceCourseId,
         ...(this.selectedAttendanceSession?.id ? { sessionId: this.selectedAttendanceSession.id,

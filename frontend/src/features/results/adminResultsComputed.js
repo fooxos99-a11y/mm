@@ -106,8 +106,7 @@ export default /** @type {Record<string, any>} */ ({
   showStudentFilter() { return this.isAttendanceResultsType; },
   studentFilterLabel() { return 'حالة المعلمين'; },
   attendanceStudents() {
-    return this.students.filter((student) => student.branchId === this.effectiveAttendanceBranchId
-        && (!this.selectedAttendanceSession || this.attendanceEnrollmentIds?.includes(student.id)));
+    return this.students.filter((student) => student.branchId === this.effectiveAttendanceBranchId);
   },
   displayedAttendanceStudents() {
     return [...this.attendanceStudents].sort((left, right) => {

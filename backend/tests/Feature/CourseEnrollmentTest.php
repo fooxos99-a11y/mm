@@ -184,17 +184,22 @@ class CourseEnrollmentTest extends TestCase
         $this->assertDatabaseCount('course_attendance', 1);
     }
 
-    public function test_supervisor_cannot_enroll_implicitly_or_cancel_another_branch_or_another_session(): void
+    public function test_manual_attendance_does_not_require_enrollment_or_allow_another_branch_or_session(): void
     {
         $session = $this->open($this->course);
-        $this->postJson('/api/dashboard/manual-attendance', $this->manual($session))->assertForbidden();
+        Sanctum::actingAs(User::factory()->create(['role' => 'male_manager']));
+        $this->postJson('/api/dashboard/manual-attendance', $this->manual($session))->assertNoContent();
+        $this->assertDatabaseHas('course_attendance', ['session_id' => $session, 'student_id' => $this->student->id]);
         $this->assertDatabaseCount('course_enrollments', 0);
+        $this->postJson('/api/dashboard/manual-attendance', ['courseId' => $this->course, 'sessionId' => $session,
+            'branchCode' => 'female', 'presentStudents' => []])->assertForbidden();
+        Sanctum::actingAs($this->admin);
         $this->enroll($this->course, [$this->female->id], 'female');
         $this->postJson('/api/dashboard/manual-attendance', ['courseId' => $this->course, 'sessionId' => $session, 'branchCode' => 'female',
             'presentStudents' => [['loginId' => $this->female->login_code, 'studentName' => 'Female']]])->assertNoContent();
         Sanctum::actingAs(User::factory()->create(['role' => 'male_manager']));
         $this->postJson('/api/dashboard/manual-attendance', $this->manual($session, false, [$this->female->login_code]))->assertForbidden();
         $this->postJson('/api/dashboard/manual-attendance', $this->manual((string) str()->uuid(), false))->assertUnprocessable();
-        $this->assertDatabaseCount('course_attendance', 1);
+        $this->assertDatabaseCount('course_attendance', 2);
     }
 }

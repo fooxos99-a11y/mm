@@ -1,4 +1,9 @@
 export async function settingsAppearance(page, selector, actionName, headerSelector = '.app-settings-panel__header') {
+  // Measure the settled button style, after hover/focus and entrance transitions finish.
+  await page.mouse.move(0, 0);
+  await page.locator(selector).evaluate(async card => {
+    await Promise.all(card.getAnimations({ subtree: true }).map(animation => animation.finished.catch(() => {})));
+  });
   return page.locator(selector).evaluate((card, { actionName: name, headerSelector: targetHeader }) => {
     const style = (element, properties) => {
       const css = getComputedStyle(element);

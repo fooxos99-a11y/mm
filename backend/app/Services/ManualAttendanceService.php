@@ -49,10 +49,7 @@ class ManualAttendanceService
                 abort_if(($course->entity_type ?? '') === 'task', 422);
                 $sessions = app(AttendanceSessionService::class);
                 $session = $sessions->session($courseId, $sessionId);
-                $enrollments = app(CourseEnrollmentService::class);
-                foreach ($students->whereIn('login_code', $presentLogins) as $student) {
-                    $enrollments->assertEnrolled($courseId, $student->id);
-                }
+                // Supervisors may prepare any teacher in their branch; enrollment gates self attendance only.
                 // Only explicit removals change existing attendance; stale checklists cannot erase new self attendance.
                 DB::table('course_attendance')->where('session_id', $sessionId)->whereIn('login_code', $removedStudents)->delete();
                 foreach ($students->whereIn('login_code', $presentLogins) as $student) {

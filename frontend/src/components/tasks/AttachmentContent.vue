@@ -1,6 +1,9 @@
 <template>
   <div class="attachment-content">
-    <AppLoadingSpinner v-if="loading" label="تحميل المرفق" />
+    <AppLoadingSpinner
+      v-if="loading"
+      label="تحميل المرفق"
+    />
     <img
       v-if="previewSource && resolvedKind === 'image'"
       :src="previewSource"

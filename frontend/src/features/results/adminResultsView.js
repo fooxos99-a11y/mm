@@ -43,7 +43,6 @@ export default {
       attendanceBranchId: 'male',
       attendanceChecked: [],
       selectedAttendanceSession: null,
-      attendanceEnrollmentIds: null,
       attendanceRemovedIds: [],
       attendanceSaveTimer: null,
       isSavingAttendance: false,
