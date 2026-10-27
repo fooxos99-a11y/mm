@@ -1,11 +1,16 @@
 export async function settingsAppearance(page, selector, actionName, headerSelector = '.app-settings-panel__header') {
   // Measure the settled button style, after hover/focus and entrance transitions finish.
   await page.mouse.move(0, 0);
-  await page.locator(selector).evaluate(async card => {
-    await Promise.all(card.getAnimations({ subtree: true })
-      .filter(animation => Number.isFinite(animation.effect?.getComputedTiming().endTime))
-      .map(animation => animation.finished.catch(() => {})));
-  });
+  await page.locator(selector).evaluate(async (card, { actionName: name, headerSelector: targetHeader }) => {
+    const button = [...card.querySelector(targetHeader).querySelectorAll('button')]
+      .find(element => element.textContent.trim() === name);
+    await Promise.race([
+      Promise.all(button.getAnimations().filter(animation => animation.playState === 'running'
+        && Number.isFinite(animation.effect?.getComputedTiming().endTime))
+        .map(animation => animation.finished.catch(() => {}))),
+      new Promise(resolve => setTimeout(resolve, 500)),
+    ]);
+  }, { actionName, headerSelector });
   return page.locator(selector).evaluate((card, { actionName: name, headerSelector: targetHeader }) => {
     const style = (element, properties) => {
       const css = getComputedStyle(element);
