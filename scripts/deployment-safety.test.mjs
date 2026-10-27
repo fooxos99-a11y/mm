@@ -64,6 +64,12 @@ const fixture = () => {
   is-active) exit 0 ;;
 esac`);
   shellFile(bin, 'php', `
+if [[ "$1" == *audit-attendance-preservation.php ]]; then
+  echo "attendance-$2" >> "$EVENT_LOG"
+  [[ "\${FAIL_STAGE:-}" != attendance-compare || "$2" != compare ]] || exit 9
+  printf '{"records":{},"preserved":true}'
+  exit 0
+fi
 if [[ "$1" == *backup-deployment.php ]]; then
   echo backup >> "$EVENT_LOG"
   [[ "\${FAIL_STAGE:-}" != backup ]] || exit 9
@@ -177,6 +183,8 @@ test('release verifies snapshots before migration and secures legacy media befor
     assert.equal(result.status, 0, result.stderr);
     const events = readFileSync(data.events, 'utf8').trim().split('\n');
     assert.ok(events.indexOf('backup') < events.indexOf('migrate'));
+    assert.ok(events.indexOf('attendance-snapshot') < events.indexOf('migrate'));
+    assert.ok(events.indexOf('attendance-compare') < events.indexOf('up'));
     assert.ok(events.indexOf('queue-idle-restart') < events.indexOf('backup'));
     assert.ok(events.indexOf('migrate') < events.indexOf('media'));
     assert.ok(events.indexOf('media') < events.indexOf('queue-new-release-restart'));
@@ -192,7 +200,7 @@ test('release verifies snapshots before migration and secures legacy media befor
   }
 });
 
-for (const stage of ['backup', 'migrate', 'media', 'interrupt', 'crash', 'activation-fpm', 'activation-queue']) {
+for (const stage of ['backup', 'migrate', 'media', 'interrupt', 'crash', 'activation-fpm', 'activation-queue', 'attendance-compare']) {
   test(`failed ${stage} never exposes old code to changed schema`, linuxOnly, () => {
     const data = releaseFixture();
     try {

@@ -120,10 +120,11 @@ mkdir -p "$deploy_root/backups"
 chmod 700 "$deploy_root/backups"
 mkdir -m 700 "$backup_dir"
 php "$release_dir/scripts/backup-deployment.php" "$release_dir/backend" "$backup_dir"
+php "$release_dir/scripts/audit-attendance-preservation.php" snapshot "$release_dir/backend" > "$backup_dir/attendance-before.json"
 cp "$shared_dir/.env" "$backup_dir/environment.env"
 tar -czf "$backup_dir/storage.tgz" -C "$shared_dir" storage
 gzip -t "$backup_dir/storage.tgz"
-(cd "$backup_dir" && sha256sum database.* storage.tgz environment.env > SHA256SUMS)
+(cd "$backup_dir" && sha256sum database.* storage.tgz environment.env attendance-before.json > SHA256SUMS)
 chmod 600 "$backup_dir"/*
 printf '%s\n' "$previous_target" > "$backup_dir/previous-release"
 printf '%s\n' "$backup_dir" > "$release_dir/.deployment-backup"
@@ -139,6 +140,11 @@ artisan "$release_dir/backend/artisan" department:secure-legacy-media --apply
 php "$release_dir/backend/artisan" storage:link --force
 chmod -R g+w "$release_dir/backend/bootstrap/cache"
 artisan "$release_dir/backend/artisan" optimize
+php "$release_dir/scripts/audit-attendance-preservation.php" snapshot "$release_dir/backend" > "$backup_dir/attendance-after.json"
+php "$release_dir/scripts/audit-attendance-preservation.php" compare "$backup_dir/attendance-before.json" "$backup_dir/attendance-after.json" > "$release_dir/.attendance-preservation.json"
+(cd "$backup_dir" && sha256sum attendance-after.json >> SHA256SUMS)
+chmod 600 "$backup_dir/attendance-after.json" "$release_dir/.attendance-preservation.json"
+cat "$release_dir/.attendance-preservation.json"
 printf '%s\n' 'department-isolation-v1' > "$release_dir/.schema-generation"
 
 ln -sfn "$release_dir" "$deploy_root/.current-next"
