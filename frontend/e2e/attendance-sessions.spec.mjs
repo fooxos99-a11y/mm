@@ -1,14 +1,30 @@
 import { expect, test } from './support/isolatedTest.mjs';
-import { login } from './support/gesture-helpers.mjs';
+import { settingsAppearance } from './support/settings-appearance.mjs';
+import { login, selectOption } from './support/gesture-helpers.mjs';
 import { adminLogin, adminPassword, studentPassword } from './support/credentials.mjs';
+
+async function chooseSelfAttendance(page, label) {
+  await expect(page.locator('#attendance-settings-enabled')).toBeEnabled();
+  await page.locator('.app-select').filter({ has: page.locator('#attendance-settings-enabled') }).locator('.v-field').click();
+  await selectOption(page, label, { exact: true });
+}
 
 test('attendance settings persist both switch states', async ({ page }, info) => {
   await login(page);
+  await page.goto('dashboard?panel=settings&settingsItem=permissions', { waitUntil: 'networkidle' });
+  await expect(page.getByRole('heading', { name: 'الإشراف', exact: true })).toBeVisible();
+  await expect(page.locator('.permissions-admin .app-settings-panel__header').getByRole('button', { name: 'إضافة', exact: true })).toBeEnabled();
+  const reference = await settingsAppearance(page, '.permissions-admin__card', 'إضافة');
+  await page.screenshot({ path: info.outputPath('supervision-reference.png') });
   const url = 'dashboard?panel=settings&settingsItem=attendance';
   await page.goto(url);
-  const disabled = page.getByRole('button', { name: 'تفعيل التحضير الذاتي للطلاب: إيقاف', exact: true });
-  await expect(disabled).toBeEnabled();
-  await disabled.click();
+  await expect(page.locator('#attendance-settings-enabled')).toBeEnabled();
+  expect(await settingsAppearance(page, '.attendance-admin__card', 'حفظ')).toEqual(reference);
+  await expect(page.locator('.attendance-admin .app-settings-panel__header').getByRole('button', { name: 'حفظ', exact: true })).toBeEnabled();
+  await expect(page.locator('.attendance-admin .app-filter-field')).toHaveCount(3);
+  await expect(page.locator('.attendance-admin p')).toHaveCount(0);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1)).toBe(false);
+  await chooseSelfAttendance(page, 'تشغيل');
   await page.getByLabel('موقع التحضير', { exact: true }).fill('https://www.google.com/maps?q=24.7136,46.6753');
   await page.getByLabel('نطاق التحضير (متر)', { exact: true }).fill('450');
   const save = async () => {
@@ -18,14 +34,15 @@ test('attendance settings persist both switch states', async ({ page }, info) =>
   };
   await save();
   await page.goto(url);
-  const enabled = page.getByRole('button', { name: 'تفعيل التحضير الذاتي للطلاب: تشغيل', exact: true });
-  await expect(enabled).toBeEnabled();
+  await expect(page.locator('#attendance-settings-enabled')).toBeEnabled();
+  await expect(page.locator('.app-select').filter({ has: page.locator('#attendance-settings-enabled') }).locator('.v-select__selection-text')).toHaveText('تشغيل');
   await expect(page.getByLabel('نطاق التحضير (متر)', { exact: true })).toHaveValue('450');
   await page.screenshot({ path: info.outputPath('attendance-settings-final.png') });
-  await enabled.click();
+  await chooseSelfAttendance(page, 'إيقاف');
   await save();
   await page.goto(url);
-  await expect(disabled).toBeEnabled();
+  await expect(page.locator('#attendance-settings-enabled')).toBeEnabled();
+  await expect(page.locator('.app-select').filter({ has: page.locator('#attendance-settings-enabled') }).locator('.v-select__selection-text')).toHaveText('إيقاف');
 });
 
 test('course sessions, settings, student location, history and supervision', async ({ page, request, context, browser }, info) => {
@@ -46,9 +63,7 @@ test('course sessions, settings, student location, history and supervision', asy
   await login(page);
   await page.goto('dashboard?panel=settings&settingsItem=attendance');
   await expect(page.getByRole('heading', { name: 'التحضير', exact: true })).toBeVisible();
-  const toggle = page.getByRole('button', { name: 'تفعيل التحضير الذاتي للطلاب: إيقاف', exact: true });
-  await expect(toggle).toBeEnabled();
-  await toggle.click();
+  await chooseSelfAttendance(page, 'تشغيل');
   await page.getByLabel('موقع التحضير', { exact: true }).fill('https://www.google.com/maps?q=24.7136,46.6753');
   await expect(page.getByLabel('نطاق التحضير (متر)', { exact: true })).toHaveValue('300');
   await page.getByRole('button', { name: 'حفظ', exact: true }).click();

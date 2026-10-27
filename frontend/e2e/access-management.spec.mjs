@@ -49,7 +49,7 @@ test('supervision supports validated create edit delete and visible audit histor
   await openAccess(page);
   await choose(page, 'permissions-section', 'الحسابات الإشرافية');
   await expect(page.locator('.permissions-admin .dashboard-accounts-panel .app-table')).toBeVisible();
-  await page.locator('.permissions-admin__header').getByRole('button', { name: 'إضافة', exact: true }).click();
+  await page.locator('.permissions-admin .app-settings-panel__header').getByRole('button', { name: 'إضافة', exact: true }).click();
   const create = page.getByRole('dialog', { name: 'إضافة حساب إشرافي', exact: true });
   await expect(create).toBeVisible();
   const add = create.getByRole('button', { name: 'إضافة', exact: true });
@@ -99,7 +99,7 @@ test('supervision supports validated create edit delete and visible audit histor
 test('closing a dirty account requires an explicit discard', async ({ page }) => {
   await openAccess(page);
   await expect(page.locator('.permissions-admin .dashboard-accounts-panel .app-table')).toBeVisible();
-  await page.locator('.permissions-admin__header').getByRole('button', { name: 'إضافة', exact: true }).click();
+  await page.locator('.permissions-admin .app-settings-panel__header').getByRole('button', { name: 'إضافة', exact: true }).click();
   const editor = page.getByRole('dialog', { name: 'إضافة حساب إشرافي', exact: true });
   await editor.locator('#dashboard-account-name').fill('مسودة حساب إشرافي');
   await editor.getByRole('button', { name: 'إلغاء', exact: true }).click();
@@ -144,7 +144,7 @@ test('loading accounts does not block navigation away from supervision', async (
   try {
     await page.goto('dashboard?panel=settings&settingsItem=permissions');
     await expect(page.getByRole('heading', { name: 'الإشراف', exact: true })).toBeVisible({ timeout: 60000 });
-    await expect(page.locator('.permissions-admin__header').getByRole('button', { name: 'إضافة', exact: true })).toBeDisabled();
+    await expect(page.locator('.permissions-admin .app-settings-panel__header').getByRole('button', { name: 'إضافة', exact: true })).toBeDisabled();
     await openManagerPanel(page, 'الأرشيف', '#archive-record-filter');
   } finally {
     release();

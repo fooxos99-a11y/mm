@@ -1,8 +1,2 @@
 @import '../components/access-management-feedback.css';
 .permissions-admin { min-width: 0; }
-.permissions-admin__card { width: 100%; overflow: visible; }
-.permissions-admin__header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
-.permissions-admin__header h1 { margin: 0; font-size: var(--app-font-title); color: var(--app-primary-dark); }
-.permissions-admin__toolbar .app-filter-field { min-width: 0; }
-@media (max-width: 1199px) { .permissions-admin__toolbar { --app-filter-columns: repeat(2, minmax(0, 1fr)); gap: 12px; } }
-@media (max-width: 599px) { .permissions-admin__toolbar { --app-filter-columns: minmax(0, 1fr); } }

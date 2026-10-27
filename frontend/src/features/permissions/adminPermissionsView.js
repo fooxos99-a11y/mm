@@ -1,13 +1,13 @@
 import { mapState } from 'vuex';
 import AccessHistoryPanel from '../../components/permissions/AccessHistoryPanel.vue';
 import DashboardAccountsPanel from '../../components/dashboard/DashboardAccountsPanel.vue';
-import { AppActionBar, AppButton, AppCard, AppDialog, AppFilterField, AppFilterToolbar, AppSelect, DialogShell } from '../../components/ui';
+import { AppActionBar, AppButton, AppSettingsPanel, AppDialog, AppFilterField, AppSelect, DialogShell } from '../../components/ui';
 import { DASHBOARD_ACCOUNT_ROLE_OPTIONS } from '../dashboardAccounts/accountModel.mjs';
 import { fetchAccessHistory } from '../../services/permissionEditorApi';
 
 export default {
   name: 'AdminPermissionsView',
-  components: { AccessHistoryPanel, DashboardAccountsPanel, AppActionBar, AppButton, AppCard, AppDialog, AppFilterField, AppFilterToolbar, AppSelect, DialogShell },
+  components: { AccessHistoryPanel, DashboardAccountsPanel, AppActionBar, AppButton, AppSettingsPanel, AppDialog, AppFilterField, AppSelect, DialogShell },
   props: { embedded: Boolean },
   data: () => ({ activeSection: 'supervision', accountRole: 'all', history: [], historyLoading: false,
     historyError: '', accountsBusy: false, accountsDirty: false, leaveDialog: false,

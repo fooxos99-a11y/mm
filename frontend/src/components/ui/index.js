@@ -12,6 +12,7 @@ export { default as AppIndicatorCard } from './AppIndicatorCard.vue';
 export { default as AppNativeSelect } from './AppNativeSelect.vue';
 export { default as AppSelect } from './AppSelect.vue';
 export { default as AppCard } from './AppCard.vue';
+export { default as AppSettingsPanel } from './AppSettingsPanel.vue';
 export { default as AppEmptyState } from './AppEmptyState.vue';
 export { default as AppErrorState } from './AppErrorState.vue';
 export { default as AppFooter } from './AppFooter.vue';

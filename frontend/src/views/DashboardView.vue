@@ -90,7 +90,7 @@
           'dashboard-workspace-panel--assessment': isAssessmentWorkspace,
           'dashboard-workspace-panel--communications': isCommunicationsWorkspace,
           'dashboard-workspace-panel--registration': isRegistrationWorkspace,
-          'dashboard-workspace-panel--standard': ['courses', 'tasks', 'finalexam', 'satisfaction', 'completion', 'results', 'materials', 'users', 'notifications'].includes(activeMenu) || (activeMenu === 'settings' && ['archive', 'permissions'].includes(selectedSettingsItemId)),
+          'dashboard-workspace-panel--standard': ['courses', 'tasks', 'finalexam', 'satisfaction', 'completion', 'results', 'materials', 'users', 'notifications'].includes(activeMenu) || (activeMenu === 'settings' && ['archive', 'permissions', 'attendance'].includes(selectedSettingsItemId)),
         }"
       >
         <component

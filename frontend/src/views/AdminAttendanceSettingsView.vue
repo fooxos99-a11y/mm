@@ -1,56 +1,88 @@
 <template>
-  <AppCard>
+  <div
+    class="attendance-admin"
+    :class="{ 'attendance-admin--embedded': embedded }"
+  >
     <form
       class="attendance-settings"
       @submit.prevent="save"
     >
-      <h2>التحضير</h2>
-      <AppButton
-        :variant="form.enabled ? 'primary' : 'secondary'"
-        :disabled="busy"
-        :aria-pressed="form.enabled"
-        @click="form.enabled = !form.enabled"
+      <AppSettingsPanel
+        title="التحضير"
+        class="attendance-admin__card"
       >
-        تفعيل التحضير الذاتي للطلاب: {{ form.enabled ? 'تشغيل' : 'إيقاف' }}
-      </AppButton>
-      <AppInput
-        v-model="form.mapsUrl"
-        label="موقع التحضير"
-        type="url"
-        dir="ltr"
-        :disabled="busy"
-      />
-      <AppInput
-        v-model="form.radius"
-        label="نطاق التحضير (متر)"
-        type="number"
-        min="1"
-        max="100000"
-        :disabled="busy"
-      />
-      <p
-        v-if="error"
-        role="alert"
-      >
-        {{ error }}
-      </p>
-      <AppButton
-        type="submit"
-        :loading="busy"
-        :disabled="busy"
-      >
-        حفظ
-      </AppButton>
+        <template #actions>
+          <AppActionBar>
+            <AppButton
+              type="submit"
+              variant="primary"
+              :loading="busy"
+              :disabled="busy"
+            >
+              حفظ
+            </AppButton>
+          </AppActionBar>
+        </template>
+        <template #filters>
+          <AppFilterField
+            for-id="attendance-settings-enabled"
+            label="تفعيل التحضير الذاتي للطلاب"
+          >
+            <AppSelect
+              id="attendance-settings-enabled"
+              v-model="form.enabled"
+              :items="enabledOptions"
+              item-text="label"
+              item-value="value"
+              :disabled="busy"
+              hide-details
+            />
+          </AppFilterField>
+          <AppFilterField
+            for-id="attendance-settings-radius"
+            label="نطاق التحضير (متر)"
+          >
+            <AppInput
+              id="attendance-settings-radius"
+              v-model="form.radius"
+              type="number"
+              min="1"
+              max="100000"
+              :disabled="busy"
+            />
+          </AppFilterField>
+        </template>
+        <AppFilterField
+          for-id="attendance-settings-location"
+          label="موقع التحضير"
+        >
+          <AppInput
+            id="attendance-settings-location"
+            v-model="form.mapsUrl"
+            type="url"
+            dir="ltr"
+            :disabled="busy"
+          />
+        </AppFilterField>
+        <p
+          v-if="error"
+          role="alert"
+        >
+          {{ error }}
+        </p>
+      </AppSettingsPanel>
     </form>
-  </AppCard>
+  </div>
 </template>
 <script>
-import { AppButton, AppCard, AppInput } from '../components/ui';
+import { AppActionBar, AppButton, AppFilterField, AppInput, AppSelect, AppSettingsPanel } from '../components/ui';
 import { attendanceSettings, saveAttendanceSettings } from '../services/attendanceApi';
 export default {
   name: 'AdminAttendanceSettingsView',
-  components: { AppButton, AppCard, AppInput },
-  data: () => ({ form: { enabled: false, mapsUrl: '', radius: 300 }, busy: true, error: '' }),
+  components: { AppActionBar, AppButton, AppFilterField, AppInput, AppSelect, AppSettingsPanel },
+  props: { embedded: Boolean },
+  data: () => ({ form: { enabled: false, mapsUrl: '', radius: 300 }, busy: true, error: '',
+    enabledOptions: [{ value: false, label: 'إيقاف' }, { value: true, label: 'تشغيل' }] }),
   async created() {
     try { this.form = await attendanceSettings(); }
     catch (error) { this.error = error?.response?.data?.message || 'تعذر تحميل الإعدادات'; }
@@ -69,7 +101,6 @@ export default {
 };
 </script>
 <style scoped>
-.attendance-settings { display: grid; gap: 20px; max-width: 560px; margin-inline: auto; }
-.attendance-settings h2 { color: var(--app-primary-dark); }
+.attendance-admin { min-width: 0; }
 .attendance-settings [role='alert'] { color: var(--app-danger); }
 </style>

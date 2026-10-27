@@ -3,12 +3,11 @@
     class="permissions-admin"
     :class="{ 'permissions-admin--embedded': embedded }"
   >
-    <AppCard
-      tag="article"
-      class="permissions-admin__card admin-workspace-card"
+    <AppSettingsPanel
+      title="الإشراف"
+      class="permissions-admin__card"
     >
-      <header class="permissions-admin__header">
-        <h1>الإشراف</h1>
+      <template #actions>
         <AppActionBar v-if="activeSection === 'supervision'">
           <AppButton
             variant="primary"
@@ -18,11 +17,8 @@
             إضافة
           </AppButton>
         </AppActionBar>
-      </header>
-      <AppFilterToolbar
-        :columns="2"
-        class="permissions-admin__toolbar"
-      >
+      </template>
+      <template #filters>
         <AppFilterField
           for-id="permissions-section"
           label="القسم"
@@ -53,7 +49,7 @@
             @input="setRole"
           />
         </AppFilterField>
-      </AppFilterToolbar>
+      </template>
       <DashboardAccountsPanel
         v-show="activeSection === 'supervision'"
         ref="accounts"
@@ -72,7 +68,7 @@
         :error="historyError"
         @reload="loadHistory"
       />
-    </AppCard>
+    </AppSettingsPanel>
     <AppDialog
       v-model="leaveDialog"
       :persistent="true"
