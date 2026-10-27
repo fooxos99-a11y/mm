@@ -65,7 +65,7 @@ trait ArchivesActiveBatch
                 ->select(['students.id', 'students.login_code'])->orderBy('students.created_at')->get();
             $studentIds = $activeStudents->pluck('id')->values();
             $studentLoginCodes = $activeStudents->pluck('login_code')->filter()->values();
-            $activeCourses = DB::table('courses')->whereNull('archive_id')->get();
+            $activeCourses = DB::table('courses')->whereNull('archive_id')->lockForUpdate()->get();
             $courseIds = $activeCourses->pluck('id')->values();
             $courseSubmissions = DB::table('course_submissions')->whereNull('archive_id')
                 ->whereIn('course_id', $courseIds)->whereIn('login_code', $studentLoginCodes)->get();
@@ -82,6 +82,29 @@ trait ArchivesActiveBatch
                 $payload['id'] = $newCourseId;
                 $payload['archive_id'] = $archiveId;
                 DB::table('courses')->insert($payload);
+            }
+
+            foreach (DB::table('course_enrollments')->whereIn('course_id', $courseIds)->whereIn('student_id', $studentIds)->get() as $enrollment) {
+                $copy = (array) $enrollment;
+                $copy['id'] = (string) Str::uuid();
+                $copy['course_id'] = $courseIdMap[$enrollment->course_id];
+                DB::table('course_enrollments')->insert($copy);
+                DB::table('course_enrollments')->where('id', $enrollment->id)->delete();
+            }
+
+            $attendanceSessionIdMap = [];
+            foreach (DB::table('attendance_sessions')->whereIn('course_id', $courseIds)->get() as $session) {
+                $copy = (array) $session;
+                $copy['id'] = (string) Str::uuid();
+                $copy['course_id'] = $courseIdMap[$session->course_id];
+                $copy['active'] = null;
+                $copy['closed_at'] ??= now();
+                DB::table('attendance_sessions')->insert($copy);
+                $attendanceSessionIdMap[$session->id] = $copy['id'];
+            }
+            if ($batchType === 'all') {
+                DB::table('attendance_sessions')->whereIn('course_id', $courseIds)->where('active', 1)
+                    ->update(['active' => null, 'closed_at' => now()]);
             }
 
             $courseQuestionIdMap = [];
@@ -170,6 +193,7 @@ trait ArchivesActiveBatch
             foreach ($attendanceRecords as $attendance) {
                 DB::table('course_attendance')->where('id', $attendance->id)->update([
                     'course_id' => $courseIdMap[$attendance->course_id] ?? $attendance->course_id,
+                    'session_id' => $attendanceSessionIdMap[$attendance->session_id] ?? $attendance->session_id,
                     'login_code' => $archivedLoginCodes[$attendance->login_code] ?? $attendance->login_code,
                     'archive_id' => $archiveId,
                 ]);

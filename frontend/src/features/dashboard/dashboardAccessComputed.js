@@ -51,6 +51,7 @@ export default {
 
     if (this.isAdmin) {
       items.push({ id: 'home', label: 'صفحة رخصة ممارس', icon: 'mdi-page-layout-body', kind: 'panel' });
+      items.push({ id: 'attendance', label: 'التحضير', icon: 'mdi-clipboard-text-outline', kind: 'panel' });
     }
     if (this.canAccessPanel('permissions')) {
       items.push({

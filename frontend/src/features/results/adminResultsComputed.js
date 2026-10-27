@@ -106,7 +106,8 @@ export default /** @type {Record<string, any>} */ ({
   showStudentFilter() { return this.isAttendanceResultsType; },
   studentFilterLabel() { return 'حالة المعلمين'; },
   attendanceStudents() {
-    return this.students.filter((student) => student.branchId === this.effectiveAttendanceBranchId);
+    return this.students.filter((student) => student.branchId === this.effectiveAttendanceBranchId
+        && (!this.selectedAttendanceSession || this.attendanceEnrollmentIds?.includes(student.id)));
   },
   displayedAttendanceStudents() {
     return [...this.attendanceStudents].sort((left, right) => {
@@ -122,7 +123,8 @@ export default /** @type {Record<string, any>} */ ({
     return this.attendanceStudents.length > 0 && this.visibleCheckedCount === this.attendanceStudents.length;
   },
   selectedAttendanceRecords() {
-    return this.attendance.filter((record) => record.courseId === this.attendanceCourseId);
+    return this.attendance.filter((record) => record.courseId === this.attendanceCourseId
+      && (record.sessionId || null) === (this.selectedAttendanceSession?.id || null));
   },
   activeResultsTypeLabel() {
     if (this.isTaskResultsSection) return this.selectedTaskResultCourse?.title || 'المهام الأدائية';

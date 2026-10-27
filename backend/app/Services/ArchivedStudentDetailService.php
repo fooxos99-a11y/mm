@@ -102,7 +102,7 @@ final class ArchivedStudentDetailService
                 ->whereIn('submission_id', $submissions->pluck('id')->filter()->values())
                 ->get())->groupBy('submission_id'),
             'attendance' => $attendanceRecords->keyBy('course_id'),
-            'attendanceCount' => $attendanceRecords->count(),
+            'attendanceCount' => $attendanceRecords->pluck('course_id')->unique()->count(),
             'satisfactionResponses' => $satisfactionResponses,
             'satisfactionQuestions' => collect(DB::table('satisfaction_questions')
                 ->where('archive_id', $archiveId)

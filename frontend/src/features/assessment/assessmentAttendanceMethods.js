@@ -1,5 +1,12 @@
 export default {
   toggleAttendance(studentId) {
+    if (this.selectedAttendanceSession && !this.selectedAttendanceSession.isOpen) return;
+    if (this.selectedAttendanceSession?.id) {
+      const removed = new Set(this.attendanceRemovedIds || []);
+      if (this.attendanceChecked.includes(studentId)) removed.add(studentId);
+      else removed.delete(studentId);
+      this.attendanceRemovedIds = [...removed];
+    }
     this.attendanceChecked = this.attendanceChecked.includes(studentId)
       ? this.attendanceChecked.filter((id) => id !== studentId)
       : [...this.attendanceChecked, studentId];
@@ -7,6 +14,15 @@ export default {
     this.queueAttendanceSave();
   },
   toggleVisibleAttendance() {
+    if (this.selectedAttendanceSession && !this.selectedAttendanceSession.isOpen) return;
+    if (this.selectedAttendanceSession?.id) {
+      const removed = new Set(this.attendanceRemovedIds || []);
+      for (const student of this.attendanceStudents) {
+        if (this.allVisibleChecked) removed.add(student.id);
+        else removed.delete(student.id);
+      }
+      this.attendanceRemovedIds = [...removed];
+    }
     const visibleStudentIds = this.attendanceStudents.map((student) => student.id);
 
     if (this.allVisibleChecked) {
@@ -37,14 +53,20 @@ export default {
     }, 250);
   },
   async saveAttendance() {
+    if (this.selectedAttendanceSession && !this.selectedAttendanceSession.isOpen) return;
+    const removedIds = [...(this.attendanceRemovedIds || [])];
     try {
       this.isSavingAttendance = true;
       this.saveStatusText = 'جارٍ حفظ التحضير...';
       const branchCode = this.managedBranchId || this.attendanceBranchId;
       const presentStudents = this.students.filter((student) => student.branchId === branchCode
-        && this.attendanceChecked.includes(student.id));
+        && this.attendanceChecked.includes(student.id)
+        && (!this.selectedAttendanceSession?.id || this.attendanceEnrollmentIds?.includes(student.id)));
       await this.setManualAttendance({
         courseId: this.selectedCourseId,
+        ...(this.selectedAttendanceSession?.id ? { sessionId: this.selectedAttendanceSession.id,
+          removedStudents: this.students.filter(student => student.branchId === branchCode && removedIds.includes(student.id)).map(student => student.loginId),
+        } : {}),
         branchCode,
         presentStudents: presentStudents.map((student) => ({
           loginId: student.loginId,
@@ -52,6 +74,7 @@ export default {
           studentId: student.id,
         })),
       });
+      this.attendanceRemovedIds = (this.attendanceRemovedIds || []).filter(id => !removedIds.includes(id));
       this.saveStatusText = 'تم حفظ التحضير';
     } catch (error) {
       this.saveStatusText = 'تعذر حفظ التحضير';

@@ -21,7 +21,9 @@ class AttendanceController extends Controller
             $request->user(),
             $data['courseId'],
             $data['presentStudents'],
-            $data['branchCode'] ?? null
+            $data['branchCode'] ?? null,
+            $data['sessionId'] ?? null,
+            $data['removedStudents'] ?? []
         );
 
         return response()->json(status: 204);

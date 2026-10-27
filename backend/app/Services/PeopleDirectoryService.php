@@ -52,7 +52,7 @@ class PeopleDirectoryService
         $partsCount = DB::table('student_parts')->selectRaw('COUNT(*)')
             ->whereColumn('student_id', 'students.id');
         $query->selectSub($partsCount, 'parts_count');
-        $attendanceCount = DB::table('course_attendance')->selectRaw('COUNT(*)')
+        $attendanceCount = DB::table('course_attendance')->selectRaw('COUNT(DISTINCT course_id)')
             ->whereNull('archive_id')->whereColumn('login_code', 'students.login_code');
         $query->selectSub($attendanceCount, 'attendance_count');
         foreach (['pre', 'post', 'tasks'] as $type) {

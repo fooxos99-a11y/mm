@@ -35,6 +35,7 @@
           <AppSelect
             id="results-attendance-branch"
             :value="branchId"
+            :disabled="isSaving"
             aria-label="الفرع"
             :items="branchOptions"
             item-text="label"
@@ -56,6 +57,7 @@
           <AppSelect
             id="results-attendance-course"
             :value="courseId"
+            :disabled="isSaving"
             aria-label="الدورة أو المهمة"
             :items="courseOptions"
             item-text="label"
@@ -95,13 +97,23 @@
             'attendance-toggle--active': allVisibleChecked,
             'attendance-toggle--partial': visibleCheckedCount > 0 && !allVisibleChecked,
           }"
-          :disabled="!students.length || isSaving"
+          :disabled="!students.length || isSaving || (selectedSession && !selectedSession.isOpen)"
           @click="$emit('toggle-visible')"
         >
           <span class="attendance-toggle__dot" />
         </AppRawButton>
       </div>
 
+      <AttendanceSessionControl
+        v-if="selectedCourse && selectedCourse.entityType !== 'task'"
+        :key="courseId"
+        :course="selectedCourse"
+        :branch="managedBranchId || branchId"
+        :can-edit="true"
+        :saving="isSaving"
+        @enrollments="$emit('enrollments', $event)"
+        @select="$emit('select-session', $event)"
+      />
       <div class="prep-table-wrap">
         <table class="prep-table">
           <thead>
@@ -135,7 +147,7 @@
                   type="button"
                   class="attendance-toggle"
                   :class="{ 'attendance-toggle--active': checkedStudentIds.includes(student.id) }"
-                  :disabled="isSaving"
+                  :disabled="isSaving || (selectedSession && !selectedSession.isOpen)"
                   @click="$emit('toggle-student', student.id)"
                 >
                   <span class="attendance-toggle__dot" />
@@ -150,12 +162,14 @@
 </template>
 
 <script>
+import AttendanceSessionControl from '../assessment/AttendanceSessionControl.vue';
 import { AppButton, AppIconButton, AppRawButton, AppSelect } from '../ui';
 
 export default {
   name: 'ResultsAttendancePanel',
-  components: { AppButton, AppIconButton, AppRawButton, AppSelect },
+  components: { AttendanceSessionControl, AppButton, AppIconButton, AppRawButton, AppSelect },
   props: {
+    selectedSession: { type: Object, default: null },
     embedded: { type: Boolean, default: false },
     saveStatusText: { type: String, default: '' },
     isSaving: { type: Boolean, default: false },
@@ -173,11 +187,14 @@ export default {
     checkedStudentIds: { type: Array, default: () => [] },
   },
   emits: [
+    'enrollments',
+    'select-session',
     'request-course-delete',
     'toggle-student',
     'toggle-visible',
     'update:branch-id',
     'update:course-id',
   ],
+  computed: { selectedCourse() { return this.courseOptions.find(course => course.value === this.courseId)?.course; } },
 };
 </script>

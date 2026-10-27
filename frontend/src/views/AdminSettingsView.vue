@@ -59,6 +59,7 @@
 <script>
 import { AppActionBar, AppButton } from '../components/ui';
 import AdminArchiveView from './AdminArchiveView.vue';
+import AdminAttendanceSettingsView from './AdminAttendanceSettingsView.vue';
 import AdminHomePageSettingsView from './AdminHomePageSettingsView.vue';
 import AdminPeopleView from './AdminPeopleView.vue';
 import AdminPermissionsView from './AdminPermissionsView.vue';
@@ -110,6 +111,8 @@ export default {
     },
     selectedPanelComponent() {
       switch (this.selectedItem?.id) {
+        case 'attendance':
+          return AdminAttendanceSettingsView;
         case 'home':
           return AdminHomePageSettingsView;
         case 'permissions':

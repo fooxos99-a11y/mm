@@ -26,6 +26,7 @@ trait ManagesCourseLifecycle
             // Referenced questions restrict deletion, so remove their answers before the course cascades.
             $answers->delete();
             DB::table('course_submissions')->where('course_id', $courseId)->delete();
+            DB::table('course_attendance')->where('course_id', $courseId)->delete();
             DB::table('courses')->where('id', $courseId)->delete();
 
             DB::afterCommit(function () use ($attachmentPaths): void {

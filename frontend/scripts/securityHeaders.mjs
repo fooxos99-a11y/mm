@@ -44,7 +44,7 @@ const configuredApiOrigins = [process.env.VUE_APP_API_BASE_URL].filter(Boolean);
 export const STATIC_SECURITY_HEADERS = {
   'Content-Security-Policy': buildContentSecurityPolicy({ apiOrigins: configuredApiOrigins }),
   'Cross-Origin-Opener-Policy': 'same-origin',
-  'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), payment=()',
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=(self), payment=()',
   'Referrer-Policy': 'strict-origin-when-cross-origin',
   'X-Content-Type-Options': 'nosniff',
   'X-Frame-Options': 'SAMEORIGIN',

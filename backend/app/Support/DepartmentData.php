@@ -17,7 +17,7 @@ final class DepartmentData
         'course_questions', 'course_submissions', 'course_submission_answers', 'course_attendance',
         'push_subscriptions', 'archives', 'registration_settings', 'registration_requests',
         'app_settings', 'completion_requirement_settings', 'student_completion_results',
-        'course_score_settings', 'course_manual_scores', 'course_score_history',
+        'course_score_settings', 'course_manual_scores', 'course_score_history', 'attendance_sessions', 'course_enrollments',
         'training_materials', 'editor_assets', 'media', 'dashboard_access_events',
     ];
 

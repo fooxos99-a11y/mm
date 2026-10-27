@@ -71,6 +71,7 @@
             >
               {{ item.label }}
             </AppButton>
+            <StudentAttendanceMenu v-if="$store.state.currentUser?.role === 'student'" />
           </div>
         </transition>
       </div>
@@ -81,10 +82,11 @@
 <script>
 import { AppButton, AppIconButton } from '../ui';
 import PublicLandingHeader from '../public/PublicLandingHeader.vue';
+import StudentAttendanceMenu from '../student/StudentAttendanceMenu.vue';
 
 export default {
   name: 'PractitionerHeader',
-  components: { AppButton, AppIconButton, PublicLandingHeader },
+  components: { AppButton, AppIconButton, PublicLandingHeader, StudentAttendanceMenu },
   props: {
     pageContent: { type: Object, required: true },
     scrolled: { type: Boolean, default: false },

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AssessmentAttachmentController;
 use App\Http\Controllers\Api\AttendanceController;
+use App\Http\Controllers\Api\AttendanceSessionController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ClientErrorController;
 use App\Http\Controllers\Api\CourseAssessmentController;
@@ -81,6 +82,9 @@ Route::prefix('management')->middleware(['auth:sanctum', 'password.changed', 'ge
 });
 
 Route::middleware(['auth:sanctum', 'password.changed'])->group(function () {
+    Route::get('students/me/attendance', [AttendanceSessionController::class, 'available']);
+    Route::post('students/me/attendance/{courseId}/{sessionId}/challenge', [AttendanceSessionController::class, 'challenge'])->middleware('throttle:30,1');
+    Route::post('students/me/attendance/{courseId}/{sessionId}', [AttendanceSessionController::class, 'attend'])->middleware('throttle:10,1');
     Route::get('assessment-attachments/{reference}', AssessmentAttachmentController::class)
         ->middleware('signed')->name('assessment-attachments.show');
     Route::post('client-errors', ClientErrorController::class)->middleware('throttle:20,1');
@@ -88,6 +92,13 @@ Route::middleware(['auth:sanctum', 'password.changed'])->group(function () {
     Route::prefix('dashboard')->group(function () {
         Route::get('snapshot', [SnapshotController::class, 'snapshot']);
         Route::middleware('can:access-dashboard')->group(function () {
+            Route::get('attendance/settings', [AttendanceSessionController::class, 'settings'])->middleware('dashboard.access:admin');
+            Route::put('attendance/settings', [AttendanceSessionController::class, 'updateSettings'])->middleware('dashboard.access:admin');
+            Route::get('courses/{courseId}/attendance-sessions', [AttendanceSessionController::class, 'index'])->middleware('dashboard.access:results');
+            Route::get('courses/{courseId}/enrollments', [AttendanceSessionController::class, 'enrollments'])->middleware('dashboard.access:results');
+            Route::put('courses/{courseId}/enrollments', [AttendanceSessionController::class, 'saveEnrollments'])->middleware('dashboard.access:results');
+            Route::post('courses/{courseId}/attendance-sessions', [AttendanceSessionController::class, 'open'])->middleware('dashboard.access:results');
+            Route::post('courses/{courseId}/attendance-sessions/{sessionId}/close', [AttendanceSessionController::class, 'close'])->middleware('dashboard.access:results');
             Route::post('people/{type}/{id}/password', ManagedPasswordController::class)
                 ->whereIn('type', ['student', 'reciter', 'account'])->middleware(['dashboard.access:admin', 'throttle:30,1']);
             Route::get('shell', [SnapshotController::class, 'shell']);

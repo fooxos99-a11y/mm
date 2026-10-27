@@ -1,9 +1,9 @@
 import apiClient from './httpClient';
 import { buildAssessmentSubmissionFormData, multipartRequestConfig } from './multipartPayload.mjs';
 
-export const saveManualAttendance = ({ courseId, presentStudents, branchCode }) => apiClient.post(
+export const saveManualAttendance = ({ courseId, presentStudents, branchCode, sessionId, removedStudents }) => apiClient.post(
   '/dashboard/manual-attendance',
-  { courseId, presentStudents, branchCode },
+  { courseId, presentStudents, branchCode, sessionId, removedStudents },
 );
 
 const assessmentPayload = ({ courseId, assessmentType, studentName, loginId, answers }) => ({

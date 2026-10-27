@@ -40,6 +40,16 @@
         </AppFilterField>
       </template>
     </AssessmentCourseToolbar>
+    <AttendanceSessionControl
+      v-if="mode === 'attendance' && selectedCourse"
+      :key="selectedCourse.id"
+      :course="selectedCourse"
+      :branch="managedBranchId || attendanceBranch"
+      :can-edit="canEdit"
+      :saving="savingAttendance"
+      @enrollments="$emit('enrollments', $event)"
+      @select="$emit('select-session', $event)"
+    />
     <AppLoadingSpinner
       v-if="loading"
       label="جارٍ تحميل البيانات"
@@ -71,7 +81,7 @@
       :students="students"
       :checked-ids="checkedIds"
       :all-checked="allChecked"
-      :can-edit="canEdit"
+      :can-edit="canEdit && (!selectedSession || selectedSession.isOpen)"
       :saving="savingAttendance"
       :save-status="saveStatus"
       @toggle-all="$emit('toggle-all')"
@@ -85,10 +95,11 @@ import { AppCard, AppEmptyState, AppFilterField, AppLoadingSpinner, AppSelect } 
 import AssessmentCourseToolbar from './AssessmentCourseToolbar.vue';
 import AssessmentIndicators from './AssessmentIndicators.vue';
 import AssessmentAttendanceList from './AssessmentAttendanceList.vue';
+import AttendanceSessionControl from './AttendanceSessionControl.vue';
 
 export default {
   name: 'AssessmentOperationalPanels',
-  components: { AppCard, AppEmptyState, AppFilterField, AppLoadingSpinner, AppSelect, AssessmentCourseToolbar, AssessmentIndicators, AssessmentAttendanceList },
+  components: { AttendanceSessionControl, AppCard, AppEmptyState, AppFilterField, AppLoadingSpinner, AppSelect, AssessmentCourseToolbar, AssessmentIndicators, AssessmentAttendanceList },
   props: {
     mode: { type: String, default: '' }, courseValue: { type: String, default: '' },
     courseOptions: { type: Array, default: () => [] }, coursePlaceholder: { type: String, default: '' },
@@ -104,8 +115,9 @@ export default {
     attendanceBranch: { type: String, default: '' }, attendanceBranchOptions: { type: Array, default: () => [] },
     students: { type: Array, default: () => [] }, checkedIds: { type: Array, default: () => [] },
     allChecked: Boolean,
+    selectedSession: { type: Object, default: null },
   },
-  emits: ['update:course-value', 'update:view-mode', 'create-course', 'edit-course', 'move-course', 'delete-course', 'update:indicator-branch', 'update:attendance-branch', 'toggle-all', 'toggle-student', 'save-attendance'],
+  emits: ['enrollments', 'select-session', 'update:course-value', 'update:view-mode', 'create-course', 'edit-course', 'move-course', 'delete-course', 'update:indicator-branch', 'update:attendance-branch', 'toggle-all', 'toggle-student', 'save-attendance'],
   computed: { branchId() { return this.mode === 'indicators' ? 'assessment-indicators-branch' : 'assessment-attendance-branch'; } },
 };
 </script>
