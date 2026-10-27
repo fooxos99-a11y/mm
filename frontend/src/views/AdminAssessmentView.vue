@@ -13,6 +13,7 @@
       >
         <AppButton
           variant="primary"
+          :disabled="currentAssessmentActionType === 'attendance' && attendanceActionState.disabled"
           @click="handleCurrentAssessmentAvailabilityAction"
         >
           {{ currentAssessmentActionLabel }}
@@ -61,6 +62,7 @@
 
       <AssessmentOperationalPanels
         v-if="showUnifiedToolbar && (isIndicatorsMode || isAttendanceMode)"
+        ref="operationalPanels"
         :mode="isIndicatorsMode ? 'indicators' : 'attendance'"
         :course-value="courseSelectValue"
         :course-options="courseSelectOptions"
@@ -89,9 +91,11 @@
         :students="displayedAttendanceStudents"
         :checked-ids="attendanceChecked"
         :selected-session="selectedAttendanceSession"
+        :show-session-action="false"
         :all-checked="allVisibleChecked"
         @select-session="selectedAttendanceSession = $event; attendanceRemovedIds = []"
         @enrollments="attendanceEnrollmentIds = $event"
+        @attendance-action-state="attendanceActionState = $event"
         @update:course-value="courseSelectValue = $event"
         @update:view-mode="requestViewModeChange($event)"
         @update:indicator-branch="assessmentIndicatorsBranch = $event"

@@ -118,6 +118,7 @@ export default {
       attendanceBranchId: 'male',
       attendanceChecked: [],
       selectedAttendanceSession: null,
+      attendanceActionState: { label: 'فتح التحضير', disabled: true },
       attendanceEnrollmentIds: null,
       attendanceRemovedIds: [],
       isSavingAttendance: false,

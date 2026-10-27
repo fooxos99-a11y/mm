@@ -56,6 +56,7 @@ export default {
       label: payload?.label || '',
       type: payload?.type || '',
       isEnabled: !!payload?.isEnabled,
+      disabled: !!payload?.disabled,
       closesAt: payload?.closesAt || null,
       timers: Array.isArray(payload?.timers) ? payload.timers : [],
     };

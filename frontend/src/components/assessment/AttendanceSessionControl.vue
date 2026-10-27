@@ -1,28 +1,13 @@
 <template>
   <div class="attendance-session-control">
-    <AppButton
-      v-if="canEdit"
-      variant="secondary"
-      :disabled="busy || saving"
-      @click="rosterDialog = true"
-    >
-      طلاب الدورة
-    </AppButton>
-    <CourseEnrollmentDialog
-      v-if="rosterDialog"
-      :course-id="course.id"
-      :branch="branch"
-      @close="rosterDialog = false"
-      @saved="rosterDialog = false; $emit('enrollments', $event)"
-    />
     <span
-      v-if="active"
+      v-if="showAction && active"
       role="status"
     >مفتوح</span>
     <AppButton
-      v-if="canEdit"
+      v-if="showAction && canEdit"
       :disabled="busy || saving"
-      @click="active ? close() : dialog = true"
+      @click="toggle"
     >
       {{ active ? 'إغلاق التحضير' : 'فتح التحضير' }}
     </AppButton>
@@ -46,7 +31,7 @@
           />
           <AppInput
             v-model="hours"
-            label="عدد ساعات التحضير"
+            label="مدة فتح التحضير"
             type="number"
             min="0.01"
             max="9999"
@@ -81,22 +66,29 @@
 </template>
 <script>
 import { AppButton, AppDialog, AppInput, DialogShell } from '../ui';
-import CourseEnrollmentDialog from './CourseEnrollmentDialog.vue';
 import { attendanceSessions, openAttendance, closeAttendance, courseEnrollments } from '../../services/attendanceApi';
 export default {
   name: 'AttendanceSessionControl',
-  components: { CourseEnrollmentDialog, AppButton, AppDialog, AppInput, DialogShell },
-  props: { course: { type: Object, required: true }, branch: { type: String, required: true }, canEdit: Boolean, saving: Boolean },
-  emits: ['select', 'enrollments'],
-  data: () => ({ sessions: [], rosterDialog: false, hours: '', dialog: false, busy: true, error: '', revision: 0 }),
+  components: { AppButton, AppDialog, AppInput, DialogShell },
+  props: { course: { type: Object, required: true }, branch: { type: String, required: true }, canEdit: Boolean, saving: Boolean,
+    showAction: { type: Boolean, default: true } },
+  emits: ['select', 'enrollments', 'action-state'],
+  data: () => ({ sessions: [], hours: '', dialog: false, busy: true, error: '', revision: 0 }),
   computed: {
     active() { return this.sessions.find(session => session.isOpen); },
+    actionState() { return { label: this.active ? 'إغلاق التحضير' : 'فتح التحضير', disabled: this.busy || this.saving }; },
   },
   watch: {
+    actionState: { immediate: true, deep: true, handler(value) { this.$emit('action-state', value); } },
     'course.id': { immediate: true, handler() { this.load(); } },
     branch() { this.load(); },
   },
   methods: {
+    toggle() {
+      if (!this.canEdit || this.busy || this.saving) return;
+      if (this.active) return this.close();
+      this.dialog = true;
+    },
     async load() {
       const revision = ++this.revision;
       this.busy = true; this.error = ''; this.$emit('select', { loading: true }); this.$emit('enrollments', null);
@@ -136,7 +128,7 @@ export default {
 };
 </script>
 <style scoped>
-.attendance-session-control { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-block: 16px; }
+.attendance-session-control { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
 .attendance-session-control > :first-child { max-width: 100%; }
 .attendance-session-fields { display: grid; gap: 16px; }
 [role='alert'] { color: var(--app-danger); }

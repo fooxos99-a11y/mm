@@ -42,11 +42,14 @@
     </AssessmentCourseToolbar>
     <AttendanceSessionControl
       v-if="mode === 'attendance' && selectedCourse"
+      ref="attendanceControl"
       :key="selectedCourse.id"
       :course="selectedCourse"
       :branch="managedBranchId || attendanceBranch"
       :can-edit="canEdit"
       :saving="savingAttendance"
+      :show-action="showSessionAction"
+      @action-state="$emit('attendance-action-state', $event)"
       @enrollments="$emit('enrollments', $event)"
       @select="$emit('select-session', $event)"
     />
@@ -115,9 +118,11 @@ export default {
     attendanceBranch: { type: String, default: '' }, attendanceBranchOptions: { type: Array, default: () => [] },
     students: { type: Array, default: () => [] }, checkedIds: { type: Array, default: () => [] },
     allChecked: Boolean,
+    showSessionAction: { type: Boolean, default: true },
     selectedSession: { type: Object, default: null },
   },
-  emits: ['enrollments', 'select-session', 'update:course-value', 'update:view-mode', 'create-course', 'edit-course', 'move-course', 'delete-course', 'update:indicator-branch', 'update:attendance-branch', 'toggle-all', 'toggle-student', 'save-attendance'],
+  emits: ['attendance-action-state', 'enrollments', 'select-session', 'update:course-value', 'update:view-mode', 'create-course', 'edit-course', 'move-course', 'delete-course', 'update:indicator-branch', 'update:attendance-branch', 'toggle-all', 'toggle-student', 'save-attendance'],
   computed: { branchId() { return this.mode === 'indicators' ? 'assessment-indicators-branch' : 'assessment-attendance-branch'; } },
+  methods: { handleAttendanceAction() { return this.$refs.attendanceControl?.toggle(); } },
 };
 </script>

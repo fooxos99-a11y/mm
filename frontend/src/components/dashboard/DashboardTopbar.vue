@@ -119,6 +119,7 @@
         <AppButton
           variant="primary"
           class="dashboard-topbar__action"
+          :disabled="assessmentState.disabled"
           @click="$emit('assessment-action')"
         >
           {{ assessmentState.label }}

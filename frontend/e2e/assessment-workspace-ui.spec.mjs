@@ -237,7 +237,8 @@ test('attendance keeps the greeting and whole-branch selection and recovers a fa
   const header = page.locator('.dashboard-topbar');
   await expect(header).toBeVisible();
   await expect(header.locator('.dashboard-topbar__label')).toHaveText('مرحبًا');
-  await expect(header.locator('.dashboard-topbar__actions')).toHaveCount(0);
+  await expect(header.locator('.dashboard-topbar__actions')).toHaveCount(1);
+  await expect(header.getByRole('button', { name: 'فتح التحضير', exact: true })).toBeEnabled();
   await expect(page.getByRole('searchbox', { name: 'البحث بالاسم أو رقم الدخول', exact: true })).toHaveCount(0);
   await expect(page.getByText('المحضّرون:', { exact: false })).toHaveCount(0);
   await page.route('**/dashboard/manual-attendance', route => route.fulfill({ status: 503, json: { message: 'تعذّر حفظ التحضير مؤقتًا' } }));

@@ -42,6 +42,7 @@ test('course sessions, settings, student location, history and supervision', asy
     branchId: 'male', password: studentPassword, passwordConfirmation: studentPassword }, 201);
   const course = await call('POST', 'dashboard/courses', { title: 'دورة التحضير', isActive: false }, 201);
   const other = await call('POST', 'dashboard/courses', { title: 'الدورة الثانية', isActive: false }, 201);
+  await call('PUT', `dashboard/courses/${course.id}/enrollments`, { branchCode: 'male', studentIds: [student.id] });
   await login(page);
   await page.goto('dashboard?panel=settings&settingsItem=attendance');
   await expect(page.getByRole('heading', { name: 'التحضير', exact: true })).toBeVisible();
@@ -56,24 +57,21 @@ test('course sessions, settings, student location, history and supervision', asy
 
   await page.goto(`dashboard?panel=courses&courseId=${course.id}`);
   await expect(page.getByLabel('جلسة التحضير', { exact: true })).toHaveCount(0);
-  await page.getByRole('button', { name: 'طلاب الدورة', exact: true }).click();
-  const roster = page.getByRole('dialog').filter({ hasText: 'طلاب الدورة' });
-  await roster.getByRole('searchbox', { name: 'الطلاب', exact: true }).fill('طالب فحص التحضير');
-  await roster.getByRole('button', { name: /طالب فحص التحضير/ }).click();
-  await page.screenshot({ path: info.outputPath('course-enrollment.png') });
-  const rosterSaved = page.waitForResponse(response => response.url().includes(`/courses/${course.id}/enrollments`) && response.request().method() === 'PUT');
-  await roster.getByRole('button', { name: 'حفظ', exact: true }).click();
-  expect((await rosterSaved).status()).toBe(200);
-  await expect(roster).toBeHidden();
+  await expect(page.getByRole('button', { name: 'طلاب الدورة', exact: true })).toHaveCount(0);
+  const header = page.locator('.dashboard-topbar');
+  await expect(header.getByRole('button', { name: 'فتح التحضير', exact: true })).toBeEnabled();
+  await expect(page.getByRole('button', { name: 'فتح التحضير', exact: true })).toHaveCount(1);
+  await expect(page.locator('.prep-card').getByRole('button', { name: 'فتح التحضير', exact: true })).toHaveCount(0);
 
   await page.getByRole('button', { name: 'فتح التحضير', exact: true }).click();
-  const dialog = page.getByRole('dialog').filter({ hasText: 'عدد ساعات التحضير' });
+  const dialog = page.getByRole('dialog').filter({ hasText: 'مدة فتح التحضير' });
   await expect(dialog.getByLabel('الدورة', { exact: true })).toHaveValue(course.title);
-  await dialog.getByLabel('عدد ساعات التحضير', { exact: true }).fill('2.5');
+  await dialog.getByLabel('مدة فتح التحضير', { exact: true }).fill('2.5');
   await page.screenshot({ path: info.outputPath('attendance-open.png'), fullPage: false });
   await dialog.getByRole('button', { name: 'فتح التحضير', exact: true }).click();
   await expect(dialog).toBeHidden();
   await expect(page.getByRole('button', { name: 'إغلاق التحضير', exact: true })).toBeVisible();
+  await expect(header.getByRole('button', { name: 'إغلاق التحضير', exact: true })).toBeEnabled();
   const [session] = await call('GET', `dashboard/courses/${course.id}/attendance-sessions`);
   expect(session.hours).toBe(2.5);
   expect(await call('GET', `dashboard/courses/${other.id}/attendance-sessions`)).toEqual([]);
@@ -98,7 +96,7 @@ test('course sessions, settings, student location, history and supervision', asy
 
   await expect(attendance.getByLabel('الدورة', { exact: true })).toBeVisible();
   await attendance.getByLabel('الدورة', { exact: true }).selectOption(session.id);
-  await expect(attendance.getByLabel('عدد ساعات التحضير')).toHaveValue('2.5');
+  await expect(attendance.getByLabel('مدة فتح التحضير')).toHaveValue('2.5');
 
   let location = null;
   // DevTools fixes carry their assignment timestamp. Assign after the real server challenge

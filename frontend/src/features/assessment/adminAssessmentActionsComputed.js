@@ -36,18 +36,21 @@ export default /** @type {Record<string, any>} */ ({
       if (this.isTasksPage) {
         return 'tasks';
       }
+      if (this.isAttendanceMode) return 'attendance';
 
       return this.viewMode === 'pre' || this.viewMode === 'post'
         ? this.viewMode
         : '';
     },
     canShowAssessmentStartButton() {
+      if (this.currentAssessmentActionType === 'attendance') return this.canEditAttendance && Boolean(this.selectedCourse);
       return this.canOpenAssessment && Boolean(this.selectedCourse && this.currentAssessmentActionType);
     },
     currentAssessmentActionLabel() {
       if (!this.selectedCourse || !this.currentAssessmentActionType) {
         return '';
       }
+      if (this.currentAssessmentActionType === 'attendance') return this.attendanceActionState?.label || 'فتح التحضير';
 
       const topbarLabel = this.currentAssessmentActionType === 'tasks'
         ? 'المهمة الأدائية'
@@ -58,7 +61,7 @@ export default /** @type {Record<string, any>} */ ({
         : `بدء ${topbarLabel}`;
     },
     currentAssessmentActionClosesAt() {
-      if (!this.selectedCourse || !this.currentAssessmentActionType) {
+      if (!this.selectedCourse || !this.currentAssessmentActionType || this.currentAssessmentActionType === 'attendance') {
         return null;
       }
 
@@ -85,7 +88,7 @@ export default /** @type {Record<string, any>} */ ({
       return null;
     },
     currentAssessmentActionTimers() {
-      if (!this.selectedCourse || !this.currentAssessmentActionType) {
+      if (!this.selectedCourse || !this.currentAssessmentActionType || this.currentAssessmentActionType === 'attendance') {
         return [];
       }
 
@@ -147,7 +150,9 @@ export default /** @type {Record<string, any>} */ ({
         selection: { courseId: this.selectedCourse?.id || '', viewMode: this.viewMode },
         label: this.currentAssessmentActionLabel,
         type: this.currentAssessmentActionType,
-        isEnabled: this.isAssessmentActive(this.selectedCourse, this.currentAssessmentActionType),
+        isEnabled: this.currentAssessmentActionType === 'attendance' ? Boolean(this.selectedAttendanceSession?.isOpen)
+          : this.isAssessmentActive(this.selectedCourse, this.currentAssessmentActionType),
+        disabled: this.currentAssessmentActionType === 'attendance' && Boolean(this.attendanceActionState?.disabled),
         closesAt: this.currentAssessmentActionClosesAt,
         timers: this.currentAssessmentActionTimers,
       };

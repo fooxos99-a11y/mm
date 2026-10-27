@@ -40,7 +40,7 @@
             disabled
           />
           <AppInput
-            label="عدد ساعات التحضير"
+            label="مدة فتح التحضير"
             :value="selected.hours"
             disabled
           />

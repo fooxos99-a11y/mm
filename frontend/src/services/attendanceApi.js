@@ -11,6 +11,3 @@ export const availableAttendance = async () => (await api.get('/students/me/atte
 export const attendanceChallenge = async session => (await api.post(`${studentPath(session)}/challenge`)).data.challenge;
 export const attendSession = (session, data) => api.post(studentPath(session), data);
 export const courseEnrollments = async (courseId, branchCode) => (await api.get(`/dashboard/courses/${courseId}/enrollments`, { params: { branchCode } })).data;
-export const saveCourseEnrollments = async (courseId, branchCode, studentIds) => (
-  await api.put(`/dashboard/courses/${courseId}/enrollments`, { branchCode, studentIds })
-).data;

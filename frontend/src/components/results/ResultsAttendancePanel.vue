@@ -14,6 +14,16 @@
             {{ saveStatusText }}
           </div>
         </div>
+        <AttendanceSessionControl
+          v-if="selectedCourse && selectedCourse.entityType !== 'task'"
+          :key="courseId"
+          :course="selectedCourse"
+          :branch="managedBranchId || branchId"
+          :can-edit="true"
+          :saving="isSaving"
+          @enrollments="$emit('enrollments', $event)"
+          @select="$emit('select-session', $event)"
+        />
         <AppButton
           v-if="!embedded"
           variant="plain"
@@ -104,16 +114,6 @@
         </AppRawButton>
       </div>
 
-      <AttendanceSessionControl
-        v-if="selectedCourse && selectedCourse.entityType !== 'task'"
-        :key="courseId"
-        :course="selectedCourse"
-        :branch="managedBranchId || branchId"
-        :can-edit="true"
-        :saving="isSaving"
-        @enrollments="$emit('enrollments', $event)"
-        @select="$emit('select-session', $event)"
-      />
       <div class="prep-table-wrap">
         <table class="prep-table">
           <thead>

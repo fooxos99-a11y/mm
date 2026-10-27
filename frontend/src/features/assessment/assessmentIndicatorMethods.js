@@ -252,6 +252,7 @@ export default {
       this.openAssessmentManageDialog(course.id, resolvedType);
     },
     handleCurrentAssessmentAvailabilityAction() {
+      if (this.currentAssessmentActionType === 'attendance') return this.$refs.operationalPanels?.handleAttendanceAction();
       if (!this.selectedCourse || !this.currentAssessmentActionType) {
         return;
       }
