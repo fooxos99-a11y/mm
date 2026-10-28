@@ -21,6 +21,7 @@
           :branch="managedBranchId || branchId"
           :can-edit="true"
           :saving="isSaving"
+          @action-state="sessionActionDisabled = $event.disabled"
           @select="$emit('select-session', $event)"
         />
         <AppButton
@@ -106,7 +107,7 @@
             'attendance-toggle--active': allVisibleChecked,
             'attendance-toggle--partial': visibleCheckedCount > 0 && !allVisibleChecked,
           }"
-          :disabled="!students.length || isSaving || (selectedSession && !selectedSession.isOpen)"
+          :disabled="!students.length || isSaving || selectedSession?.loading || sessionActionDisabled"
           @click="$emit('toggle-visible')"
         >
           <span class="attendance-toggle__dot" />
@@ -146,7 +147,7 @@
                   type="button"
                   class="attendance-toggle"
                   :class="{ 'attendance-toggle--active': checkedStudentIds.includes(student.id) }"
-                  :disabled="isSaving || (selectedSession && !selectedSession.isOpen)"
+                  :disabled="isSaving || selectedSession?.loading || sessionActionDisabled"
                   @click="$emit('toggle-student', student.id)"
                 >
                   <span class="attendance-toggle__dot" />
@@ -201,6 +202,7 @@ export default {
     'update:branch-id',
     'update:course-id',
   ],
+  data: () => ({ sessionActionDisabled: true }),
   computed: { selectedCourse() { return this.courseOptions.find(course => course.value === this.courseId)?.course; } },
 };
 </script>

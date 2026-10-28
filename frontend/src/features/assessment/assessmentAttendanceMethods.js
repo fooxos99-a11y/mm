@@ -1,6 +1,6 @@
 export default {
   toggleAttendance(studentId) {
-    if (this.selectedAttendanceSession && !this.selectedAttendanceSession.isOpen) return;
+    if (this.selectedAttendanceSession?.loading) return;
     if (this.selectedAttendanceSession?.id) {
       const removed = new Set(this.attendanceRemovedIds || []);
       if (this.attendanceChecked.includes(studentId)) removed.add(studentId);
@@ -14,7 +14,7 @@ export default {
     this.queueAttendanceSave();
   },
   toggleVisibleAttendance() {
-    if (this.selectedAttendanceSession && !this.selectedAttendanceSession.isOpen) return;
+    if (this.selectedAttendanceSession?.loading) return;
     if (this.selectedAttendanceSession?.id) {
       const removed = new Set(this.attendanceRemovedIds || []);
       for (const student of this.attendanceStudents) {
@@ -53,7 +53,7 @@ export default {
     }, 250);
   },
   async saveAttendance() {
-    if (this.selectedAttendanceSession && !this.selectedAttendanceSession.isOpen) return;
+    if (this.selectedAttendanceSession?.loading) return;
     const removedIds = [...(this.attendanceRemovedIds || [])];
     try {
       this.isSavingAttendance = true;

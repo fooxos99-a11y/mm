@@ -132,10 +132,10 @@ class AttendanceSessionService
             'student_name' => $student->full_name, 'login_code' => $student->login_code, 'source' => $source, 'created_at' => now()]);
     }
 
-    public function session(string $courseId, string $sessionId): object
+    public function session(string $courseId, string $sessionId, bool $requireOpen = true): object
     {
         $session = DB::table('attendance_sessions')->where('course_id', $courseId)->where('id', $sessionId)->first();
-        abort_unless($session && (int) $session->active === 1, 422, 'التحضير مغلق.');
+        abort_unless($session && (! $requireOpen || (int) $session->active === 1), 422, 'التحضير مغلق.');
 
         return $session;
     }

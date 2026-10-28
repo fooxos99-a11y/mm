@@ -180,7 +180,9 @@ class CourseEnrollmentTest extends TestCase
         $this->postJson('/api/dashboard/manual-attendance', $this->manual($session))->assertNoContent();
         $this->assertDatabaseHas('course_attendance', ['hours' => 2.5, 'source' => 'manual']);
         $this->postJson("/api/dashboard/courses/{$this->course}/attendance-sessions/{$session}/close")->assertNoContent();
-        $this->postJson('/api/dashboard/manual-attendance', $this->manual($session, false, [$this->student->login_code]))->assertUnprocessable();
+        $this->postJson('/api/dashboard/manual-attendance', $this->manual($session, false, [$this->student->login_code]))->assertNoContent();
+        $this->assertDatabaseCount('course_attendance', 0);
+        $this->postJson('/api/dashboard/manual-attendance', $this->manual($session))->assertNoContent();
         $this->assertDatabaseCount('course_attendance', 1);
     }
 

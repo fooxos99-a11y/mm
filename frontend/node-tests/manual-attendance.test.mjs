@@ -88,7 +88,7 @@ for (const [name, methods] of [['assessment', assessmentMethods], ['results', re
     assert.equal(errors.length, 1);
   });
 
-  test(`${name} session attendance uses the selected session and cannot save a closed or loading session`, async () => {
+  test(`${name} manual attendance can save an open or closed session but blocks while loading`, async () => {
     const calls = [];
     const context = {
       students: [], attendanceChecked: [], managedBranchId: 'male', effectiveAttendanceBranchId: 'male',
@@ -103,7 +103,8 @@ for (const [name, methods] of [['assessment', assessmentMethods], ['results', re
     await methods.saveAttendance.call(context);
     context.selectedAttendanceSession = { loading: true };
     await methods.saveAttendance.call(context);
-    assert.equal(calls.length, 1);
+    assert.equal(calls.length, 2);
+    assert.equal(calls[1].sessionId, 'session');
   });
 
   test(`${name} supervisor can undo and restore attendance with explicit branch-scoped removals`, async () => {
@@ -130,7 +131,7 @@ for (const [name, methods] of [['assessment', assessmentMethods], ['results', re
     assert.deepEqual(calls[1].presentStudents, [{ loginId: 'male', studentName: 'Male', studentId: 'm' }]);
   });
 
-  test(`${name} cancelling all tracks each explicit cancellation and a closed session rejects toggles`, () => {
+  test(`${name} explicit cancellation remains available after closing self attendance but blocks while loading`, () => {
     const context = {
       attendanceStudents: [{ id: 'm' }, { id: 'n' }], attendanceChecked: ['m', 'n'],
       attendanceRemovedIds: [], allVisibleChecked: true,
@@ -145,7 +146,12 @@ for (const [name, methods] of [['assessment', assessmentMethods], ['results', re
     assert.deepEqual(context.attendanceRemovedIds, []);
     context.selectedAttendanceSession.isOpen = false;
     methods.toggleAttendance.call(context, 'm');
+    assert.deepEqual(context.attendanceChecked, ['n']);
     methods.toggleVisibleAttendance.call(context);
-    assert.deepEqual(context.attendanceChecked, ['m', 'n']);
+    assert.deepEqual(context.attendanceChecked, ['n', 'm']);
+    context.selectedAttendanceSession = { loading: true };
+    methods.toggleAttendance.call(context, 'm');
+    methods.toggleVisibleAttendance.call(context);
+    assert.deepEqual(context.attendanceChecked, ['n', 'm']);
   });
 }

@@ -4,6 +4,47 @@ declare(strict_types=1);
 
 use Illuminate\Database\ConnectionInterface;
 
+function attendanceAccountingReport(ConnectionInterface $connection, ?array $departmentIds = null): array
+{
+    $departments = $connection->table('departments');
+    $departmentIds === null ? $departments->where('name', 'like', '%ممارس%') : $departments->whereIn('id', $departmentIds);
+    $report = [];
+    foreach ($departments->get(['id', 'name']) as $department) {
+        $report = [...$report, ...App\Support\DepartmentContext::run($department->id, function () use ($connection, $department): array {
+            $courses = $connection->table('courses')->where('department_id', $department->id)->whereNull('archive_id')->get();
+            $records = $connection->table('course_attendance')->where('department_id', $department->id)->whereNull('archive_id')->get();
+            $checks = [];
+            foreach (['male', 'female'] as $branch) {
+                $completion = app(App\Services\CompletionRequirementsService::class)->branchPayload($branch);
+                $students = collect($completion['students']);
+                foreach ($courses->where('entity_type', '!=', 'task') as $course) {
+                    $attendees = $records->where('course_id', $course->id)->pluck('login_code')->unique();
+                    $rows = $students->whereIn('loginCode', $attendees);
+                    if ($rows->isEmpty()) {
+                        continue;
+                    }
+                    $results = app(App\Services\ResultsDirectoryService::class)->paginate(new App\Models\User(['role' => 'admin']), [
+                        'branchCode' => $branch, 'assessmentType' => 'attendance', 'courseId' => $course->id,
+                    ]);
+                    $credited = $rows->filter(function ($row) use ($records): bool {
+                        $expected = $records->where('login_code', $row['loginCode'])->pluck('course_id')->unique()->count();
+
+                        return $row['details']['attendance']['current'] === $expected;
+                    })->count();
+                    $checks[] = ['department' => $department->name, 'course' => $course->title, 'branch' => $branch,
+                        'present' => $rows->count(), 'resultsPresent' => $results['summary']['present'],
+                        'creditedInCompletion' => $credited, 'completionFinalized' => $completion['settings']['isClosed'],
+                        'verified' => $results['summary']['present'] === $rows->count() && $credited === $rows->count()];
+                }
+            }
+
+            return $checks;
+        })];
+    }
+
+    return $report;
+}
+
 function attendancePreservationSnapshot(ConnectionInterface $connection): array
 {
     return $connection->transaction(function () use ($connection): array {
@@ -28,7 +69,7 @@ function attendancePreservationSnapshot(ConnectionInterface $connection): array
                 'legacyRecords' => $attendance->whereNull('session_id')->count()];
         }
 
-        return ['records' => $records, 'courses' => $courses];
+        return ['records' => $records, 'courses' => $courses, 'accounting' => attendanceAccountingReport($connection)];
     });
 }
 
@@ -44,7 +85,7 @@ function compareAttendancePreservation(array $before, array $after): array
     }
 
     return ['preserved' => true, 'beforeRecords' => count($before['records']),
-        'afterRecords' => count($after['records']), 'courses' => $after['courses'] ?? []];
+        'afterRecords' => count($after['records']), 'courses' => $after['courses'] ?? [], 'accounting' => $after['accounting'] ?? []];
 }
 
 if (realpath($_SERVER['SCRIPT_FILENAME'] ?? '') === __FILE__) {

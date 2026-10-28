@@ -49,7 +49,7 @@
       :can-edit="canEdit"
       :saving="savingAttendance"
       :show-action="showSessionAction"
-      @action-state="$emit('attendance-action-state', $event)"
+      @action-state="sessionActionDisabled = $event.disabled; $emit('attendance-action-state', $event)"
       @select="$emit('select-session', $event)"
     />
     <AppLoadingSpinner
@@ -83,7 +83,7 @@
       :students="students"
       :checked-ids="checkedIds"
       :all-checked="allChecked"
-      :can-edit="canEdit && (!selectedSession || selectedSession.isOpen)"
+      :can-edit="canEdit && !selectedSession?.loading && !sessionActionDisabled"
       :saving="savingAttendance"
       :save-status="saveStatus"
       @toggle-all="$emit('toggle-all')"
@@ -130,6 +130,7 @@ export default {
     selectedSession: { type: Object, default: null },
   },
   emits: ['attendance-action-state', 'select-session', 'update:course-value', 'update:view-mode', 'create-course', 'edit-course', 'move-course', 'delete-course', 'update:indicator-branch', 'update:attendance-branch', 'toggle-all', 'toggle-student', 'save-attendance'],
+  data: () => ({ sessionActionDisabled: true }),
   computed: { branchId() { return this.mode === 'indicators' ? 'assessment-indicators-branch' : 'assessment-attendance-branch'; } },
   methods: { handleAttendanceAction() { return this.$refs.attendanceControl?.toggle(); } },
 };

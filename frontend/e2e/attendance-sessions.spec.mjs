@@ -66,7 +66,11 @@ test('branch roster remains available with no course enrollments after opening a
   await expect(page.getByRole('button', { name: 'إغلاق التحضير', exact: true })).toBeEnabled();
   await page.getByRole('button', { name: 'إغلاق التحضير', exact: true }).click();
   await expect(rows).toHaveCount(females.length);
-  for (const button of await rows.getByRole('button').all()) await expect(button).toBeDisabled();
+  for (const button of await rows.getByRole('button').all()) await expect(button).toBeEnabled();
+  const closedSave = page.waitForResponse(response => response.url().endsWith('/manual-attendance') && response.request().method() === 'POST');
+  await rows.filter({ hasText: female.name }).getByRole('button').click();
+  expect((await closedSave).status()).toBe(204);
+  await expect(rows.filter({ hasText: female.name }).getByRole('button')).toHaveText('حاضر');
   expect((await call('GET', `dashboard/courses/${course.id}/enrollments?branchCode=male`)).studentIds).toEqual([]);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
   await page.screenshot({ path: info.outputPath('attendance-roster-preserved.png'), fullPage: true });
@@ -255,7 +259,7 @@ test('course sessions, settings, student location, history and supervision', asy
   const closeResponse = staffPage.waitForResponse(response => response.url().endsWith(`/${session.id}/close`) && response.request().method() === 'POST');
   await staffPage.getByRole('button', { name: 'إغلاق التحضير', exact: true }).click();
   expect((await closeResponse).status()).toBe(204);
-  await expect(toggleStudent).toBeDisabled();
+  await expect(toggleStudent).toBeEnabled();
   await staffPage.screenshot({ path: info.outputPath('attendance-supervision.png') });
   await staffContext.close();
 

@@ -211,7 +211,7 @@ class AttendanceSessionTest extends TestCase
             ['loginId' => $this->student->login_code, 'studentName' => 'forged']]])->assertNoContent();
         $this->assertDatabaseCount('course_attendance', 1);
         $this->postJson("/api/dashboard/courses/{$this->course}/attendance-sessions/{$session['id']}/close")->assertNoContent();
-        $this->postJson('/api/dashboard/manual-attendance', $payload)->assertUnprocessable();
+        $this->postJson('/api/dashboard/manual-attendance', $payload)->assertNoContent();
         $this->assertDatabaseHas('course_attendance', ['source' => 'student']);
     }
 
@@ -258,6 +258,47 @@ class AttendanceSessionTest extends TestCase
         Sanctum::actingAs($this->user);
         $this->postJson($this->path($next), $this->position($next))->assertNoContent();
         $this->getJson('/api/students/me/indicators')->assertOk()->assertJsonPath('student.details.attendance.current', 1);
+    }
+
+    public function test_legacy_manual_and_self_attendance_count_in_results_and_completion_even_after_closing(): void
+    {
+        $this->settings();
+        $other = (string) str()->uuid();
+        DB::table('courses')->insert(['id' => $other, 'department_id' => DepartmentContext::id(),
+            'title' => 'التجويد وعلوم القرآن', 'created_at' => now()]);
+        $payload = ['courseId' => $this->course, 'branchCode' => 'male', 'presentStudents' => [
+            ['loginId' => $this->student->login_code, 'studentName' => $this->student->full_name]]];
+        foreach ([$this->course, $other] as $course) {
+            $this->postJson('/api/dashboard/manual-attendance', [...$payload, 'courseId' => $course])->assertNoContent();
+        }
+        $legacy = DB::table('course_attendance')->get()->map(fn ($row) => (array) $row)->all();
+        $session = $this->open();
+        Sanctum::actingAs($this->user);
+        $this->postJson($this->path($session), $this->position($session))->assertNoContent();
+        $this->getJson('/api/students/me/indicators')->assertOk()->assertJsonPath('student.details.attendance.current', 2);
+        Sanctum::actingAs($this->admin);
+        $this->postJson("/api/dashboard/courses/{$this->course}/attendance-sessions/{$session['id']}/close")->assertNoContent();
+        $this->postJson('/api/dashboard/manual-attendance', [...$payload, 'sessionId' => $session['id']])->assertNoContent();
+        foreach ([$this->course, $other] as $course) {
+            $this->getJson('/api/dashboard/results?branchCode=male&assessmentType=attendance&courseId='.$course)
+                ->assertOk()->assertJsonPath('summary.present', 1);
+        }
+        $completion = $this->getJson('/api/dashboard/completion-requirements/male')->assertOk()->json('students');
+        $row = collect($completion)->firstWhere('id', $this->student->id);
+        $this->assertSame(2, $row['details']['attendance']['current']);
+        $this->assertDatabaseCount('course_attendance', 3);
+        foreach ($legacy as $record) {
+            $this->assertDatabaseHas('course_attendance', $record);
+        }
+        require_once base_path('../scripts/audit-attendance-preservation.php');
+        $accounting = attendanceAccountingReport(DB::connection(), [DepartmentContext::id()]);
+        $this->assertCount(2, $accounting);
+        foreach ($accounting as $check) {
+            $this->assertTrue($check['verified']);
+            $this->assertSame(1, $check['creditedInCompletion']);
+        }
+        Sanctum::actingAs($this->user);
+        $this->postJson($this->path($session).'/challenge')->assertUnprocessable();
     }
 
     public function test_archiving_preserves_matching_session_course_and_hours(): void
