@@ -89,7 +89,6 @@
         :attendance-branch="attendanceBranchId"
         :attendance-branch-options="assessmentBranchOptions.filter((option) => option.value !== 'all')"
         :students="displayedAttendanceStudents"
-        :attendance-records="attendance"
         :checked-ids="attendanceChecked"
         :selected-session="selectedAttendanceSession"
         :show-session-action="false"

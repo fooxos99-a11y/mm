@@ -51,9 +51,12 @@ class ManualAttendanceService
                 $session = $sessions->session($courseId, $sessionId, requireOpen: false);
                 // Supervisors may prepare any teacher in their branch; enrollment gates self attendance only.
                 // Only explicit removals change existing attendance; stale checklists cannot erase new self attendance.
-                DB::table('course_attendance')->where('session_id', $sessionId)->whereIn('login_code', $removedStudents)->delete();
+                DB::table('course_attendance')->where('course_id', $courseId)->whereNull('archive_id')
+                    ->whereIn('login_code', $removedStudents)->delete();
                 foreach ($students->whereIn('login_code', $presentLogins) as $student) {
-                    if (! DB::table('course_attendance')->where('session_id', $sessionId)->where('student_id', $student->id)->exists()) {
+                    // The checklist represents course attendance, including records saved before sessions existed.
+                    if (! DB::table('course_attendance')->where('course_id', $courseId)->whereNull('archive_id')
+                        ->where('login_code', $student->login_code)->exists()) {
                         $sessions->record($student, $session, 'manual');
                     }
                 }

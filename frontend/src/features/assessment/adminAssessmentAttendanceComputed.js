@@ -23,7 +23,6 @@ export default /** @type {Record<string, any>} */ ({
       return this.attendanceStudents.length > 0 && this.visibleCheckedCount === this.attendanceStudents.length;
     },
     selectedAttendanceRecords() {
-      return this.attendance.filter((record) => record.courseId === this.selectedCourseId
-        && (record.sessionId || null) === (this.selectedAttendanceSession?.id || null));
+      return this.attendance.filter((record) => record.courseId === this.selectedCourseId);
     },
 });

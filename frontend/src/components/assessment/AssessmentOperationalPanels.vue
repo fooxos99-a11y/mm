@@ -90,13 +90,6 @@
       @toggle-student="$emit('toggle-student', $event)"
       @save="$emit('save-attendance')"
     />
-    <AttendanceHistory
-      v-if="mode === 'attendance'"
-      :records="attendanceRecords"
-      :students="students"
-      :course-id="selectedCourse?.id || ''"
-      :session-id="selectedSession?.id || ''"
-    />
   </AppCard>
 </template>
 <script>
@@ -105,11 +98,10 @@ import AssessmentCourseToolbar from './AssessmentCourseToolbar.vue';
 import AssessmentIndicators from './AssessmentIndicators.vue';
 import AssessmentAttendanceList from './AssessmentAttendanceList.vue';
 import AttendanceSessionControl from './AttendanceSessionControl.vue';
-import AttendanceHistory from './AttendanceHistory.vue';
 
 export default {
   name: 'AssessmentOperationalPanels',
-  components: { AttendanceHistory, AttendanceSessionControl, AppCard, AppEmptyState, AppFilterField, AppLoadingSpinner, AppSelect, AssessmentCourseToolbar, AssessmentIndicators, AssessmentAttendanceList },
+  components: { AttendanceSessionControl, AppCard, AppEmptyState, AppFilterField, AppLoadingSpinner, AppSelect, AssessmentCourseToolbar, AssessmentIndicators, AssessmentAttendanceList },
   props: {
     mode: { type: String, default: '' }, courseValue: { type: String, default: '' },
     courseOptions: { type: Array, default: () => [] }, coursePlaceholder: { type: String, default: '' },
@@ -124,7 +116,6 @@ export default {
     saveStatus: { type: String, default: '' }, savingAttendance: Boolean,
     attendanceBranch: { type: String, default: '' }, attendanceBranchOptions: { type: Array, default: () => [] },
     students: { type: Array, default: () => [] }, checkedIds: { type: Array, default: () => [] },
-    attendanceRecords: { type: Array, default: () => [] },
     allChecked: Boolean,
     showSessionAction: { type: Boolean, default: true },
     selectedSession: { type: Object, default: null },

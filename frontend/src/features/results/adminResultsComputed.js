@@ -122,8 +122,7 @@ export default /** @type {Record<string, any>} */ ({
     return this.attendanceStudents.length > 0 && this.visibleCheckedCount === this.attendanceStudents.length;
   },
   selectedAttendanceRecords() {
-    return this.attendance.filter((record) => record.courseId === this.attendanceCourseId
-      && (record.sessionId || null) === (this.selectedAttendanceSession?.id || null));
+    return this.attendance.filter((record) => record.courseId === this.attendanceCourseId);
   },
   activeResultsTypeLabel() {
     if (this.isTaskResultsSection) return this.selectedTaskResultCourse?.title || 'المهام الأدائية';

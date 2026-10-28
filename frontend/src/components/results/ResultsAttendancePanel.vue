@@ -157,24 +157,17 @@
           </tbody>
         </table>
       </div>
-      <AttendanceHistory
-        :records="attendanceRecords"
-        :students="students"
-        :course-id="courseId"
-        :session-id="selectedSession?.id || ''"
-      />
     </section>
   </div>
 </template>
 
 <script>
 import AttendanceSessionControl from '../assessment/AttendanceSessionControl.vue';
-import AttendanceHistory from '../assessment/AttendanceHistory.vue';
 import { AppButton, AppIconButton, AppRawButton, AppSelect } from '../ui';
 
 export default {
   name: 'ResultsAttendancePanel',
-  components: { AttendanceHistory, AttendanceSessionControl, AppButton, AppIconButton, AppRawButton, AppSelect },
+  components: { AttendanceSessionControl, AppButton, AppIconButton, AppRawButton, AppSelect },
   props: {
     selectedSession: { type: Object, default: null },
     embedded: { type: Boolean, default: false },
@@ -190,7 +183,6 @@ export default {
     allVisibleChecked: { type: Boolean, default: false },
     visibleCheckedCount: { type: Number, default: 0 },
     students: { type: Array, default: () => [] },
-    attendanceRecords: { type: Array, default: () => [] },
     displayedStudents: { type: Array, default: () => [] },
     checkedStudentIds: { type: Array, default: () => [] },
   },

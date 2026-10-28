@@ -4,32 +4,20 @@ import assessmentMethods from '../src/features/assessment/assessmentAttendanceMe
 import resultsMethods from '../src/features/results/adminResultsDataMethods.js';
 import assessmentComputed from '../src/features/assessment/adminAssessmentAttendanceComputed.js';
 import resultsComputed from '../src/features/results/adminResultsComputed.js';
-import { previousAttendanceRecords } from '../src/features/assessment/attendanceHistory.mjs';
-
-test('attendance history preserves old records while separating the current session, course and branch', () => {
-  const students = [{ loginId: 'male', name: 'معلم' }];
-  const records = [
-    { id: 'legacy', courseId: 'course', loginId: 'male', sessionId: null, createdAt: '2026-01-01', hours: null },
-    { id: 'current', courseId: 'course', loginId: 'male', sessionId: 'current' },
-    { id: 'other-course', courseId: 'other', loginId: 'male' },
-    { id: 'other-branch', courseId: 'course', loginId: 'female' },
-    { id: 'older-session', courseId: 'course', loginId: 'male', sessionId: 'older', createdAt: '2026-02-01', hours: 2 },
-    { id: 'same-date', courseId: 'course', loginId: 'male', createdAt: '2026-02-01' },
-    { id: 'undated', courseId: 'course', loginId: 'male' },
-    { id: 'undated2', courseId: 'course', loginId: 'male' },
-  ];
-  const original = structuredClone(records);
-  const history = previousAttendanceRecords(records, students, 'course', 'current');
-  assert.deepEqual(history.map(record => record.id), ['older-session', 'same-date', 'legacy', 'undated', 'undated2']);
-  assert.equal(history[2].hours, null);
-  assert.equal(history[0].hours, 2);
-  assert.equal(history[0].studentName, 'معلم');
-  assert.deepEqual(records, original);
-  assert.deepEqual(previousAttendanceRecords(records, students, 'course', ''), []);
-  assert.deepEqual(previousAttendanceRecords(records, students, '', 'current'), []);
-});
 
 for (const [name, computed] of [['assessment', assessmentComputed], ['results', resultsComputed]]) {
+  test(`${name} course checklist retains legacy, manual and self attendance across session changes`, () => {
+    const attendance = [
+      { id: 'legacy', courseId: 'course', sessionId: null },
+      { id: 'manual', courseId: 'course', sessionId: 'older', source: 'manual' },
+      { id: 'self', courseId: 'course', sessionId: 'current', source: 'student' },
+      { id: 'other', courseId: 'other', sessionId: null },
+    ];
+    for (const session of [null, { loading: true }, { id: 'current', isOpen: true }, { id: 'new', isOpen: false }]) {
+      const context = { attendance, selectedCourseId: 'course', attendanceCourseId: 'course', selectedAttendanceSession: session };
+      assert.deepEqual(computed.selectedAttendanceRecords.call(context).map(row => row.id), ['legacy', 'manual', 'self']);
+    }
+  });
   test(`${name} keeps the full branch roster before, during and after opening attendance`, () => {
     const students = [{ id: 'm', branchId: 'male' }, { id: 'f', branchId: 'female' }];
     const context = { students, attendanceBranchId: 'male', managedBranchId: '', effectiveAttendanceBranchId: 'male' };

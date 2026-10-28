@@ -20,16 +20,22 @@ test('branch roster remains available with no course enrollments after opening a
     return status === 204 ? null : response.json();
   };
   const course = await call('POST', 'dashboard/courses', { title: 'دورة دون تسجيلات', isActive: false }, 201);
+  const secondCourse = await call('POST', 'dashboard/courses', { title: 'الدورة الثانية بحضور سابق', isActive: false }, 201);
   const female = await call('POST', 'students', { name: 'معلمة فحص قائمة الفرع', loginId: 'roster-female', branchId: 'female',
+    password: studentPassword, passwordConfirmation: studentPassword }, 201);
+  await call('POST', 'students', { name: 'معلم فحص الحضور الجديد', loginId: 'roster-male', branchId: 'male',
     password: studentPassword, passwordConfirmation: studentPassword }, 201);
   const snapshot = await call('GET', 'dashboard/snapshot');
   const males = snapshot.students.filter(student => student.branchId === 'male');
   const females = snapshot.students.filter(student => student.branchId === 'female');
-  expect(males.length).toBeGreaterThan(0);
+  expect(males.length).toBeGreaterThanOrEqual(2);
   await call('POST', 'dashboard/manual-attendance', { courseId: course.id, branchCode: 'male', presentStudents: [
     { loginId: males[0].loginId, studentName: males[0].name },
   ] }, 204);
   const legacy = (await call('GET', 'dashboard/snapshot')).attendance.find(record => record.courseId === course.id);
+  await call('POST', 'dashboard/manual-attendance', { courseId: secondCourse.id, branchCode: 'male', presentStudents: [
+    { loginId: males[1].loginId, studentName: males[1].name },
+  ] }, 204);
   expect((await call('GET', `dashboard/courses/${course.id}/enrollments?branchCode=male`)).studentIds).toEqual([]);
   // A failed enrollment endpoint must not hide the supervisor's branch roster.
   await page.route('**/enrollments?**', route => route.fulfill({ status: 503, json: { message: 'تعذر تحميل التسجيلات' } }));
@@ -44,16 +50,17 @@ test('branch roster remains available with no course enrollments after opening a
   await expect(page.getByRole('button', { name: 'إغلاق التحضير', exact: true })).toBeEnabled();
   await expect(rows).toHaveCount(males.length);
   const row = rows.filter({ hasText: males[0].name });
-  await expect(row.getByRole('button')).toHaveText('تحضير');
-  const history = page.locator('.attendance-history');
-  await expect(history.locator('summary')).toHaveText('سجلات الحضور السابقة (1)');
-  await history.locator('summary').click();
-  await expect(history.getByText(males[0].name, { exact: true })).toBeVisible();
+  await expect(row.getByRole('button')).toHaveText('حاضر');
+  await expect(page.getByText(/سجلات الحضور السابقة/)).toHaveCount(0);
+  const newRow = rows.filter({ hasText: males[1].name });
+  await expect(newRow.getByRole('button')).toHaveText('تحضير');
   const saved = page.waitForResponse(response => response.url().endsWith('/manual-attendance') && response.request().method() === 'POST');
-  await row.getByRole('button').click();
+  await newRow.getByRole('button').click();
   expect((await saved).status()).toBe(204);
   await expect(row.getByRole('button')).toHaveText('حاضر');
   expect((await call('GET', 'dashboard/snapshot')).attendance.find(record => record.id === legacy.id)).toEqual(legacy);
+  expect((await call('GET', 'dashboard/snapshot')).attendance.filter(record => record.courseId === course.id
+    && record.loginId === males[0].loginId)).toHaveLength(1);
   await page.reload();
   await expect(rows).toHaveCount(males.length);
   await expect(row.getByRole('button')).toHaveText('حاضر');
@@ -61,7 +68,6 @@ test('branch roster remains available with no course enrollments after opening a
   await selectOption(page, 'معلمات', { exact: true });
   await expect(rows).toHaveCount(females.length);
   await expect(rows.filter({ hasText: female.name })).toBeVisible();
-  await expect(history).toHaveCount(0);
   await expect(page.getByRole('heading', { name: 'لا يوجد معلمون في هذا الفرع', exact: true })).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'إغلاق التحضير', exact: true })).toBeEnabled();
   await page.getByRole('button', { name: 'إغلاق التحضير', exact: true }).click();
@@ -74,6 +80,16 @@ test('branch roster remains available with no course enrollments after opening a
   expect((await call('GET', `dashboard/courses/${course.id}/enrollments?branchCode=male`)).studentIds).toEqual([]);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
   await page.screenshot({ path: info.outputPath('attendance-roster-preserved.png'), fullPage: true });
+  await page.goto(`dashboard?panel=courses&courseId=${secondCourse.id}`);
+  await expect(rows.filter({ hasText: males[1].name }).getByRole('button')).toHaveText('حاضر');
+  await expect(rows.filter({ hasText: males[0].name }).getByRole('button')).toHaveText('تحضير');
+  await page.getByRole('button', { name: 'فتح التحضير', exact: true }).click();
+  await dialog.getByLabel('مدة فتح التحضير', { exact: true }).fill('1');
+  await dialog.getByRole('button', { name: 'فتح التحضير', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'إغلاق التحضير', exact: true })).toBeEnabled();
+  await expect(rows.filter({ hasText: males[1].name }).getByRole('button')).toHaveText('حاضر');
+  await expect(page.getByText(/سجلات الحضور السابقة/)).toHaveCount(0);
+  await page.screenshot({ path: info.outputPath('second-course-legacy-present.png'), fullPage: true });
 });
 
 test('attendance settings persist both switch states', async ({ page }, info) => {

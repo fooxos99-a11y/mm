@@ -25,7 +25,6 @@
       :all-visible-checked="allVisibleChecked"
       :visible-checked-count="visibleCheckedCount"
       :students="attendanceStudents"
-      :attendance-records="attendance"
       :displayed-students="displayedAttendanceStudents"
       :checked-student-ids="attendanceChecked"
       :selected-session="selectedAttendanceSession"
