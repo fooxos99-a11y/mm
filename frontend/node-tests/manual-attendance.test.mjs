@@ -34,6 +34,23 @@ for (const [name, computed] of [['assessment', assessmentComputed], ['results', 
 }
 
 for (const [name, methods] of [['assessment', assessmentMethods], ['results', resultsMethods]]) {
+  test(`${name} session checklist sends only newly checked teachers and never copies historical attendance`, async () => {
+    const calls = [];
+    const context = {
+      students: ['legacy', 'older', 'current', 'new'].map(id => ({ id, loginId: id, name: id, branchId: 'male' })),
+      attendanceChecked: ['legacy', 'older', 'current', 'new'], selectedAttendanceSession: { id: 'current', isOpen: true },
+      selectedAttendanceRecords: [{ loginId: 'legacy', sessionId: null }, { loginId: 'older', sessionId: 'older' },
+        { loginId: 'current', sessionId: 'current' }],
+      managedBranchId: 'male', effectiveAttendanceBranchId: 'male', selectedCourseId: 'course', attendanceCourseId: 'course',
+      setManualAttendance: async payload => calls.push(payload), $toast: { error: message => assert.fail(message) },
+    };
+    await methods.saveAttendance.call(context);
+    assert.deepEqual(calls[0].presentStudents.map(student => student.loginId), ['new']);
+    assert.deepEqual(calls[0].removedStudents, []);
+    context.selectedAttendanceSession = null;
+    await methods.saveAttendance.call(context);
+    assert.equal(calls[1].presentStudents.length, 4);
+  });
   test(`${name} attendance saves only the selected branch and allows clearing it`, async () => {
     const calls = [];
     const context = {

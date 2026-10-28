@@ -54,9 +54,7 @@ class ManualAttendanceService
                 DB::table('course_attendance')->where('course_id', $courseId)->whereNull('archive_id')
                     ->whereIn('login_code', $removedStudents)->delete();
                 foreach ($students->whereIn('login_code', $presentLogins) as $student) {
-                    // The checklist represents course attendance, including records saved before sessions existed.
-                    if (! DB::table('course_attendance')->where('course_id', $courseId)->whereNull('archive_id')
-                        ->where('login_code', $student->login_code)->exists()) {
+                    if (! DB::table('course_attendance')->where('session_id', $sessionId)->where('student_id', $student->id)->exists()) {
                         $sessions->record($student, $session, 'manual');
                     }
                 }

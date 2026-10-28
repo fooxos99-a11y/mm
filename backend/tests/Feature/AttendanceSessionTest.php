@@ -301,7 +301,7 @@ class AttendanceSessionTest extends TestCase
         $this->postJson($this->path($session).'/challenge')->assertUnprocessable();
     }
 
-    public function test_course_checklist_preserves_legacy_records_across_sessions_and_only_cancels_explicit_logins(): void
+    public function test_course_checklist_empty_deltas_preserve_legacy_records_and_only_cancel_explicit_logins(): void
     {
         $other = (string) str()->uuid();
         DB::table('courses')->insert(['id' => $other, 'department_id' => DepartmentContext::id(),
@@ -313,10 +313,9 @@ class AttendanceSessionTest extends TestCase
         }
         $legacy = DB::table('course_attendance')->get()->map(fn ($row) => (array) $row)->all();
         $first = $this->open();
-        $this->postJson('/api/dashboard/manual-attendance', [...$payload, 'sessionId' => $first['id']])->assertNoContent();
+        $this->postJson('/api/dashboard/manual-attendance', [...$payload, 'sessionId' => $first['id'], 'presentStudents' => []])->assertNoContent();
         $this->postJson("/api/dashboard/courses/{$this->course}/attendance-sessions/{$first['id']}/close")->assertNoContent();
         $second = $this->open();
-        $this->postJson('/api/dashboard/manual-attendance', [...$payload, 'sessionId' => $second['id']])->assertNoContent();
         $this->postJson('/api/dashboard/manual-attendance', [...$payload, 'sessionId' => $second['id'], 'presentStudents' => []])->assertNoContent();
         $this->assertDatabaseCount('course_attendance', 2);
         foreach ($legacy as $record) {
@@ -330,6 +329,10 @@ class AttendanceSessionTest extends TestCase
             ->assertOk()->assertJsonPath('summary.present', 0);
         $this->postJson('/api/dashboard/manual-attendance', [...$payload, 'sessionId' => $second['id']])->assertNoContent();
         $this->assertDatabaseCount('course_attendance', 2);
+        $this->postJson("/api/dashboard/courses/{$this->course}/attendance-sessions/{$second['id']}/close")->assertNoContent();
+        $third = $this->open(3);
+        $this->postJson('/api/dashboard/manual-attendance', [...$payload, 'sessionId' => $third['id']])->assertNoContent();
+        $this->assertEquals(5.5, DB::table('course_attendance')->where('course_id', $this->course)->sum('hours'));
     }
 
     public function test_archiving_preserves_matching_session_course_and_hours(): void

@@ -60,7 +60,8 @@ export default {
       this.saveStatusText = 'جارٍ حفظ التحضير...';
       const branchCode = this.managedBranchId || this.attendanceBranchId;
       const presentStudents = this.students.filter((student) => student.branchId === branchCode
-        && this.attendanceChecked.includes(student.id));
+        && this.attendanceChecked.includes(student.id)
+        && (!this.selectedAttendanceSession?.id || !(this.selectedAttendanceRecords || []).some(record => record.loginId === student.loginId)));
       await this.setManualAttendance({
         courseId: this.selectedCourseId,
         ...(this.selectedAttendanceSession?.id ? { sessionId: this.selectedAttendanceSession.id,
