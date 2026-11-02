@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use GuzzleHttp\Psr7\Uri;
+use GuzzleHttp\Psr7\UriResolver;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Validation\ValidationException;
 
@@ -9,13 +11,15 @@ class AttendanceLocationService
 {
     public function coordinates(string $url): array
     {
+        $visited = [];
         for ($redirect = 0; $redirect < 6; $redirect++) {
             $host = strtolower((string) parse_url($url, PHP_URL_HOST));
             if (parse_url($url, PHP_URL_SCHEME) !== 'https'
                 || ! in_array($host, ['google.com', 'www.google.com', 'maps.google.com', 'maps.app.goo.gl', 'goo.gl'], true)
-                || parse_url($url, PHP_URL_USER) || parse_url($url, PHP_URL_PORT)) {
+                || parse_url($url, PHP_URL_USER) || parse_url($url, PHP_URL_PORT) || isset($visited[$url])) {
                 break;
             }
+            $visited[$url] = true;
             $decoded = urldecode($url);
             foreach (['/!3d(-?\d+(?:\.\d+)?)!4d(-?\d+(?:\.\d+)?)/',
                 '/[?&](?:q|query|ll)=(-?\d+(?:\.\d+)?),\s*(-?\d+(?:\.\d+)?)/',
@@ -24,12 +28,29 @@ class AttendanceLocationService
                     return ['latitude' => (float) $match[1], 'longitude' => (float) $match[2]];
                 }
             }
-            if (! in_array($host, ['maps.app.goo.gl', 'goo.gl'], true)) {
-                break;
-            }
             try {
                 $response = Http::timeout(5)->withOptions(['allow_redirects' => false])->get($url);
-                $url = $response->redirect() ? (string) $response->header('Location') : '';
+                if ($response->redirect() && $response->header('Location')) {
+                    $url = (string) UriResolver::resolve(new Uri($url), new Uri($response->header('Location')));
+
+                    continue;
+                }
+                // Some Maps links resolve to a page whose canonical URL identifies the place.
+                if ($response->successful()) {
+                    $document = new \DOMDocument;
+                    @$document->loadHTML($response->body());
+                    $xpath = new \DOMXPath($document);
+                    $canonical = $xpath->evaluate('string(//link[@rel="canonical"]/@href)');
+                    if ($canonical === '') {
+                        $canonical = $xpath->evaluate('string(//meta[@property="og:url"]/@content)');
+                    }
+                    if ($canonical !== '') {
+                        $url = (string) UriResolver::resolve(new Uri($url), new Uri($canonical));
+
+                        continue;
+                    }
+                }
+                break;
             } catch (\Throwable) {
                 break;
             }

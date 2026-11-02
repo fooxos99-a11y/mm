@@ -88,6 +88,23 @@ class AttendanceSessionTest extends TestCase
         $this->putJson('/api/dashboard/attendance/settings', ['enabled' => false, 'mapsUrl' => '', 'radius' => 1])->assertForbidden();
     }
 
+    public function test_settings_follow_maps_redirects_and_preserve_saved_location_on_failure(): void
+    {
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://maps.app.goo.gl/attendance' => Http::response('', 302, ['Location' => 'https://www.google.com/maps?cid=123']),
+            'https://www.google.com/maps?cid=123' => Http::response('', 302, ['Location' => '/maps?q=24.7136,46.6753']),
+            'https://maps.app.goo.gl/invalid' => Http::response('', 302, ['Location' => 'https://example.com/maps?q=24,46']),
+        ]);
+        $saved = $this->putJson('/api/dashboard/attendance/settings', ['enabled' => true, 'radius' => 100,
+            'mapsUrl' => 'https://maps.app.goo.gl/attendance'])->assertOk()
+            ->assertJson(['latitude' => 24.7136, 'longitude' => 46.6753])->json();
+        $this->putJson('/api/dashboard/attendance/settings', ['enabled' => true, 'radius' => 200,
+            'mapsUrl' => 'https://maps.app.goo.gl/invalid'])->assertUnprocessable()->assertJsonValidationErrors('mapsUrl');
+        $this->getJson('/api/dashboard/attendance/settings')->assertOk()->assertExactJson($saved);
+        Http::assertSentCount(3);
+    }
+
     public function test_open_close_reopen_hours_and_preserved_history(): void
     {
         $this->settings();
