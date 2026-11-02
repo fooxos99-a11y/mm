@@ -74,28 +74,31 @@ class CourseEnrollmentTest extends TestCase
             'removedStudents' => $removed];
     }
 
-    public function test_program_registration_never_grants_implicit_course_registration(): void
+    public function test_open_attendance_does_not_require_or_create_an_enrollment_but_still_rejects_forged_challenges(): void
     {
         $session = $this->open($this->course);
         Sanctum::actingAs($this->user);
-        $this->getJson('/api/students/me/attendance')->assertExactJson([]);
-        $this->postJson($this->path($this->course, $session).'/challenge')->assertForbidden();
+        $this->getJson('/api/students/me/attendance')->assertJsonCount(1)->assertJsonPath('0.courseId', $this->course);
+        $this->postJson($this->path($this->course, $session).'/challenge')->assertOk();
         $this->postJson($this->path($this->course, $session), ['challenge' => 'forged',
-            'latitude' => 24.7136, 'longitude' => 46.6753, 'accuracy' => 10, 'timestamp' => now()->getTimestampMs()])->assertForbidden();
+            'latitude' => 24.7136, 'longitude' => 46.6753, 'accuracy' => 10, 'timestamp' => now()->getTimestampMs()])->assertUnprocessable();
         $this->putJson("/api/dashboard/courses/{$this->course}/enrollments", ['branchCode' => 'male', 'studentIds' => [$this->student->id]])->assertForbidden();
         $this->assertDatabaseCount('course_enrollments', 0);
         $this->assertDatabaseCount('course_attendance', 0);
     }
 
-    public function test_opening_one_course_never_opens_another_and_only_explicit_enrollments_are_available(): void
+    public function test_only_open_courses_are_available_and_attendance_is_recorded_only_for_the_confirmed_course(): void
     {
         $this->enroll($this->course, [$this->student->id]);
         $first = $this->open($this->course);
         $this->assertDatabaseMissing('attendance_sessions', ['course_id' => $this->other]);
-        $second = $this->open($this->other);
         Sanctum::actingAs($this->user);
         $this->getJson('/api/students/me/attendance')->assertJsonCount(1)->assertJsonPath('0.courseId', $this->course);
-        $this->postJson($this->path($this->other, $second).'/challenge')->assertForbidden();
+        Sanctum::actingAs($this->admin);
+        $second = $this->open($this->other);
+        Sanctum::actingAs($this->user);
+        $this->getJson('/api/students/me/attendance')->assertJsonCount(2);
+        $this->postJson($this->path($this->other, $second).'/challenge')->assertOk();
         Sanctum::actingAs($this->admin);
         $this->enroll($this->other, [$this->student->id]);
         Sanctum::actingAs($this->user);
@@ -136,7 +139,7 @@ class CourseEnrollmentTest extends TestCase
         $this->putJson("/api/dashboard/courses/{$this->other}/enrollments", ['branchCode' => 'male', 'studentIds' => []])->assertNotFound();
     }
 
-    public function test_revocation_rejects_an_issued_challenge_and_preserves_previous_hours(): void
+    public function test_disabling_a_student_rejects_an_issued_challenge_and_preserves_previous_hours(): void
     {
         $this->enroll($this->course, [$this->student->id]);
         $first = $this->open($this->course);
@@ -150,7 +153,9 @@ class CourseEnrollmentTest extends TestCase
         Sanctum::actingAs($this->admin);
         $this->enroll($this->course, []);
         Sanctum::actingAs($this->user);
-        $this->getJson('/api/students/me/attendance')->assertExactJson([]);
+        $this->getJson('/api/students/me/attendance')->assertJsonCount(1)->assertJsonPath('0.id', $second);
+        $this->user->update(['is_active' => false]);
+        $this->getJson('/api/students/me/attendance')->assertForbidden();
         $this->postJson($this->path($this->course, $second), $data)->assertForbidden();
         $this->assertDatabaseCount('course_attendance', 1);
         $this->assertDatabaseHas('course_attendance', ['session_id' => $first, 'hours' => 2.5]);
