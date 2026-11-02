@@ -288,15 +288,29 @@ test('course sessions, settings, student location, history and supervision', asy
   await staffPage.screenshot({ path: info.outputPath('attendance-supervision.png') });
   await staffContext.close();
 
+  // Already-present students keep the menu entry and can confirm without another write.
+  await call('POST', `dashboard/courses/${other.id}/attendance-sessions/${otherSession.id}/close`, {}, 204);
+  const repeatSession = await call('POST', `dashboard/courses/${course.id}/attendance-sessions`, { hours: 3 }, 201);
+  await call('POST', 'dashboard/manual-attendance', { courseId: course.id, sessionId: repeatSession.id, presentStudents: [
+    { loginId: 'attendance-student', studentId: student.id, studentName: student.name },
+  ] }, 204);
+  await page.getByRole('button', { name: 'التحضير', exact: true }).click();
+  await expect(attendance).toBeVisible();
+  const attendanceWrites = [];
+  const captureAttendance = request => { if (request.method() === 'POST' && request.url().includes('/students/me/attendance/')) attendanceWrites.push(request.url()); };
+  page.on('request', captureAttendance);
+  await attendance.getByRole('button', { name: 'تأكيد', exact: true }).click();
+  await expect(attendance).toBeHidden();
+  page.off('request', captureAttendance);
+  expect(attendanceWrites).toEqual([]);
+  const repeated = await call('GET', 'dashboard/snapshot');
+  expect(repeated.attendance.filter(row => row.sessionId === repeatSession.id && row.loginId === 'attendance-student')).toHaveLength(1);
+
   await call('PUT', 'dashboard/attendance/settings', { enabled: false, mapsUrl: 'https://www.google.com/maps?q=24.7136,46.6753', radius: 300 });
   await page.goto('practitioner');
   await page.getByRole('button', { name: 'الحساب', exact: true }).click();
   await expect(page.getByRole('button', { name: 'التحضير', exact: true })).toHaveCount(0);
   expect((await call('GET', `dashboard/courses/${course.id}/attendance-sessions`)).find(row => row.id === session.id).isOpen).toBe(false);
-  const reopened = await call('POST', `dashboard/courses/${course.id}/attendance-sessions`, { hours: 3 }, 201);
-  await call('POST', 'dashboard/manual-attendance', { courseId: course.id, sessionId: reopened.id, presentStudents: [
-    { loginId: 'attendance-student', studentId: student.id, studentName: student.name },
-  ] }, 204);
   const result = await call('GET', 'dashboard/snapshot');
   expect(result.attendance.filter(row => row.courseId === course.id && row.loginId === 'attendance-student')
     .reduce((sum, row) => sum + row.hours, 0)).toBe(5.5);

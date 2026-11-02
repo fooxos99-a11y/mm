@@ -1,6 +1,6 @@
 <template>
   <AppButton
-    v-if="sessions.length && !sessions[0].attended"
+    v-if="sessions.length"
     variant="plain"
     class="account-menu__item"
     @click="open"
@@ -49,23 +49,31 @@ export default {
         const sessions = await availableAttendance();
         if (this.disposed) return false;
         this.sessions = sessions;
-        if (this.dialog && !sessions.some(session => session.id === this.selectedId && !session.attended)) this.dialog = false;
+        if (this.dialog && !sessions.some(session => session.id === this.selectedId)) this.dialog = false;
         if (!this.dialog) this.selectedId = sessions[0]?.id || '';
         return true;
       } catch { return false; }
     },
     async open() {
       if (!await this.refresh()) { this.$toast.error('تعذر تحميل التحضير. حاول مرة أخرى.'); return; }
-      if (this.sessions[0] && !this.sessions[0].attended) {
+      if (this.sessions[0]) {
         this.selectedId = this.sessions[0].id;
         this.dialog = true;
       }
     },
     async attend() {
-      if (this.busy || !this.selected || this.selected.attended) return;
+      if (this.busy || !this.selected) return;
       this.busy = true;
-      const session = this.selected;
+      const sessionId = this.selectedId;
       try {
+        if (!await this.refresh()) throw new Error('تعذر تحميل التحضير.');
+        const session = this.sessions.find(row => row.id === sessionId);
+        if (!session) throw new Error('التحضير مغلق.');
+        if (session.attended) {
+          this.dialog = false;
+          this.$toast.success('تم تسجيل الحضور');
+          return;
+        }
         const challenge = await attendanceChallenge(session);
         if (!navigator.geolocation || !window.isSecureContext) throw new Error('تعذر التحقق من الموقع.');
         const position = await new Promise((resolve, reject) => navigator.geolocation.getCurrentPosition(resolve, reject,
