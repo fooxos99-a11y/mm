@@ -8,6 +8,10 @@ export const attendanceSessions = async courseId => (await api.get(sessionsPath(
 export const openAttendance = async (courseId, hours) => (await api.post(sessionsPath(courseId), { hours })).data;
 export const closeAttendance = (courseId, id) => api.post(`${sessionsPath(courseId)}/${id}/close`);
 export const availableAttendance = async () => (await api.get('/students/me/attendance')).data;
-export const attendanceChallenge = async session => (await api.post(`${studentPath(session)}/challenge`)).data.challenge;
+export const attendanceChallenge = async session => {
+  const startedAt = Date.now();
+  const { data } = await api.post(`${studentPath(session)}/challenge`);
+  return { ...data, startedAt, receivedAt: Date.now() };
+};
 export const attendSession = (session, data) => api.post(studentPath(session), data);
 export const courseEnrollments = async (courseId, branchCode) => (await api.get(`/dashboard/courses/${courseId}/enrollments`, { params: { branchCode } })).data;

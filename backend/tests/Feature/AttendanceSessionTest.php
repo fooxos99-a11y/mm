@@ -160,6 +160,17 @@ class AttendanceSessionTest extends TestCase
         $this->postJson($this->path($session), $this->position($session))->assertNoContent();
     }
 
+    public function test_location_challenge_supplies_server_clock_and_department_accuracy_limit(): void
+    {
+        $this->freezeTime();
+        $this->putJson('/api/dashboard/attendance/settings', ['enabled' => true, 'radius' => 100,
+            'mapsUrl' => 'https://www.google.com/maps?q=24.7136,46.6753'])->assertOk();
+        $session = $this->open();
+        Sanctum::actingAs($this->user);
+        $this->postJson($this->path($session).'/challenge')->assertOk()->assertJsonStructure(['challenge'])
+            ->assertJsonPath('serverTime', now()->getTimestampMs())->assertJsonPath('maxAccuracy', 50);
+    }
+
     public function test_closed_session_rejects_a_previously_issued_challenge(): void
     {
         $this->settings();

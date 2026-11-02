@@ -213,12 +213,22 @@ test('course sessions, settings, student location, history and supervision', asy
   expect(denied.status()).toBe(422);
 
   let location = null;
-  // DevTools fixes carry their assignment timestamp. Assign after the real server challenge
-  // so the test exercises fresh sensor samples rather than stale emulated coordinates.
-  await page.route('**/api/students/me/attendance/**/challenge', async route => {
-    const response = await route.fetch();
+  let improvedLocation = null;
+  // DevTools stamps a fix when assigned; inject it after the native watch starts.
+  await page.exposeFunction('__attendanceWatchStarted', async () => {
     if (location) await context.setGeolocation(location);
-    await route.fulfill({ response });
+    if (improvedLocation) {
+      await new Promise(resolve => setTimeout(resolve, 150));
+      await context.setGeolocation(improvedLocation);
+    }
+  });
+  await page.evaluate(() => {
+    const watch = navigator.geolocation.watchPosition.bind(navigator.geolocation);
+    navigator.geolocation.watchPosition = (...args) => {
+      const id = watch(...args);
+      window.__attendanceWatchStarted();
+      return id;
+    };
   });
   // A denied browser permission must produce no attendance record.
   await context.clearPermissions();
@@ -236,12 +246,15 @@ test('course sessions, settings, student location, history and supervision', asy
   await page.getByRole('button', { name: 'التحضير', exact: true }).click();
   location = { latitude: 24.7136, longitude: 46.6753, accuracy: 150 };
   await attendance.getByRole('button', { name: 'تأكيد', exact: true }).click();
-  await expect(page.locator('.Vue-Toastification__toast--error').last()).toContainText('دقة الموقع');
+  await expect(page.locator('.Vue-Toastification__toast--error').filter({ hasText: 'فعّل الموقع الدقيق' }))
+    .toBeVisible({ timeout: 30000 });
   await expect(attendance).toBeHidden();
   await page.getByRole('button', { name: 'التحضير', exact: true }).click();
   // Opening another course cannot silently redirect an already visible confirmation.
+  await expect(attendance).toBeVisible();
   const otherSession = await call('POST', `dashboard/courses/${other.id}/attendance-sessions`, { hours: 1.25 }, 201);
-  location = { latitude: 24.7136, longitude: 46.6753, accuracy: 10 };
+  location = { latitude: 24.7136, longitude: 46.6753, accuracy: 500 };
+  improvedLocation = { latitude: 24.7136, longitude: 46.6753, accuracy: 10 };
   await attendance.getByRole('button', { name: 'تأكيد', exact: true }).click();
   await expect(attendance).toBeHidden();
   await expect(page.locator('.Vue-Toastification__toast--success').filter({ hasText: 'تم تسجيل الحضور' })).toBeVisible();

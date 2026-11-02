@@ -69,7 +69,11 @@ class AttendanceSessionController extends Controller
 
     public function challenge(Request $request, string $courseId, string $sessionId): JsonResponse
     {
-        return response()->json(['challenge' => $this->attendance->challenge($request->user(), $courseId, $sessionId)]);
+        $challenge = $this->attendance->challenge($request->user(), $courseId, $sessionId);
+        $settings = $this->attendance->settings();
+
+        return response()->json(['challenge' => $challenge, 'serverTime' => now()->getTimestampMs(),
+            'maxAccuracy' => min(100, (float) $settings['radius'] / 2)]);
     }
 
     public function attend(Request $request, string $courseId, string $sessionId): JsonResponse

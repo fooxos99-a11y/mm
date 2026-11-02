@@ -64,9 +64,11 @@ class AttendanceLocationService
         $accuracy = (float) $position['accuracy'];
         $radius = (float) $settings['radius'];
         if (! isset($settings['latitude'], $settings['longitude']) || $timestamp < $challengedAt
-            || $timestamp < now()->timestamp - 30 || $timestamp > now()->timestamp + 5
-            || $accuracy <= 0 || $accuracy > min(100, $radius / 2)) {
-            throw ValidationException::withMessages(['location' => 'تعذر التحقق من دقة الموقع أو حداثته.']);
+            || $timestamp < now()->timestamp - 30 || $timestamp > now()->timestamp + 5) {
+            throw ValidationException::withMessages(['location' => 'قراءة الموقع قديمة. حاول تأكيد الحضور مرة أخرى.']);
+        }
+        if ($accuracy <= 0 || $accuracy > min(100, $radius / 2)) {
+            throw ValidationException::withMessages(['location' => 'دقة الموقع غير كافية. فعّل الموقع الدقيق وحاول مرة أخرى.']);
         }
         $lat1 = deg2rad((float) $settings['latitude']);
         $lat2 = deg2rad((float) $position['latitude']);

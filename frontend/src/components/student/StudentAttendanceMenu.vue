@@ -36,6 +36,7 @@
 <script>
 import { AppButton, AppDialog, DialogShell } from '../ui';
 import { availableAttendance, attendanceChallenge, attendSession } from '../../services/attendanceApi';
+import { acquireAttendancePosition } from '../../utils/attendancePosition.mjs';
 export default {
   name: 'StudentAttendanceMenu',
   components: { AppButton, AppDialog, DialogShell },
@@ -76,17 +77,15 @@ export default {
         }
         const challenge = await attendanceChallenge(session);
         if (!navigator.geolocation || !window.isSecureContext) throw new Error('تعذر التحقق من الموقع.');
-        const position = await new Promise((resolve, reject) => navigator.geolocation.getCurrentPosition(resolve, reject,
-          { enableHighAccuracy: true, maximumAge: 0, timeout: 20000 }));
-        await attendSession(session, { challenge, latitude: position.coords.latitude, longitude: position.coords.longitude,
-          accuracy: position.coords.accuracy, timestamp: position.timestamp });
+        const position = await acquireAttendancePosition(navigator.geolocation, challenge);
+        await attendSession(session, { challenge: challenge.challenge, ...position });
         this.dialog = false;
         this.$toast.success('تم تسجيل الحضور');
         await this.refresh();
         this.$store.dispatch('loadDashboardSnapshot', { background: true }).catch(() => {});
       } catch (error) {
         this.dialog = false;
-        this.$toast.error(error?.response?.data?.message || (error.code === 1 ? 'لم يُسمح بالوصول إلى الموقع.' : 'تعذر التحقق من الموقع أو تسجيل الحضور.'));
+        this.$toast.error(error?.response?.data?.message || error.userMessage || (error.code === 1 ? 'لم يُسمح بالوصول إلى الموقع.' : 'تعذر التحقق من الموقع أو تسجيل الحضور.'));
         await this.refresh();
       } finally { this.busy = false; }
     },
