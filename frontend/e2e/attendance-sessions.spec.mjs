@@ -144,7 +144,6 @@ test('course sessions, settings, student location, history and supervision', asy
     branchId: 'male', password: studentPassword, passwordConfirmation: studentPassword }, 201);
   const course = await call('POST', 'dashboard/courses', { title: 'دورة التحضير', isActive: false }, 201);
   const other = await call('POST', 'dashboard/courses', { title: 'الدورة الثانية', isActive: false }, 201);
-  await call('PUT', `dashboard/courses/${course.id}/enrollments`, { branchCode: 'male', studentIds: [student.id] });
   await login(page);
   await page.goto('dashboard?panel=settings&settingsItem=attendance');
   await expect(page.getByRole('heading', { name: 'التحضير', exact: true })).toBeVisible();
@@ -187,9 +186,8 @@ test('course sessions, settings, student location, history and supervision', asy
   const unmarkUnenrolled = page.waitForResponse(response => response.url().endsWith('/manual-attendance') && response.request().method() === 'POST');
   await unenrolledRow.getByRole('button').click();
   expect((await unmarkUnenrolled).status()).toBe(204);
-  expect((await call('GET', `dashboard/courses/${course.id}/enrollments?branchCode=male`)).studentIds).toEqual([student.id]);
+  expect((await call('GET', `dashboard/courses/${course.id}/enrollments?branchCode=male`)).studentIds).toEqual([]);
   expect(await call('GET', `dashboard/courses/${other.id}/attendance-sessions`)).toEqual([]);
-  const otherSession = await call('POST', `dashboard/courses/${other.id}/attendance-sessions`, { hours: 1.25 }, 201);
   const adminStorage = await context.storageState();
 
   await page.goto('about:blank'); await context.clearCookies();
@@ -197,20 +195,22 @@ test('course sessions, settings, student location, history and supervision', asy
   await page.goto('practitioner');
   await page.getByRole('button', { name: 'الحساب', exact: true }).click();
   await page.getByRole('button', { name: 'التحضير', exact: true }).click();
-  const attendance = page.getByRole('dialog').filter({ hasText: 'تسجيل الحضور' });
+  const attendance = page.getByRole('dialog').filter({ hasText: 'تأكيد الحضور' });
+  await expect(attendance.getByText('تأكيد الحضور', { exact: true })).toBeVisible();
+  await expect(attendance.getByRole('button')).toHaveText(['إلغاء', 'تأكيد']);
+  await expect(attendance.locator('input, select, textarea')).toHaveCount(0);
+  await page.screenshot({ path: info.outputPath('attendance-confirmation.png') });
+  await attendance.getByRole('button', { name: 'إلغاء', exact: true }).click();
+  await expect(attendance).toBeHidden();
+  expect((await call('GET', 'dashboard/snapshot')).attendance.filter(row => row.sessionId === session.id)).toHaveLength(0);
+  await page.getByRole('button', { name: 'التحضير', exact: true }).click();
   const studentHeaders = { Referer: page.url(), Accept: 'application/json',
     'X-XSRF-TOKEN': decodeURIComponent((await context.cookies(api)).find(cookie => cookie.name === 'XSRF-TOKEN')?.value || '') };
   const available = await page.request.get(`${api}/students/me/attendance`, { headers: studentHeaders });
   expect(available.status()).toBe(200);
   expect((await available.json()).map(row => row.courseId)).toEqual([course.id]);
-  const denied = await page.request.post(`${api}/students/me/attendance/${other.id}/${otherSession.id}/challenge`, { headers: studentHeaders });
-  expect(denied.status()).toBe(403);
-  await expect(attendance.getByLabel('الدورة', { exact: true })).toHaveValue(course.title);
-  await call('PUT', `dashboard/courses/${other.id}/enrollments`, { branchCode: 'male', studentIds: [student.id] });
-
-  await expect(attendance.getByLabel('الدورة', { exact: true })).toBeVisible();
-  await attendance.getByLabel('الدورة', { exact: true }).selectOption(session.id);
-  await expect(attendance.getByLabel('مدة فتح التحضير')).toHaveValue('2.5');
+  const denied = await page.request.post(`${api}/students/me/attendance/${other.id}/${session.id}/challenge`, { headers: studentHeaders });
+  expect(denied.status()).toBe(422);
 
   let location = null;
   // DevTools fixes carry their assignment timestamp. Assign after the real server challenge
@@ -223,20 +223,29 @@ test('course sessions, settings, student location, history and supervision', asy
   // A denied browser permission must produce no attendance record.
   await context.clearPermissions();
   await context.grantPermissions([], { origin: new URL(page.url()).origin });
-  await attendance.getByRole('button', { name: 'تسجيل الحضور', exact: true }).click();
-  await expect(attendance.getByRole('alert')).toContainText('لم يُسمح');
+  await attendance.getByRole('button', { name: 'تأكيد', exact: true }).click();
+  await expect(page.locator('.Vue-Toastification__toast--error').last()).toContainText('لم يُسمح');
+  await expect(attendance).toBeHidden();
+  await page.getByRole('button', { name: 'التحضير', exact: true }).click();
 
   await context.grantPermissions(['geolocation'], { origin: new URL(page.url()).origin });
   location = { latitude: 25, longitude: 46.6753, accuracy: 10 };
-  await attendance.getByRole('button', { name: 'تسجيل الحضور', exact: true }).click();
-  await expect(attendance.getByRole('alert')).toContainText('خارج نطاق');
+  await attendance.getByRole('button', { name: 'تأكيد', exact: true }).click();
+  await expect(page.locator('.Vue-Toastification__toast--error').last()).toContainText('خارج نطاق');
+  await expect(attendance).toBeHidden();
+  await page.getByRole('button', { name: 'التحضير', exact: true }).click();
   location = { latitude: 24.7136, longitude: 46.6753, accuracy: 150 };
-  await attendance.getByRole('button', { name: 'تسجيل الحضور', exact: true }).click();
-  await expect(attendance.getByRole('alert')).toContainText('دقة الموقع');
+  await attendance.getByRole('button', { name: 'تأكيد', exact: true }).click();
+  await expect(page.locator('.Vue-Toastification__toast--error').last()).toContainText('دقة الموقع');
+  await expect(attendance).toBeHidden();
+  await page.getByRole('button', { name: 'التحضير', exact: true }).click();
+  // Opening another course cannot silently redirect an already visible confirmation.
+  const otherSession = await call('POST', `dashboard/courses/${other.id}/attendance-sessions`, { hours: 1.25 }, 201);
   location = { latitude: 24.7136, longitude: 46.6753, accuracy: 10 };
-  await attendance.getByRole('button', { name: 'تسجيل الحضور', exact: true }).click();
-  await expect(attendance.getByRole('status')).toHaveText('تم تسجيل الحضور');
-  await expect(attendance.getByRole('button', { name: 'تسجيل الحضور', exact: true })).toHaveCount(0);
+  await attendance.getByRole('button', { name: 'تأكيد', exact: true }).click();
+  await expect(attendance).toBeHidden();
+  await expect(page.locator('.Vue-Toastification__toast--success').filter({ hasText: 'تم تسجيل الحضور' })).toBeVisible();
+  expect((await call('GET', 'dashboard/snapshot')).attendance.filter(row => row.sessionId === otherSession.id)).toHaveLength(0);
   await page.screenshot({ path: info.outputPath('attendance-student.png'), fullPage: false });
 
   // A stale supervisor checklist cannot erase or duplicate the student's record.
@@ -279,7 +288,6 @@ test('course sessions, settings, student location, history and supervision', asy
   await staffPage.screenshot({ path: info.outputPath('attendance-supervision.png') });
   await staffContext.close();
 
-  await attendance.getByRole('button', { name: 'إغلاق', exact: true }).click();
   await call('PUT', 'dashboard/attendance/settings', { enabled: false, mapsUrl: 'https://www.google.com/maps?q=24.7136,46.6753', radius: 300 });
   await page.goto('practitioner');
   await page.getByRole('button', { name: 'الحساب', exact: true }).click();

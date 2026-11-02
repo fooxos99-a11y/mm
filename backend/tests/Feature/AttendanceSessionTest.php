@@ -173,7 +173,7 @@ class AttendanceSessionTest extends TestCase
         $this->getJson('/api/students/me/attendance')->assertExactJson([]);
     }
 
-    public function test_enrollment_role_course_and_department_are_enforced(): void
+    public function test_student_identity_role_and_archive_are_enforced(): void
     {
         $this->settings();
         $session = $this->open();
@@ -188,6 +188,43 @@ class AttendanceSessionTest extends TestCase
         DB::table('archives')->insert(['id' => $archiveId, 'name' => 'أرشيف', 'created_at' => now()]);
         DB::table('students')->where('id', $this->student->id)->update(['archive_id' => $archiveId]);
         $this->postJson($this->path($session), $data)->assertForbidden();
+    }
+
+    public function test_current_students_in_both_branches_can_attend_without_course_enrollments(): void
+    {
+        DB::table('course_enrollments')->delete();
+        $this->settings();
+        $session = $this->open();
+        $second = User::factory()->create(['role' => 'student']);
+        Student::query()->create(['full_name' => 'طالبة التحضير', 'login_code' => $second->login_code,
+            'branch_id' => DB::table('branches')->where('code', 'female')->value('id'), 'note' => '']);
+        foreach ([$this->user, $second] as $user) {
+            Sanctum::actingAs($user);
+            $this->getJson('/api/students/me/attendance')->assertOk()->assertJsonCount(1)
+                ->assertJsonPath('0.id', $session['id'])->assertJsonPath('0.attended', false);
+            $this->postJson($this->path($session), $this->position($session))->assertNoContent();
+            $this->getJson('/api/students/me/attendance')->assertOk()->assertJsonPath('0.attended', true);
+        }
+        $this->assertDatabaseCount('course_enrollments', 0);
+        $this->assertDatabaseCount('course_attendance', 2);
+        $this->settings();
+        $this->postJson("/api/dashboard/courses/{$this->course}/attendance-sessions/{$session['id']}/close")->assertNoContent();
+        Sanctum::actingAs($second);
+        $this->getJson('/api/students/me/attendance')->assertOk()->assertExactJson([]);
+    }
+
+    public function test_available_sessions_put_the_most_recent_open_course_first(): void
+    {
+        $this->settings();
+        $first = $this->open();
+        $other = (string) str()->uuid();
+        DB::table('courses')->insert(['id' => $other, 'title' => 'دورة حديثة',
+            'department_id' => DepartmentContext::id(), 'created_at' => now()]);
+        $this->travel(1)->seconds();
+        $latest = $this->postJson("/api/dashboard/courses/{$other}/attendance-sessions", ['hours' => 1])->assertCreated()->json();
+        Sanctum::actingAs($this->user);
+        $this->getJson('/api/students/me/attendance')->assertOk()->assertJsonCount(2)
+            ->assertJsonPath('0.id', $latest['id'])->assertJsonPath('1.id', $first['id']);
     }
 
     public function test_manager_permission_and_supervision_cross_method_deduplication(): void

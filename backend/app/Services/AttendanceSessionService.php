@@ -77,7 +77,7 @@ class AttendanceSessionService
         }
 
         return DB::table('attendance_sessions')->where('active', 1)
-            ->whereIn('course_id', DB::table('course_enrollments')->where('student_id', $student->id)->select('course_id'))
+            ->orderByDesc('opened_at')->orderByDesc('id')
             ->get()->filter(function ($session): bool {
                 return DB::table('courses')->where('id', $session->course_id)->whereNull('archive_id')
                     ->where('entity_type', '!=', 'task')->exists();
@@ -90,9 +90,8 @@ class AttendanceSessionService
 
     public function challenge(User $user, string $courseId, string $sessionId): string
     {
-        $student = $this->student($user);
+        $this->student($user);
         $this->course($courseId);
-        app(CourseEnrollmentService::class)->assertEnrolled($courseId, $student->id);
         $this->session($courseId, $sessionId);
         abort_unless(($this->settings()['enabled'] ?? false), 403);
 
@@ -108,7 +107,6 @@ class AttendanceSessionService
             DB::table('app_settings')->where('setting_key', 'attendance')->lockForUpdate()->first();
             abort_unless(($this->settings()['enabled'] ?? false), 403);
             $student = $this->student($user);
-            app(CourseEnrollmentService::class)->assertEnrolled($courseId, $student->id);
             try {
                 $token = json_decode(Crypt::decryptString($data['challenge']), true, flags: JSON_THROW_ON_ERROR);
             } catch (\Throwable) {

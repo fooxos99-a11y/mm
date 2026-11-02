@@ -110,6 +110,7 @@ class AttendanceDepartmentIsolationTest extends TestCase
         $firstSession = $this->open($this->first);
         $secondSession = $this->open($this->second);
         Sanctum::actingAs($this->first['user']);
+        DB::table('course_enrollments')->delete();
         $this->getJson('/api/students/me/attendance')->assertOk()->assertJsonCount(1)->assertJsonPath('0.id', $firstSession);
         $firstPosition = $this->position($this->first, $firstSession);
         $this->postJson($this->path($this->first, $firstSession), [...$firstPosition,
