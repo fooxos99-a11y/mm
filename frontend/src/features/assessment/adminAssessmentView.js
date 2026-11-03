@@ -1,4 +1,5 @@
 import { mapActions, mapState } from 'vuex';
+import attendanceRefresh from './attendanceRefresh';
 import { getCurrentInstance } from 'vue';
 import { onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router';
 import AssessmentEditorHeader from '../../components/assessment/AssessmentEditorHeader.vue';
@@ -27,6 +28,7 @@ import workspaceUiMethods, { editorComputed } from './assessmentWorkspaceUi';
 
 export default {
   name: 'AdminAssessmentView',
+  mixins: [attendanceRefresh],
   components: {
     AssessmentAvailabilityDialogs,
     AssessmentCourseDialogs,

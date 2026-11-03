@@ -37,7 +37,7 @@ export default {
     if (!this.resultsCatalogReady) await this.loadResultsCatalog();
     else await this.loadResultsPage(this.resultsPage);
   },
-  async loadResultsPage(page = this.resultsPage, preserve = false) {
+  async loadResultsPage(page = this.resultsPage, preserve = false, background = false) {
     if (!this.hasSelectedResultsSection || this.isAttendanceMode) {
       this.resultsLoading = false;
       return false;
@@ -46,8 +46,7 @@ export default {
     this.resultsController?.abort();
     this.resultsController = new AbortController();
     clearTimeout(this.resultsSearchTimer);
-    this.resultsLoading = true;
-    this.resultsError = '';
+    if (!background) { this.resultsLoading = true; this.resultsError = ''; }
     if (!preserve) {
       this.closeResultDialog();
       this.resultSnapshot = null;
@@ -61,13 +60,13 @@ export default {
         search: this.resultsSearch.trim(), page, perPage: 20,
       }, this.resultsController.signal);
       if (generation !== this.resultsGeneration) return false;
-      if (page > result.pagination.pages) return this.loadResultsPage(result.pagination.pages, preserve);
+      if (page > result.pagination.pages) return this.loadResultsPage(result.pagination.pages, preserve, background);
       this.resultSnapshot = result;
       this.resultsPage = result.pagination.page;
       return true;
     } catch (error) {
       if (generation !== this.resultsGeneration || error?.code === 'ERR_CANCELED') return false;
-      this.resultsError = error?.response?.data?.message || 'تعذر تحميل النتائج. حاول مرة أخرى.';
+      if (!background) this.resultsError = error?.response?.data?.message || 'تعذر تحميل النتائج. حاول مرة أخرى.';
       return false;
     } finally {
       if (generation === this.resultsGeneration) this.resultsLoading = false;

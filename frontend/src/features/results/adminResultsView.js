@@ -1,4 +1,5 @@
 import { mapActions, mapState } from 'vuex';
+import attendanceRefresh from '../assessment/attendanceRefresh';
 import ResultsDialogs from '../../components/results/ResultsDialogs.vue';
 import ResultsGradeDialog from '../../components/results/ResultsGradeDialog.vue';
 import ResultsAttendancePanel from '../../components/results/ResultsAttendancePanel.vue';
@@ -13,6 +14,7 @@ import { gradeChanges } from './gradeEntryModel.mjs';
 
 export default {
   name: 'AdminResultsView',
+  mixins: [attendanceRefresh],
   components: {
     AppActionBar,
     AppPagination,
@@ -118,6 +120,7 @@ export default {
     selectedAttendanceRecords: {
       immediate: true,
       handler(records) {
+        if (this.attendanceRefreshBusy && (this.attendanceSaveTimer || this.isSavingAttendance || this.attendanceRemovedIds?.length)) return;
         this.attendanceChecked = records.map((record) => {
           const student = this.students.find((item) => item.loginId === record.loginId);
           return student?.id || null;

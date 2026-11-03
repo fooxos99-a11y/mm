@@ -263,6 +263,21 @@ test('course sessions, settings, student location, history and supervision', asy
   await expect(attendance).toBeHidden();
   await page.getByRole('button', { name: 'التحضير', exact: true }).click();
   await expect(attendance).toBeVisible();
+  const staffContext = await browser.newContext({ baseURL: process.env.E2E_BASE_URL, storageState: adminStorage,
+    viewport: info.project.use.viewport, isMobile: info.project.use.isMobile, hasTouch: info.project.use.hasTouch });
+  const staffPage = await staffContext.newPage();
+  await staffPage.goto(`dashboard?panel=courses&courseId=${course.id}`);
+  const row = staffPage.locator('.assessment-attendance__row').filter({ hasText: student.name });
+  await expect(staffPage.locator('.assessment-attendance__row')).toHaveCount(rosterCount);
+  const toggleStudent = row.getByRole('button');
+  await expect(toggleStudent).toHaveText('تحضير');
+  const resultsPage = await staffContext.newPage();
+  await resultsPage.goto('dashboard?panel=results');
+  await resultsPage.getByRole('combobox', { name: 'القسم', exact: true }).locator('..').click();
+  await selectOption(resultsPage, course.title, { exact: true });
+  await resultsPage.getByRole('searchbox').fill(student.loginId);
+  const resultStatus = resultsPage.locator('.results-entry').filter({ hasText: student.loginId }).locator('.results-entry__status-pill');
+  await expect(resultStatus).toHaveText('غائب');
   location = { latitude: 24.7136, longitude: 46.6753, accuracy: 500 };
   improvedLocation = { latitude: 24.7136, longitude: 46.6753, accuracy: 10 };
   await attendance.getByRole('button', { name: 'تأكيد', exact: true }).click();
@@ -271,6 +286,11 @@ test('course sessions, settings, student location, history and supervision', asy
   expect((await call('GET', 'dashboard/snapshot')).attendance.filter(row => row.sessionId === otherSession.id)).toHaveLength(0);
   await page.screenshot({ path: info.outputPath('attendance-student.png'), fullPage: false });
 
+  // Both already-open supervisor views update after another user's self confirmation.
+  await expect(toggleStudent).toHaveText('حاضر');
+  await expect(resultStatus).toHaveText('حاضر');
+  await resultsPage.close();
+
   // A stale supervisor checklist cannot erase or duplicate the student's record.
   await call('POST', 'dashboard/manual-attendance', { courseId: course.id, sessionId: session.id, presentStudents: [
     { loginId: 'attendance-student', studentId: student.id, studentName: student.name },
@@ -278,13 +298,6 @@ test('course sessions, settings, student location, history and supervision', asy
   const snapshot = await call('GET', 'dashboard/snapshot');
   expect(snapshot.attendance.filter(row => row.sessionId === session.id && row.loginId === 'attendance-student')).toHaveLength(1);
   expect(snapshot.attendance.find(row => row.sessionId === session.id).source).toBe('student');
-  const staffContext = await browser.newContext({ baseURL: process.env.E2E_BASE_URL, storageState: adminStorage,
-    viewport: info.project.use.viewport, isMobile: info.project.use.isMobile, hasTouch: info.project.use.hasTouch });
-  const staffPage = await staffContext.newPage();
-  await staffPage.goto(`dashboard?panel=courses&courseId=${course.id}`);
-  const row = staffPage.locator('.assessment-attendance__row').filter({ hasText: student.name });
-  await expect(staffPage.locator('.assessment-attendance__row')).toHaveCount(rosterCount);
-  const toggleStudent = row.getByRole('button');
   await expect(toggleStudent).toHaveText('حاضر');
   const cancelResponse = staffPage.waitForResponse(response => response.url().endsWith('/manual-attendance') && response.request().method() === 'POST');
   await toggleStudent.click();

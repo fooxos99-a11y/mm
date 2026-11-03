@@ -109,6 +109,7 @@ export default {
     selectedAttendanceRecords: {
       immediate: true,
       handler(records) {
+        if (this.attendanceRefreshBusy && (this.attendanceSaveTimer || this.isSavingAttendance || this.attendanceRemovedIds?.length)) return;
         this.attendanceChecked = attendanceSelectionFromRecords(records, this.students);
       },
     },
