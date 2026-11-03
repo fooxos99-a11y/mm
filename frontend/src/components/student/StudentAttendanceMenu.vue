@@ -69,7 +69,9 @@ export default {
       try {
         if (!await this.refresh()) throw new Error('تعذر تحميل التحضير.');
         const session = this.sessions.find(row => row.id === sessionId);
-        if (!session) throw new Error('التحضير مغلق.');
+        if (!session) throw Object.assign(new Error('التحضير مغلق.'), {
+          userMessage: 'التحضير لهذه المحاضرة مغلق. افتح التحضير مجددًا.',
+        });
         if (session.attended) {
           this.dialog = false;
           this.$toast.success('تم تسجيل الحضور');

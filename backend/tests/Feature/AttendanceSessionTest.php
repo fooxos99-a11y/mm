@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Department;
 use App\Models\Student;
 use App\Models\User;
+use App\Services\AttendanceSessionService;
 use App\Support\DepartmentContext;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -224,18 +225,48 @@ class AttendanceSessionTest extends TestCase
         $this->getJson('/api/students/me/attendance')->assertOk()->assertExactJson([]);
     }
 
-    public function test_available_sessions_put_the_most_recent_open_course_first(): void
+    public function test_opening_a_course_closes_the_previous_course_and_invalidates_its_challenge(): void
     {
         $this->settings();
         $first = $this->open();
+        Sanctum::actingAs($this->user);
+        $position = $this->position($first);
+        Sanctum::actingAs($this->admin);
         $other = (string) str()->uuid();
         DB::table('courses')->insert(['id' => $other, 'title' => 'دورة حديثة',
             'department_id' => DepartmentContext::id(), 'created_at' => now()]);
         $this->travel(1)->seconds();
         $latest = $this->postJson("/api/dashboard/courses/{$other}/attendance-sessions", ['hours' => 1])->assertCreated()->json();
         Sanctum::actingAs($this->user);
-        $this->getJson('/api/students/me/attendance')->assertOk()->assertJsonCount(2)
-            ->assertJsonPath('0.id', $latest['id'])->assertJsonPath('1.id', $first['id']);
+        $this->getJson('/api/students/me/attendance')->assertOk()->assertJsonCount(1)->assertJsonPath('0.id', $latest['id']);
+        $this->postJson($this->path($first).'/challenge')->assertUnprocessable();
+        $this->postJson($this->path($first), $position)->assertUnprocessable();
+        $this->assertDatabaseHas('attendance_sessions', ['id' => $first['id'], 'active' => null, 'closed_at' => now()]);
+        $this->assertDatabaseCount('course_attendance', 0);
+    }
+
+    public function test_failed_new_session_creation_rolls_back_the_automatic_close(): void
+    {
+        $first = $this->open();
+        $other = (string) str()->uuid();
+        DB::table('courses')->insert(['id' => $other, 'title' => 'دورة جديدة',
+            'department_id' => DepartmentContext::id(), 'created_at' => now()]);
+        $injected = false;
+        DB::listen(function ($query) use (&$injected): void {
+            if (! $injected && str_starts_with($query->sql, 'insert') && str_contains($query->sql, 'attendance_sessions')) {
+                $injected = true;
+                throw new \RuntimeException('Simulated session storage failure');
+            }
+        });
+        try {
+            app(AttendanceSessionService::class)->open($this->admin, $other, 1);
+            $this->fail('The simulated storage failure must be propagated.');
+        } catch (\RuntimeException $exception) {
+            $this->assertSame('Simulated session storage failure', $exception->getMessage());
+        }
+        $this->assertTrue($injected);
+        $this->assertDatabaseHas('attendance_sessions', ['id' => $first['id'], 'active' => 1, 'closed_at' => null]);
+        $this->assertDatabaseMissing('attendance_sessions', ['course_id' => $other]);
     }
 
     public function test_manager_permission_and_supervision_cross_method_deduplication(): void
@@ -305,23 +336,27 @@ class AttendanceSessionTest extends TestCase
         }
     }
 
-    public function test_multiple_enrolled_courses_and_hours_do_not_inflate_completion(): void
+    public function test_switching_courses_preserves_previous_hours_without_inflating_completion(): void
     {
         $this->settings();
         $first = $this->open();
+        Sanctum::actingAs($this->user);
+        $this->postJson($this->path($first), $this->position($first))->assertNoContent();
+        Sanctum::actingAs($this->admin);
         $otherCourse = (string) str()->uuid();
         DB::table('courses')->insert(['id' => $otherCourse, 'title' => 'دورة ثانية',
             'department_id' => DepartmentContext::id(), 'created_at' => now()]);
         $this->enroll($otherCourse, $this->student->id);
         $this->postJson("/api/dashboard/courses/{$otherCourse}/attendance-sessions", ['hours' => 1])->assertCreated();
         Sanctum::actingAs($this->user);
-        $this->getJson('/api/students/me/attendance')->assertJsonCount(2);
-        $this->postJson($this->path($first), $this->position($first))->assertNoContent();
+        $this->getJson('/api/students/me/attendance')->assertJsonCount(1)->assertJsonPath('0.courseId', $otherCourse);
         Sanctum::actingAs($this->admin);
-        $this->postJson("/api/dashboard/courses/{$this->course}/attendance-sessions/{$first['id']}/close")->assertNoContent();
         $next = $this->open(1);
         Sanctum::actingAs($this->user);
         $this->postJson($this->path($next), $this->position($next))->assertNoContent();
+        $this->assertDatabaseHas('course_attendance', ['session_id' => $first['id'], 'hours' => 2.5]);
+        $this->assertDatabaseHas('course_attendance', ['session_id' => $next['id'], 'hours' => 1]);
+        $this->assertDatabaseMissing('attendance_sessions', ['course_id' => $otherCourse, 'active' => 1]);
         $this->getJson('/api/students/me/indicators')->assertOk()->assertJsonPath('student.details.attendance.current', 1);
     }
 

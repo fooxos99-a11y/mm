@@ -94,18 +94,20 @@ class CourseEnrollmentTest extends TestCase
         $this->assertDatabaseMissing('attendance_sessions', ['course_id' => $this->other]);
         Sanctum::actingAs($this->user);
         $this->getJson('/api/students/me/attendance')->assertJsonCount(1)->assertJsonPath('0.courseId', $this->course);
+        $oldPosition = $this->position($this->course, $first);
         Sanctum::actingAs($this->admin);
         $second = $this->open($this->other);
         Sanctum::actingAs($this->user);
-        $this->getJson('/api/students/me/attendance')->assertJsonCount(2);
+        $this->getJson('/api/students/me/attendance')->assertJsonCount(1)->assertJsonPath('0.courseId', $this->other);
         $this->postJson($this->path($this->other, $second).'/challenge')->assertOk();
         Sanctum::actingAs($this->admin);
         $this->enroll($this->other, [$this->student->id]);
         Sanctum::actingAs($this->user);
-        $this->getJson('/api/students/me/attendance')->assertJsonCount(2);
+        $this->getJson('/api/students/me/attendance')->assertJsonCount(1)->assertJsonPath('0.courseId', $this->other);
         $this->postJson($this->path($this->other, $first).'/challenge')->assertUnprocessable();
-        $this->postJson($this->path($this->course, $first), $this->position($this->course, $first))->assertNoContent();
-        $this->assertDatabaseMissing('course_attendance', ['course_id' => $this->other]);
+        $this->postJson($this->path($this->course, $first), $oldPosition)->assertUnprocessable();
+        $this->postJson($this->path($this->other, $second), $this->position($this->other, $second))->assertNoContent();
+        $this->assertDatabaseMissing('course_attendance', ['course_id' => $this->course]);
     }
 
     public function test_repeated_roster_saves_are_idempotent_and_each_branch_is_isolated(): void

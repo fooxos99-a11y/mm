@@ -140,6 +140,34 @@ class AttendanceDepartmentIsolationTest extends TestCase
         $this->assertDatabaseCount('course_attendance', 2);
     }
 
+    public function test_switching_courses_closes_only_the_same_departments_session_and_keeps_attendance_history(): void
+    {
+        $this->save($this->first, true);
+        $this->save($this->second, true);
+        $firstSession = $this->open($this->first);
+        $otherDepartmentSession = $this->open($this->second);
+        Sanctum::actingAs($this->first['user']);
+        $this->postJson($this->path($this->first, $firstSession), $this->position($this->first, $firstSession))->assertNoContent();
+        Sanctum::actingAs($this->second['user']);
+        $otherPosition = $this->position($this->second, $otherDepartmentSession);
+
+        $courseId = (string) str()->uuid();
+        DB::table('courses')->insert(['id' => $courseId, 'title' => 'المحاضرة التالية',
+            'department_id' => $this->first['id'], 'created_at' => now()]);
+        Sanctum::actingAs($this->first['admin']);
+        $latest = $this->postJson("/api/dashboard/courses/{$courseId}/attendance-sessions", ['hours' => 1.5])
+            ->assertCreated()->json('id');
+        $this->assertDatabaseHas('attendance_sessions', ['id' => $firstSession, 'active' => null]);
+        $this->assertNotNull(DB::table('attendance_sessions')->where('id', $firstSession)->value('closed_at'));
+        $this->assertDatabaseHas('attendance_sessions', ['id' => $otherDepartmentSession, 'active' => 1, 'closed_at' => null]);
+        $this->assertDatabaseHas('course_attendance', ['session_id' => $firstSession, 'hours' => 2.5]);
+        Sanctum::actingAs($this->first['user']);
+        $this->getJson('/api/students/me/attendance')->assertOk()->assertJsonCount(1)->assertJsonPath('0.id', $latest);
+        Sanctum::actingAs($this->second['user']);
+        $this->getJson('/api/students/me/attendance')->assertOk()->assertJsonCount(1)->assertJsonPath('0.id', $otherDepartmentSession);
+        $this->postJson($this->path($this->second, $otherDepartmentSession), $otherPosition)->assertNoContent();
+    }
+
     public function test_administrators_cannot_read_open_close_or_enroll_in_another_department(): void
     {
         $firstSession = $this->open($this->first);

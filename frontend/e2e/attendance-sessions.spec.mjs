@@ -153,6 +153,7 @@ test('course sessions, settings, student location, history and supervision', asy
   await page.getByRole('button', { name: 'حفظ', exact: true }).click();
   await expect.poll(async () => (await call('GET', 'dashboard/attendance/settings')).enabled).toBe(true);
   await page.screenshot({ path: info.outputPath('attendance-settings.png'), fullPage: false });
+  const otherSession = await call('POST', `dashboard/courses/${other.id}/attendance-sessions`, { hours: 1.25 }, 201);
 
   await page.goto(`dashboard?panel=courses&courseId=${course.id}`);
   const rosterCount = (await call('GET', 'dashboard/snapshot')).students.filter(student => student.branchId === 'male').length;
@@ -175,7 +176,7 @@ test('course sessions, settings, student location, history and supervision', asy
   await expect(dialog).toBeHidden();
   await expect(page.getByRole('button', { name: 'إغلاق التحضير', exact: true })).toBeVisible();
   await expect(header.getByRole('button', { name: 'إغلاق التحضير', exact: true })).toBeEnabled();
-  const [session] = await call('GET', `dashboard/courses/${course.id}/attendance-sessions`);
+  let [session] = await call('GET', `dashboard/courses/${course.id}/attendance-sessions`);
   expect(session.hours).toBe(2.5);
   await expect(page.locator('.assessment-attendance__row')).toHaveCount(rosterCount);
   await expect(page.getByRole('heading', { name: 'لا يوجد معلمون في هذا الفرع', exact: true })).toHaveCount(0);
@@ -187,7 +188,7 @@ test('course sessions, settings, student location, history and supervision', asy
   await unenrolledRow.getByRole('button').click();
   expect((await unmarkUnenrolled).status()).toBe(204);
   expect((await call('GET', `dashboard/courses/${course.id}/enrollments?branchCode=male`)).studentIds).toEqual([]);
-  expect(await call('GET', `dashboard/courses/${other.id}/attendance-sessions`)).toEqual([]);
+  expect((await call('GET', `dashboard/courses/${other.id}/attendance-sessions`))[0]).toMatchObject({ id: otherSession.id, isOpen: false });
   const adminStorage = await context.storageState();
 
   await page.goto('about:blank'); await context.clearCookies();
@@ -211,6 +212,17 @@ test('course sessions, settings, student location, history and supervision', asy
   expect((await available.json()).map(row => row.courseId)).toEqual([course.id]);
   const denied = await page.request.post(`${api}/students/me/attendance/${other.id}/${session.id}/challenge`, { headers: studentHeaders });
   expect(denied.status()).toBe(422);
+
+  // A confirmation that was open before switching must close without attending the new lecture.
+  await expect(attendance).toBeVisible();
+  await call('POST', `dashboard/courses/${other.id}/attendance-sessions`, { hours: 1.25 }, 201);
+  await attendance.getByRole('button', { name: 'تأكيد', exact: true }).click();
+  await expect(attendance).toBeHidden();
+  await expect(page.locator('.Vue-Toastification__toast--error').filter({ hasText: 'التحضير لهذه المحاضرة مغلق' })).toBeVisible();
+  expect((await call('GET', 'dashboard/snapshot')).attendance.filter(row => [course.id, other.id].includes(row.courseId))).toHaveLength(0);
+  session = await call('POST', `dashboard/courses/${course.id}/attendance-sessions`, { hours: 2.5 }, 201);
+  await page.getByRole('button', { name: 'التحضير', exact: true }).click();
+  await expect(attendance).toBeVisible();
 
   let location = null;
   let improvedLocation = null;
@@ -250,9 +262,7 @@ test('course sessions, settings, student location, history and supervision', asy
     .toBeVisible({ timeout: 30000 });
   await expect(attendance).toBeHidden();
   await page.getByRole('button', { name: 'التحضير', exact: true }).click();
-  // Opening another course cannot silently redirect an already visible confirmation.
   await expect(attendance).toBeVisible();
-  const otherSession = await call('POST', `dashboard/courses/${other.id}/attendance-sessions`, { hours: 1.25 }, 201);
   location = { latitude: 24.7136, longitude: 46.6753, accuracy: 500 };
   improvedLocation = { latitude: 24.7136, longitude: 46.6753, accuracy: 10 };
   await attendance.getByRole('button', { name: 'تأكيد', exact: true }).click();
@@ -302,7 +312,7 @@ test('course sessions, settings, student location, history and supervision', asy
   await staffContext.close();
 
   // Already-present students keep the menu entry and can confirm without another write.
-  await call('POST', `dashboard/courses/${other.id}/attendance-sessions/${otherSession.id}/close`, {}, 204);
+  expect((await call('GET', `dashboard/courses/${other.id}/attendance-sessions`))[0].isOpen).toBe(false);
   const repeatSession = await call('POST', `dashboard/courses/${course.id}/attendance-sessions`, { hours: 3 }, 201);
   await call('POST', 'dashboard/manual-attendance', { courseId: course.id, sessionId: repeatSession.id, presentStudents: [
     { loginId: 'attendance-student', studentId: student.id, studentName: student.name },

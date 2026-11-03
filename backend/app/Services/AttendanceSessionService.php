@@ -47,21 +47,25 @@ class AttendanceSessionService
     public function open(User $user, string $courseId, float $hours): array
     {
         return DB::transaction(function () use ($user, $courseId, $hours): array {
+            $this->lockDepartment();
             $this->course($courseId, true);
             if (DB::table('attendance_sessions')->where('course_id', $courseId)->where('active', 1)->exists()) {
                 throw ValidationException::withMessages(['session' => 'التحضير مفتوح لهذه الدورة.']);
             }
+            DB::table('attendance_sessions')->where('department_id', DepartmentContext::id())->where('active', 1)
+                ->update(['active' => null, 'closed_at' => now()]);
             $id = (string) str()->uuid();
             DB::table('attendance_sessions')->insert(['id' => $id, 'course_id' => $courseId,
                 'hours' => $hours, 'opened_at' => now(), 'opened_by' => $user->id, 'active' => 1]);
 
             return $this->serialize(DB::table('attendance_sessions')->where('id', $id)->first());
-        });
+        }, 3);
     }
 
     public function close(string $courseId, string $sessionId): void
     {
         DB::transaction(function () use ($courseId, $sessionId): void {
+            $this->lockDepartment();
             $this->course($courseId, true);
             $session = $this->session($courseId, $sessionId);
             abort_unless($session->active === 1 || $session->active === '1', 422, 'التحضير مغلق.');
@@ -102,6 +106,7 @@ class AttendanceSessionService
     public function attend(User $user, string $courseId, string $sessionId, array $data): void
     {
         DB::transaction(function () use ($user, $courseId, $sessionId, $data): void {
+            $this->lockDepartment();
             $this->course($courseId, true);
             $session = $this->session($courseId, $sessionId);
             DB::table('app_settings')->where('setting_key', 'attendance')->lockForUpdate()->first();
@@ -136,6 +141,11 @@ class AttendanceSessionService
         abort_unless($session && (! $requireOpen || (int) $session->active === 1), 422, 'التحضير مغلق.');
 
         return $session;
+    }
+
+    private function lockDepartment(): void
+    {
+        abort_unless(DB::table('departments')->where('id', DepartmentContext::id())->lockForUpdate()->first(), 404);
     }
 
     private function course(string $id, bool $lock = false): object
