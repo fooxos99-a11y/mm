@@ -7,7 +7,7 @@ test('attendance refresh shares persisted data and preserves pending manual edit
   globalThis.document = { visibilityState: 'visible' };
   try {
     const calls = [];
-    const vm = { viewMode: 'attendance', loadDashboardSnapshot: async options => calls.push(options) };
+    const vm = { isAttendanceMode: true, loadDashboardSnapshot: async options => calls.push(options) };
     const run = () => refresh.methods.refreshAttendanceSilently.call(vm);
     await run();
     assert.deepEqual(calls, [{ background: true }]);
@@ -26,7 +26,8 @@ test('attendance refresh shares persisted data and preserves pending manual edit
     await run();
     assert.equal(calls.length, 1);
     globalThis.document.visibilityState = 'visible';
-    vm.viewMode = 'post';
+    vm.isAttendanceMode = false;
+    vm.viewMode = 'attendance'; // Task editors reuse the view value but are not attendance screens.
     await run();
     assert.equal(calls.length, 1);
     vm.isAttendanceResultsType = true;

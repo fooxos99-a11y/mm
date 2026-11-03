@@ -18,7 +18,7 @@ export default {
         || this.dashboardLoading || this.attendanceSaveTimer || this.isSavingAttendance
         || this.attendanceRemovedIds?.length || this.saveStatusText === 'تعذر حفظ التحضير') return;
       const results = this.isAttendanceResultsType && !this.isAttendanceMode;
-      const checklist = this.isAttendanceMode || this.viewMode === 'attendance';
+      const checklist = this.isAttendanceMode;
       if ((!results && !checklist) || (results && (this.resultsLoading || !this.hasSelectedResultsSection))) return;
       this.attendanceRefreshBusy = true;
       try {
