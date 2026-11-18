@@ -83,6 +83,15 @@
         </template>
       </AppCard>
 
+      <SatisfactionResponses
+        v-if="selectedCourse && canViewResponses"
+        :course-id="selectedCourse.id"
+        :course-title="selectedCourse.title"
+        :responses="responses"
+        :questions="questions"
+        :students="dashboardSnapshot?.students || []"
+      />
+
       <AppDialog
         v-model="addDialogOpen"
         max-width="640"

@@ -195,6 +195,7 @@ trait SerializesDashboardSnapshots
                 'questionId' => $item->question_id,
                 'loginCode' => $item->login_code,
                 'studentName' => $item->student_name,
+                'questionPrompt' => $item->question_prompt ?? '',
                 'ratingValue' => $item->rating_value !== null ? (int) $item->rating_value : null,
                 'textValue' => $item->text_value ?? '',
                 'submittedAt' => (string) $item->submitted_at,

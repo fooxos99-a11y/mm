@@ -4,6 +4,7 @@ import {
 } from '../../components/ui';
 import { useIndicatorAnimation } from '../../composables/useIndicatorAnimation';
 import { canUseDashboardPermission } from '../permissions/permissionAccess.mjs';
+import SatisfactionResponses from '../../components/satisfaction/SatisfactionResponses.vue';
 
 const buildIndicatorValue = (isRating, average, textCount) => {
   if (!isRating) {
@@ -32,6 +33,7 @@ export default {
     AppIconButton,
     AppIndicatorCard,
     AppTextField,
+    SatisfactionResponses,
   },
   setup() {
     return useIndicatorAnimation();
@@ -60,6 +62,7 @@ export default {
   computed: {
     ...mapState(['dashboardSnapshot', 'dashboardError', 'currentUser']),
     canEditQuestions() { return canUseDashboardPermission(this.currentUser, this.dashboardSnapshot, 'edit_satisfaction_questions'); },
+    canViewResponses() { return canUseDashboardPermission(this.currentUser, this.dashboardSnapshot, 'page_satisfaction'); },
     availableCourseOptions() {
       return [...((this.dashboardSnapshot?.courses || []).filter((course) => course.entityType !== 'task'))]
         .sort((left, right) => (left.sortOrder || 0) - (right.sortOrder || 0))

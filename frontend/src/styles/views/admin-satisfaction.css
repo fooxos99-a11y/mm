@@ -17,6 +17,10 @@
   max-width: 1200px;
 }
 
+.satisfaction-admin__container > :deep(.satisfaction-responses) {
+  margin-top: var(--app-space-4);
+}
+
 .satisfaction-admin__toolbar {
   display: grid;
   grid-template-columns: minmax(260px, 360px);

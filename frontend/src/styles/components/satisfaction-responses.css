@@ -1,0 +1,23 @@
+.satisfaction-responses { margin-top: var(--app-space-4); min-width: 0; direction: rtl; }
+.satisfaction-responses__header { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; margin-bottom: 16px; }
+.satisfaction-responses__header h2 { margin: 0; font-size: 1.125rem; color: var(--app-primary-dark); }
+.satisfaction-responses__header p, .satisfaction-responses__identity p, .satisfaction-responses__answer p { margin: 0; }
+.satisfaction-responses__header p, .satisfaction-responses__identity p, .satisfaction-responses__muted { color: var(--app-text-muted); font-size: var(--app-font-sm); }
+.satisfaction-responses__list { list-style: none; padding: 0; margin: 16px 0; }
+.satisfaction-responses__row { display: grid; grid-template-columns: minmax(0, 1fr); align-items: center; gap: 12px; padding-block: 16px; }
+.satisfaction-responses__row + .satisfaction-responses__row { border-top: 1px solid var(--app-border); }
+.satisfaction-responses__row > .app-button { justify-self: end; }
+.satisfaction-responses__identity { display: grid; gap: 6px; min-width: 0; overflow-wrap: anywhere; }
+.satisfaction-responses__identity h3 { margin: 0; font-size: 1rem; line-height: 1.7; color: var(--app-primary-dark); }
+.satisfaction-responses__empty { padding-block: 24px; margin: 0; color: var(--app-text-muted); line-height: 1.8; }
+.satisfaction-responses__answers { display: grid; gap: 16px; margin: 0; min-width: 0; }
+.satisfaction-responses__person { min-width: 0; overflow-wrap: anywhere; }
+.satisfaction-responses__person p { margin: 6px 0 0; }
+.satisfaction-responses__answer { min-width: 0; padding: 16px; border: 1px solid var(--app-border); border-radius: var(--app-radius-control); background: var(--app-surface); overflow-wrap: anywhere; }
+.satisfaction-responses__answer dt { font-weight: 700; line-height: 1.8; color: var(--app-primary-dark); }
+.satisfaction-responses__answer dd { display: grid; gap: 12px; margin: 12px 0 0; }
+.satisfaction-responses__rating { display: flex; align-items: center; gap: 8px; font-weight: 700; color: var(--app-primary-dark); }
+.satisfaction-responses__text { white-space: pre-wrap; line-height: 1.9; color: var(--app-primary-dark); }
+@media (min-width: 600px) {
+  .satisfaction-responses__row { grid-template-columns: minmax(0, 1fr) auto; gap: 24px; }
+}

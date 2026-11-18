@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Support\DepartmentData as DB;
+use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Collection;
 
 class DashboardSnapshotFeedbackLoader
@@ -17,8 +18,13 @@ class DashboardSnapshotFeedbackLoader
         int $page = 1,
     ): array {
         $satisfactionResponsesQuery = DB::table('satisfaction_responses')
-            ->whereNull('archive_id')
-            ->orderByDesc('submitted_at')->orderByDesc('id');
+            ->leftJoin('satisfaction_questions as response_question', fn (JoinClause $join) => $join
+                ->on('response_question.id', '=', 'satisfaction_responses.question_id')
+                ->on('response_question.course_id', '=', 'satisfaction_responses.course_id')
+                ->on('response_question.department_id', '=', 'satisfaction_responses.department_id'))
+            ->select('satisfaction_responses.*', 'response_question.prompt as question_prompt')
+            ->whereNull('satisfaction_responses.archive_id')
+            ->orderByDesc('satisfaction_responses.submitted_at')->orderByDesc('satisfaction_responses.id');
         $finalExamQuestionsQuery = DB::table('final_exam_questions')
             ->whereNull('archive_id')
             ->whereNull('deleted_at')
