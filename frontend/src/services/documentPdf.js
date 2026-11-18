@@ -1,4 +1,6 @@
 import { DOCUMENT_PDF_LAYOUT, documentPageSlices } from '../utils/documentPdfLayout.mjs';
+import { documentFontCss } from './documentFonts';
+import { documentRaster } from './documentRaster';
 
 const checkAborted = signal => {
   if (signal?.aborted) throw new DOMException('Preview closed', 'AbortError');
@@ -38,10 +40,12 @@ function documentBlocks(element) {
 
 export async function createDocumentAnswerPdf(element, { signal } = {}) {
   checkAborted(signal);
-  const [{ default: html2canvas }, { jsPDF }] = await Promise.all([import('html2canvas'), import('jspdf')]);
+  const { jsPDF } = await import('jspdf');
   checkAborted(signal);
   await document.fonts.ready;
   await prepareImages(element, signal);
+  const fontCss = await documentFontCss(element, signal);
+  const renderPage = documentRaster(element, fontCss);
   checkAborted(signal);
   const layout = DOCUMENT_PDF_LAYOUT;
   const slices = documentPageSlices(Math.ceil(element.getBoundingClientRect().height), documentBlocks(element));
@@ -51,11 +55,7 @@ export async function createDocumentAnswerPdf(element, { signal } = {}) {
   const pages = [];
   for (const [index, slice] of slices.entries()) {
     checkAborted(signal);
-    const canvas = await html2canvas(element, {
-      scale: 1.5, backgroundColor: '#ffffff', logging: false, useCORS: true,
-      width: layout.width, height: slice.height, x: 0, y: slice.start,
-      windowWidth: 1200, windowHeight: 900, scrollX: 0, scrollY: 0,
-    });
+    const canvas = await renderPage(slice);
     checkAborted(signal);
     const source = canvas.toDataURL('image/png');
     if (index) pdf.addPage();

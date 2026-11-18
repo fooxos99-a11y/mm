@@ -3,6 +3,9 @@ import { selectOption } from './support/gesture-helpers.mjs';
 import { expectDialogContained } from './support/dialogGeometry.mjs';
 import { mkdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
+import { expectArabicDocumentShape } from './support/documentRasterAssertions.mjs';
+
+test.use({ deviceScaleFactor: 1.5 });
 
 test('Word answers render as complete PDF pages with image recovery, download and cleanup', async ({ page, context }, info) => {
   test.setTimeout(180_000);
@@ -10,6 +13,10 @@ test('Word answers render as complete PDF pages with image recovery, download an
     window.revokedDocumentUrls = [];
     const revoke = URL.revokeObjectURL;
     URL.revokeObjectURL = url => { window.revokedDocumentUrls.push(url); revoke.call(URL, url); };
+    new MutationObserver(() => {
+      const source = document.querySelector('.document-answer-preview__source');
+      if (source?.querySelector('.ql-arabic-wrap-regression')) window.documentNativeSource = source.cloneNode(true);
+    }).observe(document, { childList: true, subtree: true });
   });
   const loginId = `word-pdf-${info.project.name}`;
   const studentName = 'معلم معاينة المستند';
@@ -20,8 +27,9 @@ test('Word answers render as complete PDF pages with image recovery, download an
     <p><strong>المعلم: ${studentName}</strong></p>
     <img src="${imageUrl}" style="width:80px;height:80px">
     <table style="width:100%;border-collapse:collapse"><tr><td style="border:1px solid #17394b">المهارة</td><td style="border:1px solid #17394b">التطبيق</td></tr><tr><td style="border:1px solid #17394b">التعاون</td><td style="border:1px solid #17394b">أنجزت النشاط مع زملائي</td></tr></table>
+    <table style="width:100%;border-collapse:collapse"><tr><td style="width:100px;border:1px solid #17394b"><span class="ql-arabic-wrap-regression" style="display:block;font-weight:700">الوسيلة الوجدانيةلغرسالقيمةالقرآنية</span></td><td>نص عربي محفوظ سابقًا يلتف داخل خلية ضيقة</td></tr></table>
     ${Array.from({ length: 44 }, (_, i) => `<p>إجابة ${i + 1}: طبّقت المهارة في الدرس، وناقشت النتائج مع زملائي.</p>`).join('')}
-    <p><strong>نهاية إجابة المعلم - تمّت مراجعة المستند كاملًا.</strong></p>`;
+    <p><strong class="ql-document-end-regression">نهاية إجابة المعلم - تمّت مراجعة المستند كاملًا.</strong></p>`;
   const snapshot = { branches: [{ id: 'male', name: 'معلمين' }, { id: 'female', name: 'معلمات' }],
     courses: [course], students: [{ id: 'word-student', name: studentName, loginId, branchId: 'male' }],
     submissions: [{ id: 'word-submission', courseId: course.id, assessmentType: 'tasks', studentName, loginId, submittedAt: '2026-10-20T00:00:00Z',
@@ -61,6 +69,9 @@ test('Word answers render as complete PDF pages with image recovery, download an
   const pages = dialog.locator('.document-answer-preview__pages figure');
   expect(await pages.count()).toBeGreaterThanOrEqual(2);
   await expect.poll(() => pages.first().locator('img').evaluate(image => image.naturalWidth)).toBeGreaterThan(0);
+  await expectArabicDocumentShape(page);
+  await expectArabicDocumentShape(page, undefined, 'img');
+  await expectArabicDocumentShape(page, undefined, '.ql-document-end-regression');
   await expectDialogContained(dialog);
   await expect(dialog.getByRole('button', { name: /تكبير المستند|تصغير المستند/ })).toHaveCount(0);
   const directory = path.resolve('../.deploy/word-pdf');
