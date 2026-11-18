@@ -183,7 +183,7 @@
             :disabled="saving || Boolean(savingAnswerId)"
             @click="$emit('reset-assessment')"
           >
-            إعادة المحاولة
+            إتاحة محاولة جديدة
           </AppButton>
         </AppActionBar>
       </div>

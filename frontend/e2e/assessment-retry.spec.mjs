@@ -28,7 +28,7 @@ for (const type of ['pre', 'post', 'tasks']) {
       await page.getByRole('option', { name: type === 'pre' ? 'الاختبار القبلي' : 'الاختبار البعدي', exact: true }).click();
     }
     await page.locator('.results-entry').filter({ hasText: loginId }).getByRole('button', { name: /عرض إجابة/ }).click();
-    await page.getByRole('button', { name: 'إعادة المحاولة', exact: true }).click();
+    await page.getByRole('button', { name: 'إتاحة محاولة جديدة', exact: true }).click();
     const confirmation = page.getByRole('dialog', { name: 'إعادة المحاولة', exact: true });
     await expect(confirmation).toContainText('ستُحذف');
     expect(await confirmation.locator('input,textarea').count()).toBe(0);
