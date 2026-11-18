@@ -56,6 +56,14 @@ for (const [path, readySelector] of managementPages) {
     if (path.includes('panel=results')) {
       await expect(page.locator('.results-entry').first()).toBeVisible();
     }
+    if (path.includes('settingsItem=permissions')) {
+      const add = page.locator('.permissions-admin .app-settings-panel__header')
+        .getByRole('button', { name: 'إضافة', exact: true });
+      await expect(add).toBeEnabled();
+      // Audit the ready control after its disabled-to-enabled color transition.
+      await add.evaluate(button => Promise.all(button.getAnimations({ subtree: true })
+        .map(animation => animation.finished.catch(() => {}))));
+    }
     await expectAccessiblePage(page, path);
   });
 }
