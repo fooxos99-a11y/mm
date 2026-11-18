@@ -15,10 +15,8 @@
 
 .satisfaction-admin__container {
   max-width: 1200px;
-}
-
-.satisfaction-admin__container > :deep(.satisfaction-responses) {
-  margin-top: var(--app-space-4);
+  display: grid;
+  gap: var(--app-space-4);
 }
 
 .satisfaction-admin__toolbar {

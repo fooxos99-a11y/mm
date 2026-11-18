@@ -92,7 +92,11 @@
             </p>
           </div>
         </AppDialogHeader>
-        <AppDialogBody>
+        <AppDialogBody
+          tabindex="0"
+          role="region"
+          aria-label="تفاصيل الإجابات"
+        >
           <dl class="satisfaction-responses__answers">
             <div
               v-for="answer in selectedRespondent.answers"
