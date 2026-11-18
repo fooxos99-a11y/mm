@@ -1,6 +1,7 @@
 import { mapActions, mapState } from 'vuex';
 import attendanceRefresh from '../assessment/attendanceRefresh';
 import ResultsDialogs from '../../components/results/ResultsDialogs.vue';
+import AssessmentRetryDialog from '../../components/results/AssessmentRetryDialog.vue';
 import ResultsGradeDialog from '../../components/results/ResultsGradeDialog.vue';
 import ResultsAttendancePanel from '../../components/results/ResultsAttendancePanel.vue';
 import { AppActionBar, AppButton, AppCard, AppFilterField, AppFilterToolbar, AppIconButton, AppRawButton, AppSelect } from '../../components/ui';
@@ -28,6 +29,7 @@ export default {
     AppSelect,
     ResultsAttendancePanel,
     ResultsDialogs,
+    AssessmentRetryDialog,
   },
   props: {
     embedded: { type: Boolean, default: false },
@@ -54,6 +56,8 @@ export default {
       resultsType: 'attendance',
       studentFilter: '',
       resultDialogOpen: false,
+      retryTarget: null,
+      resettingAssessment: false,
       selectedResultLoginId: '',
       scoreEditValue: null,
       isSavingScore: false,
@@ -75,6 +79,11 @@ export default {
     canEnterGrades() {
       return !this.isAttendanceMode && this.isCourseResultsSection && ['pre', 'post'].includes(this.resultsType)
         && ['admin', 'male_manager', 'female_manager'].includes(this.currentUser?.role);
+    },
+    canResetAssessment() {
+      return !this.isFinalExamResultsSection && !this.isAttendanceMode
+        && ['admin', 'male_manager', 'female_manager'].includes(this.currentUser?.role)
+        && Boolean(this.selectedResultRow?.submission?.id && !this.selectedResultRow.submission.scoreOnly);
     },
     gradeChangedCount() { return gradeChanges(this.gradeRows).length; },
   },

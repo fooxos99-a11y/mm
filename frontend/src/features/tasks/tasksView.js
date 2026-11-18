@@ -111,6 +111,7 @@ export default {
       }
 
       const branchAvailability = this.selectedTask.branchAvailability?.[this.student.branchId] || {};
+      if (this.selectedTask.retryTypes?.includes('tasks')) return true;
 
       if (!(this.selectedTask.isTasksEnabled && branchAvailability.tasks !== false)) {
         return false;

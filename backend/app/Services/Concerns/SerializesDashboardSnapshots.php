@@ -70,13 +70,17 @@ trait SerializesDashboardSnapshots
         bool $canViewCourseAnswerKeys,
         $attendance,
         Collection $notifications,
+        ?Collection $retries = null,
     ): array {
+        $retries ??= collect();
+
         return [
-            'courses' => collect($courses)->map(function ($course) use ($questionsByCourse) {
+            'courses' => collect($courses)->map(function ($course) use ($questionsByCourse, $retries) {
                 $courseQuestions = $questionsByCourse->get($course->id, ['pre' => [], 'post' => [], 'tasks' => []]);
 
                 return [
                     'id' => $course->id,
+                    'retryTypes' => $retries->get($course->id, collect())->pluck('assessment_type')->values()->all(),
                     'title' => $course->title,
                     'entityType' => $course->entity_type === 'task' ? 'task' : 'course',
                     'isActive' => app(BranchCourseState::class)->isActive($course),

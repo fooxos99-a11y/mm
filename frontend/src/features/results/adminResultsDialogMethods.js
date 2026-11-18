@@ -3,10 +3,27 @@ import {
   setFinalExamAnswerManualScore,
   setFinalExamManualScore,
   setTaskReviewStatus,
+  resetAssessmentSubmission,
 } from '../../services/api';
 import { openHtmlDocument } from '../../utils/htmlWindow.mjs';
 
 export default {
+  async handleResetAssessment() {
+    if (!this.retryTarget?.id || this.resettingAssessment) return;
+    this.resettingAssessment = true;
+    try {
+      await resetAssessmentSubmission(this.retryTarget.id);
+      this.retryTarget = null;
+      this.closeResultDialog();
+      await this.reloadResultsAfterSave();
+      this.$toast.success('تمت إتاحة المحاولة');
+    } catch (error) {
+      this.$toast.error(Object.values(error?.response?.data?.errors || {}).flat()[0]
+        || error?.response?.data?.message || error?.message || 'تعذرت إعادة المحاولة');
+    } finally {
+      this.resettingAssessment = false;
+    }
+  },
   openAttachmentPreview(attachment) {
     if (!attachment?.fileDataUrl) return;
     openHtmlDocument(`<!doctype html><html lang="ar" dir="rtl"><head>

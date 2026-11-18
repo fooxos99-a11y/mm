@@ -56,6 +56,9 @@ export default {
     try {
       this.publicSnapshot = await this.fetchPublicSnapshotWithTimeout();
       this.restoreStudentSession();
+      if (this.activeCourse?.retryTypes?.includes(this.resolvedAssessmentType) && !this.$route.query.courseId) {
+        await this.$router.replace({ query: { ...this.$route.query, courseId: this.activeCourse.id } });
+      }
     } catch (error) {
       this.publicError = error?.message === 'snapshot-timeout'
         ? 'انتهت مهلة التحميل. تأكد من تشغيل السيرفر ثم أعد المحاولة.'

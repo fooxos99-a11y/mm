@@ -58,6 +58,12 @@ trait SubmitsCourseAssessments
                 $questionSnapshots,
                 &$storedPaths
             ) {
+                $student = Student::query()->with('branch')->whereKey($studentId)->lockForUpdate()->first();
+                $course = DB::table('courses')->where('id', $courseId)->whereNull('archive_id')->first();
+                if (! $course) {
+                    throw ValidationException::withMessages(['courseId' => 'الدورة المحددة غير موجودة.']);
+                }
+                $this->availabilityService->assertOpen($course, $assessmentType, $student);
                 StudentIdentityGuard::assertAllowed($loginId, 'loginId', true);
                 // The unique scope rejects simultaneous retries without locking gaps for other students.
                 DB::table('course_submissions')->insert([
@@ -96,6 +102,8 @@ trait SubmitsCourseAssessments
                 if ($answers !== []) {
                     DB::table('course_submission_answers')->insert($answers);
                 }
+                DB::table('assessment_retries')->where('course_id', $courseId)
+                    ->where('student_id', $studentId)->where('assessment_type', $assessmentType)->delete();
             });
         } catch (Throwable $exception) {
             foreach ($storedPaths as $path) {

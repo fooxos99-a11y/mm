@@ -293,6 +293,7 @@
         @save="saveGradeDrafts"
       />
       <ResultsDialogs
+        :can-reset="canResetAssessment"
         :result-open="resultDialogOpen"
         :delete-open="courseDeleteDialogOpen"
         :task-section="isTaskResultsSection"
@@ -310,6 +311,7 @@
         :delete-entity-label="courseDeleteEntityLabel"
         :delete-title="courseDeleteTitle"
         :deleting="isDeletingCourse"
+        @reset-assessment="retryTarget = { ...selectedResultRow.submission }"
         @update:result-open="resultDialogOpen = $event"
         @update:delete-open="courseDeleteDialogOpen = $event"
         @update:score-value="scoreEditValue = $event"
@@ -320,6 +322,13 @@
         @review-task="handleTaskReview"
         @close-delete="closeCourseDeleteDialog"
         @confirm-delete="confirmCourseDelete"
+      />
+      <AssessmentRetryDialog
+        :open="Boolean(retryTarget)"
+        :student-name="retryTarget?.studentName || ''"
+        :saving="resettingAssessment"
+        @close="retryTarget = null"
+        @confirm="handleResetAssessment"
       />
     </section>
   </div>

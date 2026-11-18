@@ -165,6 +165,8 @@ Route::middleware(['auth:sanctum', 'password.changed'])->group(function () {
                 'assessment-submissions/{submissionId}/task-review',
                 [CourseAssessmentController::class, 'reviewTask']
             )->middleware('dashboard.access:results');
+            Route::post('assessment-submissions/{submissionId}/reset', [CourseAssessmentController::class, 'reset'])
+                ->middleware('dashboard.access:results');
             Route::get('results/{dataset}', [DashboardDatasetController::class, 'index'])
                 ->whereIn('dataset', ['submissions', 'attendance', 'satisfaction-responses', 'final-exam-submissions'])
                 ->middleware('dashboard.access:results');

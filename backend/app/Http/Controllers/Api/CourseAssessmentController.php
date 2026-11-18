@@ -10,11 +10,21 @@ use App\Http\Requests\Assessment\SetTaskReviewStatusRequest;
 use App\Http\Requests\Assessment\SubmitAssessmentRequest;
 use App\Services\AssessmentAccessService;
 use App\Services\AssessmentAnswerReviewService;
+use App\Services\AssessmentRetryService;
 use App\Services\CourseAssessmentService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class CourseAssessmentController extends Controller
 {
+    public function reset(Request $request, string $submissionId, AssessmentRetryService $retries): JsonResponse
+    {
+        $this->accessService->assertCanManageSubmissionBranch($request->user(), $submissionId);
+        $retries->reset($submissionId);
+
+        return response()->json(status: 204);
+    }
+
     public function __construct(
         private readonly AssessmentAccessService $accessService,
         private readonly CourseAssessmentService $courseAssessmentService,

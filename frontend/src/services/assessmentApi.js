@@ -55,3 +55,7 @@ export const setTaskReviewStatus = (submissionId, status) => apiClient.put(
   `/dashboard/assessment-submissions/${submissionId}/task-review`,
   { status },
 );
+
+export const resetAssessmentSubmission = (submissionId) => apiClient.post(
+  `/dashboard/assessment-submissions/${submissionId}/reset`,
+);

@@ -3,6 +3,7 @@ import { AppActionBar, AppButton } from '../../components/ui';
 import AssessmentQuestionAnswer from '../../components/assessment/AssessmentQuestionAnswer.vue';
 import { ASSESSMENT_LABELS } from './courseViewConfig';
 import courseMethods from './courseViewMethods';
+import { resolveAssessmentCourse } from './assessmentCourse.mjs';
 
 const ENABLED_FLAG_BY_TYPE = { pre: 'isPreEnabled', tasks: 'isTasksEnabled', post: 'isPostEnabled' };
 
@@ -83,9 +84,8 @@ export default /** @type {Record<string, any>} */ ({
       return students.find((student) => student.loginId === loginCode) || null;
     },
     activeCourse() {
-      const courses = (this.dashboardSnapshot?.courses || []).filter((course) => course.entityType !== 'task');
-
-      return courses.find((course) => course.isActive) || null;
+      return resolveAssessmentCourse(this.dashboardSnapshot?.courses, this.resolvedAssessmentType,
+        this.$route.query.courseId, this.dashboardSnapshot?.submissions);
     },
     questions() {
       if (!this.activeCourse) {
@@ -108,6 +108,7 @@ export default /** @type {Record<string, any>} */ ({
       }
 
       const branchId = this.student?.branchId;
+      if (this.activeCourse.retryTypes?.includes(this.resolvedAssessmentType)) return true;
 
       if (!isAssessmentEnabledBySettings(this.activeCourse, this.resolvedAssessmentType, branchId)) {
         return false;

@@ -174,6 +174,18 @@
             </div>
           </div>
         </AppDialogBody>
+        <AppActionBar
+          v-if="canReset"
+          class="app-dialog-footer"
+        >
+          <AppButton
+            variant="danger"
+            :disabled="saving || Boolean(savingAnswerId)"
+            @click="$emit('reset-assessment')"
+          >
+            إعادة المحاولة
+          </AppButton>
+        </AppActionBar>
       </div>
     </AppDialog>
 
@@ -236,6 +248,7 @@ export default {
     savingAnswerId: { type: String, default: '' },
     hasManualReviewAnswers: Boolean,
     saving: Boolean,
+    canReset: Boolean,
     deleteEntityLabel: { type: String, default: 'دورة' },
     deleteTitle: { type: String, default: '' },
     deleting: Boolean,
@@ -245,6 +258,7 @@ export default {
     'close-result',
     'confirm-delete',
     'review-task',
+    'reset-assessment',
     'save-answer-score',
     'save-score',
     'update-answer-score',

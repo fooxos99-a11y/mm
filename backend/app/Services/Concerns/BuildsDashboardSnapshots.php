@@ -6,6 +6,7 @@ use App\Models\Reciter;
 use App\Models\Student;
 use App\Models\TrainingMaterial;
 use App\Support\DepartmentContext;
+use App\Support\DepartmentData;
 use Illuminate\Support\Collection;
 
 trait BuildsDashboardSnapshots
@@ -208,6 +209,10 @@ trait BuildsDashboardSnapshots
                 $canViewCourseAnswerKeys,
                 $attendance,
                 $notifications,
+                in_array($currentRole, ['student', 'trainee'], true)
+                    ? DepartmentData::table('assessment_retries')
+                        ->whereIn('student_id', $students->pluck('id'))->get()->groupBy('course_id')
+                    : collect(),
             ),
             ...$this->serializeDashboardFeedback(
                 $satisfactionQuestions,

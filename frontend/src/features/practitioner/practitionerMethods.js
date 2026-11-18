@@ -75,6 +75,8 @@ export default {
       return !Number.isFinite(opensAt) || opensAt <= this.currentTimestamp;
     },
     isStudentAssessmentEnabled(type) {
+      const retry = this.dashboardSnapshot?.courses?.some(course => course.entityType !== 'task' && course.retryTypes?.includes(type));
+      if (retry && this.currentStudentBranchId) return true;
       if (!this.currentStudentCourse || !this.currentStudentBranchId) {
         return false;
       }
@@ -104,6 +106,7 @@ export default {
       }
 
       const branchAvailability = task.branchAvailability?.[this.currentStudentBranchId] || {};
+      if (task.retryTypes?.includes('tasks')) return true;
 
       if (!(task.isTasksEnabled && branchAvailability.tasks !== false)) {
         return false;

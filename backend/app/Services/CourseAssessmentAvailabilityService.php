@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Student;
 use App\Services\Concerns\ResolvesAssessmentSettings;
+use App\Support\DepartmentData;
 use Carbon\Carbon;
 use Illuminate\Validation\ValidationException;
 
@@ -13,6 +14,12 @@ class CourseAssessmentAvailabilityService
 
     public function assertOpen(object $course, string $assessmentType, ?Student $student): void
     {
+        if ($student && DepartmentData::table('assessment_retries')
+            ->where('course_id', $course->id)->where('assessment_type', $assessmentType)
+            ->where('student_id', $student->id)->exists()) {
+            return;
+        }
+
         $enabledColumn = $this->assessmentEnabledColumn($assessmentType);
 
         if (! (bool) ($course->{$enabledColumn} ?? false)) {
