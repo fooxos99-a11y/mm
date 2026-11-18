@@ -222,6 +222,10 @@ test('independent audit: forty questions and thirty long-name teachers preserve 
   await expect(page.locator('.assessment-attendance__footer')).toHaveCount(0);
   await page.reload();
   await expect(page.locator('.assessment-attendance__row .attendance-toggle[aria-pressed=true]')).toHaveCount(roster.length);
+  const clearEveryone = page.getByRole('button', { name: 'إلغاء تحضير الكل', exact: true });
+  await expect(clearEveryone).toHaveAttribute('aria-pressed', 'true');
+  await expect.poll(() => clearEveryone.evaluate(button => button.getAnimations({ subtree: true })
+    .some(animation => animation.playState === 'running'))).toBe(false);
   await inspect(page, info, 'bulk-attendance');
   await select(page, 'assessment-toolbar-mode', 'الاختبار القبلي');
   await expect(page.locator('.assessment-inline-list__item')).toHaveCount(40);
