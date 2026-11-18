@@ -11,6 +11,23 @@ const questions = [
   { id: 'rating', courseId: 'course', prompt: 'تقييم الدورة', sortOrder: 0 },
 ];
 
+test('question drill-down keeps only answered rows for that exact question and course', () => {
+  const responses = [response({}),
+    response({ id: 'text', questionId: 'text', ratingValue: null, textValue: 'نص لا يتبع التقييم' }),
+    response({ id: 'text-only', questionId: 'text', loginCode: 'text-person', ratingValue: null, textValue: 'إجابة نصية قديمة' }),
+    response({ id: 'blank', loginCode: 'blank', ratingValue: null, textValue: '  ' }),
+    response({ id: 'zero', loginCode: 'zero', ratingValue: 0 }),
+    response({ id: 'foreign', courseId: 'other', loginCode: 'foreign' })];
+  const ratings = buildSatisfactionRespondents({ courseId: 'course', questionId: 'rating', responses, questions });
+  assert.deepEqual(ratings.map(person => person.loginCode).sort(), ['0012', 'zero']);
+  assert.ok(ratings.every(person => person.answerCount === 1 && person.answers.length === 1));
+  assert.equal(ratings.find(person => person.loginCode === '0012').answers[0].textValue, '');
+  const text = buildSatisfactionRespondents({ courseId: 'course', questionId: 'text', responses, questions });
+  assert.deepEqual(text.map(person => person.loginCode).sort(), ['0012', 'text-person']);
+  assert.equal(text.find(person => person.loginCode === 'text-person').answers[0].textValue, 'إجابة نصية قديمة');
+  assert.deepEqual(buildSatisfactionRespondents({ courseId: 'course', questionId: 'missing', responses }), []);
+});
+
 test('existing ratings, multiline comments and deleted question prompts stay attached to the right person', () => {
   const people = buildSatisfactionRespondents({ courseId: 'course', questions,
     students: [{ loginId: '0012', name: 'الاسم الحالي' }],

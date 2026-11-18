@@ -38,7 +38,7 @@
   position: absolute;
   top: 4px;
   inset-inline-end: 4px;
-  z-index: 2;
+  z-index: 3;
   display: inline-flex;
   align-items: center;
   justify-content: center;

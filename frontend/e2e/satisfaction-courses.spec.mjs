@@ -73,9 +73,10 @@ test('survey indicators share the overview layout and keep long questions and re
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(page.viewportSize().width + 1);
   await page.screenshot({ path: info.outputPath('survey-indicators.png'), fullPage: true });
   const deleted = page.waitForResponse(result => result.request().method() === 'DELETE' && result.url().includes('/satisfaction-questions/'));
-  await cards.first().getByRole('button').click();
+  await cards.first().getByRole('button', { name: `حذف سؤال ${prompts[0]}`, exact: true }).click();
   expect((await deleted).ok()).toBe(true);
   await expect(cards).toHaveCount(2);
+  await expect(page.getByRole('dialog', { name: 'إجابات السؤال', exact: true })).toBeHidden();
 });
 
 test('satisfaction includes courses with closed post tests and inherits general questions', async ({ page, context }, testInfo) => {

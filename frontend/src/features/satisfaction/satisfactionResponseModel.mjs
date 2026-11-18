@@ -13,7 +13,7 @@ const ratingValue = value => {
   return Number.isFinite(number) ? number : null;
 };
 
-export function buildSatisfactionRespondents({ courseId, responses = [], questions = [], students = [] }) {
+export function buildSatisfactionRespondents({ courseId, questionId = '', responses = [], questions = [], students = [] }) {
   const questionMap = new Map(questions.filter(question => question.courseId === courseId)
     .map((question, index) => {
       const order = Number(question.sortOrder ?? index);
@@ -24,6 +24,7 @@ export function buildSatisfactionRespondents({ courseId, responses = [], questio
   const respondents = new Map();
   for (const [index, response] of responses.entries()) {
     if (response.courseId !== courseId) continue;
+    if (questionId && response.questionId !== questionId) continue;
     const loginCode = String(response.loginCode || '').trim();
     // Login codes distinguish people with identical names. Never merge unknown identities by name.
     const key = loginCode ? `login:${loginCode}` : `unknown:${response.id || index}`;
@@ -58,7 +59,8 @@ export function buildSatisfactionRespondents({ courseId, responses = [], questio
     submittedAt: person.timestamp === null ? '' : new Date(person.timestamp).toISOString(),
     answers: [...person.answers.values()].sort((a, b) => a.order - b.order || a.prompt.localeCompare(b.prompt, 'ar')),
     answerCount: [...person.answers.values()].filter(answer => answer.answered).length,
-  })).sort((a, b) => (b.timestamp ?? 0) - (a.timestamp ?? 0) || a.name.localeCompare(b.name, 'ar') || a.key.localeCompare(b.key));
+  })).filter(person => !questionId || person.answerCount > 0)
+    .sort((a, b) => (b.timestamp ?? 0) - (a.timestamp ?? 0) || a.name.localeCompare(b.name, 'ar') || a.key.localeCompare(b.key));
 }
 
 const searchText = value => String(value || '').trim().toLocaleLowerCase('ar')

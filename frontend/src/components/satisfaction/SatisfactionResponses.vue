@@ -1,23 +1,25 @@
 <template>
-  <AppCard
-    class="satisfaction-responses admin-workspace-card"
+  <component
+    :is="questionId ? 'section' : 'AppCard'"
+    class="satisfaction-responses"
+    :class="{ 'admin-workspace-card': !questionId, 'satisfaction-responses--question': questionId }"
     :aria-labelledby="`${panelId}-title`"
   >
     <header class="satisfaction-responses__header">
       <h2 :id="`${panelId}-title`">
-        إجابات الاستبيان
+        {{ questionId ? 'إجابات السؤال' : 'إجابات الاستبيان' }}
       </h2>
       <p>عدد المشاركين: {{ respondents.length }}</p>
     </header>
     <AppFilterToolbar :columns="1">
       <AppFilterField
         :for-id="`${panelId}-search`"
-        label="البحث بالاسم أو رقم الدخول"
+        :label="questionId ? 'البحث بالاسم' : 'البحث بالاسم أو رقم الدخول'"
       >
         <AppTextField
           :id="`${panelId}-search`"
           v-model="query"
-          aria-label="البحث بالاسم أو رقم الدخول"
+          :aria-label="questionId ? 'البحث بالاسم' : 'البحث بالاسم أو رقم الدخول'"
           clearable
           hide-details
           autocomplete="off"
@@ -29,14 +31,14 @@
       class="satisfaction-responses__empty"
       role="status"
     >
-      لم تصل إجابات لهذه الدورة بعد.
+      {{ questionId ? 'لم تصل إجابات لهذا السؤال في هذه الدورة بعد.' : 'لم تصل إجابات لهذه الدورة بعد.' }}
     </p>
     <p
       v-else-if="!filteredRespondents.length"
       class="satisfaction-responses__empty"
       role="status"
     >
-      لا توجد أسماء أو أرقام دخول تطابق بحثك.
+      {{ questionId ? 'لا توجد أسماء تطابق بحثك.' : 'لا توجد أسماء أو أرقام دخول تطابق بحثك.' }}
     </p>
     <ul
       v-else
@@ -50,19 +52,29 @@
       >
         <div class="satisfaction-responses__identity">
           <h3>{{ person.name }}</h3>
-          <p v-if="person.loginCode">
+          <p v-if="!questionId && person.loginCode">
             رقم الدخول: <bdi dir="ltr">{{ person.loginCode }}</bdi>
           </p>
-          <p>عدد الإجابات: {{ person.answerCount }}</p>
-          <p>آخر إجابة: <time :datetime="person.submittedAt || undefined">{{ formatDate(person.timestamp) }}</time></p>
+          <p v-if="!questionId">
+            عدد الإجابات: {{ person.answerCount }}
+          </p>
+          <p v-if="!questionId">
+            آخر إجابة: <time :datetime="person.submittedAt || undefined">{{ formatDate(person.timestamp) }}</time>
+          </p>
         </div>
         <AppButton
+          v-if="!questionId"
           variant="secondary"
           :aria-label="person.loginCode ? `عرض إجابات ${person.name}، رقم الدخول ${person.loginCode}` : `عرض إجابات ${person.name}`"
           @click="selectedKey = person.key"
         >
           عرض الإجابات
         </AppButton>
+        <SatisfactionAnswers
+          v-else
+          :answers="person.answers"
+          :show-prompt="false"
+        />
       </li>
     </ul>
     <AppPagination
@@ -70,6 +82,7 @@
       :page-count="pageCount"
     />
     <AppDialog
+      v-if="!questionId"
       v-model="detailsOpen"
       max-width="760"
       scrollable
@@ -97,35 +110,7 @@
           role="region"
           aria-label="تفاصيل الإجابات"
         >
-          <dl class="satisfaction-responses__answers">
-            <div
-              v-for="answer in selectedRespondent.answers"
-              :key="answer.key"
-              class="satisfaction-responses__answer"
-            >
-              <dt>{{ answer.prompt }}</dt>
-              <dd>
-                <p
-                  v-if="answer.ratingValue !== null"
-                  class="satisfaction-responses__rating"
-                >
-                  التقييم: <bdi dir="ltr">{{ answer.ratingValue }} / 10</bdi>
-                </p>
-                <p
-                  v-if="answer.textValue.trim()"
-                  class="satisfaction-responses__text"
-                >
-                  {{ answer.textValue }}
-                </p>
-                <p
-                  v-if="!answer.answered"
-                  class="satisfaction-responses__muted"
-                >
-                  لا توجد إجابة لهذا السؤال.
-                </p>
-              </dd>
-            </div>
-          </dl>
+          <SatisfactionAnswers :answers="selectedRespondent.answers" />
         </AppDialogBody>
         <AppDialogFooter>
           <AppButton
@@ -137,7 +122,7 @@
         </AppDialogFooter>
       </div>
     </AppDialog>
-  </AppCard>
+  </component>
 </template>
 
 <script>
@@ -146,6 +131,7 @@ import {
   AppFilterField, AppFilterToolbar, AppPagination, AppTextField,
 } from '../ui';
 import { buildSatisfactionRespondents, filterSatisfactionRespondents } from '../../features/satisfaction/satisfactionResponseModel.mjs';
+import SatisfactionAnswers from './SatisfactionAnswers.vue';
 
 const dateFormatter = new Intl.DateTimeFormat('ar-SA-u-ca-gregory-nu-latn', {
   dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Riyadh',
@@ -156,10 +142,12 @@ export default {
   components: {
     AppButton, AppCard, AppDialog, AppDialogBody, AppDialogFooter, AppDialogHeader,
     AppFilterField, AppFilterToolbar, AppPagination, AppTextField,
+    SatisfactionAnswers,
   },
   props: {
     courseId: { type: String, required: true },
     courseTitle: { type: String, default: '' },
+    questionId: { type: String, default: '' },
     responses: { type: Array, default: () => [] },
     questions: { type: Array, default: () => [] },
     students: { type: Array, default: () => [] },
@@ -169,7 +157,7 @@ export default {
     panelId() { return `satisfaction-responses-${this.$.uid}`; },
     respondents() {
       return buildSatisfactionRespondents({
-        courseId: this.courseId, responses: this.responses, questions: this.questions, students: this.students,
+        courseId: this.courseId, questionId: this.questionId, responses: this.responses, questions: this.questions, students: this.students,
       });
     },
     filteredRespondents() { return filterSatisfactionRespondents(this.respondents, this.query); },
@@ -184,6 +172,7 @@ export default {
   watch: {
     query() { this.page = 1; },
     courseId() { this.query = ''; this.page = 1; this.selectedKey = ''; },
+    questionId() { this.query = ''; this.page = 1; this.selectedKey = ''; },
     pageCount(value) { this.page = Math.min(this.page, value); },
     selectedRespondent(value) { if (!value) this.selectedKey = ''; },
   },

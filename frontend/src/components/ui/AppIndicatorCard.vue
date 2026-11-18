@@ -6,6 +6,13 @@
     :aria-label="`${label}: ${display}، ${meta}`"
   >
     <slot name="actions" />
+    <button
+      v-if="actionLabel"
+      type="button"
+      class="app-indicator-card__trigger"
+      :aria-label="actionLabel"
+      @click="$emit('select')"
+    />
     <AppIndicatorRing
       appearance="metric"
       :progress="progress"
@@ -38,7 +45,9 @@ export default {
     showMeta: { type: Boolean, default: false },
     progress: { type: Number, default: 0 },
     color: { type: String, default: '#0d9488' },
+    actionLabel: { type: String, default: '' },
   },
+  emits: ['select'],
 };
 </script>
 
@@ -117,6 +126,20 @@ export default {
   font-size: 12px;
   font-weight: 500;
   line-height: 18px;
+}
+
+.app-indicator-card__trigger {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.app-indicator-card__trigger:focus-visible {
+  outline: 2px solid var(--app-primary-dark);
+  outline-offset: 2px;
 }
 
 .dashboard-indicator-card.app-indicator-card--actions {

@@ -47,6 +47,7 @@ export default {
   data() {
     return {
       selectedCourseId: '',
+      selectedResponseQuestionId: '',
       addDialogOpen: false,
       submitting: false,
       deletingQuestionKey: '',
@@ -63,6 +64,11 @@ export default {
     ...mapState(['dashboardSnapshot', 'dashboardError', 'currentUser']),
     canEditQuestions() { return canUseDashboardPermission(this.currentUser, this.dashboardSnapshot, 'edit_satisfaction_questions'); },
     canViewResponses() { return canUseDashboardPermission(this.currentUser, this.dashboardSnapshot, 'page_satisfaction'); },
+    selectedResponseQuestion() { return this.questions.find(question => question.id === this.selectedResponseQuestionId) || null; },
+    questionResponsesOpen: {
+      get() { return this.canViewResponses && Boolean(this.selectedResponseQuestion); },
+      set(value) { if (!value) this.selectedResponseQuestionId = ''; },
+    },
     availableCourseOptions() {
       return [...((this.dashboardSnapshot?.courses || []).filter((course) => course.entityType !== 'task'))]
         .sort((left, right) => (left.sortOrder || 0) - (right.sortOrder || 0))
@@ -169,6 +175,8 @@ export default {
     },
   },
   watch: {
+    selectedCourseId() { this.selectedResponseQuestionId = ''; },
+    selectedResponseQuestion(value) { if (!value) this.selectedResponseQuestionId = ''; },
     dashboardSnapshot: {
       immediate: true,
       handler() {

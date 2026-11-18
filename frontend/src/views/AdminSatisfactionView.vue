@@ -61,7 +61,9 @@
                 :animated-value="animatedIndicatorDisplay(indicatorCard.display)"
                 :progress="animatedIndicatorPercent(indicatorCard.progress)"
                 :meta="indicatorCard.meta"
+                :action-label="canViewResponses ? `عرض إجابات السؤال: ${indicatorCard.prompt}` : ''"
                 show-meta
+                @select="selectedResponseQuestionId = indicatorCard.id"
               >
                 <template #actions>
                   <AppIconButton
@@ -91,6 +93,48 @@
         :questions="questions"
         :students="dashboardSnapshot?.students || []"
       />
+
+      <AppDialog
+        v-model="questionResponsesOpen"
+        max-width="760"
+        scrollable
+        aria-label="إجابات السؤال"
+      >
+        <div
+          v-if="selectedCourse && selectedResponseQuestion && canViewResponses"
+          class="app-dialog"
+        >
+          <AppDialogHeader
+            :title="selectedResponseQuestion.prompt"
+            :eyebrow="selectedCourse.title"
+            closable
+            @close="questionResponsesOpen = false"
+          />
+          <AppDialogBody
+            tabindex="0"
+            role="region"
+            aria-label="إجابات المشاركين عن السؤال"
+          >
+            <SatisfactionResponses
+              :key="`${selectedCourse.id}:${selectedResponseQuestion.id}`"
+              :course-id="selectedCourse.id"
+              :course-title="selectedCourse.title"
+              :question-id="selectedResponseQuestion.id"
+              :responses="responses"
+              :questions="questions"
+              :students="dashboardSnapshot?.students || []"
+            />
+          </AppDialogBody>
+          <AppDialogFooter>
+            <AppButton
+              variant="secondary"
+              @click="questionResponsesOpen = false"
+            >
+              إغلاق
+            </AppButton>
+          </AppDialogFooter>
+        </div>
+      </AppDialog>
 
       <AppDialog
         v-model="addDialogOpen"
